@@ -10,8 +10,6 @@ import LeanAsm
 #print axioms Conjectures.collatz_two_reaches_one
 #print axioms Conjectures.collatz_four_reaches_one
 
--- end of file: leanasm/tests/TestAxioms.lean
-
 #print axioms YangMillsToy.vacuum_plaquette_trivial
 #print axioms YangMillsToy.vacuum_action_zero
 #print axioms YangMillsToy.plaquette_trace_bounded
@@ -192,3 +190,13 @@ import LeanAsm
 #print axioms NttArithmetic.intt4_ntt4_universal_F17
 #print axioms NttArithmetic.ntt4_intt4_universal_F17
 #print axioms NttArithmetic.cyclic_conv4_ntt_universal_F17
+
+-- Part 10: Universal 8-Point NTT Algebraic Soundness Theorems (gemweb042 Stage 1)
+#print axioms CrtNtt.intt8_ntt8_universal_F17
+#print axioms CrtNtt.ntt8_intt8_universal_F17
+#print axioms CrtNtt.cyclic_conv8_ntt_universal_F17
+#print axioms CrtNtt.intt8_ntt8_universal_F257
+#print axioms CrtNtt.ntt8_intt8_universal_F257
+#print axioms CrtNtt.cyclic_conv8_ntt_universal_F257
+
+-- end of file: leanasm/tests/TestAxioms.lean

@@ -181,6 +181,7 @@ def main : IO Unit := do
   let bigProd := CrtNtt.crtNttBigMul bigA bigB
   IO.println s!"  48-Digit Big-Integer CRT-NTT Mul : {bigA} * {bigB} = {bigProd}"
   IO.println "  Zero Wrap-Around & Soundness : 4-point, 8-point, 16-point, and 48-digit mul match exact (ZERO axioms)"
+  IO.println "  Universal 8-Point NTT Soundness : Invertibility & cyclic convolution over F_17 & F_257 (ZERO axioms)"
   IO.println "  Universal CRT & Carries      : ∀ x < 286,331,153 Garner 3-channel roundtrip &"
   IO.println "                                 ∀ v : Vec16 Base-1000 Horner carry preservation verified"
 
