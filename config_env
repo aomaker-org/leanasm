@@ -15,9 +15,10 @@ get_node_name() {
 }
 export NODE_NAME="$(get_node_name)"
 
-# 2. Workspace root and AI prompt file
+# 2. Workspace root, prompt file, and run type tag
 export LEANASM_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export PROMPT_FILE="$LEANASM_ROOT/AI.md"
+export LEANASM_RUN_TYPE="${1:-dev}"
 
 # 3. Lean / Lake environment path
 if [ -d "${HOME}/.elan/bin" ]; then
@@ -30,11 +31,13 @@ if [ -f "${VENV_PATH}/bin/activate" ]; then
     source "${VENV_PATH}/bin/activate"
 fi
 
-# 5. Interactive prompt styling
+# 5. Interactive prompt styling (PS1 with node, tag, timestamp, and ; line)
 if [[ $- == *i* ]]; then
     _P_USR='\[\e]0;\u@'"${NODE_NAME}"': \w\a\]\n'
     _P_USR+='\[\033[01;32m\]\u@'"${NODE_NAME}"'\[\033[00m\]:'
-    _P_TAG='\[\033[01;36m\][leanasm]\[\033[00m\] '
+    _P_TAG='\[\033[01;36m\][leanasm'
+    _P_TAG+='${LEANASM_RUN_TYPE:+:$LEANASM_RUN_TYPE}'
+    _P_TAG+=']\[\033[00m\] '
     _P_PTH='\[\033[01;37m\]\w\[\033[00m\] '
     _P_END='\[\033[01;33m\]\D{%y%m_%H%M}_\!\[\033[00m\]\n; '
     export PS1="${_P_USR}${_P_TAG}${_P_PTH}${_P_END}"
@@ -43,6 +46,7 @@ fi
 
 echo "[+] leanasm environment engaged."
 echo "    Node:    ${NODE_NAME}"
+echo "    Tag:     ${LEANASM_RUN_TYPE}"
 echo "    Lean:    $(command -v lean >/dev/null 2>&1 && lean --version || echo 'Not in PATH')"
 echo "    Lake:    $(command -v lake >/dev/null 2>&1 && lake --version || echo 'Not in PATH')"
 echo "    Root:    ${LEANASM_ROOT}"
