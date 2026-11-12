@@ -95,3 +95,16 @@ import LeanAsm
 #print axioms NttArithmetic.ntt4_equals_direct_dft_concrete
 #print axioms NttArithmetic.ntt4_roundtrip_concrete
 #print axioms NttArithmetic.ntt4_cyclic_convolution_concrete
+
+#print axioms CrtNtt.ntt4_mod5_roots_sound
+#print axioms CrtNtt.garner_5_17_inverse_sound
+#print axioms CrtNtt.garner_5_17_roundtrip_all
+#print axioms CrtNtt.ntt4_mod5_roundtrip_concrete
+#print axioms CrtNtt.crt_ntt_exact_integer_convolution
+
+#print axioms CrtNtt.ntt8_mod17_roots_sound
+#print axioms CrtNtt.ntt8_mod257_roots_sound
+#print axioms CrtNtt.garner_17_257_inverse_sound
+#print axioms CrtNtt.garner_17_257_roundtrip_samples
+#print axioms CrtNtt.ntt8_mod17_and_mod257_roundtrip_concrete
+#print axioms CrtNtt.crt_ntt8_exact_integer_convolution

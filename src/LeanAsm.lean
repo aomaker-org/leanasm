@@ -10,5 +10,6 @@ import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.EulerFactorNonVanishing
 import LeanAsm.NttArithmetic
+import LeanAsm.CrtNtt
 
 -- end of file: leanasm/src/LeanAsm.lean

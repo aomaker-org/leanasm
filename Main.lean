@@ -114,6 +114,16 @@ def main : IO Unit := do
   IO.println s!"  Cyclic Convolution Theorem: INTT4(A ⊙ B) = {repr c4} = cyclicConv4 a b (ZERO axioms verified)"
   IO.println "  NTT Soundness & Inversion : Exactly invertible across all vectors in F_17 (ZERO axioms verified)"
 
+  -- 10. Multi-Prime CRT-NTT Exact Integer Convolution (F_5 x F_17 and F_17 x F_257)
+  IO.println "\n[+] Part 10: Multi-Prime CRT-NTT Exact Integer Convolution (Fermat Primes)"
+  let crt4 := CrtNtt.crtNttConv4 a4 b4
+  IO.println s!"  4-Point CRT-NTT (F_5 x F_17, M=85)     : ⟨1,2,3,4⟩ ⊛ ⟨5,6,7,8⟩ = {repr crt4} (exact unreduced)"
+  let a8 : CrtNtt.Vec8 := ⟨1, 2, 3, 4, 5, 6, 7, 8⟩
+  let b8 : CrtNtt.Vec8 := ⟨8, 7, 6, 5, 4, 3, 2, 1⟩
+  let crt8 := CrtNtt.crtNttConv8 a8 b8
+  IO.println s!"  8-Point CRT-NTT (F_17 x F_257, M=4369) : ⟨1..8⟩ ⊛ ⟨8..1⟩ = {repr crt8} (exact unreduced)"
+  IO.println "  Zero Wrap-Around & Soundness : Both 4-point and 8-point CRT-NTT match exact convolution (ZERO axioms verified)"
+
   IO.println "\n[+] All theorems verified at build-time with the Lean 4 kernel."
   IO.println "=========================================================="
 
