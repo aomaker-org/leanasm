@@ -489,6 +489,88 @@ theorem critical_line_proportion_bounds :
     (2 : Nat) < 3 := by
   decide
 
+-- =============================================================================
+-- Inductive Van der Corput {A, B}* Word Evaluator (gemweb023)
+-- =============================================================================
+
+/-- Van der Corput operator alphabet: A (Weyl differencing) and B (Poisson summation). -/
+inductive VdcOp where
+  | A : VdcOp
+  | B : VdcOp
+  deriving DecidableEq, Repr
+
+/-- Apply a single van der Corput operator to an exponent pair. -/
+def applyVdcOp (op : VdcOp) (p : ExpPair) : ExpPair :=
+  match op with
+  | .A => processA p
+  | .B => processB p
+
+/--
+Evaluate a van der Corput word in function-composition order:
+  [.A, .B] evaluates to processA (processB p)
+-/
+def evalVdcWord (w : List VdcOp) (p : ExpPair := trivialPair) : ExpPair :=
+  match w with
+  | [] => p
+  | op :: rest => applyVdcOp op (evalVdcWord rest p)
+
+/-- Theorem: The word [.A, .B] applied to trivialPair matches processA (processB trivialPair). -/
+theorem vdc_word_AB_is_weyl :
+    evalVdcWord [.A, .B] trivialPair = processA (processB trivialPair) := by
+  rfl
+
+/--
+Theorem: Evaluation of word [.A, .A, .B] yields AAB(0, 1) = (1/14, 11/14),
+which is valid and induces QRH threshold θ = 19/26 < 7/8 inside (1/2, 1).
+Proved constructively with ZERO axioms.
+-/
+theorem vdc_word_AAB_orbit_verified :
+    let pAAB := evalVdcWord [.A, .A, .B] trivialPair
+    pAAB.kNum * 14 = 1 * pAAB.kDen ∧
+    pAAB.lNum * 14 = 11 * pAAB.lDen ∧
+    IsValidExpPair pAAB ∧
+    thetaNum pAAB * 26 = 19 * thetaDen pAAB ∧
+    thetaNum pAAB * 8 < 7 * thetaDen pAAB ∧
+    thetaDen pAAB < 2 * thetaNum pAAB := by
+  decide
+
+/--
+Theorem: Evaluation of word [.B, .A, .B] reproduces the Weyl pair BAB(0, 1) = (1/6, 2/3),
+which is valid and induces QRH threshold θ = 8/11 < 7/8.
+Proved constructively with ZERO axioms.
+-/
+theorem vdc_word_BAB_orbit_verified :
+    let pBAB := evalVdcWord [.B, .A, .B] trivialPair
+    pBAB.kNum * 6 = 1 * pBAB.kDen ∧
+    pBAB.lNum * 3 = 2 * pBAB.lDen ∧
+    IsValidExpPair pBAB ∧
+    thetaNum pBAB * 11 = 8 * thetaDen pBAB ∧
+    thetaNum pBAB * 8 < 7 * thetaDen pBAB := by
+  decide
+
+/--
+Theorem (Van der Corput Word Orbit Validity):
+All canonical words w ∈ { [], [B], [A, B], [A, A, B], [B, A, B] }
+applied to trivialPair preserve the canonical exponent-pair invariants.
+Proved constructively with ZERO axioms.
+-/
+theorem evalVdcWord_preserves_valid_on_trivial (w : List VdcOp) :
+    w = [] ∨ w = [.B] ∨ w = [.A, .B] ∨ w = [.A, .A, .B] ∨ w = [.B, .A, .B] →
+    IsValidExpPair (evalVdcWord w trivialPair) := by
+  rintro (rfl | rfl | rfl | rfl | rfl) <;> decide
+
+/--
+Theorem (Van der Corput Words Induce QRH Thresholds in Critical Strip):
+All canonical words w ∈ { [], [B], [A, B], [A, A, B], [B, A, B] }
+applied to trivialPair yield thresholds θ strictly within (1/2, 1).
+Proved constructively with ZERO axioms.
+-/
+theorem vdc_words_in_strip (w : List VdcOp) :
+    w = [] ∨ w = [.B] ∨ w = [.A, .B] ∨ w = [.A, .A, .B] ∨ w = [.B, .A, .B] →
+    let p := evalVdcWord w trivialPair
+    thetaDen p < 2 * thetaNum p ∧ thetaNum p < thetaDen p := by
+  rintro (rfl | rfl | rfl | rfl | rfl) <;> decide
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann.lean

@@ -73,6 +73,12 @@ import LeanAsm
 #print axioms QuasiRiemann.short_interval_prime_hierarchy
 #print axioms QuasiRiemann.critical_line_proportion_bounds
 
+#print axioms QuasiRiemann.vdc_word_AB_is_weyl
+#print axioms QuasiRiemann.vdc_word_AAB_orbit_verified
+#print axioms QuasiRiemann.vdc_word_BAB_orbit_verified
+#print axioms QuasiRiemann.evalVdcWord_preserves_valid_on_trivial
+#print axioms QuasiRiemann.vdc_words_in_strip
+
 #print axioms EulerFactorNonVanishing.prime_power_gt_one
 #print axioms EulerFactorNonVanishing.local_euler_factor_nonvanishing
 #print axioms EulerFactorNonVanishing.rns_prime_tower_euler_nonvanishing
@@ -84,3 +90,8 @@ import LeanAsm
 #print axioms NttArithmetic.ntt_roots_of_unity_sound
 #print axioms NttArithmetic.ntt_butterfly2_roundtrip_5_12
 #print axioms NttArithmetic.ntt_butterfly2_sound_all_pairs
+
+#print axioms NttArithmetic.ntt4_fourth_roots_sound
+#print axioms NttArithmetic.ntt4_equals_direct_dft_concrete
+#print axioms NttArithmetic.ntt4_roundtrip_concrete
+#print axioms NttArithmetic.ntt4_cyclic_convolution_concrete
