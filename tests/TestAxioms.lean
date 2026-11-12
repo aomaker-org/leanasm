@@ -32,6 +32,7 @@ import LeanAsm
 #print axioms QuasiRiemann.siegel_gap_from_seven_eighths
 
 #print axioms MiniVM.mul_mod_reg_correct
+#print axioms MiniVM.exec_garner_crt_sound
 #print axioms RnsArithmetic.crt_weight_identities
 #print axioms RnsArithmetic.crt_modulus_product
 #print axioms RnsArithmetic.crt_roundtrip_851
@@ -65,3 +66,7 @@ import LeanAsm
 #print axioms EulerFactorNonVanishing.qrh_seven_eighths_euler_margins
 #print axioms EulerFactorNonVanishing.list_euler_product_nonvanishing
 #print axioms EulerFactorNonVanishing.fermat_tower_euler_nonvanishing_concrete
+
+#print axioms NttArithmetic.ntt_roots_of_unity_sound
+#print axioms NttArithmetic.ntt_butterfly2_roundtrip_5_12
+#print axioms NttArithmetic.ntt_butterfly2_sound_all_pairs

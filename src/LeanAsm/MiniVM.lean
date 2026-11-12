@@ -97,6 +97,56 @@ theorem mul_mod_reg_correct (s : State) (dst src : Reg) (m : Nat) :
   rw [get_set_pc]
   rw [get_set_same]
 
+-- =============================================================================
+-- Multi-Instruction Assembly Program for Garner Mixed-Radix CRT (gemweb019)
+-- =============================================================================
+
+/--
+Garner mixed-radix reconstruction program:
+Input registers: r1 = residue mod 7, r2 = residue mod 11, r3 = residue mod 13.
+Computes x = v1 + v2 * 7 + v3 * 77 into r0 using bounded intermediate values.
+-/
+def garnerCrtProgram : List Instr := [
+  -- Step 1: v1 = r1 % 7 (stored back in r1)
+  Instr.modImm Reg.r1 7,
+  -- Step 2: diff2 = (r2 + 11 - (v1 % 11)) % 11; v2 = (diff2 * 8) % 11
+  Instr.addImm Reg.r2 11,
+  Instr.subReg Reg.r2 Reg.r1,
+  Instr.modImm Reg.r2 11,
+  Instr.movImm Reg.r0 8,
+  Instr.mulModReg Reg.r2 Reg.r0 11,
+  -- Step 3: term = (v1 + v2 * 7) % 13 (stored in r0)
+  Instr.movImm Reg.r0 7,
+  Instr.mulModReg Reg.r0 Reg.r2 13,
+  Instr.addReg Reg.r0 Reg.r1,
+  Instr.modImm Reg.r0 13,
+  -- Step 4: diff3 = (r3 + 13 - term) % 13; v3 = (diff3 * 12) % 13 (stored in r3)
+  Instr.addImm Reg.r3 13,
+  Instr.subReg Reg.r3 Reg.r0,
+  Instr.modImm Reg.r3 13,
+  Instr.movImm Reg.r0 12,
+  Instr.mulModReg Reg.r3 Reg.r0 13,
+  -- Step 5: x = v1 + v2 * 7 + v3 * 77 (accumulated into r0)
+  Instr.movImm Reg.r0 77,
+  Instr.mulModReg Reg.r0 Reg.r3 1001,
+  Instr.movImm Reg.r3 7,
+  Instr.mulModReg Reg.r3 Reg.r2 1001,
+  Instr.addReg Reg.r0 Reg.r3,
+  Instr.addReg Reg.r0 Reg.r1
+]
+
+/--
+Theorem (MiniVM Garner CRT Concrete Soundness):
+Executing `garnerCrtProgram` from initial state with residue inputs (r1=4, r2=4, r3=6)
+halts with r0 = 851 (matching 23 * 37 = 851) and program counter pc = 21.
+Proved constructively with ZERO axioms.
+-/
+theorem exec_garner_crt_sound :
+    let sInit : State := { r0 := 0, r1 := 4, r2 := 4, r3 := 6, pc := 0 }
+    let sFinal := runProgram sInit garnerCrtProgram
+    sFinal.r0 = 851 ∧ sFinal.pc = 21 := by
+  decide
+
 end MiniVM
 
 -- end of file: leanasm/src/LeanAsm/MiniVM.lean

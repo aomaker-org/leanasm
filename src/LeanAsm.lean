@@ -9,5 +9,6 @@ import LeanAsm.QuasiRiemann
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.EulerFactorNonVanishing
+import LeanAsm.NttArithmetic
 
 -- end of file: leanasm/src/LeanAsm.lean

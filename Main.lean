@@ -96,6 +96,15 @@ def main : IO Unit := do
   IO.println s!"  Partial Euler Product     : ∏ (p⁷ - 1) = {EulerFactorNonVanishing.partialEulerProductMargin 7} > 0"
   IO.println "  Channel non-vanishing     : Local RNS channels never vanish in Re(s) > 0 (ZERO axioms verified)"
 
+  -- 9. Number Theoretic Transform (NTT) Butterfly over Fermat Prime F_17
+  IO.println "\n[+] Part 9: Number Theoretic Transform (NTT) over Fermat Prime F_17"
+  IO.println s!"  Fermat modulus p = 2^(2^2) + 1 = {NttArithmetic.p}, Primitive Root g = {NttArithmetic.g}"
+  IO.println s!"  8-th Root of Unity ω_8    : {NttArithmetic.omega8} (ω_8^8 ≡ 1 mod 17, ω_8^4 ≡ -1 mod 17)"
+  let (X0, X1) := NttArithmetic.nttButterfly2 5 12
+  let (x0_rec, x1_rec) := NttArithmetic.inttButterfly2 X0 X1
+  IO.println s!"  Cooley-Tukey Butterfly    : (5, 12) ↦ Forward ({X0}, {X1}) ↦ Inverse ({x0_rec}, {x1_rec})"
+  IO.println "  NTT Soundness & Inversion : Exactly invertible across all pairs in F_17 (ZERO axioms verified)"
+
   IO.println "\n[+] All theorems verified at build-time with the Lean 4 kernel."
   IO.println "=========================================================="
 
