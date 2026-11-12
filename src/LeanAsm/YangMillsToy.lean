@@ -78,6 +78,20 @@ def plaquette (U : GaugeConfig) (x : Point4) (μ ν : Dir) : Z2 :=
 def plaquetteAction (U : GaugeConfig) (x : Point4) (μ ν : Dir) : Int :=
   1 - Z2.trace (plaquette U x μ ν)
 
+/-- Local gauge transformation mapping each lattice site to a gauge group element. -/
+def GaugeTransform := Point4 → Z2
+
+/--
+Action of a local gauge transformation $g$ on a link $U_\mu(x)$:
+  $U'_\mu(x) = g(x) \cdot U_\mu(x) \cdot g(x + \hat{\mu})^{-1}$
+-/
+def gaugeTransform (g : GaugeTransform) (U : GaugeConfig) : GaugeConfig :=
+  fun ⟨x, μ⟩ =>
+    let gx := g x
+    let ux := U ⟨x, μ⟩
+    let gx_shift_inv := Z2.inv (g (x.shift μ))
+    Z2.mul (Z2.mul gx ux) gx_shift_inv
+
 -- =============================================================================
 -- Formally Verified Theorems about Lattice Gauge Invariance
 -- =============================================================================
@@ -98,6 +112,46 @@ theorem vacuum_action_zero (x : Point4) (μ ν : Dir) :
 theorem plaquette_trace_bounded (g : Z2) :
     Z2.trace g = 1 ∨ Z2.trace g = -1 := by
   cases g <;> decide
+
+/-- Lemma: Commutation of shifts in Euclidean space. -/
+theorem shift_comm (p : Point4) (μ ν : Dir) :
+    (p.shift μ).shift ν = (p.shift ν).shift μ := by
+  cases μ <;> cases ν <;>
+  dsimp [Point4.shift] <;>
+  ext <;> omega
+
+/--
+Theorem (Local Gauge Invariance of Plaquette):
+Under any local gauge transformation $g : \mathbb{Z}^4 \to \mathbb{Z}_2$,
+the plaquette observable is strictly invariant:
+  $U'_{\mu\nu}(x) = U_{\mu\nu}(x)$
+Proved by case analysis and 2-dimensional shift commutativity.
+-/
+theorem plaquette_gauge_invariant
+    (g : GaugeTransform) (U : GaugeConfig) (x : Point4) (μ ν : Dir) :
+    plaquette (gaugeTransform g U) x μ ν = plaquette U x μ ν := by
+  have h_shift := shift_comm x μ ν
+  dsimp [plaquette, gaugeTransform, Z2.inv]
+  rw [h_shift]
+  cases U ⟨x, μ⟩ <;>
+  cases U ⟨x.shift μ, ν⟩ <;>
+  cases U ⟨x.shift ν, μ⟩ <;>
+  cases U ⟨x, ν⟩ <;>
+  cases g x <;>
+  cases g (x.shift μ) <;>
+  cases g (x.shift ν) <;>
+  cases g ((x.shift ν).shift μ) <;>
+  rfl
+
+/--
+Theorem (Local Gauge Invariance of Wilson Action):
+The Wilson plaquette action $S_P[U]$ is invariant under any local gauge transformation.
+-/
+theorem plaquette_action_gauge_invariant
+    (g : GaugeTransform) (U : GaugeConfig) (x : Point4) (μ ν : Dir) :
+    plaquetteAction (gaugeTransform g U) x μ ν = plaquetteAction U x μ ν := by
+  dsimp [plaquetteAction]
+  rw [plaquette_gauge_invariant]
 
 end YangMillsToy
 

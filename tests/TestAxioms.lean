@@ -15,3 +15,6 @@ import LeanAsm
 #print axioms YangMillsToy.vacuum_plaquette_trivial
 #print axioms YangMillsToy.vacuum_action_zero
 #print axioms YangMillsToy.plaquette_trace_bounded
+
+#print axioms YangMillsToy.plaquette_gauge_invariant
+#print axioms YangMillsToy.plaquette_action_gauge_invariant
