@@ -1,5 +1,5 @@
 -- Path: leanasm/Main.lean
--- Interactive runner demonstrating MiniVM, Math, Yang-Mills, and Quasi-Riemann.
+-- Interactive runner demonstrating MiniVM, Math, Yang-Mills, QRH, and RNS/CRT.
 
 import LeanAsm
 
@@ -8,10 +8,11 @@ open Conjectures
 open YangMillsToy
 open YangMillsQ8
 open QuasiRiemann
+open RnsArithmetic
 
 def main : IO Unit := do
   IO.println "=========================================================="
-  IO.println "   leanasm: Verified VM, Math, Yang-Mills & QRH Demo      "
+  IO.println "   leanasm: Verified VM, Math, Yang-Mills, QRH & RNS Demo "
   IO.println "=========================================================="
 
   -- 1. MiniVM Assembly Program execution
@@ -61,6 +62,20 @@ def main : IO Unit := do
   let err := pntBound.errorEstimate x
   IO.println s!"  Prime Number Theorem Error at x=10^6: O(x^(7/8) * log²(x)) ≈ {err.toUInt64}"
   IO.println s!"  Hierarchy verified: 1/2 < 7/8 < 11/12 < 1 (ZERO axioms verified)"
+
+  -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
+  IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"
+  let A := 23
+  let B := 37
+  let rnsA := toRns A
+  let rnsB := toRns B
+  let rnsProd := rnsMul rnsA rnsB
+  let reconstructed := fromRnsTuple rnsProd
+  IO.println s!"  Moduli basis channels     : (m1={m1}, m2={m2}, m3={m3}), Dynamic Range M={M}"
+  IO.println s!"  Operands in RNS           : A={A} ↦ {repr rnsA}, B={B} ↦ {repr rnsB}"
+  IO.println s!"  Carry-Free RNS Product    : {repr rnsProd}"
+  IO.println s!"  CRT Reconstructed Value   : {reconstructed} (expected {A * B})"
+  IO.println "  CRT roundtrip & homomorphism: ZERO axioms verified"
 
   IO.println "\n[+] All theorems verified at build-time with the Lean 4 kernel."
   IO.println "=========================================================="

@@ -30,3 +30,9 @@ import LeanAsm
 
 #print axioms QuasiRiemann.chebyshev_power_saving_k128
 #print axioms QuasiRiemann.siegel_gap_from_seven_eighths
+
+#print axioms MiniVM.mul_mod_reg_correct
+#print axioms RnsArithmetic.crt_weight_identities
+#print axioms RnsArithmetic.crt_modulus_product
+#print axioms RnsArithmetic.crt_roundtrip_851
+#print axioms RnsArithmetic.rns_mul_concrete_soundness
