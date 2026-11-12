@@ -36,3 +36,7 @@ import LeanAsm
 #print axioms RnsArithmetic.crt_modulus_product
 #print axioms RnsArithmetic.crt_roundtrip_851
 #print axioms RnsArithmetic.rns_mul_concrete_soundness
+
+#print axioms QuasiRiemann.rh_exponent_strictly_better
+#print axioms QuasiRiemann.rh_implies_qrh_seven_eighths
+#print axioms QuasiRiemann.rh_exponent_strictly_better
