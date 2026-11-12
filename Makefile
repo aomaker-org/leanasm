@@ -57,3 +57,32 @@ sync: status test
 	@echo "[+] Workspace synced and verified."
 
 # end of file: leanasm/Makefile
+
+# ------------------------------------------------------------------------------
+# Yang-Mills Verification & Exploration Targets
+# ------------------------------------------------------------------------------
+.PHONY: ym-clone ym-integrity ym-status
+
+YM_DIR := $(REPO_ROOT)/subrepos/YM/submissions/openai-20261028
+
+ym-clone:
+	@if [ ! -d "$(REPO_ROOT)/subrepos/YM/.git" ]; then \
+		echo "[*] Cloning yang-mills-group/YM into subrepos/YM..."; \
+		mkdir -p $(REPO_ROOT)/subrepos; \
+		git clone https://github.com/yang-mills-group/YM.git $(REPO_ROOT)/subrepos/YM; \
+		echo "[+] yang-mills-group/YM cloned successfully."; \
+	else \
+		echo "[+] subrepos/YM already present."; \
+	fi
+
+ym-integrity: ym-clone
+	@echo "[*] Checking SHA-256 byte integrity of Yang-Mills package..."
+	@cd $(YM_DIR) && python3 scripts/verify.py integrity
+
+ym-status:
+	@if [ -d "$(YM_DIR)" ]; then \
+		echo "YM Package Directory: $(YM_DIR)"; \
+		git -C $(REPO_ROOT)/subrepos/YM status --short; \
+	else \
+		echo "YM repository not hydrated. Run 'make ym-clone' or 'make ym-integrity'."; \
+	fi

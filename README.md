@@ -38,16 +38,21 @@ make test
 make hydrate-status
 ```
 
-## Architecture & Reference Documentation
+## Architecture & Mathematical Exploration
 
-- **Local `llama.cpp` Prover**: Details on wiring `llama-server` to a Lean 4
-  REPL (`leanprover-community/repl` or `Pantograph`) for tactic search are
-  documented in [`docs/llama_cpp_prover_architecture.md`](docs/llama_cpp_prover_architecture.md).
-- **Lazy Submodule Hydration**: Modeled on `clouds-labs`, subrepos can be
-  hydrated on-demand (`make hydrate SUB=<name>`) or dehydrated to reclaim disk
-  space (`make dehydrate SUB=<name>`). See [`docs/lazy_hydration_guide.md`](docs/lazy_hydration_guide.md).
+- **Yang–Mills QFT Formalization**: Comprehensive analysis of the 2026 4D pure
+  Yang–Mills scaling limit formalization and independent verification suite:
+  [`docs/yang_mills_formalization_overview.md`](docs/yang_mills_formalization_overview.md).
+  - Check package integrity: `make ym-integrity`
+  - Inspect YM subrepo status: `make ym-status`
+- **Local `llama.cpp` Prover**: Wiring `llama-server` to a Lean 4 REPL
+  (`leanprover-community/repl` or `Pantograph`) for automated tactic search:
+  [`docs/llama_cpp_prover_architecture.md`](docs/llama_cpp_prover_architecture.md).
+- **Lazy Submodule Hydration**: On-demand hydration (`make hydrate SUB=<name>`)
+  or dehydration (`make dehydrate SUB=<name>`) modeled on `clouds-labs`:
+  [`docs/lazy_hydration_guide.md`](docs/lazy_hydration_guide.md).
 - **External Verification & Benchmarks**: External typecheckers (`comparator`,
-  `nanoda`), axiom audits, and formalization benchmark suites are detailed in
+  `nanoda`), axiom audits, and formalization benchmark suites:
   [`docs/external_verification_and_benchmarks.md`](docs/external_verification_and_benchmarks.md).
 
 ## Project Structure
@@ -62,12 +67,13 @@ leanasm/
 ├── docs/               # Architecture guides and specifications
 │   ├── external_verification_and_benchmarks.md
 │   ├── lazy_hydration_guide.md
-│   └── llama_cpp_prover_architecture.md
+│   ├── llama_cpp_prover_architecture.md
+│   └── yang_mills_formalization_overview.md
 ├── inbox/              # Ingested research notes (gemweb001 - gemweb004)
 ├── lake-manifest.json  # Lake dependency manifest
 ├── lakefile.toml       # Lake package configuration
 ├── lean-toolchain      # Active Lean toolchain pinned version
-├── Makefile            # Convenience targets (build, run, test, sync, hydrate)
+├── Makefile            # Convenience targets (build, run, test, sync, hydrate, ym-*)
 ├── mk/                 # Modular makefile extensions (hydrate.mk)
 ├── Main.lean           # Entrypoint Lean module (runs MiniVM & Collatz)
 ├── src/                # Reusable Lean libraries
