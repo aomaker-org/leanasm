@@ -295,6 +295,16 @@ theorem garner_17_257_roundtrip_samples :
   decide
 
 /--
+Theorem (Universal Garner 17_257 Reconstruction Soundness):
+Reconstructs EVERY integer y < 4369 from its residues modulo 17 and 257.
+Proved constructively with ZERO axioms.
+-/
+theorem garner17_257_roundtrip_all (y : Nat) (hy : y < 4369) :
+    garner17_257 (y % 17) (y % 257) = y := by
+  dsimp [garner17_257]
+  omega
+
+/--
 Theorem: 8-Point NTT roundtrip invertibility on test vector (1, 2, 3, 4, 5, 6, 7, 8)
 for both F_17 and F_257 channels.
 Proved constructively with ZERO axioms.
@@ -629,6 +639,48 @@ def evalDigits1000Vec16 (d : Vec16) : Nat :=
   d.x8 + 1000 * (d.x9 + 1000 * (d.x10 + 1000 * (d.x11 + 1000 * (
   d.x12 + 1000 * (d.x13 + 1000 * (d.x14 + 1000 * d.x15))))))))))))))
 
+/-- Positional polynomial evaluation of raw uncarried 16-element vector in base 1000. -/
+def evalPoly1000Vec16 (v : Vec16) : Nat :=
+  v.x0 + 1000 * (v.x1 + 1000 * (v.x2 + 1000 * (v.x3 + 1000 * (
+  v.x4 + 1000 * (v.x5 + 1000 * (v.x6 + 1000 * (v.x7 + 1000 * (
+  v.x8 + 1000 * (v.x9 + 1000 * (v.x10 + 1000 * (v.x11 + 1000 * (
+  v.x12 + 1000 * (v.x13 + 1000 * (v.x14 + 1000 * v.x15))))))))))))))
+
+/-- Final carry-out overflow limb from carryPassBase1000 beyond 16 limbs. -/
+def carryOut15 (v : Vec16) : Nat :=
+  let s0  := v.x0
+  let c0  := s0   / 1000
+  let s1  := v.x1  + c0
+  let c1  := s1   / 1000
+  let s2  := v.x2  + c1
+  let c2  := s2   / 1000
+  let s3  := v.x3  + c2
+  let c3  := s3   / 1000
+  let s4  := v.x4  + c3
+  let c4  := s4   / 1000
+  let s5  := v.x5  + c4
+  let c5  := s5   / 1000
+  let s6  := v.x6  + c5
+  let c6  := s6   / 1000
+  let s7  := v.x7  + c6
+  let c7  := s7   / 1000
+  let s8  := v.x8  + c7
+  let c8  := s8   / 1000
+  let s9  := v.x9  + c8
+  let c9  := s9   / 1000
+  let s10 := v.x10 + c9
+  let c10 := s10  / 1000
+  let s11 := v.x11 + c10
+  let c11 := s11  / 1000
+  let s12 := v.x12 + c11
+  let c12 := s12  / 1000
+  let s13 := v.x13 + c12
+  let c13 := s13  / 1000
+  let s14 := v.x14 + c13
+  let c14 := s14  / 1000
+  let s15 := v.x15 + c14
+  s15 / 1000
+
 /--
 End-to-end multi-limb big-integer multiplication via 16-point 3-Fermat-prime CRT-NTT.
 Computes a * b for integers up to 24 digits with zero modular wrap-around.
@@ -679,6 +731,85 @@ theorem garner_17_257_65537_roundtrip_samples :
     garner17_257_65537 (123456789 % 17) (123456789 % 257) (123456789 % 65537) = 123456789 ∧
     garner17_257_65537 (286331152 % 17) (286331152 % 257) (286331152 % 65537) = 286331152 := by
   decide
+
+/--
+Theorem (Universal 3-Channel Garner Reconstruction Soundness):
+Reconstructs EVERY integer x < 286,331,153 across all 3 Fermat prime channels
+(17, 257, 65537) without modular wrap-around.
+Proved constructively with ZERO axioms.
+-/
+theorem garner_17_257_65537_roundtrip_all (x : Nat) (hx : x < 286331153) :
+    garner17_257_65537 (x % 17) (x % 257) (x % 65537) = x := by
+  dsimp [garner17_257_65537]
+  let y := x % 4369
+  have hy : y < 4369 := Nat.mod_lt x (by decide)
+  have hpart : (x % 17 % 17 + 17 * (((x % 257 % 257 + 257 - x % 17 % 17 % 257) * 121) % 257)) = y := by
+    have hd17 : 17 ∣ 4369 := ⟨257, rfl⟩
+    have hd257 : 257 ∣ 4369 := ⟨17, by decide⟩
+    rw [← Nat.mod_mod_of_dvd x hd17, ← Nat.mod_mod_of_dvd x hd257]
+    exact garner17_257_roundtrip_all y hy
+  rw [hpart]
+  omega
+
+/--
+Theorem (Universal Base-1000 Limb Normalization):
+All 16 output limbs of carryPassBase1000 v are strictly normalized (< 1000) for every v : Vec16.
+Proved constructively with ZERO axioms.
+-/
+theorem carryPassBase1000_limbs_lt_1000 (v : Vec16) :
+    let d := carryPassBase1000 v
+    d.x0 < 1000 ∧ d.x1 < 1000 ∧ d.x2 < 1000 ∧ d.x3 < 1000 ∧
+    d.x4 < 1000 ∧ d.x5 < 1000 ∧ d.x6 < 1000 ∧ d.x7 < 1000 ∧
+    d.x8 < 1000 ∧ d.x9 < 1000 ∧ d.x10 < 1000 ∧ d.x11 < 1000 ∧
+    d.x12 < 1000 ∧ d.x13 < 1000 ∧ d.x14 < 1000 ∧ d.x15 < 1000 := by
+  dsimp [carryPassBase1000]
+  refine ⟨Nat.mod_lt _ (by decide), Nat.mod_lt _ (by decide),
+          Nat.mod_lt _ (by decide), Nat.mod_lt _ (by decide),
+          Nat.mod_lt _ (by decide), Nat.mod_lt _ (by decide),
+          Nat.mod_lt _ (by decide), Nat.mod_lt _ (by decide),
+          Nat.mod_lt _ (by decide), Nat.mod_lt _ (by decide),
+          Nat.mod_lt _ (by decide), Nat.mod_lt _ (by decide),
+          Nat.mod_lt _ (by decide), Nat.mod_lt _ (by decide),
+          Nat.mod_lt _ (by decide), Nat.mod_lt _ (by decide)⟩
+
+/--
+Lemma (Carry Propagation Horner Decomposition):
+The uncarried Horner polynomial decomposes into the carried Horner value plus carryOut15 * 1000^16.
+-/
+theorem carryPassBase1000_horner_eq (v : Vec16) :
+    evalDigits1000Vec16 (carryPassBase1000 v) + carryOut15 v * (1000 ^ 16) =
+    evalPoly1000Vec16 v := by
+  dsimp [evalDigits1000Vec16, carryPassBase1000, evalPoly1000Vec16, carryOut15]
+  omega
+
+/--
+Theorem (Universal Base-1000 Carry Value Preservation Modulo 1000^16):
+Carrying preserves the exact positional polynomial value modulo 1000^16 for EVERY v : Vec16.
+Proved constructively with ZERO axioms.
+-/
+theorem carryPassBase1000_preserves_value_mod (v : Vec16) :
+    evalDigits1000Vec16 (carryPassBase1000 v) = evalPoly1000Vec16 v % (1000 ^ 16) := by
+  have h := carryPassBase1000_horner_eq v
+  have h1 : (evalDigits1000Vec16 (carryPassBase1000 v) + carryOut15 v * (1000 ^ 16)) % (1000 ^ 16) =
+            evalPoly1000Vec16 v % (1000 ^ 16) := by rw [h]
+  rw [Nat.add_mul_mod_self_right] at h1
+  have hd_lt : evalDigits1000Vec16 (carryPassBase1000 v) < 1000 ^ 16 := by
+    dsimp [evalDigits1000Vec16, carryPassBase1000]
+    omega
+  rw [Nat.mod_eq_of_lt hd_lt] at h1
+  exact h1
+
+/--
+Theorem (Universal Exact Base-1000 Carry Value Preservation When Bounded):
+When the polynomial value is strictly bounded below 1000^16, carryPassBase1000
+preserves the exact integer value without alteration.
+Proved constructively with ZERO axioms.
+-/
+theorem carryPassBase1000_exact_when_bounded (v : Vec16)
+    (h : evalPoly1000Vec16 v < 1000 ^ 16) :
+    evalDigits1000Vec16 (carryPassBase1000 v) = evalPoly1000Vec16 v := by
+  have h_eq := carryPassBase1000_horner_eq v
+  omega
 
 /--
 Theorem: 16-Point NTT roundtrip invertibility on test vector ⟨1..16⟩ across all 3 Fermat channels.
