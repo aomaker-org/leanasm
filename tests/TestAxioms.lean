@@ -184,3 +184,11 @@ import LeanAsm
 #print axioms CrtNtt.base1000_roundtrip_concrete
 #print axioms CrtNtt.crt_ntt_big_mul_12_digit
 #print axioms CrtNtt.crt_ntt_big_mul_24_digit_max
+
+-- Part 9: Universal NTT Algebraic Soundness Theorems (gemweb041)
+#print axioms NttArithmetic.intt4_ntt4_universal_F5
+#print axioms NttArithmetic.ntt4_intt4_universal_F5
+#print axioms NttArithmetic.cyclic_conv4_ntt_universal_F5
+#print axioms NttArithmetic.intt4_ntt4_universal_F17
+#print axioms NttArithmetic.ntt4_intt4_universal_F17
+#print axioms NttArithmetic.cyclic_conv4_ntt_universal_F17

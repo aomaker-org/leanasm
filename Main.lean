@@ -156,12 +156,12 @@ def main : IO Unit := do
   IO.println s!"  Cooley-Tukey Butterfly    : (5, 12) ↦ Forward ({X0}, {X1}) ↦ Inverse ({x0_rec}, {x1_rec})"
   let a4 : NttArithmetic.Vec4 := ⟨1, 2, 3, 4⟩
   let b4 : NttArithmetic.Vec4 := ⟨5, 6, 7, 8⟩
-  let A4 := NttArithmetic.ntt4 a4
-  let B4 := NttArithmetic.ntt4 b4
-  let c4 := NttArithmetic.intt4 (NttArithmetic.pointwiseMul4 A4 B4)
+  let A4 := NttArithmetic.ntt4 17 13 a4
+  let B4 := NttArithmetic.ntt4 17 13 b4
+  let c4 := NttArithmetic.intt4 17 13 4 (NttArithmetic.pointwiseMul4 17 A4 B4)
   IO.println s!"  4-Point Radix-2 NTT       : a=⟨1,2,3,4⟩ ↦ A={repr A4}, b=⟨5,6,7,8⟩ ↦ B={repr B4}"
   IO.println s!"  Cyclic Convolution Theorem: INTT4(A ⊙ B) = {repr c4} = cyclicConv4 a b (ZERO axioms verified)"
-  IO.println "  NTT Soundness & Inversion : Exactly invertible across all vectors in F_17 (ZERO axioms verified)"
+  IO.println s!"  Universal Invertibility & Convolution (F_5 & F_17): ZERO axioms verified"
 
   -- 10. Multi-Prime CRT-NTT Exact Integer Convolution (F_5 x F_17, F_17 x F_257, 3 Fermat Primes)
   IO.println "\n[+] Part 10: Multi-Prime CRT-NTT Exact Integer Convolution (Fermat Primes)"

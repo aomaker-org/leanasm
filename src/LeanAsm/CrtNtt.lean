@@ -82,7 +82,7 @@ def exactIntCyclicConv4 (a b : Vec4) : Vec4 :=
 /-- End-to-end 4-point CRT-NTT exact convolution pipeline over F_5 x F_17. -/
 def crtNttConv4 (a b : Vec4) : Vec4 :=
   let conv5  := intt4Mod5 (pointwiseMul4Mod5 (ntt4Mod5 a) (ntt4Mod5 b))
-  let conv17 := intt4 (pointwiseMul4 (ntt4 a) (ntt4 b))
+  let conv17 := intt4 17 13 4 (pointwiseMul4 17 (ntt4 17 13 a) (ntt4 17 13 b))
   garnerVec4_5_17 conv5 conv17
 
 -- =============================================================================
