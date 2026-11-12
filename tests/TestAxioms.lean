@@ -85,6 +85,11 @@ import LeanAsm
 #print axioms QuasiRiemann.pl_interp_concrete_rungs
 #print axioms QuasiRiemann.zero_density_guth_maynard_strip_bounds
 
+#print axioms QuasiRiemann.mollifier_theta_in_rh_range
+#print axioms QuasiRiemann.mollifier_longer_improves_qrh
+#print axioms QuasiRiemann.mollifier_regime_ladder_verified
+#print axioms QuasiRiemann.deuring_heilbronn_repulsion_below_seven_eighths
+
 #print axioms EulerFactorNonVanishing.prime_power_gt_one
 #print axioms EulerFactorNonVanishing.local_euler_factor_nonvanishing
 #print axioms EulerFactorNonVanishing.rns_prime_tower_euler_nonvanishing

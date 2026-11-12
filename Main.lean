@@ -70,6 +70,8 @@ def main : IO Unit := do
   IO.println "  Phragmén-Lindelöf : μ_Bourgain(3/4) = 13/168 < 1/12 < 1/8; μ_Bourgain(7/8) = 13/336 < 1/24 < 1/16"
   IO.println "  Zero-Density Slopes: Guth-Maynard beats Huxley inside (1/2, 7/8]"
   IO.println "                       (15/26 < 3/5, 15/52 < 3/10, ZERO axioms verified)"
+  IO.println "  Mollifier θ(ϑ) Map: ϑ=1/4 (Weil) ↦ 7/8, ϑ=1/3 ↦ 5/6, ϑ=1/2 ↦ 3/4, ϑ=4/7 ↦ 5/7, ϑ=1 ↦ 1/2 (RH)"
+  IO.println "  Deuring-Heilbronn : β₀ = 7/8 repels secondary zeros to β₁ ≤ 3/4 (k=2) and β₁ ≤ 5/8 (k=3)"
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"
