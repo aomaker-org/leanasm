@@ -112,6 +112,11 @@ import LeanAsm
 #print axioms QuasiRiemann.generated_cert_7_8_105_verified
 #print axioms QuasiRiemann.generated_cert_lifts_to_valid_cert
 
+#print axioms QuasiRiemann.n8_pow_neg_upper_sound
+#print axioms QuasiRiemann.buildGridCert_implies_valid
+#print axioms QuasiRiemann.sweepDirichletGrid_all_valid
+#print axioms QuasiRiemann.sample_grid_sweep_nonempty_and_refines
+
 #print axioms EulerFactorNonVanishing.prime_power_gt_one
 #print axioms EulerFactorNonVanishing.local_euler_factor_nonvanishing
 #print axioms EulerFactorNonVanishing.rns_prime_tower_euler_nonvanishing
