@@ -21,3 +21,6 @@ import LeanAsm
 
 #print axioms YangMillsQ8.q8_trace_cyclic
 #print axioms YangMillsQ8.q8_trace_conjugation_invariant
+
+#print axioms QuasiRiemann.seven_eighths_lt_eleven_twelfths
+#print axioms QuasiRiemann.seven_eighths_in_critical_strip
