@@ -116,6 +116,10 @@ import LeanAsm
 #print axioms QuasiRiemann.buildGridCert_implies_valid
 #print axioms QuasiRiemann.sweepDirichletGrid_all_valid
 #print axioms QuasiRiemann.sample_grid_sweep_nonempty_and_refines
+#print axioms QuasiRiemann.continuous_box_certifies_interior_heights
+#print axioms QuasiRiemann.buildContinuousBoxCert_implies_valid
+#print axioms QuasiRiemann.sweepContinuousBoxes_all_valid
+#print axioms QuasiRiemann.sample_continuous_boxes_certified
 
 #print axioms EulerFactorNonVanishing.prime_power_gt_one
 #print axioms EulerFactorNonVanishing.local_euler_factor_nonvanishing
