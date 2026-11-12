@@ -2,6 +2,10 @@ name = "leanasm"
 version = "0.1.0"
 defaultTargets = ["leanasm"]
 
+[[lean_lib]]
+name = "LeanAsm"
+srcDir = "src"
+
 [[lean_exe]]
 name = "leanasm"
 root = "Main"
