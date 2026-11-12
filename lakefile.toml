@@ -1,0 +1,7 @@
+name = "leanasm"
+version = "0.1.0"
+defaultTargets = ["leanasm"]
+
+[[lean_exe]]
+name = "leanasm"
+root = "Main"

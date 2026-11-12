@@ -1,0 +1,42 @@
+# Path: leanasm/.editorconfig
+# EditorConfig — indentation and whitespace rules for leanasm workspace
+# Respected by: VSCode, vim/neovim, Emacs, and JetBrains IDEs.
+# Max Column: 80 Columns
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+[*.{md,txt,rst}]
+indent_size = 2
+max_line_length = 80
+
+[*.lean]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+[*.py]
+indent_size = 4
+max_line_length = 120
+
+[*.{json,jsonl}]
+indent_size = 2
+
+[*.{yml,yaml,toml}]
+indent_size = 2
+
+[*.{sh,bash,zsh}]
+indent_size = 4
+
+[{Makefile,*.mk}]
+indent_style = tab
+indent_size = 8
+
+# end of file: leanasm/.editorconfig

@@ -1,0 +1,48 @@
+# ==============================================================================
+# leanasm: config_env
+# Target: Ubuntu Linux / POSIX shell
+# ==============================================================================
+
+# 1. Discover node identity
+get_node_name() {
+    if [ -f "${HOME}/.node_identity" ]; then
+        cat "${HOME}/.node_identity" | tr -d '[:space:]'
+    elif [ -f "/etc/node_identity" ]; then
+        cat "/etc/node_identity" | tr -d '[:space:]'
+    else
+        hostname
+    fi
+}
+export NODE_NAME="$(get_node_name)"
+
+# 2. Workspace root and AI prompt file
+export LEANASM_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROMPT_FILE="$LEANASM_ROOT/AI.md"
+
+# 3. Lean / Lake environment path
+if [ -d "${HOME}/.elan/bin" ]; then
+    export PATH="${HOME}/.elan/bin:${PATH}"
+fi
+
+# 4. Optional uv / Python virtual environment
+VENV_PATH="${LEANASM_ROOT}/.venv"
+if [ -f "${VENV_PATH}/bin/activate" ]; then
+    source "${VENV_PATH}/bin/activate"
+fi
+
+# 5. Interactive prompt styling
+if [[ $- == *i* ]]; then
+    _P_USR='\[\e]0;\u@'"${NODE_NAME}"': \w\a\]\n'
+    _P_USR+='\[\033[01;32m\]\u@'"${NODE_NAME}"'\[\033[00m\]:'
+    _P_TAG='\[\033[01;36m\][leanasm]\[\033[00m\] '
+    _P_PTH='\[\033[01;37m\]\w\[\033[00m\] '
+    _P_END='\[\033[01;33m\]\D{%y%m_%H%M}_\!\[\033[00m\]\n; '
+    export PS1="${_P_USR}${_P_TAG}${_P_PTH}${_P_END}"
+    unset _P_USR _P_TAG _P_PTH _P_END
+fi
+
+echo "[+] leanasm environment engaged."
+echo "    Node:    ${NODE_NAME}"
+echo "    Lean:    $(command -v lean >/dev/null 2>&1 && lean --version || echo 'Not in PATH')"
+echo "    Lake:    $(command -v lake >/dev/null 2>&1 && lake --version || echo 'Not in PATH')"
+echo "    Root:    ${LEANASM_ROOT}"
