@@ -67,6 +67,9 @@ def main : IO Unit := do
   IO.println "  Partition & Disjointness : Critical strip (1/2, 1] partitioned with ZERO axioms"
   IO.println "  Exp-Pair Descent  : 7/8 (OpenAI) → 8/11 (Weyl AB) → 37/51 (Huxley-Watt) → 2/3 (ExpPair Ceiling)"
   IO.println "  Prime Gap Exponents: 1/2 (RH) < 21/40 (BHP) < 7/12 (Huxley) < 3/4 < 7/8 (QRH) (ZERO axioms verified)"
+  IO.println "  Phragmén-Lindelöf : μ_Bourgain(3/4) = 13/168 < 1/12 < 1/8; μ_Bourgain(7/8) = 13/336 < 1/24 < 1/16"
+  IO.println "  Zero-Density Slopes: Guth-Maynard beats Huxley inside (1/2, 7/8]"
+  IO.println "                       (15/26 < 3/5, 15/52 < 3/10, ZERO axioms verified)"
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"

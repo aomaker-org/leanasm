@@ -79,6 +79,12 @@ import LeanAsm
 #print axioms QuasiRiemann.evalVdcWord_preserves_valid_on_trivial
 #print axioms QuasiRiemann.vdc_words_in_strip
 
+#print axioms QuasiRiemann.pl_interp_endpoints_samples
+#print axioms QuasiRiemann.pl_interp_monotone_right
+#print axioms QuasiRiemann.pl_interp_strict_order_inside_strip
+#print axioms QuasiRiemann.pl_interp_concrete_rungs
+#print axioms QuasiRiemann.zero_density_guth_maynard_strip_bounds
+
 #print axioms EulerFactorNonVanishing.prime_power_gt_one
 #print axioms EulerFactorNonVanishing.local_euler_factor_nonvanishing
 #print axioms EulerFactorNonVanishing.rns_prime_tower_euler_nonvanishing
