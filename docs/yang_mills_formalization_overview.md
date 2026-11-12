@@ -99,3 +99,22 @@ Following Lean FRO standards, the review runner enforces:
 - Rejection of `sorryAx` or `Lean.ofReduceBool` (`native_decide`).
 
 <!-- end of file: leanasm/docs/yang_mills_formalization_overview.md -->
+
+---
+
+## 5. Discrete to Non-Abelian Hierarchy
+
+From `inbox/gemweb007.md` and `inbox/gemweb008.md`:
+- **$\mathbb{Z}_2$ Abelian Core**: The site transformations cancel directly ($g(x)$
+  and $g(x)^{-1}$ commute past intermediate link variables).
+- **Non-Abelian $Q_8 \subset SU(2)$**: In non-abelian gauge groups, the plaquette
+  does not remain identical under local gauge transformations, but conjugates:
+  $$U'_{\mu\nu}(x) = g(x) \cdot U_{\mu\nu}(x) \cdot g(x)^{-1}$$
+  Action invariance $S_P[U'] = S_P[U]$ requires **trace cyclicity**:
+  $$\operatorname{Re}\operatorname{Tr}(g U g^{-1}) = \operatorname{Re}\operatorname{Tr}(U)$$
+  This establishes the algebraic foundation for $SU(2)$ / $SU(3)$ color gauge invariance.
+- **Quasi-Riemann Hypothesis (QRH)**: OpenAI's October 6, 2026 formalizations
+  (`QuasiRiemannHypothesis.lean`, `DirichletSevenEighths.lean`) formalize
+  explicit zero-free regions ($\Re(s) > 7/8$).
+
+<!-- end of file: leanasm/docs/yang_mills_formalization_overview.md -->

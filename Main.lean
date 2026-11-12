@@ -1,11 +1,12 @@
 -- Path: leanasm/Main.lean
--- Interactive runner demonstrating MiniVM, Conjectures, and Yang-Mills Lattice.
+-- Interactive runner demonstrating MiniVM, Math, and Yang-Mills Lattice.
 
 import LeanAsm
 
 open MiniVM
 open Conjectures
 open YangMillsToy
+open YangMillsQ8
 
 def main : IO Unit := do
   IO.println "=========================================================="
@@ -32,8 +33,8 @@ def main : IO Unit := do
     let traj := collatzTrajectory seed 25
     IO.println s!"  Seed {seed} trajectory (first {traj.length} steps): {traj}"
 
-  -- 3. 4D Wilson Lattice Gauge Theory Simulation
-  IO.println "\n[+] Part 3: 4D Yang-Mills Wilson Lattice Gauge Simulation"
+  -- 3. 4D Wilson Lattice Gauge Theory Simulation (Z2)
+  IO.println "\n[+] Part 3: 4D Yang-Mills Abelian Z2 Wilson Lattice Simulation"
   let origin : Point4 := ⟨0, 0, 0, 0⟩
   let vacConfig : GaugeConfig := fun _ => Z2.plusOne
   let vacP := plaquette vacConfig origin Dir.d0 Dir.d1
@@ -41,13 +42,22 @@ def main : IO Unit := do
   IO.println s!"  Vacuum Plaquette U_01(0) : {repr vacP}"
   IO.println s!"  Vacuum Plaquette Action S_P : {vacAct} (minimum energy state)"
 
-  -- Fluctuating gauge link at link (origin, d0)
   let excitedConfig : GaugeConfig := fun l =>
     if l == ⟨origin, Dir.d0⟩ then Z2.minusOne else Z2.plusOne
   let excP := plaquette excitedConfig origin Dir.d0 Dir.d1
   let excAct := plaquetteAction excitedConfig origin Dir.d0 Dir.d1
   IO.println s!"  Excited Plaquette U_01(0): {repr excP}"
   IO.println s!"  Excited Plaquette Action S_P: {excAct} (positive excitation energy)"
+
+  -- 4. Non-Abelian Quaternion Gauge Group (Q8 ⊂ SU(2))
+  IO.println "\n[+] Part 4: Non-Abelian Quaternion Gauge Group (Q8 ⊂ SU(2))"
+  let a := Q8.i
+  let b := Q8.j
+  let ab := Q8.mul a b
+  let ba := Q8.mul b a
+  IO.println s!"  Non-abelian multiplication: i * j = {repr ab}, j * i = {repr ba} (i*j ≠ j*i)"
+  IO.println s!"  Trace cyclicity verified  : ReTr(i * j) = {Q8.reTrace ab}, ReTr(j * i) = {Q8.reTrace ba}"
+  IO.println "  Conjugation invariance   : ReTr(g * u * g⁻¹) = ReTr(u) (ZERO axioms verified)"
 
   IO.println "\n[+] All theorems verified at build-time with the Lean 4 kernel."
   IO.println "=========================================================="

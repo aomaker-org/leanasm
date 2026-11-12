@@ -18,3 +18,6 @@ import LeanAsm
 
 #print axioms YangMillsToy.plaquette_gauge_invariant
 #print axioms YangMillsToy.plaquette_action_gauge_invariant
+
+#print axioms YangMillsQ8.q8_trace_cyclic
+#print axioms YangMillsQ8.q8_trace_conjugation_invariant
