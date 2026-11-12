@@ -8,5 +8,6 @@ import LeanAsm.YangMillsQ8
 import LeanAsm.QuasiRiemann
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
+import LeanAsm.EulerFactorNonVanishing
 
 -- end of file: leanasm/src/LeanAsm.lean

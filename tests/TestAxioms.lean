@@ -48,3 +48,15 @@ import LeanAsm
 #print axioms QuasiRiemann.guth_maynard_beats_huxley
 #print axioms QuasiRiemann.theta_ladder_rungs_verified
 #print axioms QuasiRiemann.theta_ladder_rungs_in_bounds
+
+#print axioms QuasiRiemann.qrh_implies_certified_2d
+#print axioms QuasiRiemann.turing_box_eliminates_low_zeros
+#print axioms QuasiRiemann.asymptotic_wedge_penetrates_seven_eighths
+#print axioms QuasiRiemann.critical_strip_dichotomy_2d
+#print axioms QuasiRiemann.certified_and_unknown_disjoint
+
+#print axioms EulerFactorNonVanishing.prime_power_gt_one
+#print axioms EulerFactorNonVanishing.local_euler_factor_nonvanishing
+#print axioms EulerFactorNonVanishing.rns_prime_tower_euler_nonvanishing
+#print axioms EulerFactorNonVanishing.partial_euler_product_nonvanishing
+#print axioms EulerFactorNonVanishing.qrh_seven_eighths_euler_margins
