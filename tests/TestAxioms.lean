@@ -11,3 +11,7 @@ import LeanAsm
 #print axioms Conjectures.collatz_four_reaches_one
 
 -- end of file: leanasm/tests/TestAxioms.lean
+
+#print axioms YangMillsToy.vacuum_plaquette_trivial
+#print axioms YangMillsToy.vacuum_action_zero
+#print axioms YangMillsToy.plaquette_trace_bounded

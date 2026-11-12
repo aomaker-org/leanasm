@@ -32,3 +32,4 @@ logs/traces/
 .DS_Store
 
 # end of file: leanasm/.gitignore
+subrepos/
