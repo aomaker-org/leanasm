@@ -45,3 +45,35 @@ drops and DeepMind's `formal-conjectures`).
    (`Comparator`) and that no `sorryAx` or `native_decide` escapes are present.
 
 <!-- end of file: leanasm/docs/external_verification_and_benchmarks.md -->
+
+---
+
+## 4. OpenAI Family 003: Quasi-Riemann Hypothesis (QRH, Oct 6, 2026)
+
+From `inbox/gemweb009.md` and `inbox/gemweb010.md`:
+In `openai/math` under `lean/ComparatorChallenges/`, the Lean 4 challenges formalize
+the $\theta = 7/8$ zero-free half-plane across three layers of $L$-functions:
+
+1. **`QuasiRiemannHypothesis.lean`**:
+   $$\forall s \in \mathbb{C}, \quad \operatorname{Re}(s) > \frac{7}{8} \land s \ne 1 \implies \zeta(s) \ne 0$$
+   By functional equation reflection $\rho \leftrightarrow 1 - \bar{\rho}$, all
+   non-trivial zeros lie in the symmetric strip $\operatorname{Re}(\rho) \in [1/8, 7/8]$,
+   reducing the critical strip width by 75%.
+2. **`DirichletSevenEighths.lean` & `SiegelZeros.lean`**:
+   Generalizes $\theta = 7/8$ uniformly over all Dirichlet characters $\chi \pmod q$.
+   Because $7/8$ is independent of the modulus $q$, it completely excludes real
+   Siegel zeros in $\beta \in (7/8, 1)$.
+3. **`HeckeSevenEighths.lean`**:
+   Extends the zero-free region to finite-order Hecke $L$-functions over the
+   Eisenstein field $\mathbb{Q}(\sqrt{-3})$.
+
+### Reproduction Commands:
+```bash
+cd ~/src/openai-lean/math/lean
+lake update
+lake exe cache get
+lake env comparator ComparatorChallenges/QuasiRiemannHypothesis.json
+lake env comparator ComparatorChallenges/DirichletSevenEighths.json
+```
+
+<!-- end of file: leanasm/docs/external_verification_and_benchmarks.md -->

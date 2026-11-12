@@ -24,3 +24,6 @@ import LeanAsm
 
 #print axioms QuasiRiemann.seven_eighths_lt_eleven_twelfths
 #print axioms QuasiRiemann.seven_eighths_in_critical_strip
+
+#print axioms QuasiRiemann.qrh_symmetric_strip
+#print axioms QuasiRiemann.seven_eighths_symmetric_bounds
