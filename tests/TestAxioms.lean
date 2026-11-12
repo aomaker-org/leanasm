@@ -96,6 +96,16 @@ import LeanAsm
 #print axioms QuasiRiemann.refined_critical_strip_dichotomy_2d
 #print axioms QuasiRiemann.refined_certified_and_unknown_disjoint
 
+#print axioms QuasiRiemann.closestToZero_sq_eq_intervalMinSq
+#print axioms QuasiRiemann.dirichletNormSq_toDirichletZeroFreeCert
+#print axioms QuasiRiemann.computed_cert_implies_valid_cert
+#print axioms QuasiRiemann.ivAdd_and_mul_samples_valid
+#print axioms QuasiRiemann.complexIntervalMinNormSq_sound_samples
+#print axioms QuasiRiemann.sample_computed_table_valid
+#print axioms QuasiRiemann.evalDirichletPolyInterval_valid_sample
+#print axioms QuasiRiemann.sample_computed_cert_7_8_105_verified
+#print axioms QuasiRiemann.sample_computed_cert_lifts_to_valid_cert
+
 #print axioms EulerFactorNonVanishing.prime_power_gt_one
 #print axioms EulerFactorNonVanishing.local_euler_factor_nonvanishing
 #print axioms EulerFactorNonVanishing.rns_prime_tower_euler_nonvanishing
