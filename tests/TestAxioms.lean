@@ -125,6 +125,20 @@ import LeanAsm
 #print axioms QuasiRiemann.sweepRectangles2D_all_valid
 #print axioms QuasiRiemann.rect2d_certifies_interior_grid_points
 #print axioms QuasiRiemann.sample_rects_2d_certified
+#print axioms QuasiRiemann.ln_table_1_to_32_valid
+#print axioms QuasiRiemann.n16_pow_neg_sigma6_sound
+#print axioms QuasiRiemann.buildRect2DCertN16_implies_valid
+#print axioms QuasiRiemann.sweepRectangles2DN16_all_valid
+#print axioms QuasiRiemann.deep_strip_rects_below_five_eighths_certified
+#print axioms QuasiRiemann.n32_pow_neg_sigma6_sound
+#print axioms QuasiRiemann.buildRect2DCertN32_implies_valid
+#print axioms QuasiRiemann.sweepRectangles2DN32_all_valid
+#print axioms QuasiRiemann.ultra_deep_rects_down_to_052_certified
+
+#print axioms CollatzQrhBridge.collatz_no_exact_power_resonance
+#print axioms CollatzQrhBridge.diophantine_log3_log2_sandwich
+#print axioms CollatzQrhBridge.collatz_2_3_phase_beat_interval
+#print axioms CollatzQrhBridge.collatz_qrh_shared_cancellation_hierarchy
 
 #print axioms EulerFactorNonVanishing.prime_power_gt_one
 #print axioms EulerFactorNonVanishing.local_euler_factor_nonvanishing

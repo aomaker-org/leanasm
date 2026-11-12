@@ -11,5 +11,6 @@ import LeanAsm.FiniteFieldRH
 import LeanAsm.EulerFactorNonVanishing
 import LeanAsm.NttArithmetic
 import LeanAsm.CrtNtt
+import LeanAsm.CollatzQrhBridge
 
 -- end of file: leanasm/src/LeanAsm.lean
