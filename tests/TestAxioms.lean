@@ -90,6 +90,12 @@ import LeanAsm
 #print axioms QuasiRiemann.mollifier_regime_ladder_verified
 #print axioms QuasiRiemann.deuring_heilbronn_repulsion_below_seven_eighths
 
+#print axioms QuasiRiemann.euler_maclaurin_dyadic_tail_bound_256
+#print axioms QuasiRiemann.dirichlet_cert_lower_bound_margin_samples
+#print axioms QuasiRiemann.sample_certs_valid_in_unknown_box
+#print axioms QuasiRiemann.refined_critical_strip_dichotomy_2d
+#print axioms QuasiRiemann.refined_certified_and_unknown_disjoint
+
 #print axioms EulerFactorNonVanishing.prime_power_gt_one
 #print axioms EulerFactorNonVanishing.local_euler_factor_nonvanishing
 #print axioms EulerFactorNonVanishing.rns_prime_tower_euler_nonvanishing
