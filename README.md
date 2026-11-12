@@ -28,7 +28,7 @@ make status
 # Build the Lean executable
 make build
 
-# Run the Lean program
+# Run the verified MiniVM and Collatz demo
 make run
 
 # Run workspace verification
@@ -38,7 +38,7 @@ make test
 make hydrate-status
 ```
 
-## Prover Integration & Submodule Hydration
+## Architecture & Reference Documentation
 
 - **Local `llama.cpp` Prover**: Details on wiring `llama-server` to a Lean 4
   REPL (`leanprover-community/repl` or `Pantograph`) for tactic search are
@@ -46,6 +46,9 @@ make hydrate-status
 - **Lazy Submodule Hydration**: Modeled on `clouds-labs`, subrepos can be
   hydrated on-demand (`make hydrate SUB=<name>`) or dehydrated to reclaim disk
   space (`make dehydrate SUB=<name>`). See [`docs/lazy_hydration_guide.md`](docs/lazy_hydration_guide.md).
+- **External Verification & Benchmarks**: External typecheckers (`comparator`,
+  `nanoda`), axiom audits, and formalization benchmark suites are detailed in
+  [`docs/external_verification_and_benchmarks.md`](docs/external_verification_and_benchmarks.md).
 
 ## Project Structure
 
@@ -57,17 +60,22 @@ leanasm/
 ├── AI.md               # Workspace directives and coding standards
 ├── config_env          # Shell environment setup with run tags
 ├── docs/               # Architecture guides and specifications
+│   ├── external_verification_and_benchmarks.md
 │   ├── lazy_hydration_guide.md
 │   └── llama_cpp_prover_architecture.md
-├── inbox/              # Ingested research notes and reference memos
+├── inbox/              # Ingested research notes (gemweb001 - gemweb004)
 ├── lake-manifest.json  # Lake dependency manifest
 ├── lakefile.toml       # Lake package configuration
 ├── lean-toolchain      # Active Lean toolchain pinned version
 ├── Makefile            # Convenience targets (build, run, test, sync, hydrate)
 ├── mk/                 # Modular makefile extensions (hydrate.mk)
-├── Main.lean           # Entrypoint Lean module
+├── Main.lean           # Entrypoint Lean module (runs MiniVM & Collatz)
 ├── src/                # Reusable Lean libraries
-├── tests/              # Verification suites and proofs
+│   ├── LeanAsm.lean
+│   └── LeanAsm/
+│       ├── Conjectures.lean
+│       └── MiniVM.lean
+├── tests/              # Verification suites and proofs (TestAxioms.lean)
 └── tools/              # Utilities (run_with_logging.py)
 ```
 
