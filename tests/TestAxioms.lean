@@ -44,3 +44,7 @@ import LeanAsm
 #print axioms FiniteFieldRH.total_points_is_five
 #print axioms FiniteFieldRH.frobenius_trace_is_three
 #print axioms FiniteFieldRH.hasse_weil_riemann_hypothesis
+
+#print axioms QuasiRiemann.guth_maynard_beats_huxley
+#print axioms QuasiRiemann.theta_ladder_rungs_verified
+#print axioms QuasiRiemann.theta_ladder_rungs_in_bounds
