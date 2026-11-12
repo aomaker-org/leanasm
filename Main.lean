@@ -88,9 +88,9 @@ def main : IO Unit := do
   IO.println "                      Excision from RefinedRemainingUnknownBox unconditionally verified (ZERO axioms)"
   let sweptBoxes := sweepContinuousBoxes sampleContinuousBoxGrid
   let totalMeasure := totalContinuousMeasure sweptBoxes
-  IO.println s!"  Continuous Sweeper: Certified {sweptBoxes.length}/7 continuous boxes across σ ∈ \{5/8, 3/4, 7/8}"
-  IO.println s!"                      Total certified vertical measure Δt = {totalMeasure / 1000000}." ++
-    s!"{totalMeasure % 1000000} (ZERO axioms)"
+  IO.println (s!"  Continuous Sweeper: Certified {sweptBoxes.length}/7 continuous boxes across σ ∈ \{5/8, 3/4, 7/8}")
+  IO.println (s!"                      Total certified vertical measure Δt = {totalMeasure / 1000000}." ++
+    s!"{totalMeasure % 1000000} (ZERO axioms)")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"
