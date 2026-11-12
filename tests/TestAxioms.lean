@@ -40,3 +40,7 @@ import LeanAsm
 #print axioms QuasiRiemann.rh_exponent_strictly_better
 #print axioms QuasiRiemann.rh_implies_qrh_seven_eighths
 #print axioms QuasiRiemann.rh_exponent_strictly_better
+
+#print axioms FiniteFieldRH.total_points_is_five
+#print axioms FiniteFieldRH.frobenius_trace_is_three
+#print axioms FiniteFieldRH.hasse_weil_riemann_hypothesis

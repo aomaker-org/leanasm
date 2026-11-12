@@ -1,5 +1,5 @@
 -- Path: leanasm/Main.lean
--- Interactive runner demonstrating MiniVM, Math, Yang-Mills, QRH, and RNS/CRT.
+-- Interactive runner demonstrating MiniVM, Math, Yang-Mills, QRH, RNS/CRT, and Finite-Field RH.
 
 import LeanAsm
 
@@ -9,10 +9,11 @@ open YangMillsToy
 open YangMillsQ8
 open QuasiRiemann
 open RnsArithmetic
+open FiniteFieldRH
 
 def main : IO Unit := do
   IO.println "=========================================================="
-  IO.println "   leanasm: Verified VM, Math, Yang-Mills, QRH & RNS Demo "
+  IO.println "   leanasm: Verified VM, Math, QFT, QRH, RNS & Weil Demo  "
   IO.println "=========================================================="
 
   -- 1. MiniVM Assembly Program execution
@@ -76,6 +77,13 @@ def main : IO Unit := do
   IO.println s!"  Carry-Free RNS Product    : {repr rnsProd}"
   IO.println s!"  CRT Reconstructed Value   : {reconstructed} (expected {A * B})"
   IO.println "  CRT roundtrip & homomorphism: ZERO axioms verified"
+
+  -- 7. Unconditional Riemann Hypothesis for Curves over Finite Fields (Hasse-Weil)
+  IO.println "\n[+] Part 7: Unconditional Riemann Hypothesis for E/F_7 (Hasse-Weil)"
+  IO.println s!"  Curve equation over F_7   : y² ≡ x³ + x + 1 (mod 7)"
+  IO.println s!"  Total Projective Points   : #E(F_7) = {totalProjectivePoints} (including point at infinity)"
+  IO.println s!"  Frobenius Trace a_7       : (p+1) - #E = (7+1) - {totalProjectivePoints} = {frobeniusTrace}"
+  IO.println s!"  Hasse-Weil Bound          : a_7² = {frobeniusTrace * frobeniusTrace} ≤ 28 = 4*p (RH for E/F_7 verified)"
 
   IO.println "\n[+] All theorems verified at build-time with the Lean 4 kernel."
   IO.println "=========================================================="
