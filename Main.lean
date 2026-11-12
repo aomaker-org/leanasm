@@ -65,6 +65,8 @@ def main : IO Unit := do
   IO.println s!"  Hierarchy verified: 1/2 < 7/8 < 11/12 < 1 (ZERO axioms verified)"
   IO.println s!"  2D Region Union   : Turing Box (|t|≤{turingBoxHeight}) ∪ QRH (σ>7/8) ∪ Wedge (|t|≥10⁹ ⇒ σ>3/4)"
   IO.println "  Partition & Disjointness : Critical strip (1/2, 1] partitioned with ZERO axioms"
+  IO.println "  Exp-Pair Descent  : 7/8 (OpenAI) → 8/11 (Weyl AB) → 37/51 (Huxley-Watt) → 2/3 (ExpPair Ceiling)"
+  IO.println "  Prime Gap Exponents: 1/2 (RH) < 21/40 (BHP) < 7/12 (Huxley) < 3/4 < 7/8 (QRH) (ZERO axioms verified)"
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"

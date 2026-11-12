@@ -59,6 +59,20 @@ import LeanAsm
 #print axioms QuasiRiemann.critical_strip_dichotomy_2d
 #print axioms QuasiRiemann.certified_and_unknown_disjoint
 
+#print axioms QuasiRiemann.trivial_pair_valid
+#print axioms QuasiRiemann.processA_preserves_trivial
+#print axioms QuasiRiemann.processB_preserves_trivial
+#print axioms QuasiRiemann.processB_involutive_concrete
+#print axioms QuasiRiemann.weyl_pair_from_AB
+#print axioms QuasiRiemann.trivial_pair_qrh_in_strip
+#print axioms QuasiRiemann.weyl_pair_qrh_in_strip
+#print axioms QuasiRiemann.weyl_pair_beats_seven_eighths
+#print axioms QuasiRiemann.huxley_watt_pair_beats_weyl
+#print axioms QuasiRiemann.exponent_pair_hypothesis_ceiling
+#print axioms QuasiRiemann.subconvexity_hierarchy_verified
+#print axioms QuasiRiemann.short_interval_prime_hierarchy
+#print axioms QuasiRiemann.critical_line_proportion_bounds
+
 #print axioms EulerFactorNonVanishing.prime_power_gt_one
 #print axioms EulerFactorNonVanishing.local_euler_factor_nonvanishing
 #print axioms EulerFactorNonVanishing.rns_prime_tower_euler_nonvanishing
