@@ -36,6 +36,9 @@ import LeanAsm
 #print axioms RnsArithmetic.crt_modulus_product
 #print axioms RnsArithmetic.crt_roundtrip_851
 #print axioms RnsArithmetic.rns_mul_concrete_soundness
+#print axioms RnsArithmetic.garner_inverses_sound
+#print axioms RnsArithmetic.garner_roundtrip_851
+#print axioms RnsArithmetic.garner_mul_concrete_soundness
 
 #print axioms QuasiRiemann.rh_exponent_strictly_better
 #print axioms QuasiRiemann.rh_implies_qrh_seven_eighths
@@ -60,3 +63,5 @@ import LeanAsm
 #print axioms EulerFactorNonVanishing.rns_prime_tower_euler_nonvanishing
 #print axioms EulerFactorNonVanishing.partial_euler_product_nonvanishing
 #print axioms EulerFactorNonVanishing.qrh_seven_eighths_euler_margins
+#print axioms EulerFactorNonVanishing.list_euler_product_nonvanishing
+#print axioms EulerFactorNonVanishing.fermat_tower_euler_nonvanishing_concrete

@@ -78,6 +78,7 @@ def main : IO Unit := do
   IO.println s!"  Operands in RNS           : A={A} ↦ {repr rnsA}, B={B} ↦ {repr rnsB}"
   IO.println s!"  Carry-Free RNS Product    : {repr rnsProd}"
   IO.println s!"  CRT Reconstructed Value   : {reconstructed} (expected {A * B})"
+  IO.println s!"  Garner Mixed-Radix Recon  : {fromRnsTupleGarner rnsProd} (bounded operands < 169)"
   IO.println "  CRT roundtrip & homomorphism: ZERO axioms verified"
 
   -- 7. Unconditional Riemann Hypothesis for Curves over Finite Fields (Hasse-Weil)

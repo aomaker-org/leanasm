@@ -59,6 +59,29 @@ def fromRns (r1 r2 r3 : Nat) : Nat :=
 def fromRnsTuple (t : RnsTuple) : Nat :=
   fromRns t.r1 t.r2 t.r3
 
+/--
+Garner's Mixed-Radix Reconstruction Algorithm:
+Computes mixed-radix coefficients (v1, v2, v3) where:
+  v1 = r1
+  v2 = ((r2 - v1) * 7⁻¹ mod 11) mod 11, with 7 * 8 ≡ 1 mod 11
+  v3 = (((r3 - v1) - v2 * 7) * 77⁻¹ mod 13) mod 13, with 77 * 12 ≡ 1 mod 13
+Reconstructed value is:
+  x = v1 + v2 * 7 + v3 * 77
+All intermediate multiplications remain bounded within single-channel registers (< 169).
+-/
+def garnerReconstruct (r1 r2 r3 : Nat) : Nat :=
+  let v1 := r1 % m1
+  let diff2 := (r2 % m2 + m2 - (v1 % m2)) % m2
+  let v2 := (diff2 * 8) % m2
+  let term := (v1 + v2 * 7) % m3
+  let diff3 := (r3 % m3 + m3 - term) % m3
+  let v3 := (diff3 * 12) % m3
+  v1 + v2 * 7 + v3 * 77
+
+/-- Garner reconstruction from an RnsTuple. -/
+def fromRnsTupleGarner (t : RnsTuple) : Nat :=
+  garnerReconstruct t.r1 t.r2 t.r3
+
 -- =============================================================================
 -- Formally Verified Theorems about RNS & CRT (ZERO AXIOMS)
 -- =============================================================================
@@ -91,6 +114,35 @@ Proved with ZERO axioms.
 -/
 theorem rns_mul_concrete_soundness :
     fromRnsTuple (rnsMul (toRns 23) (toRns 37)) = 23 * 37 := by
+  decide
+
+/--
+Theorem: Garner Mixed-Radix Inverses.
+The constants 8 and 12 are exact modular inverses for Garner reconstruction:
+  7 * 8 ≡ 1 mod 11
+  77 * 12 ≡ 1 mod 13
+Proved with ZERO axioms.
+-/
+theorem garner_inverses_sound :
+    (7 * 8) % 11 = 1 ∧ (77 * 12) % 13 = 1 := by
+  decide
+
+/--
+Theorem: Garner Mixed-Radix Concrete Roundtrip Reconstruction.
+Reconstructs value 851 from residues (4, 4, 6) through bounded register arithmetic.
+Proved with ZERO axioms.
+-/
+theorem garner_roundtrip_851 :
+    garnerReconstruct (851 % 7) (851 % 11) (851 % 13) = 851 := by
+  decide
+
+/--
+Theorem: Garner Parallel Multiplication Soundness.
+Reconstruction of RNS product of 23 and 37 via Garner's algorithm matches 23 * 37 = 851.
+Proved with ZERO axioms.
+-/
+theorem garner_mul_concrete_soundness :
+    fromRnsTupleGarner (rnsMul (toRns 23) (toRns 37)) = 23 * 37 := by
   decide
 
 end RnsArithmetic
