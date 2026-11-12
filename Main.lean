@@ -91,6 +91,11 @@ def main : IO Unit := do
   IO.println (s!"  Continuous Sweeper: Certified {sweptBoxes.length}/7 continuous boxes across σ ∈ \{5/8, 3/4, 7/8}")
   IO.println (s!"                      Total certified vertical measure Δt = {totalMeasure / 1000000}." ++
     s!"{totalMeasure % 1000000} (ZERO axioms)")
+  let sweptRects := sweepRectangles2D sampleRectGrid2D
+  let totalArea := totalCertifiedAreaScaled12 sweptRects
+  IO.println (s!"  2D Rectangle Sweep: Certified {sweptRects.length}/7 2D rectangles [σ_lo, σ_hi] × [t_lo, t_hi]")
+  IO.println (s!"                      Total certified 2D Lebesgue area Δσ·Δt = {totalArea / 1000000000000}." ++
+    s!"{totalArea % 1000000000000} (ZERO axioms)")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"

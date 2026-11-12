@@ -120,6 +120,11 @@ import LeanAsm
 #print axioms QuasiRiemann.buildContinuousBoxCert_implies_valid
 #print axioms QuasiRiemann.sweepContinuousBoxes_all_valid
 #print axioms QuasiRiemann.sample_continuous_boxes_certified
+#print axioms QuasiRiemann.n8_pow_neg_sigma6_sound
+#print axioms QuasiRiemann.buildRect2DCert_implies_valid
+#print axioms QuasiRiemann.sweepRectangles2D_all_valid
+#print axioms QuasiRiemann.rect2d_certifies_interior_grid_points
+#print axioms QuasiRiemann.sample_rects_2d_certified
 
 #print axioms EulerFactorNonVanishing.prime_power_gt_one
 #print axioms EulerFactorNonVanishing.local_euler_factor_nonvanishing
