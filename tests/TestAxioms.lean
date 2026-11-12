@@ -108,3 +108,13 @@ import LeanAsm
 #print axioms CrtNtt.garner_17_257_roundtrip_samples
 #print axioms CrtNtt.ntt8_mod17_and_mod257_roundtrip_concrete
 #print axioms CrtNtt.crt_ntt8_exact_integer_convolution
+
+#print axioms CrtNtt.ntt16_all_fermat_roots_sound
+#print axioms CrtNtt.garner_17_257_65537_inverse_sound
+#print axioms CrtNtt.garner_17_257_65537_roundtrip_samples
+#print axioms CrtNtt.ntt16_three_channels_roundtrip_concrete
+#print axioms CrtNtt.crt_ntt16_exact_integer_convolution
+#print axioms CrtNtt.base1000_limb_capacity_bound
+#print axioms CrtNtt.base1000_roundtrip_concrete
+#print axioms CrtNtt.crt_ntt_big_mul_12_digit
+#print axioms CrtNtt.crt_ntt_big_mul_24_digit_max

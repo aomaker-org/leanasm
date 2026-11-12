@@ -1,7 +1,7 @@
 -- Path: leanasm/src/LeanAsm/CrtNtt.lean
 -- Multi-prime CRT-NTT polynomial convolution engine over Fermat primes.
 -- Computes exact unreduced integer cyclic convolutions with ZERO axioms.
--- Supports 4-point (F_5 x F_17, M=85) and 8-point (F_17 x F_257, M=4369) transforms.
+-- Supports 4-point (F_5 x F_17), 8-point (F_17 x F_257), and 16-point (3 Fermat primes) transforms.
 -- Max Column: 100 Columns
 
 import LeanAsm.NttArithmetic
@@ -316,6 +316,419 @@ theorem crt_ntt8_exact_integer_convolution :
     let b : Vec8 := ⟨8, 7, 6, 5, 4, 3, 2, 1⟩
     crtNttConv8 a b = exactIntCyclicConv8 a b ∧
     crtNttConv8 a b = ⟨176, 156, 144, 140, 144, 156, 176, 204⟩ := by
+  decide
+
+-- =============================================================================
+-- =============================================================================
+-- Part C: 16-Point CRT-NTT over F_17 x F_257 x F_65537 (Dynamic Range M = 286,331,153)
+-- =============================================================================
+
+/-- 16-Vector over Nat for 16-point polynomial arithmetic. -/
+structure Vec16 where
+  x0 : Nat
+  x1 : Nat
+  x2 : Nat
+  x3 : Nat
+  x4 : Nat
+  x5 : Nat
+  x6 : Nat
+  x7 : Nat
+  x8 : Nat
+  x9 : Nat
+  x10 : Nat
+  x11 : Nat
+  x12 : Nat
+  x13 : Nat
+  x14 : Nat
+  x15 : Nat
+  deriving DecidableEq, Repr
+
+/-- Fermat prime p3 = 2^(2^4) + 1 = 65537. -/
+def p65537 : Nat := 65537
+
+/-- General radix-2 butterfly modulo p with twiddle factor w. -/
+def butterflyWithTwiddle (p u v w : Nat) : Nat × Nat :=
+  let t := (v * w) % p
+  ((u + t) % p, (u + p - (t % p)) % p)
+
+/--
+Parametric 4-stage radix-2 decimation-in-time Cooley-Tukey NTT on Vec16.
+Twiddle parameters: w0, w1, w2, w3, w4, w5, w6, w7.
+-/
+def ntt16WithRoots (p : Nat) (w0 w1 w2 w3 w4 w5 w6 w7 : Nat) (v : Vec16) : Vec16 :=
+  -- Bit-reversed reindexing: [0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15]
+  let (s1_0,  s1_1)  := butterflyWithTwiddle p v.x0  v.x8  w0
+  let (s1_2,  s1_3)  := butterflyWithTwiddle p v.x4  v.x12 w0
+  let (s1_4,  s1_5)  := butterflyWithTwiddle p v.x2  v.x10 w0
+  let (s1_6,  s1_7)  := butterflyWithTwiddle p v.x6  v.x14 w0
+  let (s1_8,  s1_9)  := butterflyWithTwiddle p v.x1  v.x9  w0
+  let (s1_10, s1_11) := butterflyWithTwiddle p v.x5  v.x13 w0
+  let (s1_12, s1_13) := butterflyWithTwiddle p v.x3  v.x11 w0
+  let (s1_14, s1_15) := butterflyWithTwiddle p v.x7  v.x15 w0
+
+  -- Stage 2: 4 x 4-point butterflies (twiddles w0, w4)
+  let (s2_0,  s2_2)  := butterflyWithTwiddle p s1_0  s1_2  w0
+  let (s2_1,  s2_3)  := butterflyWithTwiddle p s1_1  s1_3  w4
+  let (s2_4,  s2_6)  := butterflyWithTwiddle p s1_4  s1_6  w0
+  let (s2_5,  s2_7)  := butterflyWithTwiddle p s1_5  s1_7  w4
+  let (s2_8,  s2_10) := butterflyWithTwiddle p s1_8  s1_10 w0
+  let (s2_9,  s2_11) := butterflyWithTwiddle p s1_9  s1_11 w4
+  let (s2_12, s2_14) := butterflyWithTwiddle p s1_12 s1_14 w0
+  let (s2_13, s2_15) := butterflyWithTwiddle p s1_13 s1_15 w4
+
+  -- Stage 3: 2 x 8-point butterflies (twiddles w0, w2, w4, w6)
+  let (s3_0,  s3_4)  := butterflyWithTwiddle p s2_0  s2_4  w0
+  let (s3_1,  s3_5)  := butterflyWithTwiddle p s2_1  s2_5  w2
+  let (s3_2,  s3_6)  := butterflyWithTwiddle p s2_2  s2_6  w4
+  let (s3_3,  s3_7)  := butterflyWithTwiddle p s2_3  s2_7  w6
+  let (s3_8,  s3_12) := butterflyWithTwiddle p s2_8  s2_12 w0
+  let (s3_9,  s3_13) := butterflyWithTwiddle p s2_9  s2_13 w2
+  let (s3_10, s3_14) := butterflyWithTwiddle p s2_10 s2_14 w4
+  let (s3_11, s3_15) := butterflyWithTwiddle p s2_11 s2_15 w6
+
+  -- Stage 4: 1 x 16-point butterfly (twiddles w0..w7)
+  let (s4_0, s4_8)   := butterflyWithTwiddle p s3_0  s3_8  w0
+  let (s4_1, s4_9)   := butterflyWithTwiddle p s3_1  s3_9  w1
+  let (s4_2, s4_10)  := butterflyWithTwiddle p s3_2  s3_10 w2
+  let (s4_3, s4_11)  := butterflyWithTwiddle p s3_3  s3_11 w3
+  let (s4_4, s4_12)  := butterflyWithTwiddle p s3_4  s3_12 w4
+  let (s4_5, s4_13)  := butterflyWithTwiddle p s3_5  s3_13 w5
+  let (s4_6, s4_14)  := butterflyWithTwiddle p s3_6  s3_14 w6
+  let (s4_7, s4_15)  := butterflyWithTwiddle p s3_7  s3_15 w7
+
+  ⟨s4_0, s4_1, s4_2, s4_3, s4_4, s4_5, s4_6, s4_7,
+   s4_8, s4_9, s4_10, s4_11, s4_12, s4_13, s4_14, s4_15⟩
+
+/-- Inverse 16-point NTT using inverse twiddles and scaling inverse. -/
+def intt16WithRoots (p : Nat) (iw0 iw1 iw2 iw3 iw4 iw5 iw6 iw7 inv16 : Nat) (v : Vec16) : Vec16 :=
+  let u := ntt16WithRoots p iw0 iw1 iw2 iw3 iw4 iw5 iw6 iw7 v
+  ⟨(u.x0  * inv16) % p, (u.x1  * inv16) % p, (u.x2  * inv16) % p, (u.x3  * inv16) % p,
+   (u.x4  * inv16) % p, (u.x5  * inv16) % p, (u.x6  * inv16) % p, (u.x7  * inv16) % p,
+   (u.x8  * inv16) % p, (u.x9  * inv16) % p, (u.x10 * inv16) % p, (u.x11 * inv16) % p,
+   (u.x12 * inv16) % p, (u.x13 * inv16) % p, (u.x14 * inv16) % p, (u.x15 * inv16) % p⟩
+
+/-- 16-Point forward NTT modulo 17 (ω16 = 3). -/
+def ntt16Mod17 (v : Vec16) : Vec16 :=
+  ntt16WithRoots 17 1 3 9 10 13 5 15 11 v
+
+/-- 16-Point inverse NTT modulo 17 (ω16⁻¹ = 6, 16⁻¹ ≡ 16). -/
+def intt16Mod17 (v : Vec16) : Vec16 :=
+  intt16WithRoots 17 1 6 2 12 4 7 8 14 16 v
+
+/-- 16-Point forward NTT modulo 257 (ω16 = 2). -/
+def ntt16Mod257 (v : Vec16) : Vec16 :=
+  ntt16WithRoots 257 1 2 4 8 16 32 64 128 v
+
+/-- 16-Point inverse NTT modulo 257 (ω16⁻¹ = 129, 16⁻¹ ≡ 241). -/
+def intt16Mod257 (v : Vec16) : Vec16 :=
+  intt16WithRoots 257 1 129 193 225 241 249 253 255 241 v
+
+/-- 16-Point forward NTT modulo 65537 (ω16 = 4). -/
+def ntt16Mod65537 (v : Vec16) : Vec16 :=
+  ntt16WithRoots 65537 1 4 16 64 256 1024 4096 16384 v
+
+/-- 16-Point inverse NTT modulo 65537 (ω16⁻¹ = 49153, 16⁻¹ ≡ 61441). -/
+def intt16Mod65537 (v : Vec16) : Vec16 :=
+  intt16WithRoots 65537 1 49153 61441 64513 65281 65473 65521 65533 61441 v
+
+/-- Pointwise Hadamard modular product on Vec16 modulo p. -/
+def pointwiseMul16Mod (p : Nat) (u v : Vec16) : Vec16 :=
+  ⟨(u.x0  * v.x0)  % p, (u.x1  * v.x1)  % p, (u.x2  * v.x2)  % p, (u.x3  * v.x3)  % p,
+   (u.x4  * v.x4)  % p, (u.x5  * v.x5)  % p, (u.x6  * v.x6)  % p, (u.x7  * v.x7)  % p,
+   (u.x8  * v.x8)  % p, (u.x9  * v.x9)  % p, (u.x10 * v.x10) % p, (u.x11 * v.x11) % p,
+   (u.x12 * v.x12) % p, (u.x13 * v.x13) % p, (u.x14 * v.x14) % p, (u.x15 * v.x15) % p⟩
+
+/--
+Word-bounded 3-channel Garner mixed-radix CRT reconstruction for F_17 x F_257 x F_65537:
+  M = 17 * 257 * 65537 = 286,331,153 > 2^28
+  17⁻¹ ≡ 121 (mod 257)
+  (17 * 257)⁻¹ = 4369⁻¹ ≡ 32761 (mod 65537)
+-/
+def garner17_257_65537 (r17 r257 r65537 : Nat) : Nat :=
+  let v1 := r17 % 17
+  let v2 := ((r257 % 257 + 257 - (v1 % 257)) * 121) % 257
+  let partial12 := v1 + 17 * v2
+  let v3 := ((r65537 % 65537 + 65537 - (partial12 % 65537)) * 32761) % 65537
+  partial12 + 4369 * v3
+
+/-- Componentwise Garner CRT reconstruction on Vec16 across all 3 channels. -/
+def garnerVec16_17_257_65537 (u17 u257 u65537 : Vec16) : Vec16 :=
+  ⟨garner17_257_65537 u17.x0  u257.x0  u65537.x0,
+   garner17_257_65537 u17.x1  u257.x1  u65537.x1,
+   garner17_257_65537 u17.x2  u257.x2  u65537.x2,
+   garner17_257_65537 u17.x3  u257.x3  u65537.x3,
+   garner17_257_65537 u17.x4  u257.x4  u65537.x4,
+   garner17_257_65537 u17.x5  u257.x5  u65537.x5,
+   garner17_257_65537 u17.x6  u257.x6  u65537.x6,
+   garner17_257_65537 u17.x7  u257.x7  u65537.x7,
+   garner17_257_65537 u17.x8  u257.x8  u65537.x8,
+   garner17_257_65537 u17.x9  u257.x9  u65537.x9,
+   garner17_257_65537 u17.x10 u257.x10 u65537.x10,
+   garner17_257_65537 u17.x11 u257.x11 u65537.x11,
+   garner17_257_65537 u17.x12 u257.x12 u65537.x12,
+   garner17_257_65537 u17.x13 u257.x13 u65537.x13,
+   garner17_257_65537 u17.x14 u257.x14 u65537.x14,
+   garner17_257_65537 u17.x15 u257.x15 u65537.x15⟩
+
+/-- End-to-end 16-point CRT-NTT exact convolution pipeline over F_17 x F_257 x F_65537. -/
+def crtNttConv16 (a b : Vec16) : Vec16 :=
+  let conv17    := intt16Mod17    (pointwiseMul16Mod 17    (ntt16Mod17    a) (ntt16Mod17    b))
+  let conv257   := intt16Mod257   (pointwiseMul16Mod 257   (ntt16Mod257   a) (ntt16Mod257   b))
+  let conv65537 := intt16Mod65537 (pointwiseMul16Mod 65537 (ntt16Mod65537 a) (ntt16Mod65537 b))
+  garnerVec16_17_257_65537 conv17 conv257 conv65537
+
+/-- Exact unreduced integer 16-point cyclic convolution. -/
+def exactIntCyclicConv16 (a b : Vec16) : Vec16 :=
+  ⟨
+   (a.x0*b.x0 + a.x1*b.x15 + a.x2*b.x14 + a.x3*b.x13 +
+    a.x4*b.x12 + a.x5*b.x11 + a.x6*b.x10 + a.x7*b.x9 +
+    a.x8*b.x8 + a.x9*b.x7 + a.x10*b.x6 + a.x11*b.x5 +
+    a.x12*b.x4 + a.x13*b.x3 + a.x14*b.x2 + a.x15*b.x1),
+   (a.x0*b.x1 + a.x1*b.x0 + a.x2*b.x15 + a.x3*b.x14 +
+    a.x4*b.x13 + a.x5*b.x12 + a.x6*b.x11 + a.x7*b.x10 +
+    a.x8*b.x9 + a.x9*b.x8 + a.x10*b.x7 + a.x11*b.x6 +
+    a.x12*b.x5 + a.x13*b.x4 + a.x14*b.x3 + a.x15*b.x2),
+   (a.x0*b.x2 + a.x1*b.x1 + a.x2*b.x0 + a.x3*b.x15 +
+    a.x4*b.x14 + a.x5*b.x13 + a.x6*b.x12 + a.x7*b.x11 +
+    a.x8*b.x10 + a.x9*b.x9 + a.x10*b.x8 + a.x11*b.x7 +
+    a.x12*b.x6 + a.x13*b.x5 + a.x14*b.x4 + a.x15*b.x3),
+   (a.x0*b.x3 + a.x1*b.x2 + a.x2*b.x1 + a.x3*b.x0 +
+    a.x4*b.x15 + a.x5*b.x14 + a.x6*b.x13 + a.x7*b.x12 +
+    a.x8*b.x11 + a.x9*b.x10 + a.x10*b.x9 + a.x11*b.x8 +
+    a.x12*b.x7 + a.x13*b.x6 + a.x14*b.x5 + a.x15*b.x4),
+   (a.x0*b.x4 + a.x1*b.x3 + a.x2*b.x2 + a.x3*b.x1 +
+    a.x4*b.x0 + a.x5*b.x15 + a.x6*b.x14 + a.x7*b.x13 +
+    a.x8*b.x12 + a.x9*b.x11 + a.x10*b.x10 + a.x11*b.x9 +
+    a.x12*b.x8 + a.x13*b.x7 + a.x14*b.x6 + a.x15*b.x5),
+   (a.x0*b.x5 + a.x1*b.x4 + a.x2*b.x3 + a.x3*b.x2 +
+    a.x4*b.x1 + a.x5*b.x0 + a.x6*b.x15 + a.x7*b.x14 +
+    a.x8*b.x13 + a.x9*b.x12 + a.x10*b.x11 + a.x11*b.x10 +
+    a.x12*b.x9 + a.x13*b.x8 + a.x14*b.x7 + a.x15*b.x6),
+   (a.x0*b.x6 + a.x1*b.x5 + a.x2*b.x4 + a.x3*b.x3 +
+    a.x4*b.x2 + a.x5*b.x1 + a.x6*b.x0 + a.x7*b.x15 +
+    a.x8*b.x14 + a.x9*b.x13 + a.x10*b.x12 + a.x11*b.x11 +
+    a.x12*b.x10 + a.x13*b.x9 + a.x14*b.x8 + a.x15*b.x7),
+   (a.x0*b.x7 + a.x1*b.x6 + a.x2*b.x5 + a.x3*b.x4 +
+    a.x4*b.x3 + a.x5*b.x2 + a.x6*b.x1 + a.x7*b.x0 +
+    a.x8*b.x15 + a.x9*b.x14 + a.x10*b.x13 + a.x11*b.x12 +
+    a.x12*b.x11 + a.x13*b.x10 + a.x14*b.x9 + a.x15*b.x8),
+   (a.x0*b.x8 + a.x1*b.x7 + a.x2*b.x6 + a.x3*b.x5 +
+    a.x4*b.x4 + a.x5*b.x3 + a.x6*b.x2 + a.x7*b.x1 +
+    a.x8*b.x0 + a.x9*b.x15 + a.x10*b.x14 + a.x11*b.x13 +
+    a.x12*b.x12 + a.x13*b.x11 + a.x14*b.x10 + a.x15*b.x9),
+   (a.x0*b.x9 + a.x1*b.x8 + a.x2*b.x7 + a.x3*b.x6 +
+    a.x4*b.x5 + a.x5*b.x4 + a.x6*b.x3 + a.x7*b.x2 +
+    a.x8*b.x1 + a.x9*b.x0 + a.x10*b.x15 + a.x11*b.x14 +
+    a.x12*b.x13 + a.x13*b.x12 + a.x14*b.x11 + a.x15*b.x10),
+   (a.x0*b.x10 + a.x1*b.x9 + a.x2*b.x8 + a.x3*b.x7 +
+    a.x4*b.x6 + a.x5*b.x5 + a.x6*b.x4 + a.x7*b.x3 +
+    a.x8*b.x2 + a.x9*b.x1 + a.x10*b.x0 + a.x11*b.x15 +
+    a.x12*b.x14 + a.x13*b.x13 + a.x14*b.x12 + a.x15*b.x11),
+   (a.x0*b.x11 + a.x1*b.x10 + a.x2*b.x9 + a.x3*b.x8 +
+    a.x4*b.x7 + a.x5*b.x6 + a.x6*b.x5 + a.x7*b.x4 +
+    a.x8*b.x3 + a.x9*b.x2 + a.x10*b.x1 + a.x11*b.x0 +
+    a.x12*b.x15 + a.x13*b.x14 + a.x14*b.x13 + a.x15*b.x12),
+   (a.x0*b.x12 + a.x1*b.x11 + a.x2*b.x10 + a.x3*b.x9 +
+    a.x4*b.x8 + a.x5*b.x7 + a.x6*b.x6 + a.x7*b.x5 +
+    a.x8*b.x4 + a.x9*b.x3 + a.x10*b.x2 + a.x11*b.x1 +
+    a.x12*b.x0 + a.x13*b.x15 + a.x14*b.x14 + a.x15*b.x13),
+   (a.x0*b.x13 + a.x1*b.x12 + a.x2*b.x11 + a.x3*b.x10 +
+    a.x4*b.x9 + a.x5*b.x8 + a.x6*b.x7 + a.x7*b.x6 +
+    a.x8*b.x5 + a.x9*b.x4 + a.x10*b.x3 + a.x11*b.x2 +
+    a.x12*b.x1 + a.x13*b.x0 + a.x14*b.x15 + a.x15*b.x14),
+   (a.x0*b.x14 + a.x1*b.x13 + a.x2*b.x12 + a.x3*b.x11 +
+    a.x4*b.x10 + a.x5*b.x9 + a.x6*b.x8 + a.x7*b.x7 +
+    a.x8*b.x6 + a.x9*b.x5 + a.x10*b.x4 + a.x11*b.x3 +
+    a.x12*b.x2 + a.x13*b.x1 + a.x14*b.x0 + a.x15*b.x15),
+   (a.x0*b.x15 + a.x1*b.x14 + a.x2*b.x13 + a.x3*b.x12 +
+    a.x4*b.x11 + a.x5*b.x10 + a.x6*b.x9 + a.x7*b.x8 +
+    a.x8*b.x7 + a.x9*b.x6 + a.x10*b.x5 + a.x11*b.x4 +
+    a.x12*b.x3 + a.x13*b.x2 + a.x14*b.x1 + a.x15*b.x0)⟩
+
+-- =============================================================================
+-- Part D: Verified Multi-Limb Base-1000 Big-Integer Multiplication
+-- =============================================================================
+
+/-- Base-1000 limb extraction: extracts the idx-th limb (0 <= limb < 1000). -/
+def limb1000 (n idx : Nat) : Nat :=
+  (n / (1000 ^ idx)) % 1000
+
+/-- Converts a Nat up to 24 decimal digits (8 limbs) into zero-padded Vec16. -/
+def toBase1000Vec16 (n : Nat) : Vec16 where
+  x0  := limb1000 n 0
+  x1  := limb1000 n 1
+  x2  := limb1000 n 2
+  x3  := limb1000 n 3
+  x4  := limb1000 n 4
+  x5  := limb1000 n 5
+  x6  := limb1000 n 6
+  x7  := limb1000 n 7
+  x8  := 0
+  x9  := 0
+  x10 := 0
+  x11 := 0
+  x12 := 0
+  x13 := 0
+  x14 := 0
+  x15 := 0
+
+/-- Carry propagation across 16 base-1000 limbs. -/
+def carryPassBase1000 (v : Vec16) : Vec16 :=
+  let d0  := v.x0  % 1000
+  let c0  := v.x0  / 1000
+  let s1  := v.x1  + c0
+  let d1  := s1    % 1000
+  let c1  := s1    / 1000
+  let s2  := v.x2  + c1
+  let d2  := s2    % 1000
+  let c2  := s2    / 1000
+  let s3  := v.x3  + c2
+  let d3  := s3    % 1000
+  let c3  := s3    / 1000
+  let s4  := v.x4  + c3
+  let d4  := s4    % 1000
+  let c4  := s4    / 1000
+  let s5  := v.x5  + c4
+  let d5  := s5    % 1000
+  let c5  := s5    / 1000
+  let s6  := v.x6  + c5
+  let d6  := s6    % 1000
+  let c6  := s6    / 1000
+  let s7  := v.x7  + c6
+  let d7  := s7    % 1000
+  let c7  := s7    / 1000
+  let s8  := v.x8  + c7
+  let d8  := s8    % 1000
+  let c8  := s8    / 1000
+  let s9  := v.x9  + c8
+  let d9  := s9    % 1000
+  let c9  := s9    / 1000
+  let s10 := v.x10 + c9
+  let d10 := s10   % 1000
+  let c10 := s10   / 1000
+  let s11 := v.x11 + c10
+  let d11 := s11   % 1000
+  let c11 := s11   / 1000
+  let s12 := v.x12 + c11
+  let d12 := s12   % 1000
+  let c12 := s12   / 1000
+  let s13 := v.x13 + c12
+  let d13 := s13   % 1000
+  let c13 := s13   / 1000
+  let s14 := v.x14 + c13
+  let d14 := s14   % 1000
+  let c14 := s14   / 1000
+  let s15 := v.x15 + c14
+  let d15 := s15   % 1000
+  ⟨d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15⟩
+
+/-- Positional evaluation of 16 base-1000 digits using Horner's rule. -/
+def evalDigits1000Vec16 (d : Vec16) : Nat :=
+  d.x0 + 1000 * (d.x1 + 1000 * (d.x2 + 1000 * (d.x3 + 1000 * (
+  d.x4 + 1000 * (d.x5 + 1000 * (d.x6 + 1000 * (d.x7 + 1000 * (
+  d.x8 + 1000 * (d.x9 + 1000 * (d.x10 + 1000 * (d.x11 + 1000 * (
+  d.x12 + 1000 * (d.x13 + 1000 * (d.x14 + 1000 * d.x15))))))))))))))
+
+/--
+End-to-end multi-limb big-integer multiplication via 16-point 3-Fermat-prime CRT-NTT.
+Computes a * b for integers up to 24 digits with zero modular wrap-around.
+-/
+def crtNttBigMul (a b : Nat) : Nat :=
+  let va := toBase1000Vec16 a
+  let vb := toBase1000Vec16 b
+  let rawConv := crtNttConv16 va vb
+  let normalizedDigits := carryPassBase1000 rawConv
+  evalDigits1000Vec16 normalizedDigits
+
+/-- Theorem: Principal 16th roots of unity and modular inverses across all 3 Fermat primes. -/
+theorem ntt16_all_fermat_roots_sound :
+    (3 ^ 8) % 17 = 16 ∧
+    (3 * 6) % 17 = 1 ∧
+    (16 * 16) % 17 = 1 ∧
+    (2 ^ 8) % 257 = 256 ∧
+    (2 * 129) % 257 = 1 ∧
+    (16 * 241) % 257 = 1 ∧
+    (4 ^ 8) % 65537 = 65536 ∧
+    (4 * 49153) % 65537 = 1 ∧
+    (16 * 61441) % 65537 = 1 := by
+  decide
+
+/-- Theorem: Inverses for 3-channel Garner 17_257_65537 reconstruction are sound. -/
+theorem garner_17_257_65537_inverse_sound :
+    (17 * 121) % 257 = 1 ∧
+    (4369 * 32761) % 65537 = 1 ∧
+    17 * 257 * 65537 = 286331153 := by
+  decide
+
+/--
+Theorem: Garner 17_257_65537 reconstruction soundness across boundary and multi-million test states.
+Proved constructively with ZERO axioms.
+-/
+theorem garner_17_257_65537_roundtrip_samples :
+    garner17_257_65537 (0 % 17) (0 % 257) (0 % 65537) = 0 ∧
+    garner17_257_65537 (1 % 17) (1 % 257) (1 % 65537) = 1 ∧
+    garner17_257_65537 (16 % 17) (16 % 257) (16 % 65537) = 16 ∧
+    garner17_257_65537 (17 % 17) (17 % 257) (17 % 65537) = 17 ∧
+    garner17_257_65537 (256 % 17) (256 % 257) (256 % 65537) = 256 ∧
+    garner17_257_65537 (257 % 17) (257 % 257) (257 % 65537) = 257 ∧
+    garner17_257_65537 (4368 % 17) (4368 % 257) (4368 % 65537) = 4368 ∧
+    garner17_257_65537 (4369 % 17) (4369 % 257) (4369 % 65537) = 4369 ∧
+    garner17_257_65537 (65536 % 17) (65536 % 257) (65536 % 65537) = 65536 ∧
+    garner17_257_65537 (65537 % 17) (65537 % 257) (65537 % 65537) = 65537 ∧
+    garner17_257_65537 (1000000 % 17) (1000000 % 257) (1000000 % 65537) = 1000000 ∧
+    garner17_257_65537 (123456789 % 17) (123456789 % 257) (123456789 % 65537) = 123456789 ∧
+    garner17_257_65537 (286331152 % 17) (286331152 % 257) (286331152 % 65537) = 286331152 := by
+  decide
+
+/--
+Theorem: 16-Point NTT roundtrip invertibility on test vector ⟨1..16⟩ across all 3 Fermat channels.
+Proved constructively with ZERO axioms.
+-/
+theorem ntt16_three_channels_roundtrip_concrete :
+    let v : Vec16 := ⟨1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16⟩
+    intt16Mod17 (ntt16Mod17 v) = v ∧
+    intt16Mod257 (ntt16Mod257 v) = v ∧
+    intt16Mod65537 (ntt16Mod65537 v) = v := by
+  decide
+
+/--
+Theorem (16-Point CRT-NTT Exact Integer Convolution):
+Recovers exact unreduced integer cyclic convolution whose peak coefficient is 149,600,
+exceeding every individual Fermat channel modulus (17, 257, 65537), verified over M = 286,331,153.
+Proved constructively with ZERO axioms.
+-/
+theorem crt_ntt16_exact_integer_convolution :
+    let a : Vec16 := ⟨10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160⟩
+    let b : Vec16 := ⟨160, 150, 140, 130, 120, 110, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10⟩
+    crtNttConv16 a b = exactIntCyclicConv16 a b ∧
+    (crtNttConv16 a b).x15 = 149600 := by
+  decide
+
+/-- Theorem: Base-1000 8-limb capacity bound: worst-case coefficient strictly below CRT modulus. -/
+theorem base1000_limb_capacity_bound :
+    8 * 999 ^ 2 < 17 * 257 * 65537 ∧
+    8 * 999 ^ 2 = 7984008 ∧
+    17 * 257 * 65537 = 286331153 := by
+  decide
+
+/-- Theorem: Base-1000 roundtrip lossless encoding for 24-digit integer. -/
+theorem base1000_roundtrip_concrete :
+    evalDigits1000Vec16 (toBase1000Vec16 123456789012345678901234) =
+      123456789012345678901234 := by
+  decide
+
+/-- Theorem: Multi-limb CRT-NTT multiplication on 12-digit integers. -/
+theorem crt_ntt_big_mul_12_digit :
+    crtNttBigMul 123456789012 987654321098 =
+      123456789012 * 987654321098 := by
+  decide
+
+/-- Theorem: Multi-limb CRT-NTT multiplication on 24-digit integers (48-digit product). -/
+theorem crt_ntt_big_mul_24_digit_max :
+    crtNttBigMul 123456789012345678901234 987654321098765432109876 =
+      123456789012345678901234 * 987654321098765432109876 ∧
+    crtNttBigMul 999999999999999999999999 999999999999999999999999 =
+      999999999999999999999999 * 999999999999999999999999 := by
   decide
 
 end CrtNtt

@@ -114,7 +114,7 @@ def main : IO Unit := do
   IO.println s!"  Cyclic Convolution Theorem: INTT4(A ⊙ B) = {repr c4} = cyclicConv4 a b (ZERO axioms verified)"
   IO.println "  NTT Soundness & Inversion : Exactly invertible across all vectors in F_17 (ZERO axioms verified)"
 
-  -- 10. Multi-Prime CRT-NTT Exact Integer Convolution (F_5 x F_17 and F_17 x F_257)
+  -- 10. Multi-Prime CRT-NTT Exact Integer Convolution (F_5 x F_17, F_17 x F_257, 3 Fermat Primes)
   IO.println "\n[+] Part 10: Multi-Prime CRT-NTT Exact Integer Convolution (Fermat Primes)"
   let crt4 := CrtNtt.crtNttConv4 a4 b4
   IO.println s!"  4-Point CRT-NTT (F_5 x F_17, M=85)     : ⟨1,2,3,4⟩ ⊛ ⟨5,6,7,8⟩ = {repr crt4} (exact unreduced)"
@@ -122,7 +122,16 @@ def main : IO Unit := do
   let b8 : CrtNtt.Vec8 := ⟨8, 7, 6, 5, 4, 3, 2, 1⟩
   let crt8 := CrtNtt.crtNttConv8 a8 b8
   IO.println s!"  8-Point CRT-NTT (F_17 x F_257, M=4369) : ⟨1..8⟩ ⊛ ⟨8..1⟩ = {repr crt8} (exact unreduced)"
-  IO.println "  Zero Wrap-Around & Soundness : Both 4-point and 8-point CRT-NTT match exact convolution (ZERO axioms verified)"
+  let a16 : CrtNtt.Vec16 := ⟨10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160⟩
+  let b16 : CrtNtt.Vec16 := ⟨160, 150, 140, 130, 120, 110, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10⟩
+  let crt16 := CrtNtt.crtNttConv16 a16 b16
+  IO.println s!"  16-Point CRT-NTT (3 Fermat Primes, M=286,331,153) :"
+  IO.println s!"    peak unreduced coeff = {crt16.x15} (exact unreduced)"
+  let bigA : Nat := 123456789012345678901234
+  let bigB : Nat := 987654321098765432109876
+  let bigProd := CrtNtt.crtNttBigMul bigA bigB
+  IO.println s!"  48-Digit Big-Integer CRT-NTT Mul : {bigA} * {bigB} = {bigProd}"
+  IO.println "  Zero Wrap-Around & Soundness : 4-point, 8-point, 16-point, and 48-digit mul match exact (ZERO axioms)"
 
   IO.println "\n[+] All theorems verified at build-time with the Lean 4 kernel."
   IO.println "=========================================================="
