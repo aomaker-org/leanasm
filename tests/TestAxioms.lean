@@ -106,6 +106,12 @@ import LeanAsm
 #print axioms QuasiRiemann.sample_computed_cert_7_8_105_verified
 #print axioms QuasiRiemann.sample_computed_cert_lifts_to_valid_cert
 
+#print axioms QuasiRiemann.toScaled6_preserves_valid_samples
+#print axioms QuasiRiemann.ln_table_1_to_8_valid
+#print axioms QuasiRiemann.generated_table_7_8_105_valid
+#print axioms QuasiRiemann.generated_cert_7_8_105_verified
+#print axioms QuasiRiemann.generated_cert_lifts_to_valid_cert
+
 #print axioms EulerFactorNonVanishing.prime_power_gt_one
 #print axioms EulerFactorNonVanishing.local_euler_factor_nonvanishing
 #print axioms EulerFactorNonVanishing.rns_prime_tower_euler_nonvanishing

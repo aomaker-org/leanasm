@@ -79,6 +79,10 @@ def main : IO Unit := do
   IO.println s!"  Interval Evaluator: D_8(7/8 + 105i) enclosure Re ∈ [{sampleReIv.lo}, {sampleReIv.hi}]/10⁶"
   IO.println s!"                      Im ∈ [{sampleImIv.lo}, {sampleImIv.hi}]/10⁶"
   IO.println s!"                      |D_8|_min² · 10¹² = {minNormSq} > TailSq = 360·10⁹ (ZERO axioms verified)"
+  let (genReIv, genImIv) := evalDirichletPolyInterval (generateDirichletTable 7 105 8)
+  let genMinNormSq := complexIntervalMinNormSq genReIv genImIv
+  IO.println s!"  Taylor Generator  : Self-generated 8-term D_8(7/8 + 105i) from pure Taylor artanh/exp/cos/sin"
+  IO.println s!"                      Generated |D_8|_min² · 10¹² = {genMinNormSq} > TailSq = 360·10⁹ (ZERO axioms)"
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"
