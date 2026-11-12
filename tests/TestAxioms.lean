@@ -27,3 +27,6 @@ import LeanAsm
 
 #print axioms QuasiRiemann.qrh_symmetric_strip
 #print axioms QuasiRiemann.seven_eighths_symmetric_bounds
+
+#print axioms QuasiRiemann.chebyshev_power_saving_k128
+#print axioms QuasiRiemann.siegel_gap_from_seven_eighths
