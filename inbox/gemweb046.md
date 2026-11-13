@@ -63,7 +63,7 @@ Here is a self-contained implementation prompt (`gemweb046`) for AGY to extend
 convergent gaps $\vert{}k \ln 2 - m \ln 3\vert{}$, exact multi-digit integer
 power separations $\vert{}2^k - 3^m\vert{}$, and Collatz nontrivial cycle lower
 bounds across high-denominator convergents ($8/5, 19/12, 65/41, 84/53, 306/193$)
-with **zero `Classical.choice` and zero `sorryAx**`.
+with **zero `Classical.choice` and zero `sorryAx`**.
 
 ---
 
@@ -203,7 +203,7 @@ and `karatsubaCrtNttMul192_universal_sound`)** from
 `src/LeanAsm/CrtNttUniversal.lean` alongside constructive integer Newton–Raphson
 $\sqrt{10005}$ and exact rational/integer Chudnovsky binary splitting to compute
 and formally certify the **first 100 decimal digits of $\pi$** with **zero
-`Classical.choice` and zero `sorryAx**`.
+`Classical.choice` and zero `sorryAx`**.
 
 ---
 
@@ -213,8 +213,9 @@ by 192-Digit CRT-NTT (`src/LeanAsm/PiChudnovsky.lean`)
 ```text
 Task: Create `src/LeanAsm/PiChudnovsky.lean` in `leanasm` (and expose it in
 `src/LeanAsm.lean`) to compute and formally certify the **first 100 decimal
-digits of π**
-(`3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679`)
+digits of π** (3 + 100 decimals:
+`3.14159265358979323846264338327950288419716939937510`
+followed by `58209749445923078164062862089986280348253421170679`)
 using the universally verified 192-digit Karatsuba-over-CRT-NTT multiplier
 (`karatsubaCrtNttMul192` and `karatsubaCrtNttMul192_universal_sound` from
 `LeanAsm.CrtNttUniversal`) with **ZERO `Classical.choice` and ZERO `sorryAx`**:
@@ -256,9 +257,17 @@ using the universally verified 192-digit Karatsuba-over-CRT-NTT multiplier
    Digits) & Remainder Bound:**
    - Recall the Chudnovsky formula (derived from the Heegner number `d = 163`,
      where `j((1 + i√163)/2) = -640320^3`):
-     $$\frac{1}{\pi} = 12 \sum_{k=0}^{\infty} \frac{(-1)^k (6k)! (13591409 + 545140134 k)}{(3k)! (k!)^3 640320^{3k + 3/2}}$$
+     $$
+     \frac{1}{\pi} = 12 \sum_{k=0}^{\infty}
+     \frac{(-1)^k (6k)! (13591409 + 545140134 k)}
+     {(3k)! (k!)^3 640320^{3k + 3/2}}
+     $$
      Equivalently, $\pi = \frac{426880 \sqrt{10005}}{S}$, where:
-     $$S = \sum_{k=0}^{\infty} \frac{(-1)^k (6k)! (13591409 + 545140134 k)}{(3k)! (k!)^3 640320^{3k}}$$
+     $$
+     S = \sum_{k=0}^{\infty}
+     \frac{(-1)^k (6k)! (13591409 + 545140134 k)}
+     {(3k)! (k!)^3 640320^{3k}}
+     $$
    - Compute exact rational partial sums `chudnovskySumNum (N : Nat) : Int` and
      `chudnovskySumDen (N : Nat) : Nat` for `N = 8` (`k = 0 .. 7`, 8 terms) via
      binary splitting using `natMul192ViaCrtNtt` (since `640320^21 ≈ 1.49 ×
@@ -283,7 +292,8 @@ using the universally verified 192-digit Karatsuba-over-CRT-NTT multiplier
      `Classical.choice` and ZERO `sorryAx`):
      `pi_100_digits_certified : piLower105 / 10 ^ 5 = piDigits100 ∧ piUpper105 /
      10 ^ 5 = piDigits100 ∧ piDigits100 =
-     31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679`.
+     314159265358979323846264338327950288419716939937510 * 10 ^ 50 +
+     58209749445923078164062862089986280348253421170679`.
 
 Context & Constraints:
 - Inspect `src/LeanAsm/CrtNttUniversal.lean`, `src/LeanAsm/QuasiRiemann.lean`,
@@ -351,7 +361,7 @@ a **72-digit fixed-point interval engine (`ScaledInterval72`, scale $S_{72} =
 10^{72}$)** and an **$N = 128$ 2D continuous zero-free rectangle sweeper**
 pushing certified zero-free boxes down to **$\sigma = 0.501$** (within
 **$0.001$** of the critical line $\sigma = 1/2$) with **zero `Classical.choice`
-and zero `sorryAx**`.
+and zero `sorryAx`**.
 
 ---
 

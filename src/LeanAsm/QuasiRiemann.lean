@@ -2611,7 +2611,7 @@ private theorem int_mul4_cancel (a b c d : Int) :
     Int.mul_comm b (d * c)]
 
 /-- Theorem (Rational Division Lawfulness): For every non-zero `b` (`b.num ≠ 0`),
-`(a / b) * b ≃ a` holds in `QRat.eqv`. -/
+`QRat.eqv (QRat.div a b hb * b) a` holds constructively. -/
 theorem qrat_div_mul_cancel (a b : QRat) (hb : b.num ≠ 0) :
     QRat.eqv (QRat.div a b hb * b) a := by
   rcases a with ⟨an, ad, had⟩
@@ -3501,17 +3501,6 @@ private def foldNatStep {α : Type} (fuel k : Nat) (acc : α) (step : Nat → α
 
 /-- Lightweight raw `(lo, hi)` interval pair without `Prop` proofs for fast kernel folds. -/
 private abbrev RawIv36 := Int × Int
-
-/-- Strict pair fold forcing WHNF reduction of all 4 interval bounds at every step. -/
-private def foldRawPair
-    (fuel k : Nat) (term acc : RawIv36)
-    (step : Nat → RawIv36 × RawIv36 → RawIv36 × RawIv36) : RawIv36 :=
-  match fuel with
-  | 0 => acc
-  | fuel' + 1 =>
-    let res := step k (term, acc)
-    if res.1.1 ≤ res.1.2 && res.2.1 ≤ res.2.2 then foldRawPair fuel' (k + 1) res.1 res.2 step
-    else foldRawPair fuel' (k + 1) res.1 res.2 step
 
 private def rawAdd36 (a b : RawIv36) : RawIv36 := (a.1 + b.1, a.2 + b.2)
 private def rawSub36 (a b : RawIv36) : RawIv36 := (a.1 - b.2, a.2 - b.1)

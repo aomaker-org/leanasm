@@ -70,7 +70,7 @@ your universally verified **96-digit Karatsuba-over-CRT-NTT multiplier
 from $N = 32$ to **$N = 64$** so Lean 4 certifies positive-area 2D continuous
 zero-free rectangles down to **$\sigma = 0.505$** (within $0.005$ of the
 critical line $\sigma = 1/2$) with **zero `Classical.choice` and zero
-`sorryAx**`.
+`sorryAx`**.
 
 ---
 

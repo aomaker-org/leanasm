@@ -6,9 +6,9 @@ hierarchy in `src/LeanAsm/CollatzQrhBridge.lean`) with an **explicit rational
 van der Corput $\{A, B\}^*$ exponent-pair engine, Guth–Maynard vs. classical
 Huxley zero-density comparison, and constructive mollifier descent theorems
 (`11/12 → 7/8 → 5/6 → 3/4 → 1/2`)**—proving with **zero `Classical.choice` and
-zero `sorryAx**` how breaking past the off-diagonal mollifier barrier $\vartheta
-= 1/4$ drives the Quasi-Riemann Hypothesis threshold strictly below $\theta =
-7/8$.
+zero `sorryAx`** how breaking past the off-diagonal mollifier barrier
+$\vartheta = 1/4$ drives the Quasi-Riemann Hypothesis threshold strictly
+below $\theta = 7/8$.
 
 ---
 
