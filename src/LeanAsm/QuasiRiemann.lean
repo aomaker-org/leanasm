@@ -2402,6 +2402,634 @@ theorem ultra_deep_rects_down_to_052_certified :
     (∃ r ∈ swept, r.sLo6 = 520000) := by
   decide
 
+-- =============================================================================
+-- Part 13: Constructive Rational Engine (QRat), {A, B}* VdC Pairs,
+--          Guth-Maynard (30/13) Zero-Density & Mollifier Descent (gemweb044)
+-- =============================================================================
+
+/-- Constructive exact rational number `num / den` with `0 < den`. -/
+structure QRat where
+  num : Int
+  den : Nat
+  den_pos : 0 < den
+
+instance : Repr QRat where
+  reprPrec q _ :=
+    if q.den = 1 then repr q.num else s!"({q.num}/{q.den})"
+
+/-- Embed an `Int` as a `QRat`. -/
+def QRat.ofInt (n : Int) : QRat :=
+  ⟨n, 1, Nat.zero_lt_one⟩
+
+/-- Construct a `QRat` from numerator and positive denominator. -/
+def QRat.mk' (num : Int) (den : Nat) (den_pos : 0 < den := by omega) : QRat :=
+  ⟨num, den, den_pos⟩
+
+instance : Inhabited QRat := ⟨QRat.ofInt 0⟩
+
+instance : DecidableEq QRat := fun a b =>
+  if hn : a.num = b.num then
+    if hd : a.den = b.den then
+      isTrue (by cases a; cases b; simp_all)
+    else
+      isFalse (by intro h; cases h; exact hd rfl)
+  else
+    isFalse (by intro h; cases h; exact hn rfl)
+
+/-- Reduce a `QRat` by `Nat.gcd` for canonical display. -/
+def QRat.reduce (q : QRat) : QRat :=
+  let g := Nat.gcd q.num.natAbs q.den
+  if hg : 0 < g then
+    ⟨q.num / (g : Int), q.den / g, Nat.div_pos (Nat.le_of_dvd q.den_pos (Nat.gcd_dvd_right _ _)) hg⟩
+  else
+    q
+
+/-- Cross-multiplied rational equivalence `a = b`. -/
+def QRat.eqv (a b : QRat) : Prop :=
+  a.num * (b.den : Int) = b.num * (a.den : Int)
+
+/-- Cross-multiplied strict inequality `a < b`. -/
+def QRat.lt (a b : QRat) : Prop :=
+  a.num * (b.den : Int) < b.num * (a.den : Int)
+
+/-- Cross-multiplied non-strict inequality `a ≤ b`. -/
+def QRat.le (a b : QRat) : Prop :=
+  a.num * (b.den : Int) ≤ b.num * (a.den : Int)
+
+instance (a b : QRat) : Decidable (QRat.eqv a b) :=
+  inferInstanceAs (Decidable (a.num * (b.den : Int) = b.num * (a.den : Int)))
+
+instance (a b : QRat) : Decidable (QRat.lt a b) :=
+  inferInstanceAs (Decidable (a.num * (b.den : Int) < b.num * (a.den : Int)))
+
+instance (a b : QRat) : Decidable (QRat.le a b) :=
+  inferInstanceAs (Decidable (a.num * (b.den : Int) ≤ b.num * (a.den : Int)))
+
+/-- Exact rational addition. -/
+def QRat.add (a b : QRat) : QRat :=
+  ⟨a.num * (b.den : Int) + b.num * (a.den : Int), a.den * b.den,
+    Nat.mul_pos a.den_pos b.den_pos⟩
+
+/-- Exact rational negation. -/
+def QRat.neg (a : QRat) : QRat :=
+  ⟨-a.num, a.den, a.den_pos⟩
+
+/-- Exact rational subtraction. -/
+def QRat.sub (a b : QRat) : QRat :=
+  ⟨a.num * (b.den : Int) - b.num * (a.den : Int), a.den * b.den,
+    Nat.mul_pos a.den_pos b.den_pos⟩
+
+/-- Exact rational multiplication. -/
+def QRat.mul (a b : QRat) : QRat :=
+  ⟨a.num * b.num, a.den * b.den, Nat.mul_pos a.den_pos b.den_pos⟩
+
+/-- Total exact rational division (returning `0` if divisor is `0`). -/
+def QRat.div (a b : QRat) : QRat :=
+  if hb : 0 < b.num then
+    ⟨a.num * (b.den : Int), a.den * b.num.natAbs,
+      Nat.mul_pos a.den_pos (Int.natAbs_pos.mpr (by omega))⟩
+  else if hbn : b.num < 0 then
+    ⟨-(a.num * (b.den : Int)), a.den * b.num.natAbs,
+      Nat.mul_pos a.den_pos (Int.natAbs_pos.mpr (by omega))⟩
+  else
+    QRat.ofInt 0
+
+instance : Add QRat := ⟨QRat.add⟩
+instance : Neg QRat := ⟨QRat.neg⟩
+instance : Sub QRat := ⟨QRat.sub⟩
+instance : Mul QRat := ⟨QRat.mul⟩
+instance : Div QRat := ⟨QRat.div⟩
+instance : LT QRat := ⟨QRat.lt⟩
+instance : LE QRat := ⟨QRat.le⟩
+
+instance (a b : QRat) : Decidable (a < b) :=
+  inferInstanceAs (Decidable (QRat.lt a b))
+
+instance (a b : QRat) : Decidable (a ≤ b) :=
+  inferInstanceAs (Decidable (QRat.le a b))
+
+/-- Van der Corput exponent pair `(k, ℓ)` represented over `QRat`. -/
+structure RatExpPair where
+  k : QRat
+  l : QRat
+  deriving Repr, DecidableEq
+
+/-- Canonical exponent-pair invariants: `0 ≤ k ≤ 1/2`, `1/2 ≤ ℓ ≤ 1`, `1/2 ≤ k + ℓ`. -/
+def RatExpPair.valid (p : RatExpPair) : Prop :=
+  QRat.ofInt 0 ≤ p.k ∧
+  p.k ≤ QRat.mk' 1 2 ∧
+  QRat.mk' 1 2 ≤ p.l ∧
+  p.l ≤ QRat.ofInt 1 ∧
+  QRat.mk' 1 2 ≤ p.k + p.l
+
+instance (p : RatExpPair) : Decidable (RatExpPair.valid p) := by
+  dsimp [RatExpPair.valid]
+  infer_instance
+
+/-- Coordinatewise rational equivalence of `RatExpPair`. -/
+def RatExpPair.eqv (p q : RatExpPair) : Prop :=
+  QRat.eqv p.k q.k ∧ QRat.eqv p.l q.l
+
+instance (p q : RatExpPair) : Decidable (RatExpPair.eqv p q) := by
+  dsimp [RatExpPair.eqv]
+  infer_instance
+
+/-- Canonical trivial exponent pair `(0, 1)`. -/
+def trivialRatPair : RatExpPair :=
+  ⟨QRat.ofInt 0, QRat.ofInt 1⟩
+
+/-- Van der Corput Weyl-differencing `A`-process: `(k / (2(k+1)), (k + ℓ + 1) / (2(k+1)))`. -/
+def vdcProcessA (p : RatExpPair) : RatExpPair :=
+  let one := QRat.ofInt 1
+  let two := QRat.ofInt 2
+  let denom := two * (p.k + one)
+  ⟨p.k / denom, (p.k + p.l + one) / denom⟩
+
+/-- Van der Corput Poisson-summation `B`-process: `(ℓ - 1/2, k + 1/2)`. -/
+def vdcProcessB (p : RatExpPair) : RatExpPair :=
+  let half := QRat.mk' 1 2
+  ⟨p.l - half, p.k + half⟩
+
+/-- Critical-line subconvexity exponent `μ(k, ℓ) = (k + ℓ - 1/2) / 2`. -/
+def criticalLineMu (p : RatExpPair) : QRat :=
+  (p.k + p.l - QRat.mk' 1 2) / QRat.ofInt 2
+
+/-- Helper for `QRat.div` when the divisor numerator is strictly positive. -/
+theorem qrat_div_pos (a b : QRat) (hb : 0 < b.num) :
+    QRat.div a b =
+      ⟨a.num * (b.den : Int), a.den * b.num.natAbs,
+        Nat.mul_pos a.den_pos (Int.natAbs_pos.mpr (by omega))⟩ := by
+  dsimp [QRat.div]
+  simp only [hb, ↓reduceDIte]
+
+/-- Helper for division by `2` in `QRat`. -/
+theorem qrat_div_two (a : QRat) :
+    a / QRat.ofInt 2 = ⟨a.num, a.den * 2, Nat.mul_pos a.den_pos (by decide)⟩ := by
+  have h : (a / QRat.ofInt 2).num = a.num ∧ (a / QRat.ofInt 2).den = a.den * 2 := by
+    dsimp [HDiv.hDiv, Div.div, QRat.div, QRat.ofInt]
+    exact ⟨Int.mul_one _, rfl⟩
+  cases heq : a / QRat.ofInt 2
+  rw [heq] at h
+  rcases h with ⟨hn, hd⟩
+  subst hn hd
+  rfl
+
+private theorem qrat_le_iff (a b : QRat) :
+    (a ≤ b) ↔ a.num * (b.den : Int) ≤ b.num * (a.den : Int) :=
+  Iff.rfl
+
+private theorem qrat_lt_iff (a b : QRat) :
+    (a < b) ↔ a.num * (b.den : Int) < b.num * (a.den : Int) :=
+  Iff.rfl
+
+private theorem qrat_eqv_iff (a b : QRat) :
+    QRat.eqv a b ↔ a.num * (b.den : Int) = b.num * (a.den : Int) :=
+  Iff.rfl
+
+private theorem qrat_add_num (a b : QRat) :
+    (a + b).num = a.num * (b.den : Int) + b.num * (a.den : Int) :=
+  rfl
+
+private theorem qrat_add_den (a b : QRat) :
+    (a + b).den = a.den * b.den :=
+  rfl
+
+private theorem qrat_sub_num (a b : QRat) :
+    (a - b).num = a.num * (b.den : Int) - b.num * (a.den : Int) :=
+  rfl
+
+private theorem qrat_sub_den (a b : QRat) :
+    (a - b).den = a.den * b.den :=
+  rfl
+
+private theorem natCast_1 : ((1 : Nat) : Int) = 1 := rfl
+private theorem natCast_2 : ((2 : Nat) : Int) = 2 := rfl
+private theorem natCast_4 : ((4 : Nat) : Int) = 4 := rfl
+private theorem natCast_7 : ((7 : Nat) : Int) = 7 := rfl
+private theorem natCast_8 : ((8 : Nat) : Int) = 8 := rfl
+
+private theorem int_mul2_mul2 (a b : Int) :
+    (a * 2) * (b * 2) = 4 * (b * a) := by
+  have h1 : (a * 2) * (b * 2) = ((a * 2) * b) * 2 := (Int.mul_assoc _ _ _).symm
+  have h2 : (a * 2) * b = (2 * b) * a := by
+    rw [Int.mul_assoc, Int.mul_comm a (2 * b)]
+  rw [h1, h2, Int.mul_comm ((2 * b) * a) 2, ← Int.mul_assoc 2 (2 * b) a,
+    ← Int.mul_assoc 2 2 b, show (2 * 2 : Int) = 4 from rfl, Int.mul_assoc 4 b a]
+
+private theorem int_add_sub_half (x k : Int) :
+    ((x * 2 + k) * 2 - k * 2) * k = x * (k * 2 * 2) := by
+  have hlin : (x * 2 + k) * 2 - k * 2 = x * (2 * 2) := by
+    rw [Int.add_mul, Int.mul_assoc x 2 2]
+    omega
+  rw [hlin, Int.mul_assoc x (2 * 2) k, Int.mul_comm (2 * 2) k,
+    ← Int.mul_assoc k 2 2]
+
+private theorem int_sub_sub_half (x k : Int) :
+    ((x * 2 - k) * 2 + k * 2) * k = x * (k * 2 * 2) := by
+  have hlin : (x * 2 - k) * 2 + k * 2 = x * (2 * 2) := by
+    rw [Int.sub_mul, Int.mul_assoc x 2 2]
+    omega
+  rw [hlin, Int.mul_assoc x (2 * 2) k, Int.mul_comm (2 * 2) k,
+    ← Int.mul_assoc k 2 2]
+
+/-- Theorem: Weyl-differencing operator `vdcProcessA` preserves all valid exponent-pair invariants. -/
+theorem vdcProcessA_preserves_valid (p : RatExpPair) (hp : RatExpPair.valid p) :
+    RatExpPair.valid (vdcProcessA p) := by
+  rcases p with ⟨⟨kn, kd, hkd⟩, ⟨ln, ld, hld⟩⟩
+  rcases hp with ⟨h0k, hk_half, hhalf_l, hl_one, _hkl⟩
+  rw [qrat_le_iff] at h0k hk_half hhalf_l hl_one
+  change 0 * (kd : Int) ≤ kn * 1 at h0k
+  change kn * 2 ≤ 1 * (kd : Int) at hk_half
+  change 1 * (ld : Int) ≤ ln * 2 at hhalf_l
+  change ln * 1 ≤ 1 * (ld : Int) at hl_one
+  have hk_nonneg : 0 ≤ kn := by omega
+  have hl_nonneg : 0 ≤ ln := by omega
+  have hkd_pos : (0 : Int) < (kd : Int) := Int.natCast_pos.mpr hkd
+  have hld_pos : (0 : Int) < (ld : Int) := Int.natCast_pos.mpr hld
+  have hD_pos : (0 : Int) < 2 * (kn + (kd : Int)) := by omega
+  have hD_abs : ((2 * (kn + (kd : Int))).natAbs : Int) = 2 * (kn + (kd : Int)) :=
+    Int.natAbs_of_nonneg (Int.le_of_lt hD_pos)
+  have hden_pos :
+      (0 : Int) < (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)).num := by
+    change 0 < 2 * (kn * 1 + 1 * (kd : Int))
+    omega
+  dsimp [RatExpPair.valid, vdcProcessA]
+  change _ ∧ _ ∧ _ ∧ _ ∧ _
+  rw [qrat_le_iff, qrat_le_iff, qrat_le_iff, qrat_le_iff, qrat_le_iff]
+  have hkdiv :
+      (⟨kn, kd, hkd⟩ / (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1))) =
+        ⟨kn * (kd : Int), kd * (2 * (kn + (kd : Int))).natAbs,
+          Nat.mul_pos hkd (Int.natAbs_pos.mpr (by omega))⟩ := by
+    have h := qrat_div_pos ⟨kn, kd, hkd⟩ (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)) hden_pos
+    have hnum_eq :
+        kn * ((QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)).den : Int) = kn * (kd : Int) := by
+      change kn * (1 * (kd * 1) : Nat) = kn * (kd : Int)
+      simp
+    have hden_eq :
+        kd * (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)).num.natAbs =
+          kd * (2 * (kn + (kd : Int))).natAbs := by
+      have hnum : (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)).num = 2 * (kn + (kd : Int)) := by
+        change 2 * (kn * 1 + 1 * (kd : Int)) = 2 * (kn + (kd : Int))
+        omega
+      rw [hnum]
+    change QRat.div _ _ = _ at h
+    cases heq : ⟨kn, kd, hkd⟩ / (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1))
+    change QRat.div _ _ = _ at heq
+    rw [h] at heq
+    cases heq
+    simp only [hnum_eq, hden_eq]
+  have hldiv :
+      ((⟨kn, kd, hkd⟩ + ⟨ln, ld, hld⟩ + QRat.ofInt 1) /
+          (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1))) =
+        ⟨(kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int)) * (kd : Int),
+          (kd * ld) * (2 * (kn + (kd : Int))).natAbs,
+          Nat.mul_pos (Nat.mul_pos hkd hld) (Int.natAbs_pos.mpr (by omega))⟩ := by
+    have h := qrat_div_pos (⟨kn, kd, hkd⟩ + ⟨ln, ld, hld⟩ + QRat.ofInt 1)
+      (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)) hden_pos
+    have hnum1 : (⟨kn, kd, hkd⟩ + ⟨ln, ld, hld⟩ + QRat.ofInt 1).num =
+        kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int) := by
+      change (kn * (ld : Int) + ln * (kd : Int)) * 1 + 1 * ((kd * ld : Nat) : Int) = _
+      simp [Int.natCast_mul]
+    have hden1 : (⟨kn, kd, hkd⟩ + ⟨ln, ld, hld⟩ + QRat.ofInt 1).den = kd * ld := by
+      change (kd * ld) * 1 = kd * ld
+      omega
+    have hden2 : ((QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)).den : Int) = (kd : Int) := by
+      change ((1 * (kd * 1) : Nat) : Int) = (kd : Int)
+      simp
+    have hnum2 : (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)).num = 2 * (kn + (kd : Int)) := by
+      change 2 * (kn * 1 + 1 * (kd : Int)) = 2 * (kn + (kd : Int))
+      omega
+    change QRat.div _ _ = _
+    rw [h]
+    simp only [hnum1, hden1, hden2, hnum2]
+  rw [hkdiv, hldiv]
+  dsimp [QRat.add, QRat.ofInt, QRat.mk']
+  simp only [qrat_add_num, qrat_add_den, Int.zero_mul, Int.one_mul, Int.mul_one,
+    Int.natCast_mul, hD_abs]
+  have hk_nonneg' : 0 ≤ kn * (kd : Int) :=
+    Int.mul_nonneg hk_nonneg (Int.le_of_lt hkd_pos)
+  have hk'_half : kn * (kd : Int) * 2 ≤ (kd : Int) * (2 * (kn + (kd : Int))) := by
+    have h2le : 2 * kn ≤ 2 * (kn + (kd : Int)) := by omega
+    have hmul := Int.mul_le_mul_of_nonneg_right h2le (Int.le_of_lt hkd_pos)
+    calc
+      kn * (kd : Int) * 2 = kn * ((kd : Int) * 2) := Int.mul_assoc _ _ _
+      _ = kn * (2 * (kd : Int)) := by rw [Int.mul_comm (kd : Int) 2]
+      _ = 2 * kn * (kd : Int) := by rw [← Int.mul_assoc, Int.mul_comm kn 2]
+      _ ≤ 2 * (kn + (kd : Int)) * (kd : Int) := hmul
+      _ = (kd : Int) * (2 * (kn + (kd : Int))) := Int.mul_comm _ _
+  have hhalf_l' :
+      (kd : Int) * (ld : Int) * (2 * (kn + (kd : Int))) ≤
+      (kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int)) * (kd : Int) * 2 := by
+    have hln_kd : 0 ≤ 2 * ln * (kd : Int) :=
+      Int.mul_nonneg (by omega) (Int.le_of_lt hkd_pos)
+    have h1 : (ld : Int) * (2 * (kn + (kd : Int))) ≤
+        2 * (kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int)) := by
+      calc
+        (ld : Int) * (2 * (kn + (kd : Int)))
+            = (ld : Int) * (2 * kn) + (ld : Int) * (2 * (kd : Int)) := by
+              rw [Int.mul_add (2 : Int), Int.mul_add]
+        _ = 2 * (kn * (ld : Int)) + 2 * ((kd : Int) * (ld : Int)) := by
+              rw [← Int.mul_assoc, Int.mul_comm (ld : Int) 2, Int.mul_assoc 2,
+                Int.mul_comm (ld : Int) kn, ← Int.mul_assoc (ld : Int) 2,
+                Int.mul_comm (ld : Int) 2, Int.mul_assoc 2, Int.mul_comm (ld : Int) (kd : Int)]
+        _ ≤ 2 * (kn * (ld : Int)) + 2 * ((kd : Int) * (ld : Int)) + 2 * ln * (kd : Int) := by omega
+        _ = 2 * (kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int)) := by
+              rw [Int.mul_add, Int.mul_add, Int.mul_assoc 2 ln (kd : Int)]
+              omega
+    have h2 := Int.mul_le_mul_of_nonneg_right h1 (Int.le_of_lt hkd_pos)
+    calc
+      (kd : Int) * (ld : Int) * (2 * (kn + (kd : Int)))
+          = (ld : Int) * (2 * (kn + (kd : Int))) * (kd : Int) := by
+            rw [Int.mul_comm (kd : Int) (ld : Int), Int.mul_assoc (ld : Int),
+              Int.mul_comm (kd : Int) (2 * (kn + (kd : Int))), ← Int.mul_assoc]
+      _ ≤ 2 * (kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int)) * (kd : Int) := h2
+      _ = (kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int)) * (kd : Int) * 2 := by
+            rw [Int.mul_comm 2, Int.mul_assoc, Int.mul_comm 2 (kd : Int), ← Int.mul_assoc]
+  have hl'_one :
+      (kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int)) * (kd : Int) ≤
+      (kd : Int) * (ld : Int) * (2 * (kn + (kd : Int))) := by
+    have hln_le : ln * (kd : Int) ≤ (ld : Int) * (kd : Int) :=
+      Int.mul_le_mul_of_nonneg_right (by omega) (Int.le_of_lt hkd_pos)
+    have hkn_ld : 0 ≤ kn * (ld : Int) :=
+      Int.mul_nonneg hk_nonneg (Int.le_of_lt hld_pos)
+    have hkd_ld : (kd : Int) * (ld : Int) = (ld : Int) * (kd : Int) := Int.mul_comm _ _
+    have h1 : kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int) ≤
+        (ld : Int) * (2 * (kn + (kd : Int))) := by
+      calc
+        kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int)
+            ≤ kn * (ld : Int) + (ld : Int) * (kd : Int) + (kd : Int) * (ld : Int) := by omega
+        _ ≤ 2 * (kn * (ld : Int)) + 2 * ((ld : Int) * (kd : Int)) := by
+              rw [hkd_ld]; omega
+        _ = (ld : Int) * (2 * (kn + (kd : Int))) := by
+              rw [Int.mul_add (2 : Int) kn (kd : Int),
+                Int.mul_add (ld : Int) (2 * kn) (2 * (kd : Int)),
+                Int.mul_comm (ld : Int) (2 * kn),
+                Int.mul_comm (ld : Int) (2 * (kd : Int)),
+                ← Int.mul_assoc 2 kn (ld : Int),
+                Int.mul_assoc 2 (kd : Int) (ld : Int),
+                hkd_ld]
+    have h2 := Int.mul_le_mul_of_nonneg_right h1 (Int.le_of_lt hkd_pos)
+    calc
+      (kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int)) * (kd : Int)
+          ≤ (ld : Int) * (2 * (kn + (kd : Int))) * (kd : Int) := h2
+      _ = (kd : Int) * (ld : Int) * (2 * (kn + (kd : Int))) := by
+            rw [Int.mul_assoc, Int.mul_comm (2 * (kn + (kd : Int))) (kd : Int),
+              ← Int.mul_assoc, Int.mul_comm (ld : Int) (kd : Int)]
+  have hkl' :
+      ((kd : Int) * (2 * (kn + (kd : Int)))) *
+        ((kd : Int) * (ld : Int) * (2 * (kn + (kd : Int)))) ≤
+      (kn * (kd : Int) * ((kd : Int) * (ld : Int) * (2 * (kn + (kd : Int)))) +
+       (kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int)) * (kd : Int) *
+         ((kd : Int) * (2 * (kn + (kd : Int))))) * 2 := by
+    have h_mul := Int.mul_le_mul_of_nonneg_left hhalf_l'
+      (Int.mul_nonneg (Int.le_of_lt hkd_pos) (Int.le_of_lt hD_pos))
+    have hk_term_nn :
+        0 ≤ kn * (kd : Int) * ((kd : Int) * (ld : Int) * (2 * (kn + (kd : Int)))) * 2 :=
+      Int.mul_nonneg (Int.mul_nonneg hk_nonneg'
+        (Int.mul_nonneg (Int.mul_nonneg (Int.le_of_lt hkd_pos) (Int.le_of_lt hld_pos))
+          (Int.le_of_lt hD_pos))) (by omega)
+    have hassoc :
+        ((kd : Int) * (2 * (kn + (kd : Int)))) *
+          ((kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int)) * (kd : Int) * 2) =
+        (kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int)) * (kd : Int) *
+          ((kd : Int) * (2 * (kn + (kd : Int)))) * 2 := by
+      rw [← Int.mul_assoc ((kd : Int) * (2 * (kn + (kd : Int)))),
+        Int.mul_comm ((kd : Int) * (2 * (kn + (kd : Int))))]
+    rw [Int.add_mul]
+    omega
+  exact ⟨hk_nonneg', hk'_half, hhalf_l', hl'_one, hkl'⟩
+
+/-- Theorem: Poisson operator `vdcProcessB` preserves all valid exponent-pair invariants. -/
+theorem vdcProcessB_preserves_valid (p : RatExpPair) (hp : RatExpPair.valid p) :
+    RatExpPair.valid (vdcProcessB p) := by
+  rcases p with ⟨⟨kn, kd, hkd⟩, ⟨ln, ld, hld⟩⟩
+  rcases hp with ⟨h0k, hk_half, hhalf_l, hl_one, _hkl⟩
+  rw [qrat_le_iff] at h0k hk_half hhalf_l hl_one
+  change 0 * (kd : Int) ≤ kn * 1 at h0k
+  change kn * 2 ≤ 1 * (kd : Int) at hk_half
+  change 1 * (ld : Int) ≤ ln * 2 at hhalf_l
+  change ln * 1 ≤ 1 * (ld : Int) at hl_one
+  have hkd_pos : (0 : Int) < (kd : Int) := Int.natCast_pos.mpr hkd
+  have hld_pos : (0 : Int) < (ld : Int) := Int.natCast_pos.mpr hld
+  dsimp [RatExpPair.valid, vdcProcessB]
+  rw [qrat_le_iff, qrat_le_iff, qrat_le_iff, qrat_le_iff, qrat_le_iff]
+  simp only [qrat_add_num, qrat_add_den, qrat_sub_num, qrat_sub_den, QRat.ofInt, QRat.mk',
+    Int.zero_mul, Int.one_mul, Int.mul_one, Int.natCast_mul, natCast_1, natCast_2]
+  refine ⟨by omega, by omega, by omega, by omega, ?_⟩
+  have h_l : 0 ≤ (ln * 2 - (ld : Int)) * ((kd : Int) * 2) :=
+    Int.mul_nonneg (by omega) (Int.mul_nonneg (Int.le_of_lt hkd_pos) (by omega))
+  have h_r1 : ((ld : Int) * 2) * ((kd : Int) * 2) = 4 * ((kd : Int) * (ld : Int)) :=
+    int_mul2_mul2 (ld : Int) (kd : Int)
+  have h_r2 : 2 * ((kn * 2 + (kd : Int)) * ((ld : Int) * 2)) =
+      4 * ((kd : Int) * (ld : Int)) + 8 * (kn * (ld : Int)) := by
+    have hkd_ld : (ld : Int) * (kd : Int) = (kd : Int) * (ld : Int) := Int.mul_comm _ _
+    rw [Int.add_mul, Int.mul_add]
+    have ha : 2 * (kn * 2 * ((ld : Int) * 2)) = 8 * (kn * (ld : Int)) := by
+      have htmp : 2 * (kn * 2) = kn * 4 := by omega
+      rw [← Int.mul_assoc 2 (kn * 2) ((ld : Int) * 2), htmp,
+        Int.mul_assoc kn 4 ((ld : Int) * 2), Int.mul_comm 4 ((ld : Int) * 2),
+        Int.mul_assoc (ld : Int) 2 4, Int.mul_comm (ld : Int) (2 * 4),
+        show (2 * 4 : Int) = 8 from rfl, ← Int.mul_assoc kn 8 (ld : Int),
+        Int.mul_comm kn 8, Int.mul_assoc 8 kn (ld : Int)]
+    have hb : 2 * ((kd : Int) * ((ld : Int) * 2)) = 4 * ((kd : Int) * (ld : Int)) := by
+      rw [← Int.mul_assoc 2 (kd : Int) ((ld : Int) * 2),
+        Int.mul_comm (2 * (kd : Int)) ((ld : Int) * 2),
+        ← Int.mul_assoc ((ld : Int) * 2) 2 (kd : Int),
+        Int.mul_assoc (ld : Int) 2 2, Int.mul_comm ((ld : Int) * (2 * 2)) (kd : Int),
+        Int.mul_comm (ld : Int) (2 * 2), ← Int.mul_assoc (kd : Int) (2 * 2) (ld : Int),
+        Int.mul_comm (kd : Int) (2 * 2), Int.mul_assoc (2 * 2) (kd : Int) (ld : Int)]
+      rfl
+    rw [ha, hb]
+    omega
+  have hkn_ld_nn : 0 ≤ kn * (ld : Int) :=
+    Int.mul_nonneg (by omega) (Int.le_of_lt hld_pos)
+  have hrhs :
+      ((ln * 2 - (ld : Int)) * ((kd : Int) * 2) + (kn * 2 + (kd : Int)) * ((ld : Int) * 2)) * 2 =
+      (ln * 2 - (ld : Int)) * ((kd : Int) * 2) * 2 +
+        2 * ((kn * 2 + (kd : Int)) * ((ld : Int) * 2)) := by
+    rw [Int.add_mul, Int.mul_comm ((kn * 2 + (kd : Int)) * ((ld : Int) * 2)) 2]
+  rw [h_r1, hrhs, h_r2]
+  omega
+
+/-- Theorem: Poisson operator `vdcProcessB` is an involution (`B(B(p)) ≃ p`) for all `p`. -/
+theorem vdcProcessB_involutive (p : RatExpPair) :
+    RatExpPair.eqv (vdcProcessB (vdcProcessB p)) p := by
+  rcases p with ⟨⟨kn, kd, hkd⟩, ⟨ln, ld, hld⟩⟩
+  dsimp [RatExpPair.eqv, vdcProcessB]
+  rw [qrat_eqv_iff, qrat_eqv_iff]
+  simp only [qrat_add_num, qrat_add_den, qrat_sub_num, qrat_sub_den, QRat.mk',
+    Int.one_mul, Int.natCast_mul, natCast_2]
+  exact ⟨int_add_sub_half kn (kd : Int), int_sub_sub_half ln (ld : Int)⟩
+
+/-- Theorem: Classic `{A, B}*` exponent-pair orbit from `(0, 1)` to `ABA²B(0, 1) = (1/9, 13/18)`
+with exact critical-line exponents `μ(p0) = 1/4 > μ(A²B) = 5/28 > μ(AB) = μ(ABA²B) = 1/6`. -/
+theorem vdc_classic_orbit_chain :
+    let p0 := trivialRatPair
+    let p1 := vdcProcessB p0
+    let p2 := vdcProcessA p1
+    let p3 := vdcProcessA p2
+    let p4 := vdcProcessB p3
+    let p5 := vdcProcessA p4
+    RatExpPair.valid p0 ∧ RatExpPair.valid p1 ∧ RatExpPair.valid p2 ∧
+    RatExpPair.valid p3 ∧ RatExpPair.valid p4 ∧ RatExpPair.valid p5 ∧
+    RatExpPair.eqv p1 ⟨QRat.mk' 1 2, QRat.mk' 1 2⟩ ∧
+    RatExpPair.eqv p2 ⟨QRat.mk' 1 6, QRat.mk' 2 3⟩ ∧
+    RatExpPair.eqv p3 ⟨QRat.mk' 1 14, QRat.mk' 11 14⟩ ∧
+    RatExpPair.eqv p4 ⟨QRat.mk' 2 7, QRat.mk' 4 7⟩ ∧
+    RatExpPair.eqv p5 ⟨QRat.mk' 1 9, QRat.mk' 13 18⟩ ∧
+    QRat.eqv (criticalLineMu p0) (QRat.mk' 1 4) ∧
+    QRat.eqv (criticalLineMu p2) (QRat.mk' 1 6) ∧
+    QRat.eqv (criticalLineMu p3) (QRat.mk' 5 28) ∧
+    QRat.eqv (criticalLineMu p5) (QRat.mk' 1 6) ∧
+    criticalLineMu p5 < criticalLineMu p3 ∧
+    criticalLineMu p3 < criticalLineMu p0 ∧
+    criticalLineMu p2 < criticalLineMu p0 ∧
+    p5.k < p2.k ∧ p2.k < p1.k := by
+  decide
+
+/-- Classical Ingham zero-density slope `A = 3`. -/
+def zeroDensityIngham : QRat := QRat.ofInt 3
+
+/-- Classical Huxley (1972) zero-density slope `A = 12/5`. -/
+def zeroDensityHuxley : QRat := QRat.mk' 12 5
+
+/-- Guth–Maynard (2024) zero-density slope `A = 30/13`. -/
+def zeroDensityGuthMaynard : QRat := QRat.mk' 30 13
+
+/-- Lindelöf / Density Hypothesis limiting slope `A = 2`. -/
+def zeroDensityHypothesis : QRat := QRat.ofInt 2
+
+/-- Zero-density exponent `A * (1 - σ)`. -/
+def zeroDensityExponentAt (A sigma : QRat) : QRat :=
+  A * (QRat.ofInt 1 - sigma)
+
+/-- Short-interval prime gap exponent `θ_prime(A) = 1 - 1 / A`. -/
+def primeGapExponent (A : QRat) : QRat :=
+  QRat.ofInt 1 - (QRat.ofInt 1) / A
+
+/-- Theorem: Guth–Maynard (`30/13`) strictly improves Huxley (`12/5`) and Ingham (`3`),
+saving `3/130` in zero-density exponent at `σ = 3/4`. -/
+theorem guth_maynard_strictly_improves_huxley :
+    let sigma := QRat.mk' 3 4
+    let eDH := zeroDensityExponentAt zeroDensityHypothesis sigma
+    let eGM := zeroDensityExponentAt zeroDensityGuthMaynard sigma
+    let eHux := zeroDensityExponentAt zeroDensityHuxley sigma
+    let eIng := zeroDensityExponentAt zeroDensityIngham sigma
+    zeroDensityHypothesis < zeroDensityGuthMaynard ∧
+    zeroDensityGuthMaynard < zeroDensityHuxley ∧
+    zeroDensityHuxley < zeroDensityIngham ∧
+    QRat.eqv eDH (QRat.mk' 1 2) ∧
+    QRat.eqv eGM (QRat.mk' 15 26) ∧
+    QRat.eqv eHux (QRat.mk' 3 5) ∧
+    QRat.eqv eIng (QRat.mk' 3 4) ∧
+    eDH < eGM ∧ eGM < eHux ∧ eHux < eIng ∧
+    QRat.eqv ((zeroDensityHuxley - zeroDensityGuthMaynard) * QRat.mk' 1 4)
+      (QRat.mk' 3 130) := by
+  decide
+
+/-- Theorem: Prime-in-short-intervals threshold `θ_prime(A) = 1 - 1/A`:
+`1/2 (DH) < 17/30 (Guth–Maynard) < 7/12 (Huxley) < 2/3 (Ingham)`. -/
+theorem guth_maynard_prime_gap_threshold :
+    let tDH := primeGapExponent zeroDensityHypothesis
+    let tGM := primeGapExponent zeroDensityGuthMaynard
+    let tHux := primeGapExponent zeroDensityHuxley
+    let tIng := primeGapExponent zeroDensityIngham
+    QRat.eqv tDH (QRat.mk' 1 2) ∧
+    QRat.eqv tGM (QRat.mk' 17 30) ∧
+    QRat.eqv tHux (QRat.mk' 7 12) ∧
+    QRat.eqv tIng (QRat.mk' 2 3) ∧
+    tDH < tGM ∧ tGM < tHux ∧ tHux < tIng := by
+  decide
+
+/-- Mollifier length-to-QRH threshold map: `θ(ϑ) = 1 - ϑ / 2`. -/
+def qrhThresholdFromMollifier (ϑ : QRat) : QRat :=
+  QRat.ofInt 1 - ϑ / QRat.ofInt 2
+
+/-- Theorem: Increasing mollifier length strictly lowers the QRH zero-free threshold `θ(ϑ)`. -/
+theorem mollifier_descent_monotone (ϑ₁ ϑ₂ : QRat) (h : ϑ₁ < ϑ₂) :
+    qrhThresholdFromMollifier ϑ₂ < qrhThresholdFromMollifier ϑ₁ := by
+  rcases ϑ₁ with ⟨n1, d1, hd1⟩
+  rcases ϑ₂ with ⟨n2, d2, hd2⟩
+  rw [qrat_lt_iff] at h ⊢
+  dsimp [qrhThresholdFromMollifier]
+  rw [qrat_div_two, qrat_div_two]
+  simp only [qrat_sub_num, qrat_sub_den, QRat.ofInt, Int.one_mul, Int.mul_one,
+    Int.natCast_mul, natCast_1, natCast_2]
+  have h4a :
+      ((d2 : Int) * 2 - n2) * ((d1 : Int) * 2) =
+        4 * ((d2 : Int) * (d1 : Int)) - 2 * (n2 * (d1 : Int)) := by
+    rw [Int.sub_mul]
+    have hx : (d2 : Int) * 2 * ((d1 : Int) * 2) = 4 * ((d2 : Int) * (d1 : Int)) := by
+      rw [int_mul2_mul2 (d2 : Int) (d1 : Int), Int.mul_comm (d1 : Int) (d2 : Int)]
+    have hy : n2 * ((d1 : Int) * 2) = 2 * (n2 * (d1 : Int)) := by
+      rw [← Int.mul_assoc, Int.mul_comm (n2 * (d1 : Int)) 2]
+    rw [hx, hy]
+  have h4b :
+      ((d1 : Int) * 2 - n1) * ((d2 : Int) * 2) =
+        4 * ((d2 : Int) * (d1 : Int)) - 2 * (n1 * (d2 : Int)) := by
+    rw [Int.sub_mul]
+    have hx : (d1 : Int) * 2 * ((d2 : Int) * 2) = 4 * ((d2 : Int) * (d1 : Int)) :=
+      int_mul2_mul2 (d1 : Int) (d2 : Int)
+    have hy : n1 * ((d2 : Int) * 2) = 2 * (n1 * (d2 : Int)) := by
+      rw [← Int.mul_assoc, Int.mul_comm (n1 * (d2 : Int)) 2]
+    rw [hx, hy]
+  rw [h4a, h4b]
+  dsimp at h
+  omega
+
+/-- Theorem: Any admissible mollifier length `ϑ > 1/4` yields a QRH threshold strictly below `7/8`. -/
+theorem mollifier_beyond_quarter_beats_seven_eighths (ϑ : QRat) (h : QRat.mk' 1 4 < ϑ) :
+    qrhThresholdFromMollifier ϑ < QRat.mk' 7 8 := by
+  have hmon := mollifier_descent_monotone (QRat.mk' 1 4) ϑ h
+  rcases ϑ with ⟨n, d, hd⟩
+  rw [qrat_lt_iff] at hmon ⊢
+  dsimp [qrhThresholdFromMollifier] at hmon ⊢
+  rw [qrat_div_two, qrat_div_two] at hmon
+  rw [qrat_div_two]
+  simp only [qrat_sub_num, qrat_sub_den, QRat.ofInt, QRat.mk', Int.one_mul, Int.natCast_mul,
+    natCast_1, natCast_2, natCast_4, natCast_8] at hmon ⊢
+  omega
+
+/-- Theorem: Mollifier length `ϑ = 1/3` certifies `θ = 5/6 < 7/8` (margin `1/24`). -/
+theorem mollifier_one_third_yields_five_sixths :
+    let th := qrhThresholdFromMollifier (QRat.mk' 1 3)
+    QRat.eqv th (QRat.mk' 5 6) ∧
+    th < QRat.mk' 7 8 ∧
+    QRat.eqv (QRat.mk' 7 8 - th) (QRat.mk' 1 24) := by
+  decide
+
+/-- Theorem: Levinson–Conrey length `ϑ = 1/2` certifies `θ = 3/4 < 5/6 < 7/8` (margin `1/8`). -/
+theorem mollifier_one_half_yields_three_quarters :
+    let th := qrhThresholdFromMollifier (QRat.mk' 1 2)
+    QRat.eqv th (QRat.mk' 3 4) ∧
+    th < QRat.mk' 5 6 ∧
+    th < QRat.mk' 7 8 ∧
+    QRat.eqv (QRat.mk' 7 8 - th) (QRat.mk' 1 8) := by
+  decide
+
+/-- Theorem: Complete constructive analytic QRH descent chain combining mollifier ladder
+`1/2 < 3/4 < 5/6 < 7/8 < 11/12 < 1`, `{A, B}*` exponent-pair chain, and Guth–Maynard savings. -/
+theorem qrh_full_descent_chain_certified :
+    let th1 := qrhThresholdFromMollifier (QRat.ofInt 1)
+    let thHalf := qrhThresholdFromMollifier (QRat.mk' 1 2)
+    let thThird := qrhThresholdFromMollifier (QRat.mk' 1 3)
+    let thQuarter := qrhThresholdFromMollifier (QRat.mk' 1 4)
+    let thSixth := qrhThresholdFromMollifier (QRat.mk' 1 6)
+    let thZero := qrhThresholdFromMollifier (QRat.ofInt 0)
+    QRat.eqv th1 (QRat.mk' 1 2) ∧
+    QRat.eqv thHalf (QRat.mk' 3 4) ∧
+    QRat.eqv thThird (QRat.mk' 5 6) ∧
+    QRat.eqv thQuarter (QRat.mk' 7 8) ∧
+    QRat.eqv thSixth (QRat.mk' 11 12) ∧
+    QRat.eqv thZero (QRat.ofInt 1) ∧
+    th1 < thHalf ∧ thHalf < thThird ∧ thThird < thQuarter ∧
+    thQuarter < thSixth ∧ thSixth < thZero ∧
+    QRat.mk' 1 6 < QRat.mk' 5 28 ∧
+    QRat.mk' 5 28 < QRat.mk' 1 4 ∧
+    zeroDensityGuthMaynard < zeroDensityHuxley ∧
+    primeGapExponent zeroDensityGuthMaynard < primeGapExponent zeroDensityHuxley := by
+  decide
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann.lean

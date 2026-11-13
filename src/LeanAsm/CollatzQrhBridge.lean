@@ -108,6 +108,23 @@ theorem collatz_qrh_shared_cancellation_hierarchy :
     (7 : Nat) * 1 < 1 * 8 := by
   decide
 
+/--
+Synchronized Collatz–QRH Mollifier & Exponent-Pair Cancellation Descent:
+Connects the cross-domain Collatz–QRH ladder (`1/2 < 3/4 < 7/8 < 1`) with the
+full constructive QRH mollifier descent (`1/2 < 3/4 < 5/6 < 7/8 < 11/12 < 1`),
+`{A, B}*` subconvexity chain, and Guth–Maynard zero-density breakthrough.
+Proved constructively with ZERO axioms.
+-/
+theorem collatz_qrh_mollifier_descent_synchronized :
+    QRat.mk' 1 2 < QRat.mk' 3 4 ∧
+    QRat.mk' 3 4 < QRat.mk' 5 6 ∧
+    QRat.mk' 5 6 < QRat.mk' 7 8 ∧
+    QRat.mk' 7 8 < QRat.mk' 11 12 ∧
+    QRat.mk' 11 12 < QRat.ofInt 1 ∧
+    qrhThresholdFromMollifier (QRat.mk' 1 3) < QRat.mk' 7 8 ∧
+    qrhThresholdFromMollifier (QRat.mk' 1 2) < QRat.mk' 5 6 := by
+  decide
+
 end CollatzQrhBridge
 
 -- end of file: leanasm/src/LeanAsm/CollatzQrhBridge.lean

@@ -88,6 +88,20 @@ import LeanAsm
 #print axioms QuasiRiemann.mollifier_regime_ladder_verified
 #print axioms QuasiRiemann.deuring_heilbronn_repulsion_below_seven_eighths
 
+-- Part 5b: Constructive QRat {A,B}* Orbit, Guth-Maynard (30/13) & Mollifier Descent (gemweb044)
+#print axioms QuasiRiemann.vdcProcessA_preserves_valid
+#print axioms QuasiRiemann.vdcProcessB_preserves_valid
+#print axioms QuasiRiemann.vdcProcessB_involutive
+#print axioms QuasiRiemann.vdc_classic_orbit_chain
+#print axioms QuasiRiemann.guth_maynard_strictly_improves_huxley
+#print axioms QuasiRiemann.guth_maynard_prime_gap_threshold
+#print axioms QuasiRiemann.mollifier_descent_monotone
+#print axioms QuasiRiemann.mollifier_beyond_quarter_beats_seven_eighths
+#print axioms QuasiRiemann.mollifier_one_third_yields_five_sixths
+#print axioms QuasiRiemann.mollifier_one_half_yields_three_quarters
+#print axioms QuasiRiemann.qrh_full_descent_chain_certified
+#print axioms CollatzQrhBridge.collatz_qrh_mollifier_descent_synchronized
+
 #print axioms QuasiRiemann.euler_maclaurin_dyadic_tail_bound_256
 #print axioms QuasiRiemann.dirichlet_cert_lower_bound_margin_samples
 #print axioms QuasiRiemann.sample_certs_valid_in_unknown_box
