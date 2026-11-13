@@ -2485,22 +2485,28 @@ def QRat.sub (a b : QRat) : QRat :=
 def QRat.mul (a b : QRat) : QRat :=
   ⟨a.num * b.num, a.den * b.den, Nat.mul_pos a.den_pos b.den_pos⟩
 
-/-- Total exact rational division (returning `0` if divisor is `0`). -/
-def QRat.div (a b : QRat) : QRat :=
-  if hb : 0 < b.num then
+/-- Checked exact rational division requiring a non-zero divisor (`b.num ≠ 0`). -/
+def QRat.div (a b : QRat) (hb : b.num ≠ 0) : QRat :=
+  if _hb_pos : 0 < b.num then
     ⟨a.num * (b.den : Int), a.den * b.num.natAbs,
-      Nat.mul_pos a.den_pos (Int.natAbs_pos.mpr (by omega))⟩
-  else if hbn : b.num < 0 then
-    ⟨-(a.num * (b.den : Int)), a.den * b.num.natAbs,
-      Nat.mul_pos a.den_pos (Int.natAbs_pos.mpr (by omega))⟩
+      Nat.mul_pos a.den_pos (Int.natAbs_pos.mpr hb)⟩
   else
-    QRat.ofInt 0
+    ⟨-(a.num * (b.den : Int)), a.den * b.num.natAbs,
+      Nat.mul_pos a.den_pos (Int.natAbs_pos.mpr hb)⟩
+
+/-- Safe exact rational division returning `none` on a zero divisor (`b.num = 0`). -/
+def QRat.div? (a b : QRat) : Option QRat :=
+  if hb : b.num = 0 then none else some (QRat.div a b hb)
+
+/-- Explicit total rational division returning `0` when the divisor is `0`.
+Prefer `QRat.div` (proof-carrying) or `QRat.div?` (`Option`) when division by zero should be rejected. -/
+def QRat.divOrZero (a b : QRat) : QRat :=
+  if hb : b.num = 0 then QRat.ofInt 0 else QRat.div a b hb
 
 instance : Add QRat := ⟨QRat.add⟩
 instance : Neg QRat := ⟨QRat.neg⟩
 instance : Sub QRat := ⟨QRat.sub⟩
 instance : Mul QRat := ⟨QRat.mul⟩
-instance : Div QRat := ⟨QRat.div⟩
 instance : LT QRat := ⟨QRat.lt⟩
 instance : LE QRat := ⟨QRat.le⟩
 
@@ -2540,37 +2546,101 @@ instance (p q : RatExpPair) : Decidable (RatExpPair.eqv p q) := by
 def trivialRatPair : RatExpPair :=
   ⟨QRat.ofInt 0, QRat.ofInt 1⟩
 
-/-- Van der Corput Weyl-differencing `A`-process: `(k / (2(k+1)), (k + ℓ + 1) / (2(k+1)))`. -/
+/-- Van der Corput Weyl-differencing `A`-process: `(k / (2(k+1)), (k + ℓ + 1) / (2(k+1)))`,
+using `QRat.divOrZero` for unvalidated inputs (`denom = 2(k+1) > 0` on valid pairs). -/
 def vdcProcessA (p : RatExpPair) : RatExpPair :=
   let one := QRat.ofInt 1
   let two := QRat.ofInt 2
   let denom := two * (p.k + one)
-  ⟨p.k / denom, (p.k + p.l + one) / denom⟩
+  ⟨QRat.divOrZero p.k denom, QRat.divOrZero (p.k + p.l + one) denom⟩
 
 /-- Van der Corput Poisson-summation `B`-process: `(ℓ - 1/2, k + 1/2)`. -/
 def vdcProcessB (p : RatExpPair) : RatExpPair :=
   let half := QRat.mk' 1 2
   ⟨p.l - half, p.k + half⟩
 
-/-- Critical-line subconvexity exponent `μ(k, ℓ) = (k + ℓ - 1/2) / 2`. -/
+/-- Critical-line subconvexity exponent `μ(k, ℓ) = (k + ℓ - 1/2) / 2` via checked `QRat.div`. -/
 def criticalLineMu (p : RatExpPair) : QRat :=
-  (p.k + p.l - QRat.mk' 1 2) / QRat.ofInt 2
+  QRat.div (p.k + p.l - QRat.mk' 1 2) (QRat.ofInt 2) (by decide)
 
 /-- Helper for `QRat.div` when the divisor numerator is strictly positive. -/
 theorem qrat_div_pos (a b : QRat) (hb : 0 < b.num) :
-    QRat.div a b =
+    QRat.div a b (Int.ne_of_gt hb) =
       ⟨a.num * (b.den : Int), a.den * b.num.natAbs,
-        Nat.mul_pos a.den_pos (Int.natAbs_pos.mpr (by omega))⟩ := by
+        Nat.mul_pos a.den_pos (Int.natAbs_pos.mpr (Int.ne_of_gt hb))⟩ := by
   dsimp [QRat.div]
-  simp only [hb, ↓reduceDIte]
+  split
+  · rfl
+  · rename_i hneg
+    exfalso
+    exact hneg hb
 
-/-- Helper for division by `2` in `QRat`. -/
+/-- Equivalence between `QRat.divOrZero` and checked `QRat.div` whenever `b.num ≠ 0`. -/
+theorem qrat_divOrZero_eq_div (a b : QRat) (hb : b.num ≠ 0) :
+    QRat.divOrZero a b = QRat.div a b hb := by
+  dsimp [QRat.divOrZero]
+  split
+  · rename_i hz
+    exfalso
+    exact hb hz
+  · rfl
+
+/-- `QRat.div?` returns `none` iff the divisor is zero (`b.num = 0`). -/
+theorem qrat_div?_zero (a b : QRat) (hb : b.num = 0) :
+    QRat.div? a b = none := by
+  dsimp [QRat.div?]
+  split
+  · rfl
+  · rename_i hne
+    exfalso
+    exact hne hb
+
+/-- `QRat.div?` agrees with checked `QRat.div` whenever `b.num ≠ 0`. -/
+theorem qrat_div?_eq_some (a b : QRat) (hb : b.num ≠ 0) :
+    QRat.div? a b = some (QRat.div a b hb) := by
+  dsimp [QRat.div?]
+  split
+  · rename_i hz
+    exfalso
+    exact hb hz
+  · rfl
+
+private theorem int_mul4_cancel (a b c d : Int) :
+    (a * b * c) * d = a * (d * c * b) := by
+  rw [Int.mul_assoc (a * b) c d, Int.mul_comm c d, Int.mul_assoc a b (d * c),
+    Int.mul_comm b (d * c)]
+
+/-- Theorem (Rational Division Lawfulness): For every non-zero `b` (`b.num ≠ 0`),
+`(a / b) * b ≃ a` holds in `QRat.eqv`. -/
+theorem qrat_div_mul_cancel (a b : QRat) (hb : b.num ≠ 0) :
+    QRat.eqv (QRat.div a b hb * b) a := by
+  rcases a with ⟨an, ad, had⟩
+  rcases b with ⟨bn, bd, hbd⟩
+  dsimp only at hb
+  dsimp [QRat.div]
+  split
+  · rename_i hpos
+    change (an * (bd : Int) * bn) * (ad : Int) = an * (((ad * bn.natAbs : Nat) : Int) * (bd : Int))
+    have hbn : (bn.natAbs : Int) = bn := Int.natAbs_of_nonneg (Int.le_of_lt hpos)
+    rw [Int.natCast_mul, hbn]
+    exact int_mul4_cancel an (bd : Int) bn (ad : Int)
+  · rename_i hnpos
+    change (-(an * (bd : Int)) * bn) * (ad : Int) = an * (((ad * bn.natAbs : Nat) : Int) * (bd : Int))
+    have hneg : bn < 0 := by omega
+    have hbn : (bn.natAbs : Int) = -bn := Int.ofNat_natAbs_of_nonpos (Int.le_of_lt hneg)
+    rw [Int.natCast_mul, hbn, Int.neg_mul, Int.neg_mul, Int.mul_neg, Int.neg_mul, Int.mul_neg]
+    congr 1
+    exact int_mul4_cancel an (bd : Int) bn (ad : Int)
+
+/-- Helper for checked division by `2` in `QRat`. -/
 theorem qrat_div_two (a : QRat) :
-    a / QRat.ofInt 2 = ⟨a.num, a.den * 2, Nat.mul_pos a.den_pos (by decide)⟩ := by
-  have h : (a / QRat.ofInt 2).num = a.num ∧ (a / QRat.ofInt 2).den = a.den * 2 := by
-    dsimp [HDiv.hDiv, Div.div, QRat.div, QRat.ofInt]
+    QRat.div a (QRat.ofInt 2) (by decide) =
+      ⟨a.num, a.den * 2, Nat.mul_pos a.den_pos (by decide)⟩ := by
+  have h : (QRat.div a (QRat.ofInt 2) (by decide)).num = a.num ∧
+      (QRat.div a (QRat.ofInt 2) (by decide)).den = a.den * 2 := by
+    dsimp [QRat.div, QRat.ofInt]
     exact ⟨Int.mul_one _, rfl⟩
-  cases heq : a / QRat.ofInt 2
+  cases heq : QRat.div a (QRat.ofInt 2) (by decide)
   rw [heq] at h
   rcases h with ⟨hn, hd⟩
   subst hn hd
@@ -2659,9 +2729,11 @@ theorem vdcProcessA_preserves_valid (p : RatExpPair) (hp : RatExpPair.valid p) :
   change _ ∧ _ ∧ _ ∧ _ ∧ _
   rw [qrat_le_iff, qrat_le_iff, qrat_le_iff, qrat_le_iff, qrat_le_iff]
   have hkdiv :
-      (⟨kn, kd, hkd⟩ / (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1))) =
+      QRat.divOrZero ⟨kn, kd, hkd⟩ (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)) =
         ⟨kn * (kd : Int), kd * (2 * (kn + (kd : Int))).natAbs,
           Nat.mul_pos hkd (Int.natAbs_pos.mpr (by omega))⟩ := by
+    have h0 := qrat_divOrZero_eq_div ⟨kn, kd, hkd⟩
+      (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)) (Int.ne_of_gt hden_pos)
     have h := qrat_div_pos ⟨kn, kd, hkd⟩ (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)) hden_pos
     have hnum_eq :
         kn * ((QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)).den : Int) = kn * (kd : Int) := by
@@ -2674,18 +2746,16 @@ theorem vdcProcessA_preserves_valid (p : RatExpPair) (hp : RatExpPair.valid p) :
         change 2 * (kn * 1 + 1 * (kd : Int)) = 2 * (kn + (kd : Int))
         omega
       rw [hnum]
-    change QRat.div _ _ = _ at h
-    cases heq : ⟨kn, kd, hkd⟩ / (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1))
-    change QRat.div _ _ = _ at heq
-    rw [h] at heq
-    cases heq
+    rw [h0, h]
     simp only [hnum_eq, hden_eq]
   have hldiv :
-      ((⟨kn, kd, hkd⟩ + ⟨ln, ld, hld⟩ + QRat.ofInt 1) /
-          (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1))) =
+      QRat.divOrZero (⟨kn, kd, hkd⟩ + ⟨ln, ld, hld⟩ + QRat.ofInt 1)
+          (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)) =
         ⟨(kn * (ld : Int) + ln * (kd : Int) + (kd : Int) * (ld : Int)) * (kd : Int),
           (kd * ld) * (2 * (kn + (kd : Int))).natAbs,
           Nat.mul_pos (Nat.mul_pos hkd hld) (Int.natAbs_pos.mpr (by omega))⟩ := by
+    have h0 := qrat_divOrZero_eq_div (⟨kn, kd, hkd⟩ + ⟨ln, ld, hld⟩ + QRat.ofInt 1)
+      (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)) (Int.ne_of_gt hden_pos)
     have h := qrat_div_pos (⟨kn, kd, hkd⟩ + ⟨ln, ld, hld⟩ + QRat.ofInt 1)
       (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)) hden_pos
     have hnum1 : (⟨kn, kd, hkd⟩ + ⟨ln, ld, hld⟩ + QRat.ofInt 1).num =
@@ -2701,8 +2771,7 @@ theorem vdcProcessA_preserves_valid (p : RatExpPair) (hp : RatExpPair.valid p) :
     have hnum2 : (QRat.ofInt 2 * (⟨kn, kd, hkd⟩ + QRat.ofInt 1)).num = 2 * (kn + (kd : Int)) := by
       change 2 * (kn * 1 + 1 * (kd : Int)) = 2 * (kn + (kd : Int))
       omega
-    change QRat.div _ _ = _
-    rw [h]
+    rw [h0, h]
     simp only [hnum1, hden1, hden2, hnum2]
   rw [hkdiv, hldiv]
   dsimp [QRat.add, QRat.ofInt, QRat.mk']
@@ -2905,9 +2974,19 @@ def zeroDensityHypothesis : QRat := QRat.ofInt 2
 def zeroDensityExponentAt (A sigma : QRat) : QRat :=
   A * (QRat.ofInt 1 - sigma)
 
-/-- Short-interval prime gap exponent `θ_prime(A) = 1 - 1 / A`. -/
+/-- Short-interval prime gap exponent `θ_prime(A) = 1 - 1 / A` for non-zero `A`. -/
+def primeGapExponentChecked (A : QRat) (hA : A.num ≠ 0) : QRat :=
+  QRat.ofInt 1 - QRat.div (QRat.ofInt 1) A hA
+
+/-- Safe short-interval prime gap exponent returning `none` if `A = 0`. -/
+def primeGapExponent? (A : QRat) : Option QRat :=
+  match QRat.div? (QRat.ofInt 1) A with
+  | none => none
+  | some inv => some (QRat.ofInt 1 - inv)
+
+/-- Short-interval prime gap exponent `θ_prime(A) = 1 - 1 / A` using explicit `divOrZero`. -/
 def primeGapExponent (A : QRat) : QRat :=
-  QRat.ofInt 1 - (QRat.ofInt 1) / A
+  QRat.ofInt 1 - QRat.divOrZero (QRat.ofInt 1) A
 
 /-- Theorem: Guth–Maynard (`30/13`) strictly improves Huxley (`12/5`) and Ingham (`3`),
 saving `3/130` in zero-density exponent at `σ = 3/4`. -/
@@ -2943,9 +3022,9 @@ theorem guth_maynard_prime_gap_threshold :
     tDH < tGM ∧ tGM < tHux ∧ tHux < tIng := by
   decide
 
-/-- Mollifier length-to-QRH threshold map: `θ(ϑ) = 1 - ϑ / 2`. -/
+/-- Mollifier length-to-QRH threshold map: `θ(ϑ) = 1 - ϑ / 2` via checked `QRat.div`. -/
 def qrhThresholdFromMollifier (ϑ : QRat) : QRat :=
-  QRat.ofInt 1 - ϑ / QRat.ofInt 2
+  QRat.ofInt 1 - QRat.div ϑ (QRat.ofInt 2) (by decide)
 
 /-- Theorem: Increasing mollifier length strictly lowers the QRH zero-free threshold `θ(ϑ)`. -/
 theorem mollifier_descent_monotone (ϑ₁ ϑ₂ : QRat) (h : ϑ₁ < ϑ₂) :
