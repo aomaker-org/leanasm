@@ -250,4 +250,10 @@ import LeanAsm
 #print axioms QuasiRiemann.sweepRectangles2DN64_all_valid
 #print axioms QuasiRiemann.ultra_deep_rects_down_to_0505_certified
 
+-- Safe QRat division & cancellation lawfulness (PR #2 review remediation)
+#print axioms QuasiRiemann.qrat_div_mul_cancel
+#print axioms QuasiRiemann.qrat_div?_zero
+#print axioms QuasiRiemann.qrat_div?_eq_some
+#print axioms QuasiRiemann.qrat_divOrZero_eq_div
+
 -- end of file: leanasm/tests/TestAxioms.lean
