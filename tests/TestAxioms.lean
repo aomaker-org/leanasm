@@ -290,4 +290,14 @@ import LeanAsm
 #print axioms QuasiRiemann.sweepRectangles2DN128_all_valid
 #print axioms QuasiRiemann.ultra_deep_rects_down_to_0501_certified
 
+-- Part 15: Smooth Genus-2 Curve C / F_5 Riemann Hypothesis (gemweb051)
+#print axioms FiniteFieldRH.genus2_curve_smooth_F5
+#print axioms FiniteFieldRH.genus2_N1_eq_11
+#print axioms FiniteFieldRH.genus2_N2_eq_31
+#print axioms FiniteFieldRH.genus2_weil_traces_verified
+#print axioms FiniteFieldRH.genus2_frob_poly_functional_eq
+#print axioms FiniteFieldRH.genus2_frob_poly_quad_factor_id
+#print axioms FiniteFieldRH.genus2_real_trace_bounds
+#print axioms FiniteFieldRH.genus2_frob_negative_discriminants
+
 -- end of file: leanasm/tests/TestAxioms.lean

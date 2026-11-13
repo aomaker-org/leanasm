@@ -165,6 +165,11 @@ def main : IO Unit := do
   IO.println s!"  Total Projective Points   : #E(F_7) = {totalProjectivePoints} (including point at infinity)"
   IO.println s!"  Frobenius Trace a_7       : (p+1) - #E = (7+1) - {totalProjectivePoints} = {frobeniusTrace}"
   IO.println s!"  Hasse-Weil Bound          : a_7² = {frobeniusTrace * frobeniusTrace} ≤ 28 (RH for E/F_7 verified)"
+  IO.println s!"  Genus-2 Curve C / F_5     : y² = x⁵ - x + 1 (smooth, f'(x) = -1 ≠ 0)"
+  IO.println (s!"  Genus-2 Point Counts      : #C(F_5) = {cardGenus2F5}, #C(F_25) = {cardGenus2F25} " ++
+    s!"(a_1 = {genus2TraceA1}, a_2 = {genus2TraceA2})")
+  IO.println s!"  Frobenius Char Poly P_frob: P_frob(X) = X⁴ + 5X³ + 15X² + 25X + 25"
+  IO.println s!"  Genus-2 RH Eigenvalues    : |α_i|² = 5 (Re(s) = 1/2, negative Δ_i = u_i² - 20 < 0)"
 
   -- 8. Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)
   IO.println "\n[+] Part 8: Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)"
