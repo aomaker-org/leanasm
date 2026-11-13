@@ -48,6 +48,11 @@ def main : IO Unit := do
   let beat306 := CollatzQrhBridge.collatzBeatPeriodUpper36 306 193
   IO.println s!"  CRT-NTT |2^306 - 3^193|   : {gap306} (93-digit powers)"
   IO.println s!"  Baker Lower Bound (306/193): |306 ln2 - 193 ln3|·10³⁶ ≥ {lf306}, beat≤{repr beat306}"
+  let gap485 := CollatzQrhBridge.powViaCrtNtt192 2 485 - CollatzQrhBridge.powViaCrtNtt192 3 306
+  let lf485 := CollatzQrhBridge.linearFormLn2Ln3AbsLower72 485 306
+  let beat485 := CollatzQrhBridge.collatzBeatPeriodUpper72 485 306
+  IO.println s!"  CRT-NTT |2^485 - 3^306|   : {gap485} (146-digit powers)"
+  IO.println s!"  72-Digit Baker (485/306)  : |485 ln2 - 306 ln3|·10⁷² ≥ {lf485}, beat≤{repr beat485}"
   IO.println "  QRH Cancellation Ladder   : 1/2 < 3/4 < 5/6 < 7/8 < 11/12 < 1 (Collatz ↔ Mollifier)"
 
   -- 3. 4D Wilson Lattice Gauge Theory Simulation (Z2)

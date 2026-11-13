@@ -300,4 +300,14 @@ import LeanAsm
 #print axioms FiniteFieldRH.genus2_real_trace_bounds
 #print axioms FiniteFieldRH.genus2_frob_negative_discriminants
 
+-- Part 16: 192-Digit CRT-NTT (485, 306) Gap & 72-Digit Linear Forms (gemweb052)
+#print axioms CollatzQrhBridge.powViaCrtNtt192_eq_pow
+#print axioms CollatzQrhBridge.collatz_convergent_485_306_separation_certified
+#print axioms CollatzQrhBridge.linearFormLn2Ln3Interval72_sound
+#print axioms CollatzQrhBridge.linearFormLn2Ln3AbsLower72_sound
+#print axioms CollatzQrhBridge.baker_effective_measure_485_306_verified
+#print axioms CollatzQrhBridge.collatz_485_306_cycle_denominator_certified
+#print axioms CollatzQrhBridge.collatzBeatPeriodUpper72_sound
+#print axioms CollatzQrhBridge.collatz_qrh_phase_beat_72_verified
+
 -- end of file: leanasm/tests/TestAxioms.lean
