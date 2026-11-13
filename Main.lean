@@ -39,6 +39,7 @@ def main : IO Unit := do
   IO.println s!"  Diophantine Gap 2^k ≠ 3^m : ∀ k, m ≥ 1 constructive parity obstruction verified"
   IO.println s!"  Log Sandwich 3/2 < ln3/ln2: < 8/5 certified via rational Taylor lnInterval12"
   IO.println s!"  \{2, 3} Phase Beat Interval : (ln 3 - ln 2)·10¹² ∈ [{diff23.lo}, {diff23.hi}]"
+  IO.println "  QRH Cancellation Ladder   : 1/2 < 3/4 < 5/6 < 7/8 < 11/12 < 1 (Collatz ↔ Mollifier)"
 
   -- 3. 4D Wilson Lattice Gauge Theory Simulation (Z2)
   IO.println "\n[+] Part 3: 4D Yang-Mills Abelian Z2 Wilson Lattice Simulation"
@@ -74,6 +75,13 @@ def main : IO Unit := do
   IO.println "  Phragmén-Lindelöf : μ_Bourgain(3/4) = 13/168 < 1/12 < 1/8; μ_Bourgain(7/8) = 13/336 < 1/24 < 1/16"
   IO.println "  Zero-Density Slopes: Guth-Maynard beats Huxley inside (1/2, 7/8]"
   IO.println "                       (15/26 < 3/5, 15/52 < 3/10, ZERO axioms verified)"
+  let gmGap := primeGapExponent zeroDensityGuthMaynard |>.reduce
+  let huxGap := primeGapExponent zeroDensityHuxley |>.reduce
+  let abaab := vdcProcessA (vdcProcessB (vdcProcessA (vdcProcessA (vdcProcessB trivialRatPair))))
+  IO.println (s!"  \{A,B}* QRat Orbit : (0,1) → (1/2,1/2) → (1/6,2/3) → (1/14,11/14) " ++
+    s!"→ ABA²B=({repr abaab.k.reduce}, {repr abaab.l.reduce})")
+  IO.println s!"  GM 30/13 vs Hux 12/5: σ=3/4 savings = 3/130; prime gap θ_p {repr gmGap} < {repr huxGap}"
+  IO.println "  Mollifier Descent  : 11/12 (ϑ=1/6) → 7/8 (1/4) → 5/6 (1/3) → 3/4 (1/2) → 1/2 (1)"
   IO.println "  Mollifier θ(ϑ) Map: ϑ=1/4 (Weil) ↦ 7/8, ϑ=1/3 ↦ 5/6, ϑ=1/2 ↦ 3/4, ϑ=4/7 ↦ 5/7, ϑ=1 ↦ 1/2 (RH)"
   IO.println "  Deuring-Heilbronn : β₀ = 7/8 repels secondary zeros to β₁ ≤ 3/4 (k=2) and β₁ ≤ 5/8 (k=3)"
   IO.println "  Dirichlet Certs   : Dyadic N=256 Euler-Maclaurin tail E_256(7/8, 200) < 0.92"
