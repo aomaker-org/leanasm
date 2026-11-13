@@ -217,6 +217,15 @@ def main : IO Unit := do
   IO.println "  Universal CRT & Carries      : ∀ x < 286,331,153 Garner 3-channel roundtrip &"
   IO.println "                                 ∀ v : Vec16 Base-1000 Horner carry preservation verified"
 
+  -- 11. Constructive 100-Digit Chudnovsky Pi via 192-Digit CRT-NTT
+  IO.println "\n[+] Part 11: Constructive 100-Digit Chudnovsky Pi via 192-Digit CRT-NTT"
+  let piInt := PiChudnovsky.piDigits100 / 10 ^ 100
+  let piFrac := PiChudnovsky.piDigits100 % 10 ^ 100
+  let bracketWidth := PiChudnovsky.piUpper105 - PiChudnovsky.piLower105
+  IO.println s!"  Chudnovsky pi (100 digits)   : {piInt}.{piFrac}"
+  IO.println s!"  10^105 Bracket Width         : {bracketWidth} (< 10^4 certified)"
+  IO.println "  Zero-Axiom Kernel Audit      : pi_100_digits_certified & universal m ≥ 8 trap verified"
+
   IO.println "\n[+] All theorems verified at build-time with the Lean 4 kernel."
   IO.println "=========================================================="
 

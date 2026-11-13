@@ -13,5 +13,6 @@ import LeanAsm.NttArithmetic
 import LeanAsm.CrtNtt
 import LeanAsm.CrtNttUniversal
 import LeanAsm.CollatzQrhBridge
+import LeanAsm.PiChudnovsky
 
 -- end of file: leanasm/src/LeanAsm.lean

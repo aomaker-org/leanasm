@@ -266,4 +266,19 @@ import LeanAsm
 #print axioms CollatzQrhBridge.collatzBeatPeriodUpper36_sound
 #print axioms CollatzQrhBridge.collatz_qrh_phase_beat_lower_bound
 
+-- Part 13: Constructive 100-Digit Chudnovsky Pi via 192-Digit CRT-NTT (gemweb047)
+#print axioms PiChudnovsky.natMul192ViaCrtNtt_eq_mul
+#print axioms PiChudnovsky.natMul192ViaCrtNtt_total_eq_mul
+#print axioms PiChudnovsky.sqrt10005_scaled110_certified
+#print axioms PiChudnovsky.sqrt10005_scaled110_crt_limbs_certified
+#print axioms PiChudnovsky.chudnovsky_alternating_decreasing
+#print axioms PiChudnovsky.chudnovsky_k8_tail_bound
+#print axioms PiChudnovsky.chudPartialSum_trapped
+#print axioms PiChudnovsky.chudBinarySplit_eq_exact
+#print axioms PiChudnovsky.chud8_eq_partialSum8
+#print axioms PiChudnovsky.chud9_eq_partialSum9
+#print axioms PiChudnovsky.pi_105_bracket_valid
+#print axioms PiChudnovsky.pi_105_traps_all_chudnovsky_truncations
+#print axioms PiChudnovsky.pi_100_digits_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean
