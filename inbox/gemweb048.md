@@ -3,9 +3,9 @@
 # Max Column: 80 Columns
 
 This prompt is archived inline inside [`inbox/gemweb046.md`][src] at
-**lines 344–496** (`gemweb048`).
+**lines 354–505** (`gemweb048`).
 
-- **Authoritative source:** [`inbox/gemweb046.md#L344-L496`][range]
+- **Authoritative source:** [`inbox/gemweb046.md#L354-L505`][range]
 - **Scope:** Upgrade `src/LeanAsm/QuasiRiemann.lean` with 72-digit fixed-point
   intervals (`ScaledInterval72`, scale $10^{72}$) backed by
   `karatsubaCrtNttMul192`, pure-rational `lnInterval72` for `1 ≤ n ≤ 128`, and
@@ -15,6 +15,6 @@ This prompt is archived inline inside [`inbox/gemweb046.md`][src] at
 - **Prerequisite:** [`inbox/gemweb047.md`](./gemweb047.md)
 
 [src]: ./gemweb046.md
-[range]: ./gemweb046.md#L344-L496
+[range]: ./gemweb046.md#L354-L505
 
 <!-- end of file: leanasm/inbox/gemweb048.md -->
