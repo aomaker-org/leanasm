@@ -7,27 +7,40 @@ export PATH := $(HOME)/.elan/bin:$(PATH)
 
 LAKE := lake
 LEAN := lean
+CHUNK_SECS ?= 900
 
 # Include lazy hydration module
 -include $(REPO_ROOT)/mk/hydrate.mk
 
-.PHONY: help build run test check clean status sync
+.PHONY: help build build-chunk build-incremental build-status run test check clean status sync
 
 help:
 	@echo "leanasm Development Targets:"
-	@echo "  make build          - Build the Lean executable and packages via lake"
-	@echo "  make run            - Run the compiled Lean executable"
-	@echo "  make test           - Run workspace verification and tests"
-	@echo "  make check          - Typecheck and verify Lean files without full link"
-	@echo "  make clean          - Remove lake build artifacts"
-	@echo "  make status         - Show repository and toolchain status"
-	@echo "  make sync           - Verify turn state, run tests, and audit tree"
-	@echo "  make hydrate SUB=.. - Hydrate (inflate/wet) dormant subrepo"
-	@echo "  make dehydrate SUB=.- Dehydrate (dry) working tree to reclaim disk"
-	@echo "  make hydrate-status - Check thermal lifecycle status of submodules"
+	@echo "  make build            - Build the Lean executable and packages via lake"
+	@echo "  make build-chunk      - Build incrementally up to CHUNK_SECS (default 900s = 15m)"
+	@echo "  make build-incremental- Build all modules incrementally; fail if slice incomplete"
+	@echo "  make build-status     - Show per-module .olean cache status and build timings"
+	@echo "  make run              - Run the compiled Lean executable"
+	@echo "  make test             - Run workspace verification and tests"
+	@echo "  make check            - Typecheck and verify Lean files without full link"
+	@echo "  make clean            - Remove lake build artifacts"
+	@echo "  make status           - Show repository and toolchain status"
+	@echo "  make sync             - Verify turn state, run tests, and audit tree"
+	@echo "  make hydrate SUB=..   - Hydrate (inflate/wet) dormant subrepo"
+	@echo "  make dehydrate SUB=.. - Dehydrate (dry) working tree to reclaim disk"
+	@echo "  make hydrate-status   - Check thermal lifecycle status of submodules"
 
 build:
 	$(LAKE) build
+
+build-chunk:
+	python3 tools/incremental_build.py --budget-secs $(CHUNK_SECS)
+
+build-incremental:
+	python3 tools/incremental_build.py --budget-secs $(CHUNK_SECS) --require-complete
+
+build-status:
+	python3 tools/incremental_build.py --status
 
 run:
 	$(LAKE) exe leanasm
