@@ -179,9 +179,19 @@ def main : IO Unit := do
   let bigA : Nat := 123456789012345678901234
   let bigB : Nat := 987654321098765432109876
   let bigProd := CrtNtt.crtNttBigMul bigA bigB
+  let max48 : CrtNtt.Vec16 := ⟨999, 999, 999, 999, 999, 999, 999, 999,
+                               999, 999, 999, 999, 999, 999, 999, 999⟩
+  let karMax := CrtNtt.evalDigits1000Vec32 (CrtNtt.karatsubaCrtNttMul96 max48 max48)
+  let max96 : CrtNtt.Vec32 := ⟨max48, max48⟩
+  let karMax192 := CrtNtt.evalDigits1000Vec64 (CrtNtt.karatsubaCrtNttMul192 max96 max96)
   IO.println s!"  48-Digit Big-Integer CRT-NTT Mul : {bigA} * {bigB} = {bigProd}"
+  IO.println s!"  96-Digit Karatsuba CRT-NTT Max   : (10^48 - 1)^2 = {karMax}"
+  IO.println s!"  192-Digit Karatsuba CRT-NTT Max  : (10^96 - 1)^2 = {karMax192}"
   IO.println "  Zero Wrap-Around & Soundness : 4-point, 8-point, 16-point, and 48-digit mul match exact (ZERO axioms)"
   IO.println "  Universal 8-Point NTT Soundness : Invertibility & cyclic convolution over F_17 & F_257 (ZERO axioms)"
+  IO.println "  Universal 16-Point & 48-Digit : ∀ inputs over F_17, F_257, F_65537 & a,b < 10^24 exact (ZERO axioms)"
+  IO.println "  Universal 96-Digit Karatsuba : ∀ A,B < 10^48 exact 3-call CRT-NTT mul & normalized (ZERO axioms)"
+  IO.println "  Universal 192-Digit Karatsuba: ∀ A,B < 10^96 exact 2-tier 9-call CRT-NTT mul (ZERO axioms)"
   IO.println "  Universal CRT & Carries      : ∀ x < 286,331,153 Garner 3-channel roundtrip &"
   IO.println "                                 ∀ v : Vec16 Base-1000 Horner carry preservation verified"
 
