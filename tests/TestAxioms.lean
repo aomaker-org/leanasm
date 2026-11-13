@@ -256,4 +256,14 @@ import LeanAsm
 #print axioms QuasiRiemann.qrat_div?_eq_some
 #print axioms QuasiRiemann.qrat_divOrZero_eq_div
 
+-- Part 12: High-Convergent log2(3) Diophantine Gaps & CRT-NTT |2^k - 3^m| (gemweb046)
+#print axioms CollatzQrhBridge.powViaCrtNtt96_eq_pow
+#print axioms CollatzQrhBridge.collatz_convergent_powers_separation_certified
+#print axioms CollatzQrhBridge.linearFormLn2Ln3Interval36_sound
+#print axioms CollatzQrhBridge.linearFormLn2Ln3AbsLower36_sound
+#print axioms CollatzQrhBridge.baker_effective_measure_verified
+#print axioms CollatzQrhBridge.collatz_cycle_requires_positive_gap
+#print axioms CollatzQrhBridge.collatzBeatPeriodUpper36_sound
+#print axioms CollatzQrhBridge.collatz_qrh_phase_beat_lower_bound
+
 -- end of file: leanasm/tests/TestAxioms.lean
