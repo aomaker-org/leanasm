@@ -241,4 +241,13 @@ import LeanAsm
 #print axioms CrtNtt.karatsubaCrtNttMul192_universal_sound
 #print axioms CrtNtt.karatsuba_192_digit_max_verified
 
+-- Part 11: ScaledInterval36 CRT-NTT & N = 64 Deep Zeta Certification (gemweb045)
+#print axioms QuasiRiemann.natMul96ViaCrtNtt_eq_mul
+#print axioms QuasiRiemann.mulInterval36_sound
+#print axioms QuasiRiemann.ln_table_1_to_64_valid
+#print axioms QuasiRiemann.n64_pow_neg_sigma36_sound
+#print axioms QuasiRiemann.buildRect2DCertN64_implies_valid
+#print axioms QuasiRiemann.sweepRectangles2DN64_all_valid
+#print axioms QuasiRiemann.ultra_deep_rects_down_to_0505_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean

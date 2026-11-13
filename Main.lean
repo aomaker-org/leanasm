@@ -39,6 +39,8 @@ def main : IO Unit := do
   IO.println s!"  Diophantine Gap 2^k ≠ 3^m : ∀ k, m ≥ 1 constructive parity obstruction verified"
   IO.println s!"  Log Sandwich 3/2 < ln3/ln2: < 8/5 certified via rational Taylor lnInterval12"
   IO.println s!"  \{2, 3} Phase Beat Interval : (ln 3 - ln 2)·10¹² ∈ [{diff23.lo}, {diff23.hi}]"
+  let ln64 := QuasiRiemann.lnInterval36 64
+  IO.println s!"  36-Digit Log Synthesis    : (ln 64)·10³⁶ ∈ [{ln64.lo}, {ln64.hi}] (1 ≤ n ≤ 64)"
   IO.println "  QRH Cancellation Ladder   : 1/2 < 3/4 < 5/6 < 7/8 < 11/12 < 1 (Collatz ↔ Mollifier)"
 
   -- 3. 4D Wilson Lattice Gauge Theory Simulation (Z2)
@@ -118,6 +120,13 @@ def main : IO Unit := do
   IO.println (s!"  N=32 Ultra-Deep 2D: Certified {sweptRects32.length}/7 2D rectangles down to σ=0.520")
   IO.println (s!"                      Total certified 2D Lebesgue area Δσ·Δt = {totalArea32 / 1000000000000}." ++
     s!"{totalArea32 % 1000000000000} (ZERO axioms)")
+  let crtSq := natMul96ViaCrtNtt scale36 scale36
+  let sweptRects64 := sweepRectangles2DN64 ultraDeepStripRectGrid2D_N64
+  let totalArea64 := totalCertifiedAreaScaled12 sweptRects64
+  IO.println s!"  ScaledInterval36  : 96-digit CRT-NTT Mul Check (10³⁶)² = {crtSq} (exact)"
+  IO.println (s!"  N=64 Ultra-Deep 2D: Certified {sweptRects64.length}/7 2D rectangles down to σ=0.505")
+  IO.println (s!"                      Total certified 2D Lebesgue area Δσ·Δt = {totalArea64 / 1000000000000}." ++
+    s!"{totalArea64 % 1000000000000} (CRT-NTT 10³⁶ engine)")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"
