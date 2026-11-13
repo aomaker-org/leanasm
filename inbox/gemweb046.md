@@ -63,7 +63,7 @@ Here is a self-contained implementation prompt (`gemweb046`) for AGY to extend
 convergent gaps $\vert{}k \ln 2 - m \ln 3\vert{}$, exact multi-digit integer
 power separations $\vert{}2^k - 3^m\vert{}$, and Collatz nontrivial cycle lower
 bounds across high-denominator convergents ($8/5, 19/12, 65/41, 84/53, 306/193$)
-with **zero `Classical.choice` and zero `sorryAx**`.
+with **zero `Classical.choice` and zero `sorryAx`**`.
 
 ---
 
@@ -203,7 +203,7 @@ and `karatsubaCrtNttMul192_universal_sound`)** from
 `src/LeanAsm/CrtNttUniversal.lean` alongside constructive integer Newton–Raphson
 $\sqrt{10005}$ and exact rational/integer Chudnovsky binary splitting to compute
 and formally certify the **first 100 decimal digits of $\pi$** with **zero
-`Classical.choice` and zero `sorryAx**`.
+`Classical.choice` and zero `sorryAx`**`.
 
 ---
 
@@ -351,7 +351,7 @@ a **72-digit fixed-point interval engine (`ScaledInterval72`, scale $S_{72} =
 10^{72}$)** and an **$N = 128$ 2D continuous zero-free rectangle sweeper**
 pushing certified zero-free boxes down to **$\sigma = 0.501$** (within
 **$0.001$** of the critical line $\sigma = 1/2$) with **zero `Classical.choice`
-and zero `sorryAx**`.
+and zero `sorryAx`**`.
 
 ---
 
