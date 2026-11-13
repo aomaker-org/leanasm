@@ -4,6 +4,7 @@
 
 import LeanAsm.Conjectures
 import LeanAsm.QuasiRiemann
+import LeanAsm.PiChudnovsky.CrtMulBridge
 
 namespace CollatzQrhBridge
 
@@ -303,24 +304,20 @@ def collatzBeatPeriodUpper36 (k m : Nat) : Option Nat :=
   else
     none
 
-private theorem mul_natAbs_of_nonneg {n : Nat} {z : Int} (hz : 0 < z)
-    (hdiv : (twoPiInterval36.hi.natAbs + z.natAbs - 1) / z.natAbs = n)
-    (hnonneg : 0 ≤ twoPiInterval36.hi) :
-    twoPiInterval36.hi ≤ (n : Int) * z := by
+private theorem mul_natAbs_of_nonneg {tp n : Nat} {z : Int} (hz : 0 < z)
+    (hdiv : (tp + z.natAbs - 1) / z.natAbs = n) :
+    (tp : Int) ≤ (n : Int) * z := by
   have hz_pos : 0 < z.natAbs := Int.natAbs_pos.mpr (by omega)
-  have h1 : twoPiInterval36.hi.natAbs ≤ n * z.natAbs := by
-    have hrem := Nat.lt_of_lt_of_le (Nat.mod_lt (twoPiInterval36.hi.natAbs + z.natAbs - 1) hz_pos)
+  have h1 : tp ≤ n * z.natAbs := by
+    have hrem := Nat.lt_of_lt_of_le (Nat.mod_lt (tp + z.natAbs - 1) hz_pos)
       (Nat.le_refl z.natAbs)
-    have hdm := Nat.div_add_mod (twoPiInterval36.hi.natAbs + z.natAbs - 1) z.natAbs
+    have hdm := Nat.div_add_mod (tp + z.natAbs - 1) z.natAbs
     rw [hdiv] at hdm
     have hmul : z.natAbs * n = n * z.natAbs := Nat.mul_comm _ _
     omega
   have hz_eq : (z.natAbs : Int) = z := Int.natAbs_of_nonneg (Int.le_of_lt hz)
-  have htp_eq : (twoPiInterval36.hi.natAbs : Int) = twoPiInterval36.hi :=
-    Int.natAbs_of_nonneg hnonneg
-  have hcast : ((twoPiInterval36.hi.natAbs : Nat) : Int) ≤ ((n * z.natAbs : Nat) : Int) :=
-    Int.ofNat_le.mpr h1
-  rw [htp_eq, Int.natCast_mul, hz_eq] at hcast
+  have hcast : (tp : Int) ≤ ((n * z.natAbs : Nat) : Int) := Int.ofNat_le.mpr h1
+  rw [Int.natCast_mul, hz_eq] at hcast
   exact hcast
 
 /-- Universal soundness of `collatzBeatPeriodUpper36`: any returned `bound`
@@ -334,7 +331,9 @@ theorem collatzBeatPeriodUpper36_sound (k m bound : Nat)
   · rename_i hpos
     injection hsome with hdiv
     have htp : 0 ≤ twoPiInterval36.hi := by decide
-    exact ⟨hpos, mul_natAbs_of_nonneg hpos hdiv htp⟩
+    have hmul := mul_natAbs_of_nonneg hpos hdiv
+    rw [Int.natAbs_of_nonneg htp] at hmul
+    exact ⟨hpos, hmul⟩
   · cases hsome
 
 /-- Theorem (QRH Spectral Beat Period Upper Bounds): For all five convergents
@@ -352,6 +351,232 @@ theorem collatz_qrh_phase_beat_lower_bound :
     twoPiInterval36.hi ≤ 3009 * linearFormLn2Ln3AbsLower36 84 53 ∧
     twoPiInterval36.hi ≤ 89 * linearFormLn2Ln3AbsLower36 306 193 := by
   decide
+
+-- =============================================================================
+-- 192-Digit CRT-NTT Exponentiation, Convergent (485, 306), & 72-Digit Forms
+-- =============================================================================
+
+/-- Binary exponentiation `base ^ exp` backed by verified 192-digit CRT-NTT
+two-tier Karatsuba multiplication `PiChudnovsky.natMul192ViaCrtNtt`. -/
+def powViaCrtNtt192 (base exp : Nat) : Nat :=
+  if h : exp = 0 then
+    1
+  else
+    let half := powViaCrtNtt192 base (exp / 2)
+    let sq := PiChudnovsky.natMul192ViaCrtNtt half half
+    if exp % 2 = 0 then sq else PiChudnovsky.natMul192ViaCrtNtt sq base
+termination_by exp
+decreasing_by
+  exact Nat.div_lt_self (Nat.pos_of_ne_zero h) (by decide)
+
+/-- Theorem (192-Digit CRT-NTT Exponentiation Equivalence):
+`powViaCrtNtt192 base exp` equals exact natural exponentiation `base ^ exp`
+for all `base exp : Nat`, proved constructively via
+`PiChudnovsky.natMul192ViaCrtNtt_total_eq_mul`. -/
+theorem powViaCrtNtt192_eq_pow (base exp : Nat) :
+    powViaCrtNtt192 base exp = base ^ exp := by
+  induction exp using Nat.strongRecOn with
+  | ind k ih =>
+    unfold powViaCrtNtt192
+    split
+    · rename_i hk0
+      subst hk0
+      rfl
+    · rename_i hkne
+      have hlt : k / 2 < k := Nat.div_lt_self (Nat.pos_of_ne_zero hkne) (by decide)
+      have ih_half := ih (k / 2) hlt
+      dsimp only
+      split
+      · rename_i heven
+        rw [PiChudnovsky.natMul192ViaCrtNtt_total_eq_mul, ih_half]
+        exact nat_pow_even_eq base k heven
+      · rename_i hodd
+        rw [PiChudnovsky.natMul192ViaCrtNtt_total_eq_mul,
+          PiChudnovsky.natMul192ViaCrtNtt_total_eq_mul, ih_half]
+        exact nat_pow_odd_eq base k hodd
+
+/-- Exact 144-digit difference `2^485 - 3^306` written in 72-digit limbs for
+line-width clarity. -/
+def expectedGap485 : Nat :=
+  102065376400825306534437391838939444403106454408085639783964140880896699 * 10 ^ 72 +
+  835673006969445010534504805079858638689074275443284439551032910142670903
+
+set_option exponentiation.threshold 512 in
+/-- Theorem (Convergent Power Separation Through `(485, 306)`):
+Certifies exact integer gaps `|2^k - 3^m|` via `powViaCrtNtt192` across
+convergents `(8, 5)`, `(19, 12)`, `(65, 41)`, `(84, 53)`, `(306, 193)`, and
+the 146-digit strict upper convergent `(485, 306)` (`2^485 > 3^306`). -/
+theorem collatz_convergent_485_306_separation_certified :
+    powViaCrtNtt192 3 5 < powViaCrtNtt192 2 8 ∧
+    powViaCrtNtt192 2 8 - powViaCrtNtt192 3 5 = 13 ∧
+    powViaCrtNtt192 2 19 < powViaCrtNtt192 3 12 ∧
+    powViaCrtNtt192 3 12 - powViaCrtNtt192 2 19 = 7153 ∧
+    powViaCrtNtt192 3 41 < powViaCrtNtt192 2 65 ∧
+    powViaCrtNtt192 2 65 - powViaCrtNtt192 3 41 = 420491770248316829 ∧
+    powViaCrtNtt192 2 84 < powViaCrtNtt192 3 53 ∧
+    powViaCrtNtt192 3 53 - powViaCrtNtt192 2 84 = 40432553845953101497907 ∧
+    powViaCrtNtt192 3 193 < powViaCrtNtt192 2 306 ∧
+    powViaCrtNtt192 2 306 - powViaCrtNtt192 3 193 =
+      8919004416877265287627107489485238050671456548349002814112640455483105104697086921213106941 ∧
+    powViaCrtNtt192 3 306 < powViaCrtNtt192 2 485 ∧
+    powViaCrtNtt192 2 485 - powViaCrtNtt192 3 306 = expectedGap485 ∧
+    0 < powViaCrtNtt192 2 485 - powViaCrtNtt192 3 306 := by
+  simp only [powViaCrtNtt192_eq_pow]
+  decide +kernel
+
+/-- Constructive 72-digit enclosure of `k · ln 2 - m · ln 3` built from the
+certified intervals `lnInterval72 2` and `lnInterval72 3`. -/
+def linearFormLn2Ln3Interval72 (k m : Nat) : ScaledInterval72 :=
+  let ln2 := lnInterval72 2
+  let ln3 := lnInterval72 3
+  let lo := (k : Int) * ln2.lo - (m : Int) * ln3.hi
+  let hi := (k : Int) * ln2.hi - (m : Int) * ln3.lo
+  have hvalid : lo ≤ hi := by
+    have hk : 0 ≤ (k : Int) := Int.natCast_nonneg k
+    have hm : 0 ≤ (m : Int) := Int.natCast_nonneg m
+    have h2 : (k : Int) * ln2.lo ≤ (k : Int) * ln2.hi :=
+      Int.mul_le_mul_of_nonneg_left ln2.valid hk
+    have h3 : (m : Int) * ln3.lo ≤ (m : Int) * ln3.hi :=
+      Int.mul_le_mul_of_nonneg_left ln3.valid hm
+    exact Int.sub_le_sub h2 h3
+  ⟨lo, hi, hvalid⟩
+
+/-- Theorem (72-Digit Linear Form Interval Soundness): For any `a2 ∈ lnInterval72 2`
+and `a3 ∈ lnInterval72 3`, `(k : Int) * a2 - (m : Int) * a3` lies inside
+`linearFormLn2Ln3Interval72 k m`. -/
+theorem linearFormLn2Ln3Interval72_sound (k m : Nat) (a2 a3 : Int)
+    (ha2 : (lnInterval72 2).lo ≤ a2 ∧ a2 ≤ (lnInterval72 2).hi)
+    (ha3 : (lnInterval72 3).lo ≤ a3 ∧ a3 ≤ (lnInterval72 3).hi) :
+    let iv := linearFormLn2Ln3Interval72 k m
+    iv.lo ≤ (k : Int) * a2 - (m : Int) * a3 ∧
+    (k : Int) * a2 - (m : Int) * a3 ≤ iv.hi := by
+  have hk : 0 ≤ (k : Int) := Int.natCast_nonneg k
+  have hm : 0 ≤ (m : Int) := Int.natCast_nonneg m
+  have h2lo := Int.mul_le_mul_of_nonneg_left ha2.1 hk
+  have h2hi := Int.mul_le_mul_of_nonneg_left ha2.2 hk
+  have h3lo := Int.mul_le_mul_of_nonneg_left ha3.1 hm
+  have h3hi := Int.mul_le_mul_of_nonneg_left ha3.2 hm
+  exact ⟨Int.sub_le_sub h2lo h3hi, Int.sub_le_sub h2hi h3lo⟩
+
+/-- Certified `10^72`-scaled lower bound on `|k · ln 2 - m · ln 3|`:
+returns `iv.lo` if strictly positive, `-iv.hi` if strictly negative, else `0`. -/
+def linearFormLn2Ln3AbsLower72 (k m : Nat) : Int :=
+  let iv := linearFormLn2Ln3Interval72 k m
+  max 0 (max iv.lo (-iv.hi))
+
+/-- Constructive soundness of `linearFormLn2Ln3AbsLower72`: if `x` lies in
+`linearFormLn2Ln3Interval72 k m`, then `linearFormLn2Ln3AbsLower72 k m ≤ |x|`. -/
+theorem linearFormLn2Ln3AbsLower72_sound (k m : Nat) (x : Int)
+    (hx : (linearFormLn2Ln3Interval72 k m).lo ≤ x ∧
+          x ≤ (linearFormLn2Ln3Interval72 k m).hi) :
+    linearFormLn2Ln3AbsLower72 k m ≤ Int.ofNat x.natAbs := by
+  dsimp [linearFormLn2Ln3AbsLower72]
+  have h0 : (0 : Int) ≤ Int.ofNat x.natAbs := Int.natCast_nonneg _
+  have hlo : (linearFormLn2Ln3Interval72 k m).lo ≤ Int.ofNat x.natAbs :=
+    Int.le_trans hx.1 (Int.le_natAbs)
+  have hneg : -x ≤ (x.natAbs : Int) := by
+    calc -x ≤ ((-x).natAbs : Int) := Int.le_natAbs
+      _ = (x.natAbs : Int) := by rw [Int.natAbs_neg]
+  have hhi : -(linearFormLn2Ln3Interval72 k m).hi ≤ Int.ofNat x.natAbs :=
+    Int.le_trans (Int.neg_le_neg hx.2) hneg
+  exact Int.max_le.mpr ⟨h0, Int.max_le.mpr ⟨hlo, hhi⟩⟩
+
+/-- Theorem (72-Digit Baker-Type Effective Irrationality Measure Through `m = 306`):
+For every convergent `(k, m)` in `(8, 5), (19, 12), (65, 41), (84, 53), (306, 193),
+(485, 306)`, `linearFormLn2Ln3AbsLower72 k m` is strictly positive and
+`|k · ln 2 - m · ln 3| · m^2 > 1 / 10` (`> 10^71` at `10^72` scale). -/
+theorem baker_effective_measure_485_306_verified :
+    let scale71 : Int := 10 ^ 71
+    (0 < linearFormLn2Ln3AbsLower72 8 5 ∧
+      scale71 < linearFormLn2Ln3AbsLower72 8 5 * (5 * 5 : Int)) ∧
+    (0 < linearFormLn2Ln3AbsLower72 19 12 ∧
+      scale71 < linearFormLn2Ln3AbsLower72 19 12 * (12 * 12 : Int)) ∧
+    (0 < linearFormLn2Ln3AbsLower72 65 41 ∧
+      scale71 < linearFormLn2Ln3AbsLower72 65 41 * (41 * 41 : Int)) ∧
+    (0 < linearFormLn2Ln3AbsLower72 84 53 ∧
+      scale71 < linearFormLn2Ln3AbsLower72 84 53 * (53 * 53 : Int)) ∧
+    (0 < linearFormLn2Ln3AbsLower72 306 193 ∧
+      scale71 < linearFormLn2Ln3AbsLower72 306 193 * (193 * 193 : Int)) ∧
+    (0 < linearFormLn2Ln3AbsLower72 485 306 ∧
+      scale71 < linearFormLn2Ln3AbsLower72 485 306 * (306 * 306 : Int)) := by
+  decide +kernel
+
+/-- Theorem (Hypothetical `(485, 306)` Collatz Cycle Denominator Bound):
+Any positive integer cycle relation `n0 * 2^485 = n0 * 3^306 + rhs` (`1 ≤ n0, rhs`)
+forces the exact 144-digit CRT-NTT gap `expectedGap485` to divide `rhs` (`n0 * expectedGap485 = rhs`),
+bounding any hypothetical cycle entry via `n0 = rhs / expectedGap485`. -/
+theorem collatz_485_306_cycle_denominator_certified (n0 rhs : Nat)
+    (hn0 : 1 ≤ n0) (hrhs : 1 ≤ rhs)
+    (heq : n0 * 2 ^ 485 = n0 * 3 ^ 306 + rhs) :
+    3 ^ 306 < 2 ^ 485 ∧
+    1 ≤ powViaCrtNtt192 2 485 - powViaCrtNtt192 3 306 ∧
+    powViaCrtNtt192 2 485 - powViaCrtNtt192 3 306 = expectedGap485 ∧
+    expectedGap485 ≤ rhs ∧
+    n0 * expectedGap485 = rhs := by
+  have hbase := collatz_cycle_requires_positive_gap n0 rhs 485 306 hn0 hrhs heq
+  have hsep := collatz_convergent_485_306_separation_certified.2.2.2.2.2.2.2.2.2.2.2.1
+  have hmul : n0 * expectedGap485 = rhs := by
+    have h96 : n0 * (2 ^ 485 - 3 ^ 306) = rhs := by
+      have h0 := hbase.2.2
+      rw [powViaCrtNtt96_eq_pow, powViaCrtNtt96_eq_pow] at h0
+      exact h0
+    have h192 : 2 ^ 485 - 3 ^ 306 = expectedGap485 := by
+      rw [← powViaCrtNtt192_eq_pow 2 485, ← powViaCrtNtt192_eq_pow 3 306]
+      exact hsep
+    rw [h192] at h96
+    exact h96
+  have hle : expectedGap485 ≤ rhs := by
+    calc expectedGap485 = 1 * expectedGap485 := (Nat.one_mul _).symm
+      _ ≤ n0 * expectedGap485 := Nat.mul_le_mul_right expectedGap485 hn0
+      _ = rhs := hmul
+  refine ⟨hbase.1, ?_, hsep, hle, hmul⟩
+  rw [hsep]
+  have hpos := collatz_convergent_485_306_separation_certified.2.2.2.2.2.2.2.2.2.2.2.2
+  rw [hsep] at hpos
+  exact hpos
+
+/-- Safe checked 72-digit upper bound `⌈2π / |k · ln 2 - m · ln 3|⌉` for the
+`{2, 3}` spectral beat period, returning `none` when `linearFormLn2Ln3AbsLower72 k m ≤ 0`. -/
+def collatzBeatPeriodUpper72 (k m : Nat) : Option Nat :=
+  let absLo := linearFormLn2Ln3AbsLower72 k m
+  if 0 < absLo then
+    some ((twoPiInterval72.hi.natAbs + absLo.natAbs - 1) / absLo.natAbs)
+  else
+    none
+
+/-- Universal soundness of `collatzBeatPeriodUpper72`: any returned `bound`
+satisfies `twoPiInterval72.hi ≤ bound * linearFormLn2Ln3AbsLower72 k m`. -/
+theorem collatzBeatPeriodUpper72_sound (k m bound : Nat)
+    (hsome : collatzBeatPeriodUpper72 k m = some bound) :
+    0 < linearFormLn2Ln3AbsLower72 k m ∧
+    twoPiInterval72.hi ≤ (bound : Int) * linearFormLn2Ln3AbsLower72 k m := by
+  dsimp [collatzBeatPeriodUpper72] at hsome
+  split at hsome
+  · rename_i hpos
+    injection hsome with hdiv
+    have htp : 0 ≤ twoPiInterval72.hi := by decide +kernel
+    have hmul := mul_natAbs_of_nonneg hpos hdiv
+    rw [Int.natAbs_of_nonneg htp] at hmul
+    exact ⟨hpos, hmul⟩
+  · cases hsome
+
+/-- Theorem (72-Digit QRH Spectral Beat Period Upper Bounds Through `(485, 306)`):
+Certifies sharp finite upper bounds on `2π / |k · ln 2 - m · ln 3|` across all
+six convergents `(8, 5), (19, 12), (65, 41), (84, 53), (306, 193), (485, 306)`. -/
+theorem collatz_qrh_phase_beat_72_verified :
+    collatzBeatPeriodUpper72 8 5 = some 121 ∧
+    collatzBeatPeriodUpper72 19 12 = some 464 ∧
+    collatzBeatPeriodUpper72 65 41 = some 549 ∧
+    collatzBeatPeriodUpper72 84 53 = some 3009 ∧
+    collatzBeatPeriodUpper72 306 193 = some 89 ∧
+    collatzBeatPeriodUpper72 485 306 = some 6147 ∧
+    twoPiInterval72.hi ≤ 121 * linearFormLn2Ln3AbsLower72 8 5 ∧
+    twoPiInterval72.hi ≤ 464 * linearFormLn2Ln3AbsLower72 19 12 ∧
+    twoPiInterval72.hi ≤ 549 * linearFormLn2Ln3AbsLower72 65 41 ∧
+    twoPiInterval72.hi ≤ 3009 * linearFormLn2Ln3AbsLower72 84 53 ∧
+    twoPiInterval72.hi ≤ 89 * linearFormLn2Ln3AbsLower72 306 193 ∧
+    twoPiInterval72.hi ≤ 6147 * linearFormLn2Ln3AbsLower72 485 306 := by
+  decide +kernel
 
 end CollatzQrhBridge
 
