@@ -10,8 +10,6 @@ import LeanAsm
 #print axioms Conjectures.collatz_two_reaches_one
 #print axioms Conjectures.collatz_four_reaches_one
 
--- end of file: leanasm/tests/TestAxioms.lean
-
 #print axioms YangMillsToy.vacuum_plaquette_trivial
 #print axioms YangMillsToy.vacuum_action_zero
 #print axioms YangMillsToy.plaquette_trace_bounded
@@ -184,3 +182,49 @@ import LeanAsm
 #print axioms CrtNtt.base1000_roundtrip_concrete
 #print axioms CrtNtt.crt_ntt_big_mul_12_digit
 #print axioms CrtNtt.crt_ntt_big_mul_24_digit_max
+
+-- Part 9: Universal NTT Algebraic Soundness Theorems (gemweb041)
+#print axioms NttArithmetic.intt4_ntt4_universal_F5
+#print axioms NttArithmetic.ntt4_intt4_universal_F5
+#print axioms NttArithmetic.cyclic_conv4_ntt_universal_F5
+#print axioms NttArithmetic.intt4_ntt4_universal_F17
+#print axioms NttArithmetic.ntt4_intt4_universal_F17
+#print axioms NttArithmetic.cyclic_conv4_ntt_universal_F17
+
+-- Part 10: Universal 8-Point NTT Algebraic Soundness Theorems (gemweb042 Stage 1)
+#print axioms CrtNtt.intt8_ntt8_universal_F17
+#print axioms CrtNtt.ntt8_intt8_universal_F17
+#print axioms CrtNtt.cyclic_conv8_ntt_universal_F17
+#print axioms CrtNtt.intt8_ntt8_universal_F257
+#print axioms CrtNtt.ntt8_intt8_universal_F257
+#print axioms CrtNtt.cyclic_conv8_ntt_universal_F257
+
+-- Part 10b: Universal 16-Point NTT & End-to-End 48-Digit Soundness (gemweb042 Stage 2)
+#print axioms CrtNtt.intt16_ntt16_universal_F17
+#print axioms CrtNtt.ntt16_intt16_universal_F17
+#print axioms CrtNtt.cyclic_conv16_ntt_universal_F17
+#print axioms CrtNtt.intt16_ntt16_universal_F257
+#print axioms CrtNtt.ntt16_intt16_universal_F257
+#print axioms CrtNtt.cyclic_conv16_ntt_universal_F257
+#print axioms CrtNtt.intt16_ntt16_universal_F65537
+#print axioms CrtNtt.ntt16_intt16_universal_F65537
+#print axioms CrtNtt.cyclic_conv16_ntt_universal_F65537
+#print axioms CrtNtt.crtNttBigMulVec8_universal_sound
+#print axioms CrtNtt.crtNttBigMul_universal_sound
+
+-- Part 10c: 2x2 Karatsuba-over-CRT-NTT 96-Digit Multiplier (gemweb042 Stage 3)
+#print axioms CrtNtt.splitVec16_eval
+#print axioms CrtNtt.addVec8WithCarry_sound
+#print axioms CrtNtt.karatsuba_algebraic_identity
+#print axioms CrtNtt.karatsubaCrtNttMul96_normalized
+#print axioms CrtNtt.karatsubaCrtNttMul96_universal_sound
+#print axioms CrtNtt.karatsuba_96_digit_max_verified
+
+-- Part 10d: Second-Tier 2x2 Karatsuba-over-CRT-NTT 192-Digit Multiplier (gemweb043)
+#print axioms CrtNtt.addVec32WithCarry_sound
+#print axioms CrtNtt.subVec32WithBorrow_sound
+#print axioms CrtNtt.karatsubaCrtNttMul192_normalized
+#print axioms CrtNtt.karatsubaCrtNttMul192_universal_sound
+#print axioms CrtNtt.karatsuba_192_digit_max_verified
+
+-- end of file: leanasm/tests/TestAxioms.lean
