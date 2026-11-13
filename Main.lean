@@ -41,6 +41,8 @@ def main : IO Unit := do
   IO.println s!"  \{2, 3} Phase Beat Interval : (ln 3 - ln 2)·10¹² ∈ [{diff23.lo}, {diff23.hi}]"
   let ln64 := QuasiRiemann.lnInterval36 64
   IO.println s!"  36-Digit Log Synthesis    : (ln 64)·10³⁶ ∈ [{ln64.lo}, {ln64.hi}] (1 ≤ n ≤ 64)"
+  let ln128 := QuasiRiemann.lnInterval72 128
+  IO.println s!"  72-Digit Log Synthesis    : (ln 128)·10⁷² ∈ [{ln128.lo}, {ln128.hi}] (1 ≤ n ≤ 128)"
   let gap306 := CollatzQrhBridge.powViaCrtNtt96 2 306 - CollatzQrhBridge.powViaCrtNtt96 3 193
   let lf306 := CollatzQrhBridge.linearFormLn2Ln3AbsLower36 306 193
   let beat306 := CollatzQrhBridge.collatzBeatPeriodUpper36 306 193
@@ -132,6 +134,15 @@ def main : IO Unit := do
   IO.println (s!"  N=64 Ultra-Deep 2D: Certified {sweptRects64.length}/7 2D rectangles down to σ=0.505")
   IO.println (s!"                      Total certified 2D Lebesgue area Δσ·Δt = {totalArea64 / 1000000000000}." ++
     s!"{totalArea64 % 1000000000000} (CRT-NTT 10³⁶ engine)")
+  let crtSq72 := QuasiRiemann.natMul192ViaCrtNtt scale72 scale72
+  let sweptRects128 := sweepRectangles2DN128 ultraDeepStripRectGrid2D_N128
+  let totalArea128 := totalCertifiedAreaScaled12 sweptRects128
+  let rem128Str := toString (totalArea128 % 1000000000000)
+  let pad128 := String.ofList (List.replicate (12 - rem128Str.length) '0') ++ rem128Str
+  IO.println s!"  ScaledInterval72  : 192-digit CRT-NTT Mul Check (10⁷²)² = {crtSq72} (exact)"
+  IO.println s!"  N=128 Ultra-Deep  : Certified {sweptRects128.length}/7 2D rectangles down to σ=0.501"
+  IO.println (s!"                      Total certified 2D Lebesgue area Δσ·Δt = " ++
+    s!"{totalArea128 / 1000000000000}.{pad128} (CRT-NTT 10⁷² engine)")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"
