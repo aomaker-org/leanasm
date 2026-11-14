@@ -472,4 +472,16 @@ import LeanAsm
 #print axioms QuasiRiemann.fermat_tower_ap_short_interval_certs
 #print axioms QuasiRiemann.sub_three_quarters_qrh_ladder_certs
 
+-- Part 34: Parametric 4-Prime Fermat-Tower MiniVM NTT/INTT & Garner CRT (Issue #53)
+#print axioms MiniVMNttBridge.ntt4AsmFermat_sound
+#print axioms MiniVMNttBridge.intt4AsmFermat_sound
+#print axioms MiniVMNttBridge.fermatTowerNtt4Specs_valid
+#print axioms MiniVMNttBridge.intt4_ntt4_asm_fermat_roundtrip
+#print axioms MiniVMNttBridge.fermatTowerNtt4_asm_roundtrip_certs
+#print axioms MiniVMNttBridge.garnerReconstruct4Asm_sound
+#print axioms MiniVMNttBridge.crtNtt4ChannelConvAsm_sound
+#print axioms MiniVMNttBridge.crtNtt4ConvAsm_sound
+#print axioms LeanAsm.miniVm_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean
