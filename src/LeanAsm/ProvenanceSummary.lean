@@ -28,11 +28,14 @@ import LeanAsm.PiChudnovsky
 namespace LeanAsm
 
 -- =============================================================================
--- Part 1: MiniVM Assembly & F_17 NTT Execution Provenance
+-- Part 1: MiniVM Assembly & Parametric Fermat-Tower NTT/Garner CRT Provenance
 -- =============================================================================
 
 /-- Part 1 provenance specification bundling `MiniVM` Garner CRT execution,
-2-point (`289` states) and 4-point (`83,521` states) `F_17` NTT/INTT assembly soundness. -/
+2-point (`289` states) and 4-point (`83,521` states) `F_17` NTT/INTT assembly
+soundness, parametric 4-prime `{5, 17, 257, 65537}` NTT/INTT assembly
+roundtrips, compiled 4-channel Garner CRT reconstruction (`M_4 = 1,431,655,765`),
+and end-to-end 4-point CRT-NTT cyclic convolution assembly soundness. -/
 def MiniVmProvenance : Prop :=
   (let sInit : MiniVM.State := { r0 := 0, r1 := 4, r2 := 4, r3 := 6, pc := 0 }
    let sFinal := MiniVM.runProgram sInit MiniVM.garnerCrtProgram
@@ -61,9 +64,29 @@ def MiniVmProvenance : Prop :=
     s.r0 = a → s.r1 = b → s.r2 = c → s.r3 = d →
     let s1 := MiniVM.runProgram s MiniVMNttBridge.ntt4AsmF17
     let s2 := MiniVM.runProgram s1 MiniVMNttBridge.intt4AsmF17
-    (⟨s2.r0, s2.r1, s2.r2, s2.r3⟩ : NttArithmetic.Vec4) = ⟨a, b, c, d⟩)
+    (⟨s2.r0, s2.r1, s2.r2, s2.r3⟩ : NttArithmetic.Vec4) = ⟨a, b, c, d⟩) ∧
+  (∀ cfg ∈ MiniVMNttBridge.fermatTowerNtt4Specs, cfg.Valid) ∧
+  (∀ cfg ∈ MiniVMNttBridge.fermatTowerNtt4Specs,
+    ∀ (s : MiniVM.State) (a b c d : Nat),
+      a < cfg.p → b < cfg.p → c < cfg.p → d < cfg.p →
+      s.r0 = a → s.r1 = b → s.r2 = c → s.r3 = d →
+      let s1 := MiniVM.runProgram s (MiniVMNttBridge.ntt4AsmFermat cfg.p cfg.omega4)
+      let s2 := MiniVM.runProgram s1
+        (MiniVMNttBridge.intt4AsmFermat cfg.p cfg.invFour cfg.invOmega4)
+      (⟨s2.r0, s2.r1, s2.r2, s2.r3⟩ : NttArithmetic.Vec4) = ⟨a, b, c, d⟩) ∧
+  (∀ (s : MiniVM.State) (x : Nat),
+    x < CrtNtt.fermatTowerMod4 →
+    s.r0 = x % 5 → s.r1 = x % 17 → s.r2 = x % 257 → s.r3 = x % 65537 →
+    (MiniVM.runProgram s MiniVMNttBridge.garnerReconstruct4Asm).r0 = x) ∧
+  (∀ (a b : NttArithmetic.Vec4),
+    a.x0 ≤ 18918 → a.x1 ≤ 18918 → a.x2 ≤ 18918 → a.x3 ≤ 18918 →
+    b.x0 ≤ 18918 → b.x1 ≤ 18918 → b.x2 ≤ 18918 → b.x3 ≤ 18918 →
+    let c := MiniVMNttBridge.crtNtt4ConvAsmReconstruct a b
+    c = MiniVMNttBridge.exactCyclicConv4Vec a b ∧
+    c.x0 < CrtNtt.fermatTowerMod4 ∧ c.x1 < CrtNtt.fermatTowerMod4 ∧
+    c.x2 < CrtNtt.fermatTowerMod4 ∧ c.x3 < CrtNtt.fermatTowerMod4)
 
-/-- Zero-axiom certificate for `MiniVM` Garner CRT and `F_17` NTT assembly soundness. -/
+/-- Zero-axiom certificate for `MiniVM` Garner CRT & parametric Fermat-tower NTT assembly. -/
 theorem miniVm_provenance_certified : MiniVmProvenance :=
   ⟨MiniVM.exec_garner_crt_sound,
    fun s a b ha hb hr0 hr1 => MiniVMNttBridge.ntt2AsmF17_sound s a b ha hb hr0 hr1,
@@ -72,7 +95,11 @@ theorem miniVm_provenance_certified : MiniVmProvenance :=
    fun s a b c d ha hb hc hd hr0 hr1 hr2 hr3 =>
      MiniVMNttBridge.ntt4AsmF17_sound s a b c d ha hb hc hd hr0 hr1 hr2 hr3,
    fun s a b c d ha hb hc hd hr0 hr1 hr2 hr3 =>
-     MiniVMNttBridge.intt4_ntt4_asm_F17_roundtrip s a b c d ha hb hc hd hr0 hr1 hr2 hr3⟩
+     MiniVMNttBridge.intt4_ntt4_asm_F17_roundtrip s a b c d ha hb hc hd hr0 hr1 hr2 hr3,
+   MiniVMNttBridge.fermatTowerNtt4Specs_valid,
+   MiniVMNttBridge.fermatTowerNtt4_asm_roundtrip_certs,
+   MiniVMNttBridge.garnerReconstruct4Asm_sound,
+   MiniVMNttBridge.crtNtt4ConvAsm_sound⟩
 
 -- =============================================================================
 -- Part 2: Collatz Diophantine Barriers & Simons-de Weger Cycle Bounds

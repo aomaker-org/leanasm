@@ -50,6 +50,27 @@ def main : IO Unit := do
     s!"  MiniVM F_17 4-pt INTT : " ++
     s!"-> ({ntt4Out.r0},{ntt4Out.r1},{ntt4Out.r2},{ntt4Out.r3}) [83521/83521]"
   )
+  for cfg in MiniVMNttBridge.fermatTowerNtt4Specs do
+    let fwd := runProgram ntt4In (MiniVMNttBridge.ntt4AsmFermat cfg.p cfg.omega4)
+    let inv := runProgram fwd (MiniVMNttBridge.intt4AsmFermat cfg.p cfg.invFour cfg.invOmega4)
+    IO.println (
+      s!"  MiniVM F_{cfg.p} 4-pt NTT->INTT : " ++
+      s!"(1,2,3,4) -> ({fwd.r0},{fwd.r1},{fwd.r2},{fwd.r3}) " ++
+      s!"-> ({inv.r0},{inv.r1},{inv.r2},{inv.r3})"
+    )
+  let garnerIn : State := { r0 := 4, r1 := 8, r2 := 162, r3 := 63038 }
+  let garnerOut := runProgram garnerIn MiniVMNttBridge.garnerReconstruct4Asm
+  IO.println (
+    s!"  MiniVM Garner CRT4    : (4,8,162,63038) -> {garnerOut.r0} (M_4=1431655765)"
+  )
+  let convA : NttArithmetic.Vec4 := ⟨1000, 2000, 3000, 4000⟩
+  let convB : NttArithmetic.Vec4 := ⟨500, 600, 700, 800⟩
+  let asmConv := MiniVMNttBridge.crtNtt4ConvAsmReconstruct convA convB
+  let exactConv := MiniVMNttBridge.exactCyclicConv4Vec convA convB
+  IO.println (
+    s!"  MiniVM CRT-NTT Conv4  : ({asmConv.x0},{asmConv.x1},{asmConv.x2},{asmConv.x3}) " ++
+    s!"exact=({exactConv.x0},{exactConv.x1},{exactConv.x2},{exactConv.x3})"
+  )
 
   -- 2. Conjectures & Collatz computation
   IO.println "\n[+] Part 2: Collatz Trajectory Exploration & QRH Diophantine Bridge"
