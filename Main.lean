@@ -148,6 +148,13 @@ def main : IO Unit := do
   IO.println s!"  N=128 Ultra-Deep  : Certified {sweptRects128.length}/7 2D rectangles down to σ=0.501"
   IO.println (s!"                      Total certified 2D Lebesgue area Δσ·Δt = " ++
     s!"{totalArea128 / 1000000000000}.{pad128} (CRT-NTT 10⁷² engine)")
+  let zE := QuasiRiemann.dirichletDiagEnergy 4 QuasiRiemann.zetaDirichletCoeff
+  let mE := QuasiRiemann.dirichletDiagEnergy 6 QuasiRiemann.altMobiusCoeff
+  let ln16 := QuasiRiemann.octaveLnUpper36 QuasiRiemann.dvpThresholdT0
+  IO.println (s!"  Asymptotic ZFR    : c_dvp = {repr QuasiRiemann.cDvp} for t ≥ " ++
+    s!"{QuasiRiemann.dvpThresholdT0} (octave ln_hi(16) = {ln16 / 10^36}.{ln16 % 10^36})")
+  IO.println (s!"  Dirichlet L^2     : Zeta(N=4, H=64) E={repr zE} sandwich [2, 6]; " ++
+    s!"Mobius(N=6, H=144) E={repr mE} sandwich [5/2, 15/2]")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"

@@ -5,6 +5,8 @@
 
 import LeanAsm.CrtNttUniversal
 import LeanAsm.PiChudnovsky.CrtMulBridge
+import LeanAsm.QuasiRiemann.Rat
+import LeanAsm.QuasiRiemann.AsymptoticZfr
 
 namespace QuasiRiemann
 
@@ -2410,112 +2412,8 @@ theorem ultra_deep_rects_down_to_052_certified :
 --          Guth-Maynard (30/13) Zero-Density & Mollifier Descent (gemweb044)
 -- =============================================================================
 
-/-- Constructive exact rational number `num / den` with `0 < den`. -/
-structure QRat where
-  num : Int
-  den : Nat
-  den_pos : 0 < den
-
-instance : Repr QRat where
-  reprPrec q _ :=
-    if q.den = 1 then repr q.num else s!"({q.num}/{q.den})"
-
-/-- Embed an `Int` as a `QRat`. -/
-def QRat.ofInt (n : Int) : QRat :=
-  ⟨n, 1, Nat.zero_lt_one⟩
-
-/-- Construct a `QRat` from numerator and positive denominator. -/
-def QRat.mk' (num : Int) (den : Nat) (den_pos : 0 < den := by omega) : QRat :=
-  ⟨num, den, den_pos⟩
-
-instance : Inhabited QRat := ⟨QRat.ofInt 0⟩
-
-instance : DecidableEq QRat := fun a b =>
-  if hn : a.num = b.num then
-    if hd : a.den = b.den then
-      isTrue (by cases a; cases b; simp_all)
-    else
-      isFalse (by intro h; cases h; exact hd rfl)
-  else
-    isFalse (by intro h; cases h; exact hn rfl)
-
-/-- Reduce a `QRat` by `Nat.gcd` for canonical display. -/
-def QRat.reduce (q : QRat) : QRat :=
-  let g := Nat.gcd q.num.natAbs q.den
-  if hg : 0 < g then
-    ⟨q.num / (g : Int), q.den / g, Nat.div_pos (Nat.le_of_dvd q.den_pos (Nat.gcd_dvd_right _ _)) hg⟩
-  else
-    q
-
-/-- Cross-multiplied rational equivalence `a = b`. -/
-def QRat.eqv (a b : QRat) : Prop :=
-  a.num * (b.den : Int) = b.num * (a.den : Int)
-
-/-- Cross-multiplied strict inequality `a < b`. -/
-def QRat.lt (a b : QRat) : Prop :=
-  a.num * (b.den : Int) < b.num * (a.den : Int)
-
-/-- Cross-multiplied non-strict inequality `a ≤ b`. -/
-def QRat.le (a b : QRat) : Prop :=
-  a.num * (b.den : Int) ≤ b.num * (a.den : Int)
-
-instance (a b : QRat) : Decidable (QRat.eqv a b) :=
-  inferInstanceAs (Decidable (a.num * (b.den : Int) = b.num * (a.den : Int)))
-
-instance (a b : QRat) : Decidable (QRat.lt a b) :=
-  inferInstanceAs (Decidable (a.num * (b.den : Int) < b.num * (a.den : Int)))
-
-instance (a b : QRat) : Decidable (QRat.le a b) :=
-  inferInstanceAs (Decidable (a.num * (b.den : Int) ≤ b.num * (a.den : Int)))
-
-/-- Exact rational addition. -/
-def QRat.add (a b : QRat) : QRat :=
-  ⟨a.num * (b.den : Int) + b.num * (a.den : Int), a.den * b.den,
-    Nat.mul_pos a.den_pos b.den_pos⟩
-
-/-- Exact rational negation. -/
-def QRat.neg (a : QRat) : QRat :=
-  ⟨-a.num, a.den, a.den_pos⟩
-
-/-- Exact rational subtraction. -/
-def QRat.sub (a b : QRat) : QRat :=
-  ⟨a.num * (b.den : Int) - b.num * (a.den : Int), a.den * b.den,
-    Nat.mul_pos a.den_pos b.den_pos⟩
-
-/-- Exact rational multiplication. -/
-def QRat.mul (a b : QRat) : QRat :=
-  ⟨a.num * b.num, a.den * b.den, Nat.mul_pos a.den_pos b.den_pos⟩
-
-/-- Checked exact rational division requiring a non-zero divisor (`b.num ≠ 0`). -/
-def QRat.div (a b : QRat) (hb : b.num ≠ 0) : QRat :=
-  if _hb_pos : 0 < b.num then
-    ⟨a.num * (b.den : Int), a.den * b.num.natAbs,
-      Nat.mul_pos a.den_pos (Int.natAbs_pos.mpr hb)⟩
-  else
-    ⟨-(a.num * (b.den : Int)), a.den * b.num.natAbs,
-      Nat.mul_pos a.den_pos (Int.natAbs_pos.mpr hb)⟩
-
-/-- Safe exact rational division returning `none` on a zero divisor (`b.num = 0`). -/
-def QRat.div? (a b : QRat) : Option QRat :=
-  if hb : b.num = 0 then none else some (QRat.div a b hb)
-
-/-- Explicit total rational division returning `0` when the divisor is `0`.
-Prefer `QRat.div` (proof-carrying) or `QRat.div?` (`Option`) when division by zero should be rejected. -/
-def QRat.divOrZero (a b : QRat) : QRat :=
-  if hb : b.num = 0 then QRat.ofInt 0 else QRat.div a b hb
-
-instance : Add QRat := ⟨QRat.add⟩
-instance : Neg QRat := ⟨QRat.neg⟩
-instance : Sub QRat := ⟨QRat.sub⟩
-instance : Mul QRat := ⟨QRat.mul⟩
-instance : LT QRat := ⟨QRat.lt⟩
-instance : LE QRat := ⟨QRat.le⟩
-
-instance (a b : QRat) : Decidable (a < b) :=
-  inferInstanceAs (Decidable (QRat.lt a b))
-
-instance (a b : QRat) : Decidable (a ≤ b) :=
-  inferInstanceAs (Decidable (QRat.le a b))
+-- Constructive `QRat` definition and exact rational arithmetic are imported
+-- from `LeanAsm.QuasiRiemann.Rat` inside `namespace QuasiRiemann`.
 
 /-- Van der Corput exponent pair `(k, ℓ)` represented over `QRat`. -/
 structure RatExpPair where
@@ -3125,9 +3023,6 @@ def scale30Int : Int := (scale30 : Int)
 
 /-- Scaling constant `10^36` for 36-digit fixed-point intervals. -/
 def scale36 : Nat := 1000000000000000000000000000000000000
-
-/-- Integer copy of `10^36`. -/
-def scale36Int : Int := (scale36 : Int)
 
 private theorem scale36Int_pos : (0 : Int) < scale36Int := by decide
 private theorem scale36Int_ne_zero : scale36Int ≠ 0 := by decide
@@ -5330,6 +5225,25 @@ theorem ultra_deep_rects_down_to_0501_certified :
   · simp [totalCertifiedAreaScaled12, rectAreaScaled12,
       h0s, h0S, h0t, h0T, h1s, h1S, h1t, h1T, h2s, h2S, h2t, h2T,
       h3s, h3S, h3t, h3T, h4s, h4S, h4t, h4T, h5s, h5S, h5t, h5T, h6s, h6S, h6t, h6T]
+
+/-- Exact linkage between `AsymptoticZfr.ln2Upper36Scaled` and `(lnInterval36 2).hi`. -/
+theorem ln2Upper36Scaled_eq_lnInterval36_hi :
+    ln2Upper36Scaled = (lnInterval36 2).hi := by
+  decide
+
+/-- The constructive dyadic-octave upper envelope `octaveLnUpper36` agrees with multiples of
+`(lnInterval36 2).hi` and upper-bounds the certified 36-digit intervals for powers of 2. -/
+theorem octaveLnUpper36_bounds_lnInterval36 (t : Nat) :
+    octaveLnUpper36 t = ((Nat.log2 t + 1 : Nat) : Int) * (lnInterval36 2).hi ∧
+    (lnInterval36 2).hi ≤ octaveLnUpper36 t ∧
+    (lnInterval36 4).hi ≤ octaveLnUpper36 4 ∧
+    (lnInterval36 16).hi ≤ octaveLnUpper36 16 ∧
+    (lnInterval36 64).hi ≤ octaveLnUpper36 64 := by
+  refine ⟨?_, ?_, by decide, by decide, by decide⟩
+  · dsimp [octaveLnUpper36]
+    rw [ln2Upper36Scaled_eq_lnInterval36_hi]
+  · rw [← ln2Upper36Scaled_eq_lnInterval36_hi]
+    exact (octaveLnUpper36_pos t).2.2
 
 end QuasiRiemann
 
