@@ -4,6 +4,7 @@
 -- Max Column: 100 Columns
 
 import LeanAsm.QuasiRiemann.ZeroDensityBridge
+import LeanAsm.EulerFactorNonVanishing
 
 namespace QuasiRiemann
 
@@ -407,6 +408,349 @@ theorem short_interval_density_ladder_strict :
     QRat.eqv (eHux - eGM) (QRat.mk' 1 60) ∧
     QRat.eqv (θ78 - eGM) (QRat.mk' 37 120) := by
   decide
+
+-- =============================================================================
+-- 5. Fermat-Tower Arithmetic-Progression Short-Interval Envelopes
+-- =============================================================================
+
+/-- Constructive arithmetic-progression short-interval specification extending
+`ShortIntervalChebyshevSpec` with modulus `q` and totient `phiQ = φ(q)`. -/
+structure ApShortIntervalSpec where
+  base : ShortIntervalChebyshevSpec
+  q : Nat
+  phiQ : Nat
+  phiQ_pos : 0 < phiQ
+  phiQ_lt_q : phiQ < q
+
+/-- Arithmetic-progression prime-existence predicate:
+`phiQ * (2 * errUpper + primePowerCorr) < 10 ^ hScaleExp`.
+Certifies `ϑ(x + h; q, a) - ϑ(x; q, a) > 0` (hence at least one prime
+`p ≡ a (mod q)` in `(x, x + h]`) for every reduced residue class `gcd(a, q) = 1`. -/
+def ApShortIntervalSpec.HasGuaranteedApPrime
+    (s : ApShortIntervalSpec) : Prop :=
+  s.phiQ * (2 * s.base.errUpper + s.base.primePowerCorr) < 10 ^ s.base.hScaleExp
+
+instance (s : ApShortIntervalSpec) : Decidable s.HasGuaranteedApPrime :=
+  inferInstanceAs
+    (Decidable
+      (s.phiQ * (2 * s.base.errUpper + s.base.primePowerCorr) <
+        10 ^ s.base.hScaleExp))
+
+/-- Constructive AP differenced Chebyshev bridge:
+if `|φ(q) * ψ(x; q, a) - x| ≤ φ(q) * errUpper` and
+`|φ(q) * ψ(x + h; q, a) - (x + h)| ≤ φ(q) * errUpper`, with AP prime-power
+discrepancy at most `primePowerCorr`, then `s.HasGuaranteedApPrime` forces
+`0 < ϑ(x + h; q, a) - ϑ(x; q, a)`. Zero `Classical.choice`, zero `sorryAx`. -/
+theorem ap_short_interval_psi_diff_bound
+    (s : ApShortIntervalSpec)
+    (psiApX psiApXH thetaApX thetaApXH : Int)
+    (hBoundX :
+      Int.natAbs ((s.phiQ : Int) * psiApX - ((10 ^ s.base.xScaleExp : Nat) : Int)) ≤
+        s.phiQ * s.base.errUpper)
+    (hBoundXH :
+      Int.natAbs ((s.phiQ : Int) * psiApXH -
+          ((10 ^ s.base.xScaleExp + 10 ^ s.base.hScaleExp : Nat) : Int)) ≤
+        s.phiQ * s.base.errUpper)
+    (hCorr : (psiApXH - psiApX) - (thetaApXH - thetaApX) ≤ (s.base.primePowerCorr : Int))
+    (hPrime : s.HasGuaranteedApPrime) :
+    (0 : Int) < thetaApXH - thetaApX := by
+  have hxAbs := bounds_of_natAbs_le hBoundX
+  have hxhAbs := bounds_of_natAbs_le hBoundXH
+  have hMulSub :
+      (s.phiQ : Int) * (psiApXH - psiApX) =
+        (s.phiQ : Int) * psiApXH - (s.phiQ : Int) * psiApX :=
+    Int.mul_sub _ _ _
+  have hLowerPsi :
+      ((10 ^ s.base.hScaleExp : Nat) : Int) -
+          ((2 * (s.phiQ * s.base.errUpper) : Nat) : Int) ≤
+        (s.phiQ : Int) * (psiApXH - psiApX) := by
+    have hxhLo := hxhAbs.1
+    have hxHi := hxAbs.2
+    rw [Int.natCast_add] at hxhLo
+    have hTwo :
+        ((2 * (s.phiQ * s.base.errUpper) : Nat) : Int) =
+          ((s.phiQ * s.base.errUpper : Nat) : Int) +
+          ((s.phiQ * s.base.errUpper : Nat) : Int) := by
+      omega
+    rw [hMulSub, hTwo]
+    omega
+  have hPhiNonneg : (0 : Int) ≤ (s.phiQ : Int) := Int.natCast_nonneg s.phiQ
+  have hCorrMul := Int.mul_le_mul_of_nonneg_left hCorr hPhiNonneg
+  have hCorrRewrite :
+      (s.phiQ : Int) * ((psiApXH - psiApX) - (thetaApXH - thetaApX)) =
+        (s.phiQ : Int) * (psiApXH - psiApX) - (s.phiQ : Int) * (thetaApXH - thetaApX) :=
+    Int.mul_sub _ _ _
+  rw [hCorrRewrite] at hCorrMul
+  have hBoundInt :
+      ((s.phiQ * (2 * s.base.errUpper + s.base.primePowerCorr) : Nat) : Int) <
+        ((10 ^ s.base.hScaleExp : Nat) : Int) :=
+    Int.ofNat_lt.mpr hPrime
+  have hMulBoundCast :
+      ((s.phiQ * (2 * s.base.errUpper + s.base.primePowerCorr) : Nat) : Int) =
+        ((2 * (s.phiQ * s.base.errUpper) : Nat) : Int) +
+          (s.phiQ : Int) * (s.base.primePowerCorr : Int) := by
+    have hNat :
+        s.phiQ * (2 * s.base.errUpper + s.base.primePowerCorr) =
+          2 * (s.phiQ * s.base.errUpper) + s.phiQ * s.base.primePowerCorr := by
+      rw [Nat.mul_add]
+      have hComm : s.phiQ * (2 * s.base.errUpper) = 2 * (s.phiQ * s.base.errUpper) := by
+        ac_rfl
+      rw [hComm]
+    rw [hNat, Int.natCast_add, Int.natCast_mul, Int.natCast_mul]
+    rfl
+  have hThetaMulPos : (0 : Int) < (s.phiQ : Int) * (thetaApXH - thetaApX) := by
+    rw [hMulBoundCast] at hBoundInt
+    omega
+  by_cases hPos : (0 : Int) < thetaApXH - thetaApX
+  · exact hPos
+  · exfalso
+    have hNonpos : thetaApXH - thetaApX ≤ 0 := Int.not_lt.mp hPos
+    have hProdNonpos : (s.phiQ : Int) * (thetaApXH - thetaApX) ≤ 0 :=
+      Int.mul_nonpos_of_nonneg_of_nonpos hPhiNonneg hNonpos
+    omega
+
+/-- AP short-interval spec at `(x = 10^336, h = 10^308, θ = 7/8)` for prime modulus `q ≥ 2`. -/
+def fermatAp78Spec (q : Nat) (hq : 2 ≤ q) : ApShortIntervalSpec :=
+  ⟨shortIntervalQrh78Spec, q, q - 1, by omega, by omega⟩
+
+/-- AP short-interval spec at `(x = 10^168, h = 10^140, θ = 3/4)` for prime modulus `q ≥ 2`. -/
+def fermatAp34Spec (q : Nat) (hq : 2 ≤ q) : ApShortIntervalSpec :=
+  ⟨shortIntervalQrh34Spec, q, q - 1, by omega, by omega⟩
+
+private theorem ap_pow_ten_factor_lt
+    (phiQ e c pExp gap coeff hExp : Nat)
+    (hPhi : phiQ < 10 ^ 5)
+    (hp : pExp ≤ e)
+    (hc : e + gap = hExp)
+    (hCoeff : 2 * c + 1 < coeff)
+    (hGap : 10 ^ 5 * coeff < 10 ^ gap) :
+    phiQ * (2 * (c * 10 ^ e) + 10 ^ pExp) < 10 ^ hExp := by
+  have hInner : 2 * (c * 10 ^ e) + 10 ^ pExp < coeff * 10 ^ e := by
+    have hpLe : 10 ^ pExp ≤ 10 ^ e := Nat.pow_le_pow_right (by decide) hp
+    have h1 : 2 * (c * 10 ^ e) + 10 ^ pExp ≤ (2 * c + 1) * 10 ^ e := by
+      have hmul : 2 * (c * 10 ^ e) + 10 ^ e = (2 * c + 1) * 10 ^ e := by
+        rw [Nat.add_mul, Nat.one_mul]
+        ac_rfl
+      omega
+    have h2 : (2 * c + 1) * 10 ^ e < coeff * 10 ^ e :=
+      Nat.mul_lt_mul_of_pos_right hCoeff (Nat.pow_pos (by decide))
+    omega
+  have hScaled :
+      phiQ * (2 * (c * 10 ^ e) + 10 ^ pExp) < 10 ^ 5 * (coeff * 10 ^ e) := by
+    have hPos : 0 < coeff * 10 ^ e :=
+      Nat.mul_pos (by omega) (Nat.pow_pos (by decide))
+    exact Nat.mul_lt_mul_of_lt_of_le' hPhi (Nat.le_of_lt hInner)
+      (Nat.add_pos_right _ (Nat.pow_pos (by decide)))
+  have hGapMul : 10 ^ 5 * (coeff * 10 ^ e) < 10 ^ gap * 10 ^ e := by
+    rw [← Nat.mul_assoc]
+    exact Nat.mul_lt_mul_of_pos_right hGap (Nat.pow_pos (by decide))
+  have hExpEq : 10 ^ gap * 10 ^ e = 10 ^ hExp := by
+    rw [← Nat.pow_add, Nat.add_comm gap e, hc]
+  omega
+
+set_option exponentiation.threshold 2000 in
+/-- Theorem (Fermat-Tower AP Short-Interval Prime Certificates):
+Connects `EulerFactorNonVanishing.fermatTowerPrimes` (`{5, 17, 257, 65537}`) and
+`EulerFactorNonVanishing.FermatTowerStripCert` (`fermat_tower_euler_product_strip_certs`)
+to `ApShortIntervalSpec`, certifying `HasGuaranteedApPrime` (every reduced residue class
+`a mod q` contains a prime in `(x, x + h]`) for all four Fermat primes (`φ(65537) = 65536 < 10^5`)
+under both `θ = 7/8` (`x = 10^336, h = 10^308`) and `θ = 3/4` (`x = 10^168, h = 10^140`).
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem fermat_tower_ap_short_interval_certs :
+    EulerFactorNonVanishing.fermatTowerPrimes = [5, 17, 257, 65537] ∧
+    (EulerFactorNonVanishing.fermatTowerPrimes.map (· - 1)).prod = 2 ^ 30 ∧
+    EulerFactorNonVanishing.FermatTowerStripCert ∧
+    ((fermatAp78Spec 5 (by decide)).HasGuaranteedApPrime ∧
+     (fermatAp78Spec 17 (by decide)).HasGuaranteedApPrime ∧
+     (fermatAp78Spec 257 (by decide)).HasGuaranteedApPrime ∧
+     (fermatAp78Spec 65537 (by decide)).HasGuaranteedApPrime) ∧
+    ((fermatAp34Spec 5 (by decide)).HasGuaranteedApPrime ∧
+     (fermatAp34Spec 17 (by decide)).HasGuaranteedApPrime ∧
+     (fermatAp34Spec 257 (by decide)).HasGuaranteedApPrime ∧
+     (fermatAp34Spec 65537 (by decide)).HasGuaranteedApPrime) := by
+  have h78Ceil : tenPowThetaCeilExp 28 qrhThresholdSevenEighths = 294 := by decide
+  have h34Ceil : tenPowThetaCeilExp 14 qrhThresholdThreeQuarters = 126 := by decide
+  have h78Base :
+      2 * shortIntervalQrh78Spec.errUpper + shortIntervalQrh78Spec.primePowerCorr =
+        2 * (1318688 * 10 ^ 294) + 10 ^ 173 := by
+    dsimp [shortIntervalQrh78Spec, qrhRemainderBoundAtTwoTenPow, chebyshevSpec336_78]
+    rw [h78Ceil]
+  have h34Base :
+      2 * shortIntervalQrh34Spec.errUpper + shortIntervalQrh34Spec.primePowerCorr =
+        2 * (329672 * 10 ^ 126) + 10 ^ 89 := by
+    dsimp [shortIntervalQrh34Spec, qrhRemainderBoundAtTwoTenPow, chebyshevSpec168_34]
+    rw [h34Ceil]
+  have mk78 : ∀ q (hq : 2 ≤ q), q - 1 < 10 ^ 5 →
+      (fermatAp78Spec q hq).HasGuaranteedApPrime := by
+    intro q hq hPhi
+    dsimp [ApShortIntervalSpec.HasGuaranteedApPrime, fermatAp78Spec]
+    rw [h78Base]
+    exact ap_pow_ten_factor_lt (q - 1) 294 1318688 173 14 3000000 308
+      hPhi (by decide) (by decide) (by decide) (by decide)
+  have mk34 : ∀ q (hq : 2 ≤ q), q - 1 < 10 ^ 5 →
+      (fermatAp34Spec q hq).HasGuaranteedApPrime := by
+    intro q hq hPhi
+    dsimp [ApShortIntervalSpec.HasGuaranteedApPrime, fermatAp34Spec]
+    rw [h34Base]
+    exact ap_pow_ten_factor_lt (q - 1) 126 329672 89 14 700000 140
+      hPhi (by decide) (by decide) (by decide) (by decide)
+  exact ⟨rfl, rfl, EulerFactorNonVanishing.fermat_tower_euler_product_strip_certs,
+    ⟨mk78 5 (by decide) (by decide), mk78 17 (by decide) (by decide),
+     mk78 257 (by decide) (by decide), mk78 65537 (by decide) (by decide)⟩,
+    ⟨mk34 5 (by decide) (by decide), mk34 17 (by decide) (by decide),
+     mk34 257 (by decide) (by decide), mk34 65537 (by decide) (by decide)⟩⟩
+
+-- =============================================================================
+-- 6. Sub-3/4 QRH Threshold Ladder (2/3, 5/8, 9/16) & Minimal Positivity Scales
+-- =============================================================================
+
+/-- Sub-3/4 QRH threshold rung `θ = 2/3`. -/
+def qrhThresholdTwoThirds : QRat := QRat.mk' 2 3
+
+/-- Sub-3/4 QRH threshold rung `θ = 5/8`. -/
+def qrhThresholdFiveEighths : QRat := QRat.mk' 5 8
+
+/-- Sub-3/4 QRH threshold rung `θ = 9/16`. -/
+def qrhThresholdNineSixteenths : QRat := QRat.mk' 9 16
+
+/-- Chebyshev spec at `x = 10^24` (`k = 2`) for `θ = 2/3`. -/
+def chebyshevSpec24_23 : ChebyshevRemainderSpec :=
+  ⟨2, by decide, 1, by decide, qrhThresholdTwoThirds, by decide, by decide⟩
+
+/-- Chebyshev spec at `x = 10^24` (`k = 2`) for `θ = 5/8`. -/
+def chebyshevSpec24_58 : ChebyshevRemainderSpec :=
+  ⟨2, by decide, 1, by decide, qrhThresholdFiveEighths, by decide, by decide⟩
+
+/-- Chebyshev spec at `x = 10^48` (`k = 4`) for `θ = 9/16`. -/
+def chebyshevSpec48_916 : ChebyshevRemainderSpec :=
+  ⟨4, by decide, 1, by decide, qrhThresholdNineSixteenths, by decide, by decide⟩
+
+/-- Short-interval spec at minimal decimal scale `(x = 10^24, h = 10^21)` for `θ = 2/3`
+(`x^(2/3) = 10^16`, `primePowerCorr = 10^15 > 2 * sqrt(2x) * ln(2x)`). -/
+def shortIntervalQrh23Spec : ShortIntervalChebyshevSpec :=
+  { thetaNum := 2
+    thetaDen := 3
+    xScaleExp := 24
+    hScaleExp := 21
+    errUpper := qrhRemainderBoundAtTwoTenPow chebyshevSpec24_23
+    primePowerCorr := 10 ^ 15
+    thetaDen_pos := by decide
+    theta_lt_one := by decide }
+
+/-- Short-interval spec at minimal decimal scale `(x = 10^24, h = 10^20)` for `θ = 5/8`
+(`x^(5/8) = 10^15`, `primePowerCorr = 10^15 > 2 * sqrt(2x) * ln(2x)`). -/
+def shortIntervalQrh58Spec : ShortIntervalChebyshevSpec :=
+  { thetaNum := 5
+    thetaDen := 8
+    xScaleExp := 24
+    hScaleExp := 20
+    errUpper := qrhRemainderBoundAtTwoTenPow chebyshevSpec24_58
+    primePowerCorr := 10 ^ 15
+    thetaDen_pos := by decide
+    theta_lt_one := by decide }
+
+/-- Short-interval spec at minimal decimal scale `(x = 10^48, h = 10^32)` for `θ = 9/16`
+(`x^(9/16) = 10^27`, `primePowerCorr = 10^27 > 2 * sqrt(2x) * ln(2x)`). -/
+def shortIntervalQrh916Spec : ShortIntervalChebyshevSpec :=
+  { thetaNum := 9
+    thetaDen := 16
+    xScaleExp := 48
+    hScaleExp := 32
+    errUpper := qrhRemainderBoundAtTwoTenPow chebyshevSpec48_916
+    primePowerCorr := 10 ^ 27
+    thetaDen_pos := by decide
+    theta_lt_one := by decide }
+
+set_option exponentiation.threshold 2000 in
+/-- Theorem (Sub-3/4 QRH Ladder & Minimal Positivity Scales):
+1. Certifies the extended strict rational ladder
+   `1/2 < 9/16 < 5/8 < 2/3 < 3/4 < 7/8 < 1` and its reversed Chebyshev remainder gap chain
+   `0 < 1/8 < 1/4 < 1/3 < 3/8 < 7/16 < 1/2`.
+2. Certifies `HasGuaranteedPrime` at the minimal decimal scales `(xScaleExp, hScaleExp)`:
+   - `θ = 2/3`: `(24, 21)` with `x^(2/3) = 10^16` (and `10^20 < 2 * err + corr < 10^21`),
+   - `θ = 5/8`: `(24, 20)` with `x^(5/8) = 10^15` (and `10^19 < 2 * err + corr < 10^20`),
+   - `θ = 9/16`: `(48, 32)` with `x^(9/16) = 10^27` (and `10^31 < 2 * err + corr < 10^32`).
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem sub_three_quarters_qrh_ladder_certs :
+    let θ12 := QRat.mk' 1 2
+    let θ916 := qrhThresholdNineSixteenths
+    let θ58 := qrhThresholdFiveEighths
+    let θ23 := qrhThresholdTwoThirds
+    let θ34 := qrhThresholdThreeQuarters
+    let θ78 := qrhThresholdSevenEighths
+    (θ12 < θ916 ∧ θ916 < θ58 ∧ θ58 < θ23 ∧
+     θ23 < θ34 ∧ θ34 < θ78 ∧ θ78 < QRat.ofInt 1) ∧
+    (QRat.ofInt 0 < chebyshevGap θ78 ∧
+     chebyshevGap θ78 < chebyshevGap θ34 ∧
+     chebyshevGap θ34 < chebyshevGap θ23 ∧
+     chebyshevGap θ23 < chebyshevGap θ58 ∧
+     chebyshevGap θ58 < chebyshevGap θ916 ∧
+     chebyshevGap θ916 < chebyshevGap θ12) ∧
+    (tenPowThetaCeilExp 2 θ23 = 16 ∧
+     tenPowThetaCeilExp 2 θ58 = 15 ∧
+     tenPowThetaCeilExp 4 θ916 = 27) ∧
+    (shortIntervalQrh23Spec.HasGuaranteedPrime ∧
+     10 ^ 20 < 2 * shortIntervalQrh23Spec.errUpper + shortIntervalQrh23Spec.primePowerCorr) ∧
+    (shortIntervalQrh58Spec.HasGuaranteedPrime ∧
+     10 ^ 19 < 2 * shortIntervalQrh58Spec.errUpper + shortIntervalQrh58Spec.primePowerCorr) ∧
+    (shortIntervalQrh916Spec.HasGuaranteedPrime ∧
+     10 ^ 31 < 2 * shortIntervalQrh916Spec.errUpper + shortIntervalQrh916Spec.primePowerCorr) := by
+  have hLadder :
+      QRat.mk' 1 2 < qrhThresholdNineSixteenths ∧
+      qrhThresholdNineSixteenths < qrhThresholdFiveEighths ∧
+      qrhThresholdFiveEighths < qrhThresholdTwoThirds ∧
+      qrhThresholdTwoThirds < qrhThresholdThreeQuarters ∧
+      qrhThresholdThreeQuarters < qrhThresholdSevenEighths ∧
+      qrhThresholdSevenEighths < QRat.ofInt 1 := by decide
+  have hGaps :
+      QRat.ofInt 0 < chebyshevGap qrhThresholdSevenEighths ∧
+      chebyshevGap qrhThresholdSevenEighths < chebyshevGap qrhThresholdThreeQuarters ∧
+      chebyshevGap qrhThresholdThreeQuarters < chebyshevGap qrhThresholdTwoThirds ∧
+      chebyshevGap qrhThresholdTwoThirds < chebyshevGap qrhThresholdFiveEighths ∧
+      chebyshevGap qrhThresholdFiveEighths < chebyshevGap qrhThresholdNineSixteenths ∧
+      chebyshevGap qrhThresholdNineSixteenths < chebyshevGap (QRat.mk' 1 2) := by decide
+  have h23Ceil : tenPowThetaCeilExp 2 qrhThresholdTwoThirds = 16 := by decide
+  have h58Ceil : tenPowThetaCeilExp 2 qrhThresholdFiveEighths = 15 := by decide
+  have h916Ceil : tenPowThetaCeilExp 4 qrhThresholdNineSixteenths = 27 := by decide
+  have h23 :
+      shortIntervalQrh23Spec.HasGuaranteedPrime ∧
+      10 ^ 20 < 2 * shortIntervalQrh23Spec.errUpper + shortIntervalQrh23Spec.primePowerCorr := by
+    dsimp [ShortIntervalChebyshevSpec.HasGuaranteedPrime, shortIntervalQrh23Spec,
+      qrhRemainderBoundAtTwoTenPow, chebyshevSpec24_23]
+    rw [h23Ceil]
+    constructor <;> decide
+  have h58 :
+      shortIntervalQrh58Spec.HasGuaranteedPrime ∧
+      10 ^ 19 < 2 * shortIntervalQrh58Spec.errUpper + shortIntervalQrh58Spec.primePowerCorr := by
+    dsimp [ShortIntervalChebyshevSpec.HasGuaranteedPrime, shortIntervalQrh58Spec,
+      qrhRemainderBoundAtTwoTenPow, chebyshevSpec24_58]
+    rw [h58Ceil]
+    constructor <;> decide
+  have h916 :
+      shortIntervalQrh916Spec.HasGuaranteedPrime ∧
+      10 ^ 31 < 2 * shortIntervalQrh916Spec.errUpper + shortIntervalQrh916Spec.primePowerCorr := by
+    dsimp [ShortIntervalChebyshevSpec.HasGuaranteedPrime, shortIntervalQrh916Spec,
+      qrhRemainderBoundAtTwoTenPow, chebyshevSpec48_916]
+    rw [h916Ceil]
+    have hPow27 : 2 * (2 * 1 * 10 ^ 27 * ((29 * 4) * (29 * 4))) + 10 ^ 27 =
+        53825 * 10 ^ 27 := by
+      have hc : 2 * (2 * 1 * ((29 * 4) * (29 * 4))) + 1 = 53825 := by decide
+      calc 2 * (2 * 1 * 10 ^ 27 * ((29 * 4) * (29 * 4))) + 10 ^ 27
+          = (2 * (2 * 1 * ((29 * 4) * (29 * 4)))) * 10 ^ 27 + 1 * 10 ^ 27 := by
+            rw [Nat.one_mul]
+        _ = (2 * (2 * 1 * ((29 * 4) * (29 * 4))) + 1) * 10 ^ 27 := by rw [Nat.add_mul]
+        _ = 53825 * 10 ^ 27 := by rw [hc]
+    rw [hPow27]
+    constructor
+    · have hLt : 53825 * 10 ^ 27 < 10 ^ 5 * 10 ^ 27 :=
+        Nat.mul_lt_mul_of_pos_right (by decide) (Nat.pow_pos (by decide))
+      have hPow32 : (10 : Nat) ^ 5 * 10 ^ 27 = 10 ^ 32 := by decide
+      omega
+    · have hGt : 10 ^ 4 * 10 ^ 27 < 53825 * 10 ^ 27 :=
+        Nat.mul_lt_mul_of_pos_right (by decide) (Nat.pow_pos (by decide))
+      have hPow31 : (10 : Nat) ^ 4 * 10 ^ 27 = 10 ^ 31 := by decide
+      omega
+  exact ⟨hLadder, hGaps, ⟨h23Ceil, h58Ceil, h916Ceil⟩, h23, h58, h916⟩
 
 end QuasiRiemann
 

@@ -216,6 +216,10 @@ def main : IO Unit := do
     "θ=1/2 [10^168, +10^98]")
   IO.println (s!"  Short-Int Ladder  : {repr eDH} < {repr eGM} (GM) < {repr eHux} (Hux) < " ++
     s!"{repr eIng} (Ing) < 3/4 < 7/8 < 1 (ZERO axioms)")
+  IO.println ("  Fermat AP Primes  : q ∈ {5,17,257,65537} (φ≤65536) @ θ=7/8 [10^336,+10^308] " ++
+    "& θ=3/4 [10^168,+10^140]")
+  IO.println ("  Sub-3/4 QRH Ladder: 1/2 < 9/16 [10^48,+10^32] < 5/8 [10^24,+10^20] < " ++
+    "2/3 [10^24,+10^21] < 3/4 < 7/8 < 1")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"
