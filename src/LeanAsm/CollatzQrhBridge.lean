@@ -4,6 +4,7 @@
 
 import LeanAsm.Conjectures
 import LeanAsm.QuasiRiemann
+import LeanAsm.QuasiRiemann.UltraDeep72
 import LeanAsm.PiChudnovsky.CrtMulBridge
 
 namespace CollatzQrhBridge
@@ -554,7 +555,7 @@ theorem collatzBeatPeriodUpper72_sound (k m bound : Nat)
   split at hsome
   · rename_i hpos
     injection hsome with hdiv
-    have htp : 0 ≤ twoPiInterval72.hi := by decide +kernel
+    have htp : 0 ≤ twoPiInterval72.hi := Int.natCast_nonneg _
     have hmul := mul_natAbs_of_nonneg hpos hdiv
     rw [Int.natAbs_of_nonneg htp] at hmul
     exact ⟨hpos, hmul⟩
@@ -576,6 +577,8 @@ theorem collatz_qrh_phase_beat_72_verified :
     twoPiInterval72.hi ≤ 3009 * linearFormLn2Ln3AbsLower72 84 53 ∧
     twoPiInterval72.hi ≤ 89 * linearFormLn2Ln3AbsLower72 306 193 ∧
     twoPiInterval72.hi ≤ 6147 * linearFormLn2Ln3AbsLower72 485 306 := by
+  dsimp [collatzBeatPeriodUpper72]
+  rw [twoPiInterval72_hi_eq]
   decide +kernel
 
 end CollatzQrhBridge
