@@ -363,4 +363,16 @@ import LeanAsm
 #print axioms Genus2Jacobian.jacobian_D0_primitive
 #print axioms Genus2Jacobian.jacobian_group_axioms_on_orbit
 
+-- Part 22: Steiner-Simons-de Weger Collatz Cycle Bounds (Issue #26)
+#print axioms CollatzQrhBridge.collatz_cycle_min_element_lower_bound
+#print axioms CollatzQrhBridge.collatz_odd_cycle_linear_eq
+#print axioms CollatzQrhBridge.collatz_odd_cycle_gap_pos
+#print axioms CollatzQrhBridge.collatz_odd_cycle_min_element_lower_bound
+#print axioms CollatzQrhBridge.collatz_odd_cycle_product_bound
+#print axioms CollatzQrhBridge.steiner_1cycle_divides
+#print axioms CollatzQrhBridge.steiner_1cycle_excluded_at_convergents
+#print axioms CollatzQrhBridge.collatz_convergent_nmin_lower_bounds
+#print axioms CollatzQrhBridge.collatz_linear_form_uniform_306
+#print axioms CollatzQrhBridge.collatz_cycle_length_lower_bound_306
+
 -- end of file: leanasm/tests/TestAxioms.lean

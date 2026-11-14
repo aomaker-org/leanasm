@@ -581,6 +581,709 @@ theorem collatz_qrh_phase_beat_72_verified :
   rw [twoPiInterval72_hi_eq]
   decide +kernel
 
+-- =============================================================================
+-- Steiner–Simons–de Weger Cycle-Length & n_min Bounds Through (485, 306)
+-- =============================================================================
+
+/-- Cumulative halving count `s_j = ∑_{r=0}^{j-1} a_r` for a Collatz odd-step schedule `a`. -/
+def cycleShift (a : Nat → Nat) : Nat → Nat
+  | 0 => 0
+  | j + 1 => cycleShift a j + a j
+
+/-- Exact Collatz cycle RHS numerator `∑_{j=0}^{m-1} 3^{m - 1 - j} * 2^{s_j}`. -/
+def cycleRhs (a : Nat → Nat) : Nat → Nat
+  | 0 => 0
+  | m + 1 => 3 * cycleRhs a m + 2 ^ cycleShift a m
+
+/-- Constructive formalization of a positive `m`-odd-step Collatz cycle with odd iterates
+`x 0, ..., x (m-1)`, halving exponents `a 0, ..., a (m-1) ≥ 1`, and minimum `nMin ≥ 1`. -/
+structure CollatzOddCycle (m : Nat) where
+  x : Nat → Nat
+  a : Nat → Nat
+  nMin : Nat
+  nMin_pos : 1 ≤ nMin
+  nMin_le : ∀ j < m, nMin ≤ x j
+  a_pos : ∀ j < m, 1 ≤ a j
+  step_eq : ∀ j < m, 2 ^ a j * x (j + 1) = 3 * x j + 1
+  periodic : x m = x 0
+
+theorem nat_pow2_le_pow3 (m : Nat) : 2 ^ m ≤ 3 ^ m :=
+  Nat.pow_le_pow_left (by decide) m
+
+theorem cycleShift_ge_idx (a : Nat → Nat) (m : Nat) (ha : ∀ j < m, 1 ≤ a j) :
+    ∀ j ≤ m, j ≤ cycleShift a j := by
+  intro j
+  induction j with
+  | zero =>
+    intro _
+    exact Nat.le_refl 0
+  | succ j ih =>
+    intro hj
+    have hjm : j ≤ m := Nat.le_of_lt (Nat.lt_of_succ_le hj)
+    exact Nat.add_le_add (ih hjm) (ha j hj)
+
+private theorem cycleShift_one (j : Nat) : cycleShift (fun _ => 1) j = j := by
+  induction j with
+  | zero => rfl
+  | succ j ih => simp [cycleShift, ih]
+
+private theorem cycleRhs_one_add_pow2 (m : Nat) :
+    cycleRhs (fun _ => 1) m + 2 ^ m = 3 ^ m := by
+  induction m with
+  | zero => rfl
+  | succ m ih =>
+    calc cycleRhs (fun _ => 1) (m + 1) + 2 ^ (m + 1)
+        = (3 * cycleRhs (fun _ => 1) m + 2 ^ m) + (2 ^ m * 2) := by
+          simp [cycleRhs, cycleShift_one, Nat.pow_succ]
+      _ = 3 * cycleRhs (fun _ => 1) m + (2 ^ m + 2 * 2 ^ m) := by
+          rw [Nat.mul_comm (2 ^ m) 2, Nat.add_assoc]
+      _ = 3 * cycleRhs (fun _ => 1) m + 3 * 2 ^ m := by
+          have h32 : 2 ^ m + 2 * 2 ^ m = 3 * 2 ^ m := by
+            calc 2 ^ m + 2 * 2 ^ m = 1 * 2 ^ m + 2 * 2 ^ m := by rw [Nat.one_mul]
+              _ = (1 + 2) * 2 ^ m := (Nat.add_mul 1 2 (2 ^ m)).symm
+              _ = 3 * 2 ^ m := rfl
+          rw [h32]
+      _ = 3 * (cycleRhs (fun _ => 1) m + 2 ^ m) := (Nat.mul_add 3 _ _).symm
+      _ = 3 * 3 ^ m := by rw [ih]
+      _ = 3 ^ (m + 1) := by rw [Nat.pow_succ, Nat.mul_comm]
+
+theorem cycleRhs_one_eq (m : Nat) : cycleRhs (fun _ => 1) m = 3 ^ m - 2 ^ m :=
+  Nat.eq_sub_of_add_eq (cycleRhs_one_add_pow2 m)
+
+theorem cycleRhs_ge_geo (a : Nat → Nat) (m : Nat) (ha : ∀ j < m, 1 ≤ a j) :
+    3 ^ m - 2 ^ m ≤ cycleRhs a m := by
+  rw [← cycleRhs_one_eq m]
+  have hsub : ∀ t ≤ m, cycleRhs (fun _ => 1) t ≤ cycleRhs a t := by
+    intro t
+    induction t with
+    | zero =>
+      intro _
+      exact Nat.le_refl 0
+    | succ t ih =>
+      intro htm
+      have ht_le : t ≤ m := Nat.le_of_lt htm
+      have hpow : 2 ^ cycleShift (fun _ => 1) t ≤ 2 ^ cycleShift a t := by
+        rw [cycleShift_one t]
+        exact Nat.pow_le_pow_right (by decide) (cycleShift_ge_idx a m ha t ht_le)
+      exact Nat.add_le_add (Nat.mul_le_mul_left 3 (ih ht_le)) hpow
+  exact hsub m (Nat.le_refl m)
+
+/-- Constructive Collatz cycle minimum-element inequality: any schedule with `a_j ≥ 1`,
+`s_m = k`, `3^m < 2^k`, and cycle equation `nMin * (2^k - 3^m) = cycleRhs a m` satisfies
+`nMin * (2^k - 3^m) ≥ 3^m - 2^m`. -/
+theorem collatz_cycle_min_element_lower_bound (nMin k m : Nat) (a : Nat → Nat)
+    (ha : ∀ j < m, 1 ≤ a j) (_hk : cycleShift a m = k) (_hlt : 3 ^ m < 2 ^ k)
+    (heq : nMin * (2 ^ k - 3 ^ m) = cycleRhs a m) :
+    3 ^ m - 2 ^ m ≤ nMin * (2 ^ k - 3 ^ m) := by
+  rw [heq]
+  exact cycleRhs_ge_geo a m ha
+
+private theorem collatz_odd_cycle_prefix_eq {m : Nat} (c : CollatzOddCycle m) :
+    ∀ t ≤ m, 2 ^ cycleShift c.a t * c.x t = 3 ^ t * c.x 0 + cycleRhs c.a t := by
+  intro t
+  induction t with
+  | zero =>
+    intro _
+    simp [cycleShift, cycleRhs]
+  | succ t ih =>
+    intro htm
+    have ht_lt : t < m := htm
+    have ht_le : t ≤ m := Nat.le_of_lt ht_lt
+    calc 2 ^ cycleShift c.a (t + 1) * c.x (t + 1)
+        = (2 ^ cycleShift c.a t * 2 ^ c.a t) * c.x (t + 1) := by
+          simp [cycleShift, Nat.pow_add]
+      _ = 2 ^ cycleShift c.a t * (2 ^ c.a t * c.x (t + 1)) := by
+          rw [Nat.mul_assoc]
+      _ = 2 ^ cycleShift c.a t * (3 * c.x t + 1) := by
+          rw [c.step_eq t ht_lt]
+      _ = 3 * (2 ^ cycleShift c.a t * c.x t) + 2 ^ cycleShift c.a t := by
+          rw [Nat.mul_add, Nat.mul_one, Nat.mul_left_comm]
+      _ = 3 * (3 ^ t * c.x 0 + cycleRhs c.a t) + 2 ^ cycleShift c.a t := by
+          rw [ih ht_le]
+      _ = 3 ^ (t + 1) * c.x 0 + (3 * cycleRhs c.a t + 2 ^ cycleShift c.a t) := by
+          rw [Nat.mul_add, ← Nat.mul_assoc, Nat.pow_succ, Nat.mul_comm (3 ^ t) 3, Nat.add_assoc]
+      _ = 3 ^ (t + 1) * c.x 0 + cycleRhs c.a (t + 1) := rfl
+
+/-- Linear cycle identity derived from odd-step recurrence of `CollatzOddCycle m`. -/
+theorem collatz_odd_cycle_linear_eq {m : Nat} (c : CollatzOddCycle m) :
+    2 ^ cycleShift c.a m * c.x 0 = 3 ^ m * c.x 0 + cycleRhs c.a m := by
+  have h := collatz_odd_cycle_prefix_eq c m (Nat.le_refl m)
+  rwa [c.periodic] at h
+
+/-- Strict positivity of `2^k - 3^m` for any nonempty `CollatzOddCycle m` (`1 ≤ m`). -/
+theorem collatz_odd_cycle_gap_pos {m : Nat} (c : CollatzOddCycle m) (hm : 1 ≤ m) :
+    3 ^ m < 2 ^ cycleShift c.a m := by
+  have hlin := collatz_odd_cycle_linear_eq c
+  have h1m : 1 ≤ cycleRhs c.a m := by
+    have h32 : 1 ≤ 3 ^ m - 2 ^ m := by
+      cases m with
+      | zero => cases hm
+      | succ m' =>
+        have hpow : 2 ^ (m' + 1) < 3 ^ (m' + 1) := by
+          have hbase : 2 ^ m' ≤ 3 ^ m' := nat_pow2_le_pow3 m'
+          calc 2 ^ (m' + 1) = 2 * 2 ^ m' := by rw [Nat.pow_succ, Nat.mul_comm]
+            _ < 3 * 2 ^ m' := Nat.mul_lt_mul_of_pos_right (by decide) (Nat.pow_pos (by decide))
+            _ ≤ 3 * 3 ^ m' := Nat.mul_le_mul_left 3 hbase
+            _ = 3 ^ (m' + 1) := by rw [Nat.pow_succ, Nat.mul_comm]
+        exact Nat.sub_pos_of_lt hpow
+    exact Nat.le_trans h32 (cycleRhs_ge_geo c.a m c.a_pos)
+  have hx0_pos : 0 < c.x 0 :=
+    Nat.lt_of_lt_of_le (Nat.zero_lt_succ 0) (Nat.le_trans c.nMin_pos (c.nMin_le 0 hm))
+  have hlt_mul : 3 ^ m * c.x 0 < 2 ^ cycleShift c.a m * c.x 0 := by
+    rw [hlin]
+    exact Nat.lt_add_of_pos_right (Nat.lt_of_lt_of_le (Nat.zero_lt_succ 0) h1m)
+  cases Nat.lt_or_ge (3 ^ m) (2 ^ cycleShift c.a m) with
+  | inl hlt => exact hlt
+  | inr hge =>
+    exact absurd (Nat.lt_of_le_of_lt (Nat.mul_le_mul_right (c.x 0) hge) hlt_mul) (Nat.lt_irrefl _)
+
+/-- Direct corollary of `collatz_cycle_min_element_lower_bound` for a `CollatzOddCycle` whose
+minimum element occurs at `x 0 = nMin`. -/
+theorem collatz_odd_cycle_min_element_lower_bound {m : Nat} (c : CollatzOddCycle m)
+    (hm : 1 ≤ m) (hx0 : c.x 0 = c.nMin) :
+    3 ^ m - 2 ^ m ≤ c.nMin * (2 ^ cycleShift c.a m - 3 ^ m) := by
+  have hlin := collatz_odd_cycle_linear_eq c
+  rw [hx0, Nat.mul_comm (2 ^ cycleShift c.a m) c.nMin, Nat.mul_comm (3 ^ m) c.nMin] at hlin
+  have hgap := collatz_odd_cycle_gap_pos c hm
+  have heq : c.nMin * (2 ^ cycleShift c.a m - 3 ^ m) = cycleRhs c.a m := by
+    rw [Nat.mul_sub_left_distrib]
+    rw [Nat.add_comm (c.nMin * 3 ^ m)] at hlin
+    exact Nat.sub_eq_of_eq_add hlin
+  exact collatz_cycle_min_element_lower_bound c.nMin (cycleShift c.a m) m c.a
+    c.a_pos rfl hgap heq
+
+/-- Product upper inequality derived directly from `2^{a_j} * x_{j+1} = 3 * x_j + 1` and
+`nMin ≤ x_j`: `2^k * nMin^m ≤ (3 * nMin + 1)^m`. -/
+theorem collatz_odd_cycle_product_bound {m : Nat} (c : CollatzOddCycle m) :
+    2 ^ cycleShift c.a m * c.nMin ^ m ≤ (3 * c.nMin + 1) ^ m := by
+  cases m with
+  | zero =>
+    simp [cycleShift]
+  | succ m' =>
+    have hm : 1 ≤ m' + 1 := Nat.succ_le_succ (Nat.zero_le _)
+    have hprefix : ∀ t ≤ m' + 1,
+        2 ^ cycleShift c.a t * c.x t * c.nMin ^ t ≤ c.x 0 * (3 * c.nMin + 1) ^ t := by
+      intro t
+      induction t with
+      | zero =>
+        intro _
+        simp [cycleShift]
+      | succ t ih =>
+        intro htm
+        have ht_lt : t < m' + 1 := htm
+        have ht_le : t ≤ m' + 1 := Nat.le_of_lt ht_lt
+        have hstep_n : 2 ^ c.a t * c.x (t + 1) * c.nMin ≤ c.x t * (3 * c.nMin + 1) := by
+          calc 2 ^ c.a t * c.x (t + 1) * c.nMin
+              = (3 * c.x t + 1) * c.nMin := by rw [c.step_eq t ht_lt]
+            _ = 3 * c.x t * c.nMin + c.nMin := by rw [Nat.add_mul, Nat.one_mul]
+            _ ≤ 3 * c.x t * c.nMin + c.x t := Nat.add_le_add_left (c.nMin_le t ht_lt) _
+            _ = c.x t * (3 * c.nMin + 1) := by
+              rw [Nat.mul_add, Nat.mul_one, Nat.mul_left_comm (c.x t) 3 c.nMin,
+                  ← Nat.mul_assoc 3 (c.x t) c.nMin]
+        have h1 :
+            (2 ^ cycleShift c.a t * c.nMin ^ t) * (2 ^ c.a t * c.x (t + 1) * c.nMin) ≤
+            (2 ^ cycleShift c.a t * c.nMin ^ t) * (c.x t * (3 * c.nMin + 1)) :=
+          Nat.mul_le_mul_left _ hstep_n
+        have h2 :
+            (2 ^ cycleShift c.a t * c.x t * c.nMin ^ t) * (3 * c.nMin + 1) ≤
+            (c.x 0 * (3 * c.nMin + 1) ^ t) * (3 * c.nMin + 1) :=
+          Nat.mul_le_mul_right _ (ih ht_le)
+        calc 2 ^ cycleShift c.a (t + 1) * c.x (t + 1) * c.nMin ^ (t + 1)
+            = (2 ^ cycleShift c.a t * 2 ^ c.a t) * c.x (t + 1) * (c.nMin ^ t * c.nMin) := by
+              simp [cycleShift, Nat.pow_add, Nat.pow_succ]
+          _ = (2 ^ cycleShift c.a t * c.nMin ^ t) * (2 ^ c.a t * c.x (t + 1) * c.nMin) := by
+              simp only [Nat.mul_assoc, Nat.mul_left_comm]
+          _ ≤ (2 ^ cycleShift c.a t * c.nMin ^ t) * (c.x t * (3 * c.nMin + 1)) := h1
+          _ = (2 ^ cycleShift c.a t * c.x t * c.nMin ^ t) * (3 * c.nMin + 1) := by
+              simp only [Nat.mul_assoc, Nat.mul_left_comm]
+          _ ≤ (c.x 0 * (3 * c.nMin + 1) ^ t) * (3 * c.nMin + 1) := h2
+          _ = c.x 0 * (3 * c.nMin + 1) ^ (t + 1) := by
+              simp only [Nat.pow_succ, Nat.mul_assoc]
+    have hm_bound := hprefix (m' + 1) (Nat.le_refl _)
+    rw [c.periodic] at hm_bound
+    have hx0_pos : 0 < c.x 0 :=
+      Nat.lt_of_lt_of_le (Nat.zero_lt_succ 0) (Nat.le_trans c.nMin_pos (c.nMin_le 0 hm))
+    have hreord : c.x 0 * (2 ^ cycleShift c.a (m' + 1) * c.nMin ^ (m' + 1)) ≤
+        c.x 0 * (3 * c.nMin + 1) ^ (m' + 1) := by
+      have hlhs : c.x 0 * (2 ^ cycleShift c.a (m' + 1) * c.nMin ^ (m' + 1)) =
+          2 ^ cycleShift c.a (m' + 1) * c.x 0 * c.nMin ^ (m' + 1) := by
+        rw [← Nat.mul_assoc, Nat.mul_comm (c.x 0)]
+      have hrhs : c.x 0 * (3 * c.nMin + 1) ^ (m' + 1) =
+          (3 * c.nMin + 1) ^ (m' + 1) * c.x 0 := Nat.mul_comm _ _
+      simpa only [hlhs, hrhs] using hm_bound
+    exact Nat.le_of_mul_le_mul_left hreord hx0_pos
+
+/-- Exact Steiner 1-cycle divisibility condition: if `a_0 = ... = a_{m-2} = 1`,
+then `cycleRhs a m = 3^m - 2^m`, so `nMin * (2^k - 3^m) = 3^m - 2^m` and
+`(2^k - 3^m) ∣ (3^m - 2^m)`. -/
+theorem steiner_1cycle_divides (nMin k m : Nat) (a : Nat → Nat)
+    (h1cycle : ∀ j, j + 1 < m → a j = 1)
+    (heq : nMin * (2 ^ k - 3 ^ m) = cycleRhs a m) :
+    cycleRhs a m = 3 ^ m - 2 ^ m ∧
+    nMin * (2 ^ k - 3 ^ m) = 3 ^ m - 2 ^ m ∧
+    (2 ^ k - 3 ^ m) ∣ (3 ^ m - 2 ^ m) := by
+  have hshift_eq : ∀ j < m, cycleShift a j = j := by
+    intro j
+    induction j with
+    | zero =>
+      intro _
+      rfl
+    | succ j ih =>
+      intro hj1
+      have hj : j < m := Nat.lt_of_succ_lt hj1
+      simp [cycleShift, ih hj, h1cycle j hj1]
+  have hrhs_eq : ∀ t ≤ m, cycleRhs a t = cycleRhs (fun _ => 1) t := by
+    intro t
+    induction t with
+    | zero =>
+      intro _
+      rfl
+    | succ t ih =>
+      intro htm
+      have ht_lt : t < m := htm
+      have ht_le : t ≤ m := Nat.le_of_lt ht_lt
+      simp only [cycleRhs, cycleShift_one]
+      rw [ih ht_le, hshift_eq t ht_lt]
+  have hrhs : cycleRhs a m = 3 ^ m - 2 ^ m :=
+    (hrhs_eq m (Nat.le_refl m)).trans (cycleRhs_one_eq m)
+  rw [hrhs] at heq
+  exact ⟨hrhs, heq, ⟨nMin, by rw [← heq, Nat.mul_comm]⟩⟩
+
+set_option exponentiation.threshold 512 in
+private theorem steiner_crt_nondiv_checked :
+    (powViaCrtNtt192 3 5 - powViaCrtNtt192 2 5) %
+      (powViaCrtNtt192 2 8 - powViaCrtNtt192 3 5) ≠ 0 ∧
+    (powViaCrtNtt192 3 41 - powViaCrtNtt192 2 41) %
+      (powViaCrtNtt192 2 65 - powViaCrtNtt192 3 41) ≠ 0 ∧
+    (powViaCrtNtt192 3 193 - powViaCrtNtt192 2 193) %
+      (powViaCrtNtt192 2 306 - powViaCrtNtt192 3 193) ≠ 0 ∧
+    (powViaCrtNtt192 3 306 - powViaCrtNtt192 2 306) %
+      (powViaCrtNtt192 2 485 - powViaCrtNtt192 3 306) ≠ 0 := by
+  simp only [powViaCrtNtt192_eq_pow]
+  decide +kernel
+
+private theorem not_dvd_of_mod_ne_zero {d n : Nat} (hmod : n % d ≠ 0) : ¬ (d ∣ n) := by
+  intro hdvd
+  exact hmod (Nat.mod_eq_zero_of_dvd hdvd)
+
+/-- Constructive exclusion of Steiner 1-cycles at all four certified upper convergents
+`(8, 5)`, `(65, 41)`, `(306, 193)`, and `(485, 306)` via `powViaCrtNtt192`. -/
+theorem steiner_1cycle_excluded_at_convergents :
+    ¬ ((powViaCrtNtt192 2 8 - powViaCrtNtt192 3 5) ∣
+      (powViaCrtNtt192 3 5 - powViaCrtNtt192 2 5)) ∧
+    ¬ ((powViaCrtNtt192 2 65 - powViaCrtNtt192 3 41) ∣
+      (powViaCrtNtt192 3 41 - powViaCrtNtt192 2 41)) ∧
+    ¬ ((powViaCrtNtt192 2 306 - powViaCrtNtt192 3 193) ∣
+      (powViaCrtNtt192 3 193 - powViaCrtNtt192 2 193)) ∧
+    ¬ ((powViaCrtNtt192 2 485 - powViaCrtNtt192 3 306) ∣
+      (powViaCrtNtt192 3 306 - powViaCrtNtt192 2 306)) ∧
+    (∀ (k m : Nat), (k = 8 ∧ m = 5) ∨ (k = 65 ∧ m = 41) ∨
+        (k = 306 ∧ m = 193) ∨ (k = 485 ∧ m = 306) →
+      ∀ (nMin : Nat) (a : Nat → Nat),
+        (∀ j, j + 1 < m → a j = 1) →
+        nMin * (2 ^ k - 3 ^ m) ≠ cycleRhs a m) := by
+  have hchk := steiner_crt_nondiv_checked
+  have h1 := not_dvd_of_mod_ne_zero hchk.1
+  have h2 := not_dvd_of_mod_ne_zero hchk.2.1
+  have h3 := not_dvd_of_mod_ne_zero hchk.2.2.1
+  have h4 := not_dvd_of_mod_ne_zero hchk.2.2.2
+  refine ⟨h1, h2, h3, h4, ?_⟩
+  intro k m hcase nMin a h1cycle heq
+  have hdvd := (steiner_1cycle_divides nMin k m a h1cycle heq).2.2
+  rw [← powViaCrtNtt192_eq_pow 2 k, ← powViaCrtNtt192_eq_pow 3 m,
+      ← powViaCrtNtt192_eq_pow 2 m] at hdvd
+  rcases hcase with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+  · exact h1 hdvd
+  · exact h2 hdvd
+  · exact h3 hdvd
+  · exact h4 hdvd
+
+private theorem ceilDiv_le_of_le_mul {num den q : Nat} (hden : 0 < den)
+    (hle : num ≤ q * den) : (num + den - 1) / den ≤ q := by
+  cases Nat.eq_zero_or_pos q with
+  | inl hq0 =>
+    subst hq0
+    have hnum0 : num = 0 := Nat.le_zero.mp (by simpa using hle)
+    subst hnum0
+    have hlt : den - 1 < den := Nat.sub_lt hden (by decide)
+    simpa [Nat.zero_add] using Nat.le_of_eq (Nat.div_eq_of_lt hlt)
+  | inr hq =>
+    have hle_plus : num + den - 1 ≤ q * den + (den - 1) := by
+      have hsub1 : 1 ≤ q * den + den :=
+        Nat.le_trans (Nat.le_add_left 1 _) (Nat.add_le_add_left hden (q * den))
+      calc num + den - 1 ≤ q * den + den - 1 :=
+          Nat.sub_le_sub_right (Nat.add_le_add_right hle den) 1
+        _ = q * den + (den - 1) := Nat.add_sub_assoc hden (q * den)
+    have hdiv1 : (num + den - 1) / den ≤ (q * den + (den - 1)) / den :=
+      Nat.div_le_div_right hle_plus
+    have hdiv2 : (q * den + (den - 1)) / den = q := by
+      rw [Nat.add_comm (q * den), Nat.mul_comm q den, Nat.add_mul_div_left _ _ hden,
+          Nat.div_eq_of_lt (Nat.sub_lt hden (by decide)), Nat.zero_add]
+    exact Nat.le_trans hdiv1 (Nat.le_of_eq hdiv2)
+
+set_option exponentiation.threshold 512 in
+private theorem convergent_nmin_ceil_checked :
+    (powViaCrtNtt192 3 5 - powViaCrtNtt192 2 5 +
+      (powViaCrtNtt192 2 8 - powViaCrtNtt192 3 5) - 1) /
+        (powViaCrtNtt192 2 8 - powViaCrtNtt192 3 5) = 17 ∧
+    (powViaCrtNtt192 3 41 - powViaCrtNtt192 2 41 +
+      (powViaCrtNtt192 2 65 - powViaCrtNtt192 3 41) - 1) /
+        (powViaCrtNtt192 2 65 - powViaCrtNtt192 3 41) = 87 ∧
+    (powViaCrtNtt192 3 193 - powViaCrtNtt192 2 193 +
+      (powViaCrtNtt192 2 306 - powViaCrtNtt192 3 193) - 1) /
+        (powViaCrtNtt192 2 306 - powViaCrtNtt192 3 193) = 14 ∧
+    (powViaCrtNtt192 3 306 - powViaCrtNtt192 2 306 +
+      (powViaCrtNtt192 2 485 - powViaCrtNtt192 3 306) - 1) /
+        (powViaCrtNtt192 2 485 - powViaCrtNtt192 3 306) = 978 ∧
+    0 < powViaCrtNtt192 2 8 - powViaCrtNtt192 3 5 ∧
+    0 < powViaCrtNtt192 2 65 - powViaCrtNtt192 3 41 ∧
+    0 < powViaCrtNtt192 2 306 - powViaCrtNtt192 3 193 ∧
+    0 < powViaCrtNtt192 2 485 - powViaCrtNtt192 3 306 := by
+  simp only [powViaCrtNtt192_eq_pow]
+  decide +kernel
+
+/-- Explicit `n_min` lower bounds `⌈(3^{q_n} - 2^{q_n}) / (2^{p_n} - 3^{q_n})⌉` at upper
+convergents `(8, 5)` (`≥ 17`), `(65, 41)` (`≥ 87`), `(306, 193)` (`≥ 14`), and
+`(485, 306)` (`≥ 978`). -/
+theorem collatz_convergent_nmin_lower_bounds (nMin k m : Nat) (a : Nat → Nat)
+    (ha : ∀ j < m, 1 ≤ a j) (hk : cycleShift a m = k) (hlt : 3 ^ m < 2 ^ k)
+    (heq : nMin * (2 ^ k - 3 ^ m) = cycleRhs a m) :
+    (k = 8 ∧ m = 5 → 17 ≤ nMin) ∧
+    (k = 65 ∧ m = 41 → 87 ≤ nMin) ∧
+    (k = 306 ∧ m = 193 → 14 ≤ nMin) ∧
+    (k = 485 ∧ m = 306 → 978 ≤ nMin) := by
+  have hlb := collatz_cycle_min_element_lower_bound nMin k m a ha hk hlt heq
+  have hc := convergent_nmin_ceil_checked
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro ⟨hk8, hm5⟩
+    subst hk8 hm5
+    rw [← powViaCrtNtt192_eq_pow 2 8, ← powViaCrtNtt192_eq_pow 3 5,
+        ← powViaCrtNtt192_eq_pow 2 5] at hlb
+    rw [← hc.1]
+    exact ceilDiv_le_of_le_mul hc.2.2.2.2.1 hlb
+  · intro ⟨hk65, hm41⟩
+    subst hk65 hm41
+    rw [← powViaCrtNtt192_eq_pow 2 65, ← powViaCrtNtt192_eq_pow 3 41,
+        ← powViaCrtNtt192_eq_pow 2 41] at hlb
+    rw [← hc.2.1]
+    exact ceilDiv_le_of_le_mul hc.2.2.2.2.2.1 hlb
+  · intro ⟨hk306, hm193⟩
+    subst hk306 hm193
+    rw [← powViaCrtNtt192_eq_pow 2 306, ← powViaCrtNtt192_eq_pow 3 193,
+        ← powViaCrtNtt192_eq_pow 2 193] at hlb
+    rw [← hc.2.2.1]
+    exact ceilDiv_le_of_le_mul hc.2.2.2.2.2.2.1 hlb
+  · intro ⟨hk485, hm306⟩
+    subst hk485 hm306
+    rw [← powViaCrtNtt192_eq_pow 2 485, ← powViaCrtNtt192_eq_pow 3 306,
+        ← powViaCrtNtt192_eq_pow 2 306] at hlb
+    rw [← hc.2.2.2.1]
+    exact ceilDiv_le_of_le_mul hc.2.2.2.2.2.2.2 hlb
+
+private def minExpOver3Loop (fuel k p2 p3 : Nat) : Nat :=
+  match fuel with
+  | 0 => k
+  | fuel' + 1 => if p3 < p2 then k else minExpOver3Loop fuel' (k + 1) (2 * p2) p3
+
+private def minExpOver3 (m : Nat) : Nat :=
+  minExpOver3Loop (m + 2) m (2 ^ m) (3 ^ m)
+
+private def checkRange306 : Bool :=
+  (List.range 306).all fun i =>
+    let m := i + 1
+    let k := minExpOver3 m
+    (2 ^ (k - 1) ≤ 3 ^ m) &&
+    (3 ^ m < 2 ^ k) &&
+    (3 ^ m * (10 * m + 1) < 2 ^ k * (10 * m)) &&
+    ((0 : Int) < (linearFormLn2Ln3Interval72 k m).lo) &&
+    ((10 ^ 71 : Int) < linearFormLn2Ln3AbsLower72 k m * (m : Int))
+
+set_option exponentiation.threshold 512 in
+private theorem checkRange306_valid : checkRange306 = true := by
+  decide +kernel
+
+private theorem checkRange306_at {m : Nat} (hm1 : 1 ≤ m) (hm306 : m ≤ 306) :
+    let k := minExpOver3 m
+    2 ^ (k - 1) ≤ 3 ^ m ∧
+    3 ^ m < 2 ^ k ∧
+    3 ^ m * (10 * m + 1) < 2 ^ k * (10 * m) ∧
+    (0 : Int) < (linearFormLn2Ln3Interval72 k m).lo ∧
+    (10 ^ 71 : Int) < linearFormLn2Ln3AbsLower72 k m * (m : Int) := by
+  have hall := checkRange306_valid
+  dsimp only [checkRange306] at hall
+  rw [List.all_eq_true] at hall
+  have hmem : m - 1 ∈ List.range 306 := by
+    rw [List.mem_range]
+    exact Nat.sub_lt_left_of_lt_add hm1 (Nat.lt_succ_of_le hm306)
+  have hitem := hall (m - 1) hmem
+  have hm_eq : m - 1 + 1 = m := Nat.sub_add_cancel hm1
+  rw [hm_eq] at hitem
+  simp only [Bool.and_eq_true, decide_eq_true_eq] at hitem
+  exact ⟨hitem.1.1.1.1, hitem.1.1.1.2, hitem.1.1.2, hitem.1.2, hitem.2⟩
+
+/-- Uniform 72-digit linear-form lower measure and rational exponential margin
+`1 + 1/(10m) < 2^k / 3^m` across every exponent pair `(k, m)` with `1 ≤ m ≤ 306`
+and `3^m < 2^k`. -/
+theorem collatz_linear_form_uniform_306 (m k : Nat) (hm1 : 1 ≤ m) (hm306 : m ≤ 306)
+    (hpow : 3 ^ m < 2 ^ k) :
+    (10 ^ 71 : Int) < linearFormLn2Ln3AbsLower72 k m * (m : Int) ∧
+    (10 ^ 71 : Int) < linearFormLn2Ln3AbsLower72 k m * (m * m : Int) ∧
+    3 ^ m * (10 * m + 1) < 2 ^ k * (10 * m) := by
+  have h0 := checkRange306_at hm1 hm306
+  let k0 := minExpOver3 m
+  have hk0_le : k0 ≤ k := by
+    cases Nat.lt_or_ge k k0 with
+    | inl hk_lt =>
+      have hk_le : k ≤ k0 - 1 := Nat.le_pred_of_lt hk_lt
+      have h2_le : 2 ^ k ≤ 2 ^ (k0 - 1) := Nat.pow_le_pow_right (by decide) hk_le
+      exact absurd (Nat.lt_of_le_of_lt h0.1 (Nat.lt_of_lt_of_le hpow h2_le)) (Nat.lt_irrefl _)
+    | inr hk_ge => exact hk_ge
+  have hln2_pos : (0 : Int) < (lnInterval72 2).lo := by decide +kernel
+  have hiv_mono : (linearFormLn2Ln3Interval72 k0 m).lo ≤
+      (linearFormLn2Ln3Interval72 k m).lo := by
+    change (k0 : Int) * (lnInterval72 2).lo - (m : Int) * (lnInterval72 3).hi ≤
+      (k : Int) * (lnInterval72 2).lo - (m : Int) * (lnInterval72 3).hi
+    have hmul : (k0 : Int) * (lnInterval72 2).lo ≤ (k : Int) * (lnInterval72 2).lo :=
+      Int.mul_le_mul_of_nonneg_right (Int.ofNat_le.mpr hk0_le) (Int.le_of_lt hln2_pos)
+    exact Int.sub_le_sub_right hmul _
+  have hiv_k0 : (linearFormLn2Ln3Interval72 k0 m).lo = linearFormLn2Ln3AbsLower72 k0 m := by
+    have hpos := h0.2.2.2.1
+    have hlo_le : -(linearFormLn2Ln3Interval72 k0 m).hi ≤
+        (linearFormLn2Ln3Interval72 k0 m).lo := by
+      have hvalid := (linearFormLn2Ln3Interval72 k0 m).valid
+      have h0hi : (0 : Int) < (linearFormLn2Ln3Interval72 k0 m).hi :=
+        Int.lt_of_lt_of_le hpos hvalid
+      have hneg : -(linearFormLn2Ln3Interval72 k0 m).hi < 0 := by
+        calc -(linearFormLn2Ln3Interval72 k0 m).hi < -0 := Int.neg_lt_neg h0hi
+          _ = 0 := rfl
+      exact Int.le_of_lt (Int.lt_trans hneg hpos)
+    change (linearFormLn2Ln3Interval72 k0 m).lo =
+      max 0 (max (linearFormLn2Ln3Interval72 k0 m).lo (-(linearFormLn2Ln3Interval72 k0 m).hi))
+    rw [Int.max_eq_left hlo_le, Int.max_eq_right (Int.le_of_lt hpos)]
+  have habs_mono : linearFormLn2Ln3AbsLower72 k0 m ≤ linearFormLn2Ln3AbsLower72 k m := by
+    have h1 : (linearFormLn2Ln3Interval72 k0 m).lo ≤ linearFormLn2Ln3AbsLower72 k m :=
+      Int.le_trans hiv_mono (Int.le_trans (Int.le_max_left _ _) (Int.le_max_right 0 _))
+    rwa [← hiv_k0]
+  have hm_nonneg : (0 : Int) ≤ (m : Int) := Int.natCast_nonneg m
+  have hscale_m : (10 ^ 71 : Int) < linearFormLn2Ln3AbsLower72 k m * (m : Int) :=
+    Int.lt_of_lt_of_le h0.2.2.2.2 (Int.mul_le_mul_of_nonneg_right habs_mono hm_nonneg)
+  have hm_sq : (m : Int) ≤ (m * m : Int) := by
+    have hnat : m ≤ m * m := by
+      calc m = m * 1 := (Nat.mul_one m).symm
+        _ ≤ m * m := Nat.mul_le_mul_left m hm1
+    exact Int.ofNat_le.mpr hnat
+  have hlin_pos : (0 : Int) ≤ linearFormLn2Ln3AbsLower72 k m :=
+    Int.le_trans (Int.le_of_lt h0.2.2.2.1) (by rw [hiv_k0]; exact habs_mono)
+  have hscale_mm : (10 ^ 71 : Int) < linearFormLn2Ln3AbsLower72 k m * (m * m : Int) :=
+    Int.lt_of_lt_of_le hscale_m (Int.mul_le_mul_of_nonneg_left hm_sq hlin_pos)
+  have hpow_le : 2 ^ k0 ≤ 2 ^ k := Nat.pow_le_pow_right (by decide) hk0_le
+  have hmargin : 3 ^ m * (10 * m + 1) < 2 ^ k * (10 * m) :=
+    Nat.lt_of_lt_of_le h0.2.2.1 (Nat.mul_le_mul_right (10 * m) hpow_le)
+  exact ⟨hscale_m, hscale_mm, hmargin⟩
+
+private theorem bernoulli_sub_nat (D m : Nat) (hm : m ≤ D) :
+    (D - m) * D ^ m ≤ D * (D - 1) ^ m := by
+  induction m with
+  | zero =>
+    simp
+  | succ m ih =>
+    have hm_le : m ≤ D := Nat.le_of_lt hm
+    have hih := ih hm_le
+    let r := D - (m + 1)
+    have hDr : D = r + m + 1 := by
+      calc D = (m + 1) + r := (Nat.add_sub_of_le hm).symm
+        _ = r + m + 1 := by rw [Nat.add_comm (m + 1) r, Nat.add_assoc]
+    have hDm : D - m = r + 1 := by
+      calc D - m = (r + m + 1) - m := by rw [hDr]
+        _ = (r + 1 + m) - m := by rw [Nat.add_assoc, Nat.add_comm m 1, ← Nat.add_assoc]
+        _ = r + 1 := Nat.add_sub_cancel (r + 1) m
+    have hD1 : D - 1 = r + m := by
+      calc D - 1 = (r + m + 1) - 1 := by rw [hDr]
+        _ = r + m := Nat.add_sub_cancel (r + m) 1
+    have hstep_r : (D - (m + 1)) * D ≤ (D - m) * (D - 1) := by
+      rw [hDm, hD1]
+      change r * D ≤ (r + 1) * (r + m)
+      rw [hDr]
+      calc r * (r + m + 1)
+          = r * (r + m) + r := by rw [Nat.mul_add, Nat.mul_one]
+        _ ≤ r * (r + m) + (r + m) := Nat.add_le_add_left (Nat.le_add_right r m) _
+        _ = (r + 1) * (r + m) := by rw [Nat.add_mul, Nat.one_mul]
+    calc (D - (m + 1)) * D ^ (m + 1)
+        = ((D - (m + 1)) * D) * D ^ m := by rw [Nat.pow_succ, Nat.mul_comm (D ^ m) D, Nat.mul_assoc]
+      _ ≤ ((D - m) * (D - 1)) * D ^ m := Nat.mul_le_mul_right _ hstep_r
+      _ = ((D - m) * D ^ m) * (D - 1) := by
+          rw [Nat.mul_assoc, Nat.mul_comm (D - 1), ← Nat.mul_assoc]
+      _ ≤ (D * (D - 1) ^ m) * (D - 1) := Nat.mul_le_mul_right _ hih
+      _ = D * (D - 1) ^ (m + 1) := by rw [Nat.mul_assoc, ← Nat.pow_succ]
+
+private theorem pow_add_one_mul_sub_le (D m : Nat) (hm : m ≤ D) (hD : 1 ≤ D) :
+    (D + 1) ^ m * (D - m) ≤ D ^ (m + 1) := by
+  have hsq : (D + 1) * (D - 1) ≤ D * D := by
+    let s := D - 1
+    have hDs : D = s + 1 := (Nat.sub_add_cancel hD).symm
+    change (D + 1) * s ≤ D * D
+    rw [hDs]
+    calc (s + 1 + 1) * s = (s + 1) * s + 1 * s := Nat.add_mul (s + 1) 1 s
+      _ = (s + 1) * s + s := by rw [Nat.one_mul]
+      _ ≤ (s + 1) * s + (s + 1) := Nat.add_le_add_left (Nat.le_succ s) _
+      _ = (s + 1) * s + (s + 1) * 1 := by rw [Nat.mul_one]
+      _ = (s + 1) * (s + 1) := (Nat.mul_add (s + 1) s 1).symm
+  have hpow_sq : (D + 1) ^ m * (D - 1) ^ m ≤ D ^ m * D ^ m := by
+    calc (D + 1) ^ m * (D - 1) ^ m
+        = ((D + 1) * (D - 1)) ^ m := (Nat.mul_pow (D + 1) (D - 1) m).symm
+      _ ≤ (D * D) ^ m := Nat.pow_le_pow_left hsq m
+      _ = D ^ m * D ^ m := Nat.mul_pow D D m
+  have hbern := bernoulli_sub_nat D m hm
+  have hcomb : (D + 1) ^ m * (D - m) * D ^ m ≤ D ^ (m + 1) * D ^ m := by
+    calc (D + 1) ^ m * (D - m) * D ^ m
+        = (D + 1) ^ m * ((D - m) * D ^ m) := by rw [Nat.mul_assoc]
+      _ ≤ (D + 1) ^ m * (D * (D - 1) ^ m) := Nat.mul_le_mul_left _ hbern
+      _ = D * ((D + 1) ^ m * (D - 1) ^ m) := by rw [Nat.mul_left_comm]
+      _ ≤ D * (D ^ m * D ^ m) := Nat.mul_le_mul_left D hpow_sq
+      _ = D ^ (m + 1) * D ^ m := by rw [Nat.pow_succ, Nat.mul_comm (D ^ m) D, Nat.mul_assoc]
+  exact Nat.le_of_mul_le_mul_right hcomb (Nat.pow_pos hD)
+
+set_option exponentiation.threshold 512 in
+private theorem three_pow_307_bounds :
+    2 ^ 486 < 3 ^ 307 ∧ 3 ^ 307 < 2 ^ 487 := by
+  decide +kernel
+
+set_option exponentiation.threshold 512 in
+/-- Simons–de Weger cycle-length barrier through `(485, 306)`:
+- Every positive `CollatzOddCycle m` with `1 ≤ m ≤ 306` satisfies `nMin < 10 * m^2 ≤ 936,360`.
+- Contrapositively, any `CollatzOddCycle m` with `1 ≤ m` and `nMin ≥ 936,360` must have at
+  least `m ≥ 307` odd steps, `k ≥ 487` halving steps, and `K = k + m ≥ 793` total steps. -/
+theorem collatz_cycle_length_lower_bound_306 {m : Nat} (c : CollatzOddCycle m) (hm1 : 1 ≤ m) :
+    (m ≤ 306 → c.nMin < 10 * m * m ∧ c.nMin < 936360) ∧
+    (936360 ≤ c.nMin →
+      307 ≤ m ∧ 487 ≤ cycleShift c.a m ∧ 793 ≤ cycleShift c.a m + m) := by
+  have upper_for_m : ∀ (hle : m ≤ 306), c.nMin < 10 * m * m := by
+    intro hle
+    cases Nat.lt_or_ge c.nMin (10 * m * m) with
+    | inl hlt => exact hlt
+    | inr hge =>
+      let k := cycleShift c.a m
+      have hgap : 3 ^ m < 2 ^ k := collatz_odd_cycle_gap_pos c hm1
+      have hprod : 2 ^ k * c.nMin ^ m ≤ (3 * c.nMin + 1) ^ m :=
+        collatz_odd_cycle_product_bound c
+      have hunif := collatz_linear_form_uniform_306 m k hm1 hle hgap
+      have hmargin : 3 ^ m * (10 * m + 1) < 2 ^ k * (10 * m) := hunif.2.2
+      let D := 3 * c.nMin
+      have hD_ge_30m2 : 30 * (m * m) ≤ D := by
+        calc 30 * (m * m) = 3 * 10 * (m * m) := rfl
+          _ = 3 * (10 * (m * m)) := Nat.mul_assoc 3 10 (m * m)
+          _ = 3 * (10 * m * m) := by rw [Nat.mul_assoc 10 m m]
+          _ ≤ 3 * c.nMin := Nat.mul_le_mul_left 3 hge
+      have hm_le_mm : m ≤ m * m := by
+        calc m = m * 1 := (Nat.mul_one m).symm
+          _ ≤ m * m := Nat.mul_le_mul_left m hm1
+      have hD_ge_m_sq : 10 * (m * m) + m ≤ D := by
+        calc 10 * (m * m) + m ≤ 10 * (m * m) + 20 * (m * m) := by
+              have h20 : m ≤ 20 * (m * m) :=
+                Nat.le_trans hm_le_mm (Nat.le_mul_of_pos_left (m * m) (by decide))
+              exact Nat.add_le_add_left h20 _
+          _ = 30 * (m * m) := by
+              rw [← Nat.add_mul]
+          _ ≤ D := hD_ge_30m2
+      have hm_lt_D : m < D :=
+        Nat.lt_of_lt_of_le (Nat.lt_add_of_pos_left (Nat.mul_pos (by decide) (Nat.mul_pos hm1 hm1)))
+          hD_ge_m_sq
+      have hm_le_D : m ≤ D := Nat.le_of_lt hm_lt_D
+      have hD_pos : 1 ≤ D := Nat.le_trans hm1 hm_le_D
+      have hDm_pos : 0 < D - m := Nat.sub_pos_of_lt hm_lt_D
+      have hrat_D : 10 * m * D ≤ (10 * m + 1) * (D - m) := by
+        have hsub : D - m + m = D := Nat.sub_add_cancel hm_le_D
+        have hexp : (10 * m + 1) * (D - m) + (10 * m * m + m) =
+            10 * m * D + D := by
+          calc (10 * m + 1) * (D - m) + (10 * m * m + m)
+              = 10 * m * (D - m) + (D - m) + (10 * m * m + m) := by
+                rw [Nat.add_mul, Nat.one_mul]
+            _ = (10 * m * (D - m) + 10 * m * m) + ((D - m) + m) := by
+                simp only [Nat.add_assoc, Nat.add_left_comm]
+            _ = 10 * m * ((D - m) + m) + D := by
+                rw [← Nat.mul_add (10 * m) (D - m) m, hsub]
+            _ = 10 * m * D + D := by rw [hsub]
+        have hge_rhs : 10 * m * D + (10 * m * m + m) ≤ 10 * m * D + D := by
+          rw [Nat.mul_assoc 10 m m]
+          exact Nat.add_le_add_left hD_ge_m_sq _
+        rw [← hexp] at hge_rhs
+        exact Nat.le_of_add_le_add_right hge_rhs
+      have h3D_lt : 3 ^ m * D < 2 ^ k * (D - m) := by
+        have h1 : 3 ^ m * (10 * m * D) ≤ 3 ^ m * ((10 * m + 1) * (D - m)) :=
+          Nat.mul_le_mul_left _ hrat_D
+        have h2 : 3 ^ m * ((10 * m + 1) * (D - m)) < 2 ^ k * (10 * m) * (D - m) := by
+          rw [← Nat.mul_assoc]
+          exact Nat.mul_lt_mul_of_pos_right hmargin hDm_pos
+        have h3 : (10 * m) * (3 ^ m * D) < (10 * m) * (2 ^ k * (D - m)) := by
+          have hl : (10 * m) * (3 ^ m * D) = 3 ^ m * (10 * m * D) := by
+            simp only [Nat.mul_left_comm, Nat.mul_assoc]
+          have hr : (10 * m) * (2 ^ k * (D - m)) = 2 ^ k * (10 * m) * (D - m) := by
+            simp only [Nat.mul_left_comm, Nat.mul_assoc]
+          rw [hl, hr]
+          exact Nat.lt_of_le_of_lt h1 h2
+        cases Nat.lt_or_ge (3 ^ m * D) (2 ^ k * (D - m)) with
+        | inl hlt => exact hlt
+        | inr hge =>
+          exact absurd (Nat.lt_of_le_of_lt (Nat.mul_le_mul_left (10 * m) hge) h3) (Nat.lt_irrefl _)
+      have hbern := pow_add_one_mul_sub_le D m hm_le_D hD_pos
+      have hcontr : (3 * c.nMin + 1) ^ m < 2 ^ k * c.nMin ^ m := by
+        have hD_succ : D ^ (m + 1) = D * D ^ m := by
+          rw [Nat.pow_succ, Nat.mul_comm (D ^ m) D]
+        have hleft : 3 ^ m * (D + 1) ^ m * (D - m) < 2 ^ k * D ^ m * (D - m) := by
+          calc 3 ^ m * (D + 1) ^ m * (D - m)
+              = 3 ^ m * ((D + 1) ^ m * (D - m)) := Nat.mul_assoc _ _ _
+            _ ≤ 3 ^ m * D ^ (m + 1) := Nat.mul_le_mul_left _ hbern
+            _ = (3 ^ m * D) * D ^ m := by rw [hD_succ, ← Nat.mul_assoc]
+            _ < (2 ^ k * (D - m)) * D ^ m := Nat.mul_lt_mul_of_pos_right h3D_lt (Nat.pow_pos hD_pos)
+            _ = 2 ^ k * D ^ m * (D - m) := by
+              rw [Nat.mul_assoc (2 ^ k) (D - m) (D ^ m), Nat.mul_comm (D - m) (D ^ m),
+                  ← Nat.mul_assoc]
+        have hdrop : 3 ^ m * (D + 1) ^ m < 2 ^ k * D ^ m := by
+          cases Nat.lt_or_ge (3 ^ m * (D + 1) ^ m) (2 ^ k * D ^ m) with
+          | inl hlt => exact hlt
+          | inr hge =>
+            exact absurd (Nat.lt_of_le_of_lt (Nat.mul_le_mul_right (D - m) hge) hleft) (Nat.lt_irrefl _)
+        have hD_pow : 3 ^ m * (2 ^ k * c.nMin ^ m) = 2 ^ k * D ^ m := by
+          have : D ^ m = 3 ^ m * c.nMin ^ m := Nat.mul_pow 3 c.nMin m
+          rw [this, Nat.mul_left_comm]
+        rw [← hD_pow] at hdrop
+        cases Nat.lt_or_ge ((3 * c.nMin + 1) ^ m) (2 ^ k * c.nMin ^ m) with
+        | inl hlt => exact hlt
+        | inr hge =>
+          exact absurd (Nat.lt_of_le_of_lt (Nat.mul_le_mul_left (3 ^ m) hge) hdrop) (Nat.lt_irrefl _)
+      exact absurd hprod (Nat.not_le_of_lt hcontr)
+  refine ⟨?_, ?_⟩
+  · intro hle
+    have hu := upper_for_m hle
+    have h936 : 10 * m * m ≤ 936360 := by
+      calc 10 * m * m = 10 * (m * m) := Nat.mul_assoc 10 m m
+        _ ≤ 10 * (306 * 306) := Nat.mul_le_mul_left 10 (Nat.mul_le_mul hle hle)
+        _ = 936360 := by decide
+    exact ⟨hu, Nat.lt_of_lt_of_le hu h936⟩
+  · intro hn
+    have hm307 : 307 ≤ m := by
+      cases Nat.lt_or_ge 306 m with
+      | inl hgt => exact hgt
+      | inr hle =>
+        have hlt := upper_for_m hle
+        have h936 : 10 * m * m ≤ 936360 := by
+          calc 10 * m * m = 10 * (m * m) := Nat.mul_assoc 10 m m
+            _ ≤ 10 * (306 * 306) := Nat.mul_le_mul_left 10 (Nat.mul_le_mul hle hle)
+            _ = 936360 := by decide
+        exact absurd (Nat.lt_of_lt_of_le hlt h936) (Nat.not_lt_of_ge hn)
+    have hgap : 3 ^ m < 2 ^ cycleShift c.a m := collatz_odd_cycle_gap_pos c hm1
+    have h3_ge : 3 ^ 307 ≤ 3 ^ m := Nat.pow_le_pow_right (by decide) hm307
+    have h2_486 : 2 ^ 486 < 2 ^ cycleShift c.a m :=
+      Nat.lt_trans (Nat.lt_of_lt_of_le three_pow_307_bounds.1 h3_ge) hgap
+    have hk487 : 487 ≤ cycleShift c.a m := by
+      cases Nat.lt_or_ge 486 (cycleShift c.a m) with
+      | inl hgt => exact hgt
+      | inr hle =>
+        exact absurd h2_486 (Nat.not_lt_of_ge (Nat.pow_le_pow_right (by decide) hle))
+    have hK793 : 793 ≤ cycleShift c.a m + m :=
+      Nat.le_trans (by decide : 793 ≤ 487 + 307) (Nat.add_le_add hk487 hm307)
+    exact ⟨hm307, hk487, hK793⟩
+
 end CollatzQrhBridge
 
 -- end of file: leanasm/src/LeanAsm/CollatzQrhBridge.lean
