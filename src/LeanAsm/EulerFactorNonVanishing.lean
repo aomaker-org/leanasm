@@ -372,62 +372,59 @@ theorem fermat_tower_euler_product_nonvanishing (fs : List EulerLocalFactorSpec)
     simpa [List.length_map] using hmapLen
   exact ⟨hlen, hp, hm, hle, hd⟩
 
-private theorem strip_half_admissible :
-    1 ^ 2 * 5 ≥ 2 ^ 2 ∧ 1 ^ 2 * 17 ≥ 4 ^ 2 ∧
-    1 ^ 2 * 257 ≥ 16 ^ 2 ∧ 1 ^ 2 * 65537 ≥ 256 ^ 2 ∧
-    (2 - 1) * (4 - 1) * (16 - 1) * (256 - 1) = 11475 ∧
-    2 * 4 * 16 * 256 = 32768 ∧
-    32768 ^ 2 < 9 * 11475 ^ 2 := by
-  decide
+/-- Certified cleared-denominator Fermat-tower strip bounds at `σ = 1/2` (`> 1/9`). -/
+structure StripHalfCert : Prop where
+  p5_admissible : 1 ^ 2 * 5 ≥ 2 ^ 2
+  p17_admissible : 1 ^ 2 * 17 ≥ 4 ^ 2
+  p257_admissible : 1 ^ 2 * 257 ≥ 16 ^ 2
+  p65537_admissible : 1 ^ 2 * 65537 ≥ 256 ^ 2
+  margin_prod_eq : (2 - 1) * (4 - 1) * (16 - 1) * (256 - 1) = 11475
+  den_prod_eq : 2 * 4 * 16 * 256 = 32768
+  gt_one_ninth : 32768 ^ 2 < 9 * 11475 ^ 2
 
-private theorem strip_three_quarters_admissible :
-    3 ^ 4 * 5 ^ 3 ≥ 10 ^ 4 ∧ 1 ^ 4 * 17 ^ 3 ≥ 8 ^ 4 ∧
-    1 ^ 4 * 257 ^ 3 ≥ 64 ^ 4 ∧ 1 ^ 4 * 65537 ^ 3 ≥ 4096 ^ 4 ∧
-    (10 - 3) * (8 - 1) * (64 - 1) * (4096 - 1) = 12641265 ∧
-    10 * 8 * 64 * 4096 = 20971520 ∧
-    12641265 = 5 * 2528253 ∧
-    20971520 = 5 * 4194304 ∧
-    4194304 ^ 2 < 3 * 2528253 ^ 2 ∧
-    20971520 ^ 2 < 3 * 12641265 ^ 2 := by
-  decide
+/-- Certified cleared-denominator Fermat-tower strip bounds at `σ = 3/4` (`> 1/3`). -/
+structure StripThreeQuartersCert : Prop where
+  p5_admissible : 3 ^ 4 * 5 ^ 3 ≥ 10 ^ 4
+  p17_admissible : 1 ^ 4 * 17 ^ 3 ≥ 8 ^ 4
+  p257_admissible : 1 ^ 4 * 257 ^ 3 ≥ 64 ^ 4
+  p65537_admissible : 1 ^ 4 * 65537 ^ 3 ≥ 4096 ^ 4
+  margin_prod_eq : (10 - 3) * (8 - 1) * (64 - 1) * (4096 - 1) = 12641265
+  den_prod_eq : 10 * 8 * 64 * 4096 = 20971520
+  reduced_gt_one_third : 4194304 ^ 2 < 3 * 2528253 ^ 2
+  gt_one_third : 20971520 ^ 2 < 3 * 12641265 ^ 2
 
-private theorem strip_one_admissible :
-    (5 - 1) * (17 - 1) * (257 - 1) * (65537 - 1) = 2 ^ 30 ∧
-    (5 - 1) * (17 - 1) * (257 - 1) * (65537 - 1) = 1073741824 ∧
-    5 * 17 * 257 * 65537 = 1431655765 ∧
-    9 * 1431655765 ^ 2 < 16 * 1073741824 ^ 2 ∧
-    1431655765 ^ 2 < 16 * 1073741824 ^ 2 ∧
-    4294967295 ^ 2 < 4 * (2 * 1073741824) ^ 2 := by
-  decide
+/-- Certified cleared-denominator Fermat-tower strip bounds at `σ = 1`
+(`> 9/16 > 1/16`, and `> 1/4` when including `F_0 = 3`). -/
+structure StripOneCert : Prop where
+  totient_prod_eq : (5 - 1) * (17 - 1) * (257 - 1) * (65537 - 1) = 1073741824
+  tower_prod_eq : 5 * 17 * 257 * 65537 = 1431655765
+  gt_nine_sixteenths : 9 * 1431655765 ^ 2 < 16 * 1073741824 ^ 2
+  gt_one_sixteenth : 1431655765 ^ 2 < 16 * 1073741824 ^ 2
+  with_f0_gt_one_quarter : 4294967295 ^ 2 < 4 * 2147483648 ^ 2
+
+/-- Unified certificate bundling `{5, 17, 257, 65537}` strip lower bounds
+across `σ ∈ {1/2, 3/4, 1}`. -/
+structure FermatTowerStripCert : Prop where
+  half : StripHalfCert
+  threeQuarters : StripThreeQuartersCert
+  one : StripOneCert
+
+private theorem strip_half_admissible : StripHalfCert :=
+  ⟨by decide, by decide, by decide, by decide, by decide, by decide, by decide⟩
+
+private theorem strip_three_quarters_admissible : StripThreeQuartersCert :=
+  ⟨by decide, by decide, by decide, by decide,
+   by decide, by decide, by decide, by decide⟩
+
+private theorem strip_one_admissible : StripOneCert :=
+  ⟨by decide, by decide, by decide, by decide, by decide⟩
 
 /-- Theorem (Critical-Strip Certified Rational Lower Bounds for `{5, 17, 257, 65537}`):
 Certifies cleared-denominator envelope admissibility (`r_p ≥ p^{-σ}`) and strict rational
 lower bounds across `σ = 1/2` (`> 1/9`), `σ = 3/4` (`> 1/3`), and `σ = 1` (`> 9/16 > 1/16`,
 and `> 1/4 > 1/16` when including `F_0 = 3`). -/
-theorem fermat_tower_euler_product_strip_certs :
-    (1 ^ 2 * 5 ≥ 2 ^ 2 ∧ 1 ^ 2 * 17 ≥ 4 ^ 2 ∧
-     1 ^ 2 * 257 ≥ 16 ^ 2 ∧ 1 ^ 2 * 65537 ≥ 256 ^ 2 ∧
-     (2 - 1) * (4 - 1) * (16 - 1) * (256 - 1) = 11475 ∧
-     2 * 4 * 16 * 256 = 32768 ∧
-     32768 ^ 2 < 9 * 11475 ^ 2) ∧
-    (3 ^ 4 * 5 ^ 3 ≥ 10 ^ 4 ∧ 1 ^ 4 * 17 ^ 3 ≥ 8 ^ 4 ∧
-     1 ^ 4 * 257 ^ 3 ≥ 64 ^ 4 ∧ 1 ^ 4 * 65537 ^ 3 ≥ 4096 ^ 4 ∧
-     (10 - 3) * (8 - 1) * (64 - 1) * (4096 - 1) = 12641265 ∧
-     10 * 8 * 64 * 4096 = 20971520 ∧
-     4194304 ^ 2 < 3 * 2528253 ^ 2 ∧
-     20971520 ^ 2 < 3 * 12641265 ^ 2) ∧
-    ((5 - 1) * (17 - 1) * (257 - 1) * (65537 - 1) = 1073741824 ∧
-     5 * 17 * 257 * 65537 = 1431655765 ∧
-     9 * 1431655765 ^ 2 < 16 * 1073741824 ^ 2 ∧
-     1431655765 ^ 2 < 16 * 1073741824 ^ 2 ∧
-     4294967295 ^ 2 < 4 * 2147483648 ^ 2) := by
-  refine ⟨strip_half_admissible, ?_, ?_⟩
-  · have h := strip_three_quarters_admissible
-    exact ⟨h.1, h.2.1, h.2.2.1, h.2.2.2.1, h.2.2.2.2.1, h.2.2.2.2.2.1,
-           h.2.2.2.2.2.2.2.2.1, h.2.2.2.2.2.2.2.2.2⟩
-  · have h := strip_one_admissible
-    refine ⟨h.2.1, h.2.2.1, h.2.2.2.1, h.2.2.2.2.1, ?_⟩
-    simp [h.2.2.2.2.2]
+theorem fermat_tower_euler_product_strip_certs : FermatTowerStripCert :=
+  ⟨strip_half_admissible, strip_three_quarters_admissible, strip_one_admissible⟩
 
 private theorem fermat_tower_four_factors_bound
     (d5 r5 zx5 zy5 d17 r17 zx17 zy17
