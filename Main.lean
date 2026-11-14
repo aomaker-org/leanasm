@@ -163,6 +163,17 @@ def main : IO Unit := do
     s!"{QuasiRiemann.dvpThresholdT0} (octave ln_hi(16) = {ln16Nat / 10 ^ 36}.{padLn16})")
   IO.println (s!"  Dirichlet L^2     : Zeta(N=4, H=64) E={repr zE} sandwich [2, 6]; " ++
     s!"Mobius(N=6, H=144) E={repr mE} sandwich [5/2, 15/2]")
+  let highRects1e12 := QuasiRiemann.sweepDirichletRectangles2DN128
+    QuasiRiemann.highHeightRectGrid2D_1e12_N128
+  let highArea1e12 := QuasiRiemann.totalCertifiedAreaScaled12 highRects1e12
+  let padHigh := padZeros 12 (highArea1e12 % 1000000000000)
+  let tpWidth72 := QuasiRiemann.twoPiInterval72.hi - QuasiRiemann.twoPiInterval72.lo
+  IO.println (s!"  t~10^12 Phase Red.: PiChudnovsky twoPiInterval72 width={tpWidth72} ULP; " ++
+    s!"reduced width ≤ 6·10^15 ULP (<10^-56 rad)")
+  IO.println (s!"  t~10^12 ζ_128 2D  : Certified {highRects1e12.length}/5 rectangles near " ++
+    s!"t=10^12+6.1 spanning σ∈[0.501,0.750]")
+  IO.println (s!"                      Total certified 2D Lebesgue area Δσ·Δt = " ++
+    s!"{highArea1e12 / 1000000000000}.{padHigh}")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"
