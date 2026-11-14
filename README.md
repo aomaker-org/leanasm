@@ -65,13 +65,16 @@ kernel-verified computations across all 11 parts:
    multiplication, trace cyclicity, and conjugation invariance.
 5. **Part 5 (`QuasiRiemann`, `UltraDeep72`, `AsymptoticZfr`,
    `ZeroDensityBridge`, `ShortIntervalPrimes`)**: Mollifier descent, 2D
-   rectangles down to `sigma = 0.501`, `t ~ 10^12` phase-reduced rectangles,
-   DVP asymptotic ZFR, Dirichlet `L^2` diagonal dominance, rational
-   zero-density descent (`15/26 < 3/5 < 2/3`), QRH threshold ladder
-   `theta in {3/4, 7/8, 11/12, 47/48}`, Chebyshev remainder envelopes
-   (`10^12..10^336`), short-interval prime positivity (`10^336/10^308`),
-   Fermat-tower AP short-interval primes (`q in {5, 17, 257, 65537}`), and
-   the `1/2 < 9/16 < 5/8 < 2/3 < 3/4 < 7/8 < 1` sub-3/4 QRH ladder.
+   rectangles down to `sigma = 0.501` (`N = 128`) and compositional 2x2
+   Lipschitz tiles down to `sigma = 0.5005` (`N = 256`, `t ~ 10^12`) and
+   `sigma = 0.50025` (`N = 512`, `t ~ 10^18`) via 90-digit CRT-NTT phase
+   reduction (`< 10^-60` rad), DVP asymptotic ZFR, Dirichlet `L^2` diagonal
+   dominance, rational zero-density descent (`15/26 < 3/5 < 2/3`), QRH
+   threshold ladder `theta in {3/4, 7/8, 11/12, 47/48}`, Chebyshev remainder
+   envelopes (`10^12..10^336`), short-interval prime positivity
+   (`10^336/10^308`), Fermat-tower AP short-interval primes
+   (`q in {5, 17, 257, 65537}`), and the
+   `1/2 < 9/16 < 5/8 < 2/3 < 3/4 < 7/8 < 1` sub-3/4 QRH ladder.
 6. **Part 6 (`RnsArithmetic`, `EulerFactorNonVanishing`)**: 3-channel Garner
    CRT execution and Fermat-tower `{5, 17, 257, 65537}` strip bounds
    (`sigma in {1/2, 3/4, 1}`) plus cyclotomic Dedekind splitting across
@@ -95,7 +98,7 @@ kernel-verified computations across all 11 parts:
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 `QuasiRiemann/`, `PC/` for `PiChudnovsky/`, and `Main.lean` +
-`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-35.
+`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-36.
 `NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `PC` = `PiChudnovsky`.
 
 | Module | NS | Flagship Theorem / Role |
@@ -109,8 +112,8 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `YangMillsToy.lean` | `=` | `plaquette_action_gauge_invariant` |
 | `YangMillsQ8.lean` | `=` | `q8_trace_conjugation_invariant` |
 | `QR/Rat.lean` | `QR` | `QRat` constructive rational field core |
-| `QuasiRiemann.lean` | `=` | `qrh_full_descent_chain_certified` |
-| `QR/UltraDeep72.lean` | `QR` | `ultra_deep_rects_down_to_0501_certified` |
+| `QuasiRiemann.lean` | `=` | `isValidLipTile2D_sound` |
+| `QR/UltraDeep72.lean` | `QR` | `crtNtt_highTrunc_2d_zero_free_rect` |
 | `QR/AsymptoticZfr.lean` | `QR` | `dvp_asymptotic_zero_free_region` |
 | `QR/AsymptoticZfrBridge.lean` | `QR` | `ln2Upper36Scaled_eq_lnInterval36_hi` |
 | `QR/ZeroDensityBridge.lean` | `QR` | `qrh_chebyshev_benchmark_certs` |
@@ -138,8 +141,11 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
   `steiner_1cycle_excluded_at_convergents`, `log2_3_convergent_bracket_665`,
   `simons_de_weger_barrier_665`, `collatzPredTree_sound`, &
   `collatz_pred_tree_growth_certs`
-- `QuasiRiemann.high_height_dirichlet_rects_1e12_certified`,
-  `dirichlet_l2_zeta_and_mobius_certs`,
+- `QuasiRiemann.qrh_full_descent_chain_certified`,
+  `ultra_deep_rects_down_to_0501_certified`,
+  `high_height_dirichlet_rects_1e12_certified`,
+  `crtNtt_phase_reduction_512_sound`, `euler_maclaurin_tail_shrinks_with_N`,
+  `crtNtt_highTrunc_2d_zero_free_rect`, `dirichlet_l2_zeta_and_mobius_certs`,
   `zero_density_and_dvp_combined_region`, `qrh_chebyshev_savings_certs`,
   `short_interval_density_ladder_strict`, `qrh_maximal_prime_gap_bound`,
   `fermat_tower_ap_short_interval_certs`, &
@@ -188,7 +194,7 @@ leanasm/
 │       ├── ProvenanceSummary.lean
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
 │       └── QuasiRiemann/    # Rat, UltraDeep72, Zfr, Bridge, ZD, ShortInt
-├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-35)
+├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-36)
 └── tools/                   # Build and logging utilities
 ```
 
