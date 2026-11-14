@@ -287,6 +287,10 @@ def main : IO Unit := do
     s!"total split prime ideals = {fDegs.sum}")
   IO.println ("  Dedekind Strip Non-Vanish : σ∈{1/2,3/4,1} verified, " ++
     "σ=1 uniform |∏(1-F_k^-s)^g_k|² > 1/256")
+  let artinOrders := ArtinFermatBridge.artinFermatTowerSpecs.map (·.galoisOrder)
+  let artinOmegas := ArtinFermatBridge.artinFermatTowerSpecs.map (·.omega4)
+  IO.println (s!"  GL(1) Artin-Fermat Tower  : φ(F_k) = {artinOrders}, ω₄ = {artinOmegas}, " ++
+    "MiniVM 4-pt NTT = χ-transform & δ_{i,m} ortho")
   IO.println "  CRT roundtrip & homomorphism: ZERO axioms verified"
 
   -- 7. Unconditional Riemann Hypothesis for Curves over Finite Fields (Hasse-Weil)

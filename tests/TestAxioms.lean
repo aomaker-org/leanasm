@@ -530,4 +530,17 @@ import LeanAsm
 #print axioms LeanAsm.quasiRiemann_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 39: GL(1) Artin-Fermat Euler Factor & MiniVM NTT Bridge (Issue #59)
+#print axioms ArtinFermatBridge.ArtinFermatCharacterSpec.toNttSpec_valid
+#print axioms ArtinFermatBridge.artinFermatTowerSpecs_valid
+#print axioms ArtinFermatBridge.artinCharProductEval_replicate_one
+#print axioms ArtinFermatBridge.artin_split_euler_factor_collapse
+#print axioms ArtinFermatBridge.artinOrder4EulerPoly_mod_eq
+#print axioms ArtinFermatBridge.artin_order4_cyclotomic_factorization
+#print axioms ArtinFermatBridge.artinCharTransform4_eq_ntt4_generic
+#print axioms ArtinFermatBridge.artin_char_transform_eq_ntt4
+#print axioms ArtinFermatBridge.artin_char_orthogonality_minivm
+#print axioms LeanAsm.eulerRns_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean

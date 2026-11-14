@@ -25,6 +25,7 @@ import LeanAsm.CollatzQrhBridge
 import LeanAsm.PiChudnovsky.CrtMulBridge
 import LeanAsm.PiChudnovsky
 import LeanAsm.GSp4FunctorialityBridge
+import LeanAsm.ArtinFermatBridge
 
 namespace LeanAsm
 
@@ -727,7 +728,9 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
 
 /-- Parts 6 & 8 provenance specification bundling 3-channel Garner multiplication,
 `EulerFactorNonVanishing.FermatTowerStripCert` (`half`, `threeQuarters`, `one`),
-and cyclotomic Dedekind Euler product bounds across all `32,906` split prime ideals. -/
+cyclotomic Dedekind Euler product bounds across all `32,906` split prime ideals,
+and GL(1) Artin-Fermat Euler collapse, cyclotomic factorization, `ntt4` identity,
+and `MiniVM` character orthogonality across `{5, 17, 257, 65537}`. -/
 def EulerRnsProvenance : Prop :=
   (RnsArithmetic.fromRnsTupleGarner
     (RnsArithmetic.rnsMul (RnsArithmetic.toRns 23) (RnsArithmetic.toRns 37)) = 23 * 37) ∧
@@ -772,13 +775,102 @@ def EulerRnsProvenance : Prop :=
      EulerFactorNonVanishing.cyclotomicProdMarginPow fsOne ≤
        EulerFactorNonVanishing.cyclotomicProdNormPow fsOne ∧
      EulerFactorNonVanishing.cyclotomicProdDenPow fsOne <
-       256 * EulerFactorNonVanishing.cyclotomicProdNormPow fsOne))
+       256 * EulerFactorNonVanishing.cyclotomicProdNormPow fsOne)) ∧
+  (∀ (spec : ArtinFermatBridge.ArtinFermatCharacterSpec), spec.Valid →
+    ∀ (f : EulerFactorNonVanishing.EulerLocalFactorSpec),
+      EulerFactorNonVanishing.ValidEulerLocalFactorSpec f →
+      ArtinFermatBridge.artinCharProductEval (List.replicate spec.galoisOrder 1) f.d f.rNum =
+        (f.d - f.rNum) ^ spec.galoisOrder ∧
+      (f.d - f.rNum) ^ spec.galoisOrder =
+        (f.d - f.rNum) ^ (2 * spec.splittingDeg) ∧
+      0 < (f.d - f.rNum) ^ spec.galoisOrder ∧
+      (f.d - f.rNum) ^ spec.galoisOrder ≤
+        ((f.d - f.zx) * (f.d - f.zx) + f.zy * f.zy) ^ spec.splittingDeg ∧
+      0 < (f.d * f.d) ^ spec.splittingDeg ∧
+      EulerFactorNonVanishing.FermatTowerStripCert ∧
+      (ArtinFermatBridge.artinFermatTowerSpecs.map (·.primeMod) =
+        EulerFactorNonVanishing.fermatTowerPrimes ∧
+       ArtinFermatBridge.artinFermatTowerSpecs.map (·.splittingDeg) =
+        EulerFactorNonVanishing.fermatTowerSplittingDegs ∧
+       ArtinFermatBridge.artinFermatTowerSpecs.map (·.galoisOrder) = [4, 16, 256, 65536] ∧
+       (ArtinFermatBridge.artinFermatTowerSpecs.map (·.galoisOrder)).prod = 2 ^ 30) ∧
+      (∀ zx5 zy5 zx17 zy17 zx257 zy257 zx65537 zy65537 : Int,
+        (zx5 * zx5 + zy5 * zy5 ≤ 1 →
+         zx17 * zx17 + zy17 * zy17 ≤ 1 →
+         zx257 * zx257 + zy257 * zy257 ≤ 1 →
+         zx65537 * zx65537 + zy65537 * zy65537 ≤ 1 →
+         let fsOne : List EulerFactorNonVanishing.CyclotomicSplitFactorSpec :=
+           [ ⟨⟨5, 5, 1, zx5, zy5⟩, 2⟩,
+             ⟨⟨17, 17, 1, zx17, zy17⟩, 8⟩,
+             ⟨⟨257, 257, 1, zx257, zy257⟩, 128⟩,
+             ⟨⟨65537, 65537, 1, zx65537, zy65537⟩, 32768⟩ ]
+         0 < EulerFactorNonVanishing.cyclotomicProdMarginPow fsOne ∧
+         EulerFactorNonVanishing.cyclotomicProdMarginPow fsOne ≤
+           EulerFactorNonVanishing.cyclotomicProdNormPow fsOne ∧
+         EulerFactorNonVanishing.cyclotomicProdDenPow fsOne <
+           256 * EulerFactorNonVanishing.cyclotomicProdNormPow fsOne))) ∧
+  ((∀ spec ∈ ArtinFermatBridge.artinFermatTowerSpecs, ∀ T : Int,
+      ArtinFermatBridge.artinOrder4EulerPoly spec.omega4 T % (spec.primeMod : Int) =
+        (1 - T ^ 4) % (spec.primeMod : Int)) ∧
+   (∀ spec : ArtinFermatBridge.ArtinFermatCharacterSpec, spec.Valid → ∀ T : Int,
+      ArtinFermatBridge.artinOrder4EulerPoly spec.omega4 T % (spec.primeMod : Int) =
+        (1 - T ^ 4) % (spec.primeMod : Int))) ∧
+  ((∀ spec ∈ ArtinFermatBridge.artinFermatTowerSpecs, ∀ v : NttArithmetic.Vec4,
+      ArtinFermatBridge.artinCharTransform4 spec.primeMod spec.omega4 v =
+        NttArithmetic.ntt4 spec.primeMod spec.omega4 v) ∧
+   (∀ spec : ArtinFermatBridge.ArtinFermatCharacterSpec, spec.Valid →
+      ∀ v : NttArithmetic.Vec4,
+      ArtinFermatBridge.artinCharTransform4 spec.primeMod spec.omega4 v =
+        NttArithmetic.ntt4 spec.primeMod spec.omega4 v) ∧
+   (∀ cfg : MiniVMNttBridge.FermatNtt4Spec, cfg.Valid → ∀ v : NttArithmetic.Vec4,
+      ArtinFermatBridge.artinCharTransform4 cfg.p cfg.omega4 v =
+        NttArithmetic.ntt4 cfg.p cfg.omega4 v)) ∧
+  ((∀ spec ∈ ArtinFermatBridge.artinFermatTowerSpecs,
+      ∀ (s : MiniVM.State) (v : NttArithmetic.Vec4),
+        v.x0 < spec.primeMod → v.x1 < spec.primeMod →
+        v.x2 < spec.primeMod → v.x3 < spec.primeMod →
+        s.r0 = v.x0 → s.r1 = v.x1 → s.r2 = v.x2 → s.r3 = v.x3 →
+        let s1 := MiniVM.runProgram s
+          (MiniVMNttBridge.ntt4AsmFermat spec.primeMod spec.omega4)
+        let s2 := MiniVM.runProgram s1
+          (MiniVMNttBridge.intt4AsmFermat spec.primeMod spec.invFour spec.invOmega4)
+        (⟨s1.r0, s1.r1, s1.r2, s1.r3⟩ : NttArithmetic.Vec4) =
+          ArtinFermatBridge.artinCharTransform4 spec.primeMod spec.omega4 v ∧
+        (⟨s2.r0, s2.r1, s2.r2, s2.r3⟩ : NttArithmetic.Vec4) = v) ∧
+   (∀ spec : ArtinFermatBridge.ArtinFermatCharacterSpec, spec.Valid →
+      ∀ (s : MiniVM.State) (i m : Fin 4),
+        s.r0 = (ArtinFermatBridge.basisVec4 i.val).x0 →
+        s.r1 = (ArtinFermatBridge.basisVec4 i.val).x1 →
+        s.r2 = (ArtinFermatBridge.basisVec4 i.val).x2 →
+        s.r3 = (ArtinFermatBridge.basisVec4 i.val).x3 →
+        let s1 := MiniVM.runProgram s
+          (MiniVMNttBridge.ntt4AsmFermat spec.primeMod spec.omega4)
+        let s2 := MiniVM.runProgram s1
+          (MiniVMNttBridge.intt4AsmFermat spec.primeMod spec.invFour spec.invOmega4)
+        (⟨s1.r0, s1.r1, s1.r2, s1.r3⟩ : NttArithmetic.Vec4) =
+          ⟨ArtinFermatBridge.artinCharPow spec.primeMod spec.omega4 i.val 0,
+           ArtinFermatBridge.artinCharPow spec.primeMod spec.omega4 i.val 1,
+           ArtinFermatBridge.artinCharPow spec.primeMod spec.omega4 i.val 2,
+           ArtinFermatBridge.artinCharPow spec.primeMod spec.omega4 i.val 3⟩ ∧
+        ArtinFermatBridge.artinCharOrthoSum spec.primeMod spec.omega4
+          spec.invOmega4 spec.invFour i.val m.val =
+          (if i.val = m.val then 1 else 0) ∧
+        (match m.val with
+         | 0 => s2.r0
+         | 1 => s2.r1
+         | 2 => s2.r2
+         | _ => s2.r3) = (if i.val = m.val then 1 else 0)))
 
-/-- Zero-axiom certificate for RNS Garner and Fermat-tower / Dedekind strip bounds. -/
+/-- Zero-axiom certificate for RNS Garner, Fermat-tower / Dedekind strip bounds,
+and GL(1) Artin-Fermat Euler + MiniVM NTT orthogonality bridges. -/
 theorem eulerRns_provenance_certified : EulerRnsProvenance :=
   ⟨RnsArithmetic.garner_mul_concrete_soundness,
    EulerFactorNonVanishing.fermat_tower_euler_product_strip_certs,
-   EulerFactorNonVanishing.fermat_tower_dedekind_euler_strip_certs⟩
+   EulerFactorNonVanishing.fermat_tower_dedekind_euler_strip_certs,
+   ArtinFermatBridge.artin_split_euler_factor_collapse,
+   ArtinFermatBridge.artin_order4_cyclotomic_factorization,
+   ArtinFermatBridge.artin_char_transform_eq_ntt4,
+   ArtinFermatBridge.artin_char_orthogonality_minivm⟩
 
 -- =============================================================================
 -- Part 7: Finite-Field RH, Genus-2 L(C,1)=71/25, Cantor Jacobian & Weil Zeta
