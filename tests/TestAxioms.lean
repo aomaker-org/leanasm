@@ -415,4 +415,11 @@ import LeanAsm
 #print axioms QuasiRiemann.qrh_theta_ladder_certs
 #print axioms QuasiRiemann.zero_density_and_dvp_combined_region
 
+-- Part 27: Cyclotomic Fermat-Tower Dedekind Zeta Euler Factor Non-Vanishing
+#print axioms EulerFactorNonVanishing.fermat_prime_cyclotomic_splitting_deg
+#print axioms EulerFactorNonVanishing.cyclotomic_split_euler_factor_nonvanishing
+#print axioms EulerFactorNonVanishing.cyclotomic_euler_product_lower_bound
+#print axioms EulerFactorNonVanishing.fermat_sigma_one_uniform_quarter_bound
+#print axioms EulerFactorNonVanishing.fermat_tower_dedekind_euler_strip_certs
+
 -- end of file: leanasm/tests/TestAxioms.lean

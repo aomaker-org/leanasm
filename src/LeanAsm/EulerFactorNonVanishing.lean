@@ -556,6 +556,402 @@ theorem fermat_tower_sigma_one_lower_bound
     Int.mul_le_mul_of_nonneg_left hle (by decide)
   exact ⟨Int.lt_of_lt_of_le hm9 hmul, Int.lt_of_lt_of_le hm1 hmul⟩
 
+-- =============================================================================
+-- Cyclotomic Splitting & Dedekind Zeta Euler Factors over Q(ζ_{2^(2^k)})
+-- (Issue #38)
+-- =============================================================================
+
+/-- Cyclotomic splitting multiplicity `g_k = φ(2^(2^k)) = 2^(2^k - 1)` for `F_k = 2^(2^k) + 1`
+in `ℚ(ζ_{2^(2^k)})` (`k ≥ 1`). -/
+def fermatCyclotomicSplittingDeg (k : Nat) : Nat :=
+  2 ^ (2 ^ k - 1)
+
+/-- Splitting multiplicities `[g_1, g_2, g_3, g_4] = [2, 8, 128, 32768]` across `{5, 17, 257, 65537}`. -/
+def fermatTowerSplittingDegs : List Nat :=
+  [1, 2, 3, 4].map fermatCyclotomicSplittingDeg
+
+/-- Complete splitting arithmetic of Fermat primes in `ℚ(ζ_{2^(2^k)})`:
+for every `k ≥ 1`, `F_k ≡ 1 (mod 2^(2^k))` (so residue degree `f = 1`),
+`F_k - 1 = 2 * g_k`, and across `k = 1..4` the splitting multiplicities are
+`(2, 8, 128, 32768)` with total splitting prime-ideal count `32906`. -/
+theorem fermat_prime_cyclotomic_splitting_deg :
+    (∀ k : Nat, 1 ≤ k →
+      fermatNumber k % 2 ^ (2 ^ k) = 1 ∧
+      fermatNumber k - 1 = 2 * fermatCyclotomicSplittingDeg k ∧
+      1 ≤ fermatCyclotomicSplittingDeg k) ∧
+    fermatCyclotomicSplittingDeg 1 = 2 ∧
+    fermatCyclotomicSplittingDeg 2 = 8 ∧
+    fermatCyclotomicSplittingDeg 3 = 128 ∧
+    fermatCyclotomicSplittingDeg 4 = 32768 ∧
+    fermatTowerSplittingDegs = [2, 8, 128, 32768] ∧
+    fermatTowerSplittingDegs.sum = 32906 := by
+  refine ⟨?_, rfl, rfl, rfl, rfl, rfl, rfl⟩
+  intro k hk
+  have h1k : 1 ≤ 2 ^ k := Nat.one_le_two_pow
+  have h2k : 2 ≤ 2 ^ k := by
+    have hp : 2 ^ 1 ≤ 2 ^ k := Nat.pow_le_pow_right (by decide) hk
+    simpa using hp
+  have hmod_lt : 1 < 2 ^ (2 ^ k) := by
+    have h4 : (2 : Nat) ^ 2 ≤ 2 ^ (2 ^ k) := Nat.pow_le_pow_right (by decide) h2k
+    change 4 ≤ 2 ^ (2 ^ k) at h4
+    omega
+  have hmod : fermatNumber k % 2 ^ (2 ^ k) = 1 := by
+    dsimp [fermatNumber]
+    rw [Nat.add_mod, Nat.mod_self, Nat.zero_add, Nat.mod_mod, Nat.mod_eq_of_lt hmod_lt]
+  have hsub : fermatNumber k - 1 = 2 * fermatCyclotomicSplittingDeg k := by
+    dsimp [fermatNumber, fermatCyclotomicSplittingDeg]
+    have hsucc : 2 ^ k - 1 + 1 = 2 ^ k := Nat.sub_add_cancel h1k
+    have hpow : 2 ^ (2 ^ k) = 2 * 2 ^ (2 ^ k - 1) := by
+      calc 2 ^ (2 ^ k) = 2 ^ ((2 ^ k - 1) + 1) := by rw [hsucc]
+        _ = 2 ^ (2 ^ k - 1) * 2 := Nat.pow_succ _ _
+        _ = 2 * 2 ^ (2 ^ k - 1) := Nat.mul_comm _ _
+    omega
+  have hg1 : 1 ≤ fermatCyclotomicSplittingDeg k := Nat.one_le_two_pow
+  exact ⟨hmod, hsub, hg1⟩
+
+private theorem cyclotomic_split_euler_factor_pow
+    (f : EulerLocalFactorSpec) (hf : ValidEulerLocalFactorSpec f) (g : Nat) :
+    0 < (f.d - f.rNum) ^ (2 * g) ∧
+    (f.d - f.rNum) ^ (2 * g) ≤
+      ((f.d - f.zx) * (f.d - f.zx) + f.zy * f.zy) ^ g ∧
+    0 < (f.d * f.d) ^ g := by
+  obtain ⟨hm, hle, hd⟩ := local_euler_disk_nonvanishing f hf
+  induction g with
+  | zero =>
+    simp only [Nat.mul_zero, Int.pow_zero]
+    exact ⟨by decide, by decide, by decide⟩
+  | succ k ih =>
+    have hexp : 2 * (k + 1) = 2 * k + 2 := by omega
+    rw [hexp, Int.pow_succ, Int.pow_succ, Int.pow_succ, Int.pow_succ]
+    have hm2 : (f.d - f.rNum) ^ (2 * k) * (f.d - f.rNum) * (f.d - f.rNum) =
+        (f.d - f.rNum) ^ (2 * k) * ((f.d - f.rNum) * (f.d - f.rNum)) :=
+      Int.mul_assoc _ _ _
+    rw [hm2]
+    refine ⟨Int.mul_pos ih.1 hm, ?_, Int.mul_pos ih.2.2 hd⟩
+    exact Int.mul_le_mul ih.2.1 hle (Int.le_of_lt hm)
+      (Int.le_trans (Int.le_of_lt ih.1) ih.2.1)
+
+/-- Inductive power-lifted cyclotomic local Euler factor non-vanishing:
+if `f` is admissible (`|z_p| ≤ rNum/d < 1`) and `g ≥ 1` is the complete splitting
+multiplicity, then the Dedekind factor `(1 - p^{-s})^g` satisfies
+`0 < (d - rNum)^(2g) ≤ ((d - zx)^2 + zy^2)^g` and `0 < (d^2)^g`. -/
+theorem cyclotomic_split_euler_factor_nonvanishing
+    (f : EulerLocalFactorSpec) (hf : ValidEulerLocalFactorSpec f)
+    (g : Nat) (_hg : 1 ≤ g) :
+    0 < (f.d - f.rNum) ^ (2 * g) ∧
+    (f.d - f.rNum) ^ (2 * g) ≤
+      ((f.d - f.zx) * (f.d - f.zx) + f.zy * f.zy) ^ g ∧
+    0 < (f.d * f.d) ^ g :=
+  cyclotomic_split_euler_factor_pow f hf g
+
+/-- Single-prime cyclotomic splitting factor specification `(base, g)` representing
+the completely split local Dedekind Euler factor `∏_{𝔭 | p} (1 - N(𝔭)^{-s}) = (1 - z_p)^g`. -/
+structure CyclotomicSplitFactorSpec where
+  base : EulerLocalFactorSpec
+  g : Nat
+  deriving DecidableEq, Repr
+
+/-- Cleared-denominator cyclotomic lower envelope `∏ (d_p - rNum_p)^(2 * g_p)`. -/
+def cyclotomicProdMarginPow : List CyclotomicSplitFactorSpec → Int
+  | [] => 1
+  | c :: rest => (c.base.d - c.base.rNum) ^ (2 * c.g) * cyclotomicProdMarginPow rest
+
+/-- Cleared-denominator cyclotomic Dedekind product modulus `∏ ((d_p - zx_p)^2 + zy_p^2)^g_p`. -/
+def cyclotomicProdNormPow : List CyclotomicSplitFactorSpec → Int
+  | [] => 1
+  | c :: rest =>
+    ((c.base.d - c.base.zx) * (c.base.d - c.base.zx) + c.base.zy * c.base.zy) ^ c.g *
+      cyclotomicProdNormPow rest
+
+/-- Cleared-denominator cyclotomic scale `∏ (d_p^2)^g_p`. -/
+def cyclotomicProdDenPow : List CyclotomicSplitFactorSpec → Int
+  | [] => 1
+  | c :: rest => (c.base.d * c.base.d) ^ c.g * cyclotomicProdDenPow rest
+
+/-- Inductive lower bound across any list of completely split cyclotomic Euler factors:
+`0 < ∏ (d_p - r_p)^(2g_p) ≤ ∏ ((d_p - zx_p)^2 + zy_p^2)^{g_p}` and `0 < ∏ (d_p^2)^{g_p}`. -/
+theorem cyclotomic_euler_product_lower_bound (cs : List CyclotomicSplitFactorSpec)
+    (hcs : ∀ c ∈ cs, ValidEulerLocalFactorSpec c.base ∧ 1 ≤ c.g) :
+    0 < cyclotomicProdMarginPow cs ∧
+    cyclotomicProdMarginPow cs ≤ cyclotomicProdNormPow cs ∧
+    0 < cyclotomicProdDenPow cs := by
+  induction cs with
+  | nil =>
+    dsimp [cyclotomicProdMarginPow, cyclotomicProdNormPow, cyclotomicProdDenPow]
+    exact ⟨by decide, by decide, by decide⟩
+  | cons c rest ih =>
+    dsimp [cyclotomicProdMarginPow, cyclotomicProdNormPow, cyclotomicProdDenPow]
+    have hc := hcs c (List.Mem.head _)
+    have hrest : ∀ c' ∈ rest, ValidEulerLocalFactorSpec c'.base ∧ 1 ≤ c'.g :=
+      fun c' hc' => hcs c' (List.Mem.tail c hc')
+    obtain ⟨hm1, hle1, hd1⟩ :=
+      cyclotomic_split_euler_factor_nonvanishing c.base hc.1 c.g hc.2
+    obtain ⟨hm2, hle2, hd2⟩ := ih hrest
+    refine ⟨Int.mul_pos hm1 hm2, ?_, Int.mul_pos hd1 hd2⟩
+    exact Int.mul_le_mul hle1 hle2 (Int.le_of_lt hm2)
+      (Int.le_trans (Int.le_of_lt hm1) hle1)
+
+/-- Elementary constructive Bernoulli inequality in cleared-denominator `Nat` form:
+for any `d` and `k` with `k + 1 ≤ d`, `d^k * (d - (k + 1)) ≤ (d - 1)^(k + 1)`. -/
+private theorem bernoulli_sub_pow_nat (d k : Nat) (hkd : k + 1 ≤ d) :
+    d ^ k * (d - (k + 1)) ≤ (d - 1) ^ (k + 1) := by
+  induction k with
+  | zero =>
+    simp
+  | succ m ih =>
+    have hm1 : m + 1 ≤ d := Nat.le_trans (Nat.le_succ _) hkd
+    have ih' := ih hm1
+    have hstep : d * (d - (m + 2)) ≤ (d - (m + 1)) * (d - 1) := by
+      have hdm : d - (m + 2) + (m + 2) = d := Nat.sub_add_cancel hkd
+      have hm1' : d - (m + 1) = (d - (m + 2)) + 1 := by omega
+      have hd1 : d - 1 = (d - (m + 2)) + (m + 1) := by omega
+      rw [hm1', hd1]
+      have hmuld : d * (d - (m + 2)) = ((d - (m + 2)) + (m + 2)) * (d - (m + 2)) := by
+        rw [hdm]
+      rw [hmuld]
+      simp only [Nat.add_mul, Nat.mul_add, Nat.one_mul, Nat.mul_one]
+      have hcomm : (d - (m + 2)) * m = m * (d - (m + 2)) := Nat.mul_comm _ _
+      rw [hcomm]
+      omega
+    have hmul : d ^ m * (d - (m + 1)) * (d - 1) ≤ (d - 1) ^ (m + 1) * (d - 1) :=
+      Nat.mul_le_mul_right (d - 1) ih'
+    calc d ^ (m + 1) * (d - (m + 2))
+        = (d ^ m * d) * (d - (m + 2)) := by rw [Nat.pow_succ]
+      _ = d ^ m * (d * (d - (m + 2))) := Nat.mul_assoc _ _ _
+      _ ≤ d ^ m * ((d - (m + 1)) * (d - 1)) := Nat.mul_le_mul_left _ hstep
+      _ = d ^ m * (d - (m + 1)) * (d - 1) := (Nat.mul_assoc _ _ _).symm
+      _ ≤ (d - 1) ^ (m + 1) * (d - 1) := hmul
+      _ = (d - 1) ^ (m + 2) := (Nat.pow_succ _ _).symm
+
+/-- Constructive uniform Euler lower bound at `σ = 1`:
+for every `k ≥ 1`, letting `F_k = 2^(2^k) + 1` and `g_k = 2^(2^k - 1)`,
+`(F_k : Int)^(2 * g_k) < 4 * (F_k - 1 : Int)^(2 * g_k)` (i.e. `(1 - 1/F_k)^(2g_k) > 1/4`)
+holds uniformly without expanding large literal powers. -/
+theorem fermat_sigma_one_uniform_quarter_bound (k : Nat) (hk : 1 ≤ k) :
+    ((fermatNumber k : Int) ^ (2 * fermatCyclotomicSplittingDeg k)) <
+      4 * (((fermatNumber k : Int) - 1) ^ (2 * fermatCyclotomicSplittingDeg k)) := by
+  have hs := fermat_prime_cyclotomic_splitting_deg.1 k hk
+  let g := fermatCyclotomicSplittingDeg k
+  let d := fermatNumber k
+  have hg1 : 1 ≤ g := hs.2.2
+  have hd_eq : d = 2 * g + 1 := by
+    have hsub := hs.2.1
+    omega
+  have hg_d : (g - 1) + 1 ≤ d := by omega
+  have hbern := bernoulli_sub_pow_nat d (g - 1) hg_d
+  have hg_sub : (g - 1) + 1 = g := Nat.sub_add_cancel hg1
+  have hdg : d - g = g + 1 := by omega
+  rw [hg_sub, hdg] at hbern
+  have h2bern : 2 * (d ^ (g - 1) * (g + 1)) ≤ 2 * (d - 1) ^ g :=
+    Nat.mul_le_mul_left 2 hbern
+  have hdg_lt : d ^ g < 2 * (d - 1) ^ g := by
+    have hpow : d ^ g = d ^ (g - 1) * d := by
+      calc d ^ g = d ^ ((g - 1) + 1) := by rw [hg_sub]
+        _ = d ^ (g - 1) * d := Nat.pow_succ _ _
+    have hlt2 : d ^ (g - 1) * d < d ^ (g - 1) * (2 * (g + 1)) :=
+      Nat.mul_lt_mul_of_pos_left (by omega) (Nat.pow_pos (by omega))
+    have hassoc : d ^ (g - 1) * (2 * (g + 1)) = 2 * (d ^ (g - 1) * (g + 1)) := by
+      rw [← Nat.mul_assoc, Nat.mul_comm (d ^ (g - 1)) 2, Nat.mul_assoc]
+    rw [hpow]
+    exact Nat.lt_of_lt_of_le (by rw [← hassoc]; exact hlt2) h2bern
+  have hsq : d ^ (2 * g) < 4 * (d - 1) ^ (2 * g) := by
+    have hpowL : d ^ (2 * g) = d ^ g * d ^ g := by
+      rw [Nat.two_mul, Nat.pow_add]
+    have hpowR : 4 * (d - 1) ^ (2 * g) = (2 * (d - 1) ^ g) * (2 * (d - 1) ^ g) := by
+      rw [Nat.two_mul g, Nat.pow_add]
+      have hl : (2 * (d - 1) ^ g) * (2 * (d - 1) ^ g) =
+          (2 * 2) * ((d - 1) ^ g * (d - 1) ^ g) := by
+        rw [Nat.mul_assoc 2, Nat.mul_left_comm ((d - 1) ^ g) 2, ← Nat.mul_assoc 2 2]
+      rw [hl]
+    rw [hpowL, hpowR]
+    exact Nat.lt_of_le_of_lt
+      (Nat.mul_le_mul_right (d ^ g) (Nat.le_of_lt hdg_lt))
+      (Nat.mul_lt_mul_of_pos_left hdg_lt (Nat.zero_lt_of_lt hdg_lt))
+  have hz : ((d ^ (2 * g) : Nat) : Int) < ((4 * (d - 1) ^ (2 * g) : Nat) : Int) :=
+    Int.ofNat_lt.mpr hsq
+  have hcd : ((d - 1 : Nat) : Int) = (d : Int) - 1 := by omega
+  have hc4 : ((4 : Nat) : Int) = 4 := rfl
+  rw [Int.natCast_mul, Int.natCast_pow, Int.natCast_pow, hcd, hc4] at hz
+  exact hz
+
+private theorem fermat_4_mul_lt_mul {a1 a2 a3 a4 b1 b2 b3 b4 : Int}
+    (ha1 : 0 < a1) (ha2 : 0 < a2) (ha3 : 0 < a3) (ha4 : 0 < a4)
+    (h1 : a1 < b1) (h2 : a2 < b2) (h3 : a3 < b3) (h4 : a4 < b4) :
+    a1 * (a2 * (a3 * (a4 * 1))) < b1 * (b2 * (b3 * (b4 * 1))) := by
+  have hb1 : 0 < b1 := Int.lt_trans ha1 h1
+  have hb2 : 0 < b2 := Int.lt_trans ha2 h2
+  have hb3 : 0 < b3 := Int.lt_trans ha3 h3
+  have p4 : a4 * 1 < b4 * 1 := by omega
+  have ha34 : 0 < a4 * 1 := by omega
+  have p3 : a3 * (a4 * 1) < b3 * (b4 * 1) := by
+    calc a3 * (a4 * 1) < a3 * (b4 * 1) := Int.mul_lt_mul_of_pos_left p4 ha3
+      _ < b3 * (b4 * 1) := Int.mul_lt_mul_of_pos_right h3 (by omega)
+  have ha234 : 0 < a3 * (a4 * 1) := Int.mul_pos ha3 ha34
+  have p2 : a2 * (a3 * (a4 * 1)) < b2 * (b3 * (b4 * 1)) := by
+    calc a2 * (a3 * (a4 * 1)) < a2 * (b3 * (b4 * 1)) := Int.mul_lt_mul_of_pos_left p3 ha2
+      _ < b2 * (b3 * (b4 * 1)) := Int.mul_lt_mul_of_pos_right h2 (by omega)
+  have ha1234 : 0 < a2 * (a3 * (a4 * 1)) := Int.mul_pos ha2 ha234
+  calc a1 * (a2 * (a3 * (a4 * 1))) < a1 * (b2 * (b3 * (b4 * 1))) :=
+        Int.mul_lt_mul_of_pos_left p2 ha1
+    _ < b1 * (b2 * (b3 * (b4 * 1))) := Int.mul_lt_mul_of_pos_right h1 (by omega)
+
+private theorem fermatNumber_int_1 : (fermatNumber 1 : Int) = 5 := rfl
+private theorem fermatNumber_int_2 : (fermatNumber 2 : Int) = 17 := rfl
+private theorem fermatNumber_int_3 : (fermatNumber 3 : Int) = 257 := rfl
+private theorem fermatNumber_int_4 : (fermatNumber 4 : Int) = 65537 := rfl
+private theorem fermatDeg_1 : fermatCyclotomicSplittingDeg 1 = 2 := rfl
+private theorem fermatDeg_2 : fermatCyclotomicSplittingDeg 2 = 8 := rfl
+private theorem fermatDeg_3 : fermatCyclotomicSplittingDeg 3 = 128 := rfl
+private theorem fermatDeg_4 : fermatCyclotomicSplittingDeg 4 = 32768 := rfl
+
+private theorem fermat_4_cyclotomic_valid
+    (c1 c2 c3 c4 : CyclotomicSplitFactorSpec)
+    (h1 : ValidEulerLocalFactorSpec c1.base ∧ 1 ≤ c1.g)
+    (h2 : ValidEulerLocalFactorSpec c2.base ∧ 1 ≤ c2.g)
+    (h3 : ValidEulerLocalFactorSpec c3.base ∧ 1 ≤ c3.g)
+    (h4 : ValidEulerLocalFactorSpec c4.base ∧ 1 ≤ c4.g) :
+    0 < cyclotomicProdMarginPow [c1, c2, c3, c4] ∧
+    cyclotomicProdMarginPow [c1, c2, c3, c4] ≤ cyclotomicProdNormPow [c1, c2, c3, c4] ∧
+    0 < cyclotomicProdDenPow [c1, c2, c3, c4] := by
+  refine cyclotomic_euler_product_lower_bound [c1, c2, c3, c4] ?_
+  intro c hc
+  rcases List.mem_cons.mp hc with rfl | hc
+  · exact h1
+  · rcases List.mem_cons.mp hc with rfl | hc
+    · exact h2
+    · rcases List.mem_cons.mp hc with rfl | hc
+      · exact h3
+      · rcases List.mem_cons.mp hc with rfl | hc
+        · exact h4
+        · cases hc
+
+/-- Theorem (Fermat-Tower Cyclotomic Dedekind Euler Product Certificates):
+Specializes `cyclotomic_split_euler_factor_nonvanishing` across the splitting prime ideals of
+`(5, 17, 257, 65537)` in `ℚ(ζ_{2^(2^k)})` with multiplicities `(2, 8, 128, 32768)` across
+`σ ∈ {1/2, 3/4, 1}` in symbolic power form (sub-second kernel verification):
+1. At `σ = 1/2`: `0 < ∏ (d_p - 1)^(2g_p) ≤ ∏ normSq_p^{g_p}` and `0 < ∏ (d_p^2)^{g_p}`.
+2. At `σ = 3/4`: `0 < ∏ (d_p - r_p)^(2g_p) ≤ ∏ normSq_p^{g_p}` and `0 < ∏ (d_p^2)^{g_p}`.
+3. At `σ = 1`: `0 < ∏ (p - 1)^(2g_p) ≤ ∏ normSq_p^{g_p}` AND the uniform Dedekind strip
+   lower bound `∏ (p^2)^{g_p} < 256 * ∏ normSq_p^{g_p}` (`|∏_{k=1..4} (1 - F_k^{-s})^{g_k}|^2 > 1/256`).
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem fermat_tower_dedekind_euler_strip_certs
+    (zx5 zy5 zx17 zy17 zx257 zy257 zx65537 zy65537 : Int) :
+    -- (1) σ = 1/2 cyclotomic Dedekind bound
+    (zx5 * zx5 + zy5 * zy5 ≤ 1 →
+     zx17 * zx17 + zy17 * zy17 ≤ 1 →
+     zx257 * zx257 + zy257 * zy257 ≤ 1 →
+     zx65537 * zx65537 + zy65537 * zy65537 ≤ 1 →
+     let fsHalf : List CyclotomicSplitFactorSpec :=
+       [ ⟨⟨5, 2, 1, zx5, zy5⟩, 2⟩,
+         ⟨⟨17, 4, 1, zx17, zy17⟩, 8⟩,
+         ⟨⟨257, 16, 1, zx257, zy257⟩, 128⟩,
+         ⟨⟨65537, 256, 1, zx65537, zy65537⟩, 32768⟩ ]
+     0 < cyclotomicProdMarginPow fsHalf ∧
+     cyclotomicProdMarginPow fsHalf ≤ cyclotomicProdNormPow fsHalf ∧
+     0 < cyclotomicProdDenPow fsHalf) ∧
+    -- (2) σ = 3/4 cyclotomic Dedekind bound
+    (zx5 * zx5 + zy5 * zy5 ≤ 9 →
+     zx17 * zx17 + zy17 * zy17 ≤ 1 →
+     zx257 * zx257 + zy257 * zy257 ≤ 1 →
+     zx65537 * zx65537 + zy65537 * zy65537 ≤ 1 →
+     let fs34 : List CyclotomicSplitFactorSpec :=
+       [ ⟨⟨5, 10, 3, zx5, zy5⟩, 2⟩,
+         ⟨⟨17, 8, 1, zx17, zy17⟩, 8⟩,
+         ⟨⟨257, 64, 1, zx257, zy257⟩, 128⟩,
+         ⟨⟨65537, 4096, 1, zx65537, zy65537⟩, 32768⟩ ]
+     0 < cyclotomicProdMarginPow fs34 ∧
+     cyclotomicProdMarginPow fs34 ≤ cyclotomicProdNormPow fs34 ∧
+     0 < cyclotomicProdDenPow fs34) ∧
+    -- (3) σ = 1 cyclotomic Dedekind bound + uniform > 1/256 rational lower bound
+    (zx5 * zx5 + zy5 * zy5 ≤ 1 →
+     zx17 * zx17 + zy17 * zy17 ≤ 1 →
+     zx257 * zx257 + zy257 * zy257 ≤ 1 →
+     zx65537 * zx65537 + zy65537 * zy65537 ≤ 1 →
+     let fsOne : List CyclotomicSplitFactorSpec :=
+       [ ⟨⟨5, 5, 1, zx5, zy5⟩, 2⟩,
+         ⟨⟨17, 17, 1, zx17, zy17⟩, 8⟩,
+         ⟨⟨257, 257, 1, zx257, zy257⟩, 128⟩,
+         ⟨⟨65537, 65537, 1, zx65537, zy65537⟩, 32768⟩ ]
+     0 < cyclotomicProdMarginPow fsOne ∧
+     cyclotomicProdMarginPow fsOne ≤ cyclotomicProdNormPow fsOne ∧
+     cyclotomicProdDenPow fsOne < 256 * cyclotomicProdNormPow fsOne) := by
+  refine ⟨?_, ?_, ?_⟩
+  · intro h5 h17 h257 h65537 fsHalf
+    exact fermat_4_cyclotomic_valid
+      ⟨⟨5, 2, 1, zx5, zy5⟩, 2⟩ ⟨⟨17, 4, 1, zx17, zy17⟩, 8⟩
+      ⟨⟨257, 16, 1, zx257, zy257⟩, 128⟩ ⟨⟨65537, 256, 1, zx65537, zy65537⟩, 32768⟩
+      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h5⟩, by dsimp; omega⟩
+      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h17⟩, by dsimp; omega⟩
+      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h257⟩, by dsimp; omega⟩
+      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h65537⟩, by dsimp; omega⟩
+  · intro h5 h17 h257 h65537 fs34
+    exact fermat_4_cyclotomic_valid
+      ⟨⟨5, 10, 3, zx5, zy5⟩, 2⟩ ⟨⟨17, 8, 1, zx17, zy17⟩, 8⟩
+      ⟨⟨257, 64, 1, zx257, zy257⟩, 128⟩ ⟨⟨65537, 4096, 1, zx65537, zy65537⟩, 32768⟩
+      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h5⟩, by dsimp; omega⟩
+      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h17⟩, by dsimp; omega⟩
+      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h257⟩, by dsimp; omega⟩
+      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h65537⟩, by dsimp; omega⟩
+  · intro h5 h17 h257 h65537 fsOne
+    have hlow := fermat_4_cyclotomic_valid
+      ⟨⟨5, 5, 1, zx5, zy5⟩, 2⟩ ⟨⟨17, 17, 1, zx17, zy17⟩, 8⟩
+      ⟨⟨257, 257, 1, zx257, zy257⟩, 128⟩ ⟨⟨65537, 65537, 1, zx65537, zy65537⟩, 32768⟩
+      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h5⟩, by dsimp; omega⟩
+      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h17⟩, by dsimp; omega⟩
+      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h257⟩, by dsimp; omega⟩
+      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h65537⟩, by dsimp; omega⟩
+    refine ⟨hlow.1, hlow.2.1, ?_⟩
+    have q1 := fermat_sigma_one_uniform_quarter_bound 1 (by decide)
+    have q2 := fermat_sigma_one_uniform_quarter_bound 2 (by decide)
+    have q3 := fermat_sigma_one_uniform_quarter_bound 3 (by decide)
+    have q4 := fermat_sigma_one_uniform_quarter_bound 4 (by decide)
+    rw [fermatNumber_int_1, fermatDeg_1] at q1
+    rw [fermatNumber_int_2, fermatDeg_2] at q2
+    rw [fermatNumber_int_3, fermatDeg_3] at q3
+    rw [fermatNumber_int_4, fermatDeg_4] at q4
+    have hpow2 : ∀ (d : Int) (g : Nat), (d * d) ^ g = d ^ (2 * g) := by
+      intro d g
+      induction g with
+      | zero => simp
+      | succ m ih =>
+        calc (d * d) ^ (m + 1)
+            = (d * d) ^ m * (d * d) := Int.pow_succ _ _
+          _ = d ^ (2 * m) * (d * d) := by rw [ih]
+          _ = d ^ (2 * m) * (d ^ 1 * d) := by rw [Int.pow_one]
+          _ = d ^ (2 * m) * d ^ 2 := by rw [← Int.pow_succ]
+          _ = d ^ (2 * m + 2) := (Int.pow_add d (2 * m) 2).symm
+          _ = d ^ (2 * (m + 1)) := by rw [Nat.mul_succ]
+    have h256 : cyclotomicProdDenPow fsOne < 256 * cyclotomicProdMarginPow fsOne := by
+      change ((5 : Int) * 5) ^ 2 * (((17 : Int) * 17) ^ 8 *
+          (((257 : Int) * 257) ^ 128 * (((65537 : Int) * 65537) ^ 32768 * 1))) <
+        256 * (((5 : Int) - 1) ^ (2 * 2) * (((17 : Int) - 1) ^ (2 * 8) *
+          (((257 : Int) - 1) ^ (2 * 128) * (((65537 : Int) - 1) ^ (2 * 32768) * 1))))
+      rw [hpow2 5 2, hpow2 17 8, hpow2 257 128, hpow2 65537 32768]
+      have hmul := fermat_4_mul_lt_mul
+        (Int.pow_pos (by omega)) (Int.pow_pos (by omega))
+        (Int.pow_pos (by omega)) (Int.pow_pos (by omega)) q1 q2 q3 q4
+      have hr : (4 * ((5 : Int) - 1) ^ (2 * 2)) * ((4 * ((17 : Int) - 1) ^ (2 * 8)) *
+            ((4 * ((257 : Int) - 1) ^ (2 * 128)) *
+              ((4 * ((65537 : Int) - 1) ^ (2 * 32768)) * 1))) =
+          256 * (((5 : Int) - 1) ^ (2 * 2) * (((17 : Int) - 1) ^ (2 * 8) *
+            (((257 : Int) - 1) ^ (2 * 128) * (((65537 : Int) - 1) ^ (2 * 32768) * 1)))) := by
+        have h16 : (4 : Int) * 4 = 16 := rfl
+        have h64 : (4 : Int) * 16 = 64 := rfl
+        have h256c : (4 : Int) * 64 = 256 := rfl
+        calc (4 * ((5 : Int) - 1) ^ (2 * 2)) * ((4 * ((17 : Int) - 1) ^ (2 * 8)) *
+              ((4 * ((257 : Int) - 1) ^ (2 * 128)) *
+                ((4 * ((65537 : Int) - 1) ^ (2 * 32768)) * 1)))
+            = (4 * (4 * (4 * 4))) * (((5 : Int) - 1) ^ (2 * 2) *
+                (((17 : Int) - 1) ^ (2 * 8) * (((257 : Int) - 1) ^ (2 * 128) *
+                  (((65537 : Int) - 1) ^ (2 * 32768) * 1)))) := by ac_rfl
+          _ = 256 * (((5 : Int) - 1) ^ (2 * 2) * (((17 : Int) - 1) ^ (2 * 8) *
+                (((257 : Int) - 1) ^ (2 * 128) * (((65537 : Int) - 1) ^ (2 * 32768) * 1)))) := by
+              rw [h16, h64, h256c]
+      rw [hr] at hmul
+      exact hmul
+    have hnorm := Int.mul_le_mul_of_nonneg_left hlow.2.1 (by decide : (0 : Int) ≤ 256)
+    exact Int.lt_of_lt_of_le h256 hnorm
+
 end EulerFactorNonVanishing
 
 -- end of file: leanasm/src/LeanAsm/EulerFactorNonVanishing.lean
