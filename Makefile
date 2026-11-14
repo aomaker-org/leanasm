@@ -29,6 +29,7 @@ help:
 	@echo "  make hydrate SUB=..    - Hydrate (inflate/wet) dormant subrepo"
 	@echo "  make dehydrate SUB=..  - Dehydrate (dry) working tree to reclaim disk"
 	@echo "  make hydrate-status    - Check thermal lifecycle status of submodules"
+	@echo "  make scan-openai       - Scan OpenAI 2026-10-28 YM submission & emit docs"
 
 build:
 	$(LAKE) build
@@ -74,7 +75,7 @@ sync: status test
 # ------------------------------------------------------------------------------
 # Yang-Mills Verification & Exploration Targets
 # ------------------------------------------------------------------------------
-.PHONY: ym-clone ym-integrity ym-status
+.PHONY: ym-clone ym-integrity ym-status scan-openai
 
 YM_DIR := $(REPO_ROOT)/subrepos/YM/submissions/openai-20261028
 
@@ -99,3 +100,8 @@ ym-status:
 	else \
 		echo "YM repository not hydrated. Run 'make ym-clone' or 'make ym-integrity'."; \
 	fi
+
+scan-openai:
+	python3 scripts/scan_openai_submission.py --root subrepos/YM/submissions/openai-20261028 --out docs/openai-20261028
+
+# end of file: leanasm/Makefile
