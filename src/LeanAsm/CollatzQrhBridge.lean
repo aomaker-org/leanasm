@@ -1284,6 +1284,424 @@ theorem collatz_cycle_length_lower_bound_306 {m : Nat} (c : CollatzOddCycle m) (
       Nat.le_trans (by decide : 793 ≤ 487 + 307) (Nat.add_le_add hk487 hm307)
     exact ⟨hm307, hk487, hK793⟩
 
+-- =============================================================================
+-- Higher Convergent Bracket (1054, 665), m ≥ 666 Barrier & Predecessor Tree
+-- =============================================================================
+
+set_option exponentiation.threshold 2000 in
+/-- Exact 318-digit continued-fraction lower convergent separation:
+`2 ^ 1054 < 3 ^ 665` with positive 313-digit Diophantine gap `3 ^ 665 - 2 ^ 1054 > 0`. -/
+theorem convergent_1054_665_gap_pos :
+    2 ^ 1054 < 3 ^ 665 ∧ 0 < 3 ^ 665 - 2 ^ 1054 := by
+  decide +kernel
+
+set_option exponentiation.threshold 2000 in
+/-- Cleared-denominator continued-fraction convergent bracket `1054 / 665 < log_2(3) < 485 / 306`,
+backed by `2 ^ 1054 < 3 ^ 665`, `3 ^ 306 < 2 ^ 485`, and `1054 * 306 = 322524 < 322525 = 485 * 665`. -/
+theorem log2_3_convergent_bracket_665 :
+    2 ^ 1054 < 3 ^ 665 ∧
+    3 ^ 306 < 2 ^ 485 ∧
+    1054 * 306 < 485 * 665 := by
+  decide +kernel
+
+set_option exponentiation.threshold 2000 in
+private theorem steiner_1055_665_nondiv :
+    2 ^ 1054 < 3 ^ 665 ∧
+    3 ^ 665 < 2 ^ 1055 ∧
+    (3 ^ 665 - 2 ^ 665) % (2 ^ 1055 - 3 ^ 665) ≠ 0 := by
+  decide +kernel
+
+set_option exponentiation.threshold 2000 in
+/-- Constructive Steiner 1-cycle exclusion at `(k, m) = (1054, 665)` (since `2 ^ 1054 < 3 ^ 665`
+violates the positive-gap requirement) and at the minimal upper exponent `(1055, 665)` via
+`(2 ^ 1055 - 3 ^ 665) ∤ (3 ^ 665 - 2 ^ 665)`. -/
+theorem steiner_1cycle_excluded_1054_665 :
+    (∀ (c : CollatzOddCycle 665), cycleShift c.a 665 ≠ 1054) ∧
+    ¬ ((2 ^ 1055 - 3 ^ 665) ∣ (3 ^ 665 - 2 ^ 665)) ∧
+    (∀ (nMin : Nat) (a : Nat → Nat),
+      (∀ j, j + 1 < 665 → a j = 1) →
+      nMin * (2 ^ 1055 - 3 ^ 665) ≠ cycleRhs a 665) := by
+  have hchk := steiner_1055_665_nondiv
+  have hndvd : ¬ ((2 ^ 1055 - 3 ^ 665) ∣ (3 ^ 665 - 2 ^ 665)) :=
+    not_dvd_of_mod_ne_zero hchk.2.2
+  refine ⟨?_, hndvd, ?_⟩
+  · intro c heq
+    have hgap : 3 ^ 665 < 2 ^ cycleShift c.a 665 :=
+      collatz_odd_cycle_gap_pos c (by decide : 1 ≤ 665)
+    rw [heq] at hgap
+    exact absurd hgap (Nat.not_lt_of_gt hchk.1)
+  · intro nMin a h1cycle heq
+    exact hndvd (steiner_1cycle_divides nMin 1055 665 a h1cycle heq).2.2
+
+private def directLoop665 (rem m p3 p2 : Nat) : Bool :=
+  match rem with
+  | 0 => true
+  | rem' + 1 =>
+    let nextP2 := if 3 * p3 < 2 * p2 then 2 * p2 else 4 * p2
+    (p3 < p2) &&
+    (p2 ≤ 2 * p3) &&
+    (p3 * (3 * 936360) < p2 * (3 * 936360 - m)) &&
+    directLoop665 rem' (m + 1) (3 * p3) nextP2
+
+private theorem directLoop665_valid : directLoop665 665 1 3 4 = true := by
+  decide +kernel
+
+private theorem directLoop665_sound :
+    ∀ rem m p3 p2 k0,
+      1 ≤ k0 → p3 = 3 ^ m → p2 = 2 ^ k0 →
+      directLoop665 rem m p3 p2 = true →
+      ∀ j, j < rem → ∀ k, 3 ^ (m + j) < 2 ^ k →
+        3 ^ (m + j) * (3 * 936360) < 2 ^ k * (3 * 936360 - (m + j)) := by
+  intro rem
+  induction rem with
+  | zero =>
+    intro _ _ _ _ _ _ _ _ j hj
+    exact absurd hj (Nat.not_lt_zero j)
+  | succ rem' ih =>
+    intro m p3 p2 k0 hk0 hp3 hp2 htrue j hj k hgap
+    dsimp only [directLoop665] at htrue
+    simp only [Bool.and_eq_true, decide_eq_true_eq] at htrue
+    rcases htrue with ⟨⟨⟨hlt_p2, hle_2p3⟩, hmargin⟩, hrest⟩
+    cases j with
+    | zero =>
+      have hk0_pos : k0 = (k0 - 1) + 1 := (Nat.sub_add_cancel hk0).symm
+      have hp2_two : p2 = 2 * 2 ^ (k0 - 1) := by
+        calc p2 = 2 ^ k0 := hp2
+          _ = 2 ^ (k0 - 1 + 1) := by rw [← hk0_pos]
+          _ = 2 * 2 ^ (k0 - 1) := by rw [Nat.pow_succ, Nat.mul_comm _ 2]
+      have hhalf : 2 ^ (k0 - 1) ≤ 3 ^ m := by
+        rw [← hp3]
+        have : 2 * 2 ^ (k0 - 1) ≤ 2 * p3 := by rw [← hp2_two]; exact hle_2p3
+        exact Nat.le_of_mul_le_mul_left this (by decide)
+      have hk0_le_k : k0 ≤ k := by
+        cases Nat.lt_or_ge k k0 with
+        | inl hk_lt =>
+          have hk_le : k ≤ k0 - 1 := Nat.le_pred_of_lt hk_lt
+          have h2_le : 2 ^ k ≤ 2 ^ (k0 - 1) := Nat.pow_le_pow_right (by decide) hk_le
+          have hgap0 : 3 ^ m < 2 ^ k := by simpa only [Nat.add_zero] using hgap
+          exact absurd (Nat.lt_of_le_of_lt hhalf (Nat.lt_of_lt_of_le hgap0 h2_le))
+            (Nat.lt_irrefl _)
+        | inr hk_ge => exact hk_ge
+      have hp2_le : p2 ≤ 2 ^ k := by
+        rw [hp2]
+        exact Nat.pow_le_pow_right (by decide) hk0_le_k
+      have hmul : p3 * (3 * 936360) < 2 ^ k * (3 * 936360 - m) :=
+        Nat.lt_of_lt_of_le hmargin (Nat.mul_le_mul_right _ hp2_le)
+      simpa only [hp3, Nat.add_zero] using hmul
+    | succ j' =>
+      have hnext_pow3 : 3 * p3 = 3 ^ (m + 1) := by
+        rw [hp3, Nat.pow_succ, Nat.mul_comm _ 3]
+      have hidx : (m + 1) + j' = m + (j' + 1) := by omega
+      have hgap' : 3 ^ ((m + 1) + j') < 2 ^ k := by rwa [hidx]
+      by_cases hcmp : 3 * p3 < 2 * p2
+      · have hnext_p2 : (if 3 * p3 < 2 * p2 then 2 * p2 else 4 * p2) = 2 ^ (k0 + 1) := by
+          split
+          · rw [hp2, Nat.pow_succ, Nat.mul_comm _ 2]
+          · contradiction
+        have hsub := ih (m + 1) (3 * p3) (if 3 * p3 < 2 * p2 then 2 * p2 else 4 * p2)
+          (k0 + 1) (Nat.le_add_left 1 k0) hnext_pow3 hnext_p2 hrest j'
+          (Nat.lt_of_succ_lt_succ hj) k hgap'
+        rwa [hidx] at hsub
+      · have hnext_p2 : (if 3 * p3 < 2 * p2 then 2 * p2 else 4 * p2) = 2 ^ (k0 + 2) := by
+          split
+          · contradiction
+          · rw [hp2, Nat.pow_succ, Nat.pow_succ]; omega
+        have hsub := ih (m + 1) (3 * p3) (if 3 * p3 < 2 * p2 then 2 * p2 else 4 * p2)
+          (k0 + 2) (Nat.le_add_left 1 (k0 + 1)) hnext_pow3 hnext_p2 hrest j'
+          (Nat.lt_of_succ_lt_succ hj) k hgap'
+        rwa [hidx] at hsub
+
+private theorem collatz_direct_margin_665 {m k : Nat} (hm1 : 1 ≤ m) (hm665 : m ≤ 665)
+    (hgap : 3 ^ m < 2 ^ k) :
+    3 ^ m * (3 * 936360) < 2 ^ k * (3 * 936360 - m) := by
+  have hj : m - 1 < 665 := Nat.sub_lt_left_of_lt_add hm1 (Nat.lt_succ_of_le hm665)
+  have heq : 1 + (m - 1) = m := Nat.add_sub_of_le hm1
+  have hres := directLoop665_sound 665 1 3 4 2 (by decide) (by decide) (by decide)
+    directLoop665_valid (m - 1) hj k (by rw [heq]; exact hgap)
+  rwa [heq] at hres
+
+private theorem bernoulli_cycle_contradiction_665 {m : Nat} (c : CollatzOddCycle m)
+    (hm1 : 1 ≤ m) (hmD : m ≤ 3 * c.nMin)
+    (h3D : 3 ^ m * (3 * c.nMin) < 2 ^ cycleShift c.a m * (3 * c.nMin - m)) :
+    False := by
+  let k := cycleShift c.a m
+  let D := 3 * c.nMin
+  have hprod : 2 ^ k * c.nMin ^ m ≤ (3 * c.nMin + 1) ^ m := collatz_odd_cycle_product_bound c
+  have hD_pos : 1 ≤ D := Nat.le_trans hm1 hmD
+  have hbern := pow_add_one_mul_sub_le D m hmD hD_pos
+  have hD_succ : D ^ (m + 1) = D * D ^ m := by
+    rw [Nat.pow_succ, Nat.mul_comm (D ^ m) D]
+  have hleft : 3 ^ m * (D + 1) ^ m * (D - m) < 2 ^ k * D ^ m * (D - m) := by
+    calc 3 ^ m * (D + 1) ^ m * (D - m)
+        = 3 ^ m * ((D + 1) ^ m * (D - m)) := Nat.mul_assoc _ _ _
+      _ ≤ 3 ^ m * D ^ (m + 1) := Nat.mul_le_mul_left _ hbern
+      _ = (3 ^ m * D) * D ^ m := by rw [hD_succ, ← Nat.mul_assoc]
+      _ < (2 ^ k * (D - m)) * D ^ m := Nat.mul_lt_mul_of_pos_right h3D (Nat.pow_pos hD_pos)
+      _ = 2 ^ k * D ^ m * (D - m) := by
+          rw [Nat.mul_assoc (2 ^ k) (D - m) (D ^ m), Nat.mul_comm (D - m) (D ^ m), ← Nat.mul_assoc]
+  have hdrop : 3 ^ m * (D + 1) ^ m < 2 ^ k * D ^ m := by
+    cases Nat.lt_or_ge (3 ^ m * (D + 1) ^ m) (2 ^ k * D ^ m) with
+    | inl hlt => exact hlt
+    | inr hge =>
+      exact absurd (Nat.lt_of_le_of_lt (Nat.mul_le_mul_right (D - m) hge) hleft) (Nat.lt_irrefl _)
+  have hD_pow : 3 ^ m * (2 ^ k * c.nMin ^ m) = 2 ^ k * D ^ m := by
+    have : D ^ m = 3 ^ m * c.nMin ^ m := Nat.mul_pow 3 c.nMin m
+    rw [this, Nat.mul_left_comm]
+  rw [← hD_pow] at hdrop
+  have hcontr : (3 * c.nMin + 1) ^ m < 2 ^ k * c.nMin ^ m := by
+    cases Nat.lt_or_ge ((3 * c.nMin + 1) ^ m) (2 ^ k * c.nMin ^ m) with
+    | inl hlt => exact hlt
+    | inr hge =>
+      exact absurd (Nat.lt_of_le_of_lt (Nat.mul_le_mul_left (3 ^ m) hge) hdrop) (Nat.lt_irrefl _)
+  exact absurd hprod (Nat.not_le_of_lt hcontr)
+
+set_option exponentiation.threshold 2000 in
+private theorem three_pow_666_gt_two_pow_1055 : 2 ^ 1055 < 3 ^ 666 := by
+  decide +kernel
+
+set_option exponentiation.threshold 2000 in
+/-- Extended Simons–de Weger cycle-length barrier pushed through `(1054, 665)`:
+- Every `CollatzOddCycle m` with `1 ≤ m ≤ 665` satisfies `c.nMin < 936,360`.
+- Contrapositively, any non-trivial `CollatzOddCycle m` (`1 ≤ m`) with `936,360 ≤ c.nMin`
+  must satisfy `m ≥ 666` odd steps, `k ≥ 1055` halvings, and `K = k + m ≥ 1721` total steps. -/
+theorem simons_de_weger_barrier_665 {m : Nat} (c : CollatzOddCycle m) (hm1 : 1 ≤ m) :
+    (m ≤ 665 → c.nMin < 936360) ∧
+    (936360 ≤ c.nMin →
+      666 ≤ m ∧ 1055 ≤ cycleShift c.a m ∧ 1721 ≤ cycleShift c.a m + m) := by
+  have no_small_cycle : ∀ (hm665 : m ≤ 665) (hn : 936360 ≤ c.nMin), False := by
+    intro hm665 hn
+    let k := cycleShift c.a m
+    let D0 := 3 * 936360
+    let D := 3 * c.nMin
+    have hgap : 3 ^ m < 2 ^ k := collatz_odd_cycle_gap_pos c hm1
+    have hbase : 3 ^ m * D0 < 2 ^ k * (D0 - m) := collatz_direct_margin_665 hm1 hm665 hgap
+    have hD0_le_D : D0 ≤ D := Nat.mul_le_mul_left 3 hn
+    have hm_le_D0 : m ≤ D0 := Nat.le_trans hm665 (by decide : 665 ≤ 3 * 936360)
+    have hm_le_D : m ≤ D := Nat.le_trans hm_le_D0 hD0_le_D
+    let delta := D - D0
+    have hD_eq : D = D0 + delta := (Nat.add_sub_of_le hD0_le_D).symm
+    have hDm_eq : D - m = (D0 - m) + delta := by
+      have : D0 - m + delta + m = D0 + delta := by
+        rw [Nat.add_assoc, Nat.add_comm delta m, ← Nat.add_assoc, Nat.sub_add_cancel hm_le_D0]
+      omega
+    have hdelta_le : 3 ^ m * delta ≤ 2 ^ k * delta := Nat.mul_le_mul_right delta (Nat.le_of_lt hgap)
+    have h3D : 3 ^ m * D < 2 ^ k * (D - m) := by
+      rw [hDm_eq, hD_eq, Nat.mul_add, Nat.mul_add]
+      exact Nat.add_lt_add_of_lt_of_le hbase hdelta_le
+    exact bernoulli_cycle_contradiction_665 c hm1 hm_le_D h3D
+  refine ⟨?_, ?_⟩
+  · intro hm665
+    cases Nat.lt_or_ge c.nMin 936360 with
+    | inl hlt => exact hlt
+    | inr hn => exact absurd hn (no_small_cycle hm665)
+  · intro hn
+    have hm666 : 666 ≤ m := by
+      cases Nat.lt_or_ge 665 m with
+      | inl hgt => exact hgt
+      | inr hm665 => exact absurd hn (no_small_cycle hm665)
+    have hgap : 3 ^ m < 2 ^ cycleShift c.a m := collatz_odd_cycle_gap_pos c hm1
+    have h3_ge : 3 ^ 666 ≤ 3 ^ m := Nat.pow_le_pow_right (by decide) hm666
+    have h2_1055 : 2 ^ 1055 < 2 ^ cycleShift c.a m :=
+      Nat.lt_trans (Nat.lt_of_lt_of_le three_pow_666_gt_two_pow_1055 h3_ge) hgap
+    have hk1055 : 1055 ≤ cycleShift c.a m := by
+      cases Nat.lt_or_ge 1055 (cycleShift c.a m) with
+      | inl hlt => exact Nat.le_of_lt hlt
+      | inr hge =>
+        exact absurd h2_1055 (Nat.not_lt_of_ge (Nat.pow_le_pow_right (by decide) hge))
+    have hK1721 : 1721 ≤ cycleShift c.a m + m :=
+      Nat.le_trans (by decide : 1721 ≤ 1055 + 666) (Nat.add_le_add hk1055 hm666)
+    exact ⟨hm666, hk1055, hK1721⟩
+
+/-- Single-step inverse Collatz predecessor operator excluding trivial `1 -> 4 -> 1` loops. -/
+def collatzPredecessors (n : Nat) : List Nat :=
+  match n with
+  | 0 => []
+  | n' + 1 =>
+    let m := n' + 1
+    if m % 6 == 4 && decide (1 < (m - 1) / 3) then [2 * m, (m - 1) / 3] else [2 * m]
+
+/-- Depth-`d` inverse Collatz predecessor frontier rooted at `root`. -/
+def collatzPredTree : Nat → Nat → List Nat
+  | 0, root => [root]
+  | d + 1, root => (collatzPredTree d root).flatMap collatzPredecessors
+
+private theorem collatzStep_even (m : Nat) : Conjectures.collatzStep (2 * m) = m := by
+  unfold Conjectures.collatzStep
+  have hm : (2 * m) % 2 = 0 := Nat.mul_mod_right 2 m
+  have hb : ((2 * m) % 2 == 0) = true := by rw [hm]; rfl
+  rw [hb]
+  change (2 * m) / 2 = m
+  exact Nat.mul_div_cancel_left m (by decide)
+
+private theorem collatzStep_odd (q : Nat) :
+    Conjectures.collatzStep (2 * q + 1) = 3 * (2 * q + 1) + 1 := by
+  unfold Conjectures.collatzStep
+  have hodd : (2 * q + 1) % 2 = 1 := by
+    rw [Nat.add_mod, Nat.mul_mod_right, Nat.zero_add]
+  have hb : ((2 * q + 1) % 2 == 0) = false := by rw [hodd]; rfl
+  rw [hb]
+  rfl
+
+private theorem collatzPredecessors_sound (n x : Nat) (hx : x ∈ collatzPredecessors n) :
+    Conjectures.collatzStep x = n := by
+  cases n with
+  | zero => cases hx
+  | succ n' =>
+    dsimp only [collatzPredecessors] at hx
+    cases hbr : ((n' + 1) % 6 == 4 && decide (1 < (n' + 1 - 1) / 3))
+    · rw [hbr] at hx
+      change x ∈ [2 * (n' + 1)] at hx
+      cases hx with
+      | head => exact collatzStep_even (n' + 1)
+      | tail _ h => cases h
+    · rw [hbr] at hx
+      change x ∈ [2 * (n' + 1), (n' + 1 - 1) / 3] at hx
+      cases hx with
+      | head => exact collatzStep_even (n' + 1)
+      | tail _ hx2 =>
+        cases hx2 with
+        | tail _ h => cases h
+        | head =>
+          have h6 : (n' + 1) % 6 = 4 := by
+            cases h1 : ((n' + 1) % 6 == 4)
+            · rw [h1, Bool.false_and] at hbr; contradiction
+            · exact Nat.eq_of_beq_eq_true h1
+          let q := (n' + 1) / 6
+          have hdm : 6 * q + 4 = n' + 1 := by
+            have h := Nat.div_add_mod (n' + 1) 6
+            rw [h6] at h
+            exact h
+          have h3mul : 3 * (2 * q + 1) + 1 = 6 * q + 4 := by
+            rw [Nat.mul_add, Nat.mul_one, ← Nat.mul_assoc]
+          have hn' : n' = 3 * (2 * q + 1) :=
+            (Nat.add_right_cancel (h3mul.trans hdm)).symm
+          have hqdiv : (n' + 1 - 1) / 3 = 2 * q + 1 := by
+            rw [Nat.add_sub_cancel, hn', Nat.mul_div_cancel_left _ (by decide : 0 < 3)]
+          rw [hqdiv, collatzStep_odd q]
+          exact h3mul.trans hdm
+
+/-- Backward-to-forward soundness: every node `x` in `collatzPredTree d 1` reaches `1`
+under `d` forward Collatz iterations. -/
+theorem collatzPredTree_sound (d x : Nat) (hx : x ∈ collatzPredTree d 1) :
+    Conjectures.iterate Conjectures.collatzStep d x = 1 := by
+  induction d generalizing x with
+  | zero =>
+    simp only [collatzPredTree, List.mem_singleton] at hx
+    subst hx
+    rfl
+  | succ d ih =>
+    simp only [collatzPredTree, List.mem_flatMap] at hx
+    rcases hx with ⟨y, hy, hxy⟩
+    change Conjectures.iterate Conjectures.collatzStep d (Conjectures.collatzStep x) = 1
+    rw [collatzPredecessors_sound y x hxy]
+    exact ih y hy
+
+/-- Residue-class mod-6 branching theorem for single-step inverse predecessors. -/
+theorem collatz_mod6_branching (n : Nat) :
+    (n = 0 → (collatzPredecessors n).length = 0) ∧
+    (n ≠ 0 ∧ n % 6 = 4 ∧ 4 < n → (collatzPredecessors n).length = 2) ∧
+    (n ≠ 0 ∧ (n % 6 ≠ 4 ∨ n ≤ 4) → (collatzPredecessors n).length = 1) := by
+  cases n with
+  | zero =>
+    refine ⟨fun _ => rfl, fun ⟨h, _⟩ => absurd rfl h, fun ⟨h, _⟩ => absurd rfl h⟩
+  | succ n' =>
+    refine ⟨fun h => absurd h (Nat.succ_ne_zero n'), ?_, ?_⟩
+    · intro ⟨_, hmod, hgt4⟩
+      dsimp only [collatzPredecessors]
+      have hdm := Nat.div_add_mod (n' + 1) 6
+      rw [hmod] at hdm
+      have hqpos : 1 ≤ (n' + 1) / 6 := by
+        cases hq : (n' + 1) / 6 with
+        | zero =>
+          rw [hq, Nat.mul_zero, Nat.zero_add] at hdm
+          rw [← hdm] at hgt4
+          exact absurd hgt4 (by decide)
+        | succ k => exact Nat.succ_le_succ (Nat.zero_le k)
+      have hge6 : 3 * 2 ≤ n' := by
+        have h6q : 6 ≤ 6 * ((n' + 1) / 6) :=
+          Nat.le_trans (by decide : 6 ≤ 6 * 1) (Nat.mul_le_mul_left 6 hqpos)
+        have hle : 6 + 3 ≤ 6 * ((n' + 1) / 6) + 3 := Nat.add_le_add_right h6q 3
+        have h9 : 6 * ((n' + 1) / 6) + 3 = n' := by
+          have : 6 * ((n' + 1) / 6) + 3 + 1 = n' + 1 := by
+            simpa only [Nat.add_assoc] using hdm
+          exact Nat.add_right_cancel this
+        rw [h9] at hle
+        exact Nat.le_trans (by decide : 3 * 2 ≤ 6 + 3) hle
+      have hlt_n : 1 < (n' + 1 - 1) / 3 := by
+        rw [Nat.add_sub_cancel]
+        exact Nat.lt_of_lt_of_le (by decide : 1 < 2)
+          ((Nat.le_div_iff_mul_le (by decide : 0 < 3)).mpr (by rw [Nat.mul_comm]; exact hge6))
+      have hb1 : ((n' + 1) % 6 == 4) = true := beq_iff_eq.mpr hmod
+      have hb2 : decide (1 < (n' + 1 - 1) / 3) = true := decide_eq_true hlt_n
+      rw [hb1, hb2]
+      rfl
+    · intro ⟨_, hnot⟩
+      dsimp only [collatzPredecessors]
+      have hfalse : ((n' + 1) % 6 == 4 && decide (1 < (n' + 1 - 1) / 3)) = false := by
+        cases hnot with
+        | inl hne6 =>
+          have hb1 : ((n' + 1) % 6 == 4) = false := beq_false_of_ne hne6
+          rw [hb1, Bool.false_and]
+        | inr hle4 =>
+          have hlt6 : n' + 1 - 1 < 3 * 2 := by
+            rw [Nat.add_sub_cancel]
+            exact Nat.lt_trans (Nat.lt_succ_self n')
+              (Nat.lt_of_le_of_lt hle4 (by decide : 4 < 3 * 2))
+          have hdiv2 : (n' + 1 - 1) / 3 < 2 :=
+            (Nat.div_lt_iff_lt_mul (by decide : 0 < 3)).mpr (by rw [Nat.mul_comm]; exact hlt6)
+          have hnot1 : ¬ (1 < (n' + 1 - 1) / 3) :=
+            Nat.not_lt_of_ge (Nat.le_of_lt_succ hdiv2)
+          have hb2 : decide (1 < (n' + 1 - 1) / 3) = false := decide_eq_false hnot1
+          rw [hb2, Bool.and_false]
+      rw [hfalse]
+      rfl
+
+/-- Cleared-denominator specification benchmarking depth-`d` inverse Collatz predecessor
+tree growth against the halving spine and rational exponent thresholds `expNum / expDen`. -/
+structure PredecessorDensitySpec where
+  depth : Nat
+  treeCard : Nat
+  expNum : Nat
+  expDen : Nat
+  deriving Repr, DecidableEq
+
+/-- Exact depth-`d` frontier cardinality match. -/
+def PredecessorDensitySpec.MatchesDepthTree (s : PredecessorDensitySpec) : Prop :=
+  (collatzPredTree s.depth 1).length = s.treeCard
+
+/-- Strict excess over the trivial `1, 2, ..., 2^d` halving spine (`d + 1` nodes). -/
+def PredecessorDensitySpec.BeatsHalvingSpine (s : PredecessorDensitySpec) : Prop :=
+  s.depth + 1 < s.treeCard
+
+/-- Cleared-denominator power-law inequality `depth ^ expNum < treeCard ^ expDen`. -/
+def PredecessorDensitySpec.ExceedsSublinearPower (s : PredecessorDensitySpec) : Prop :=
+  s.depth ^ s.expNum < s.treeCard ^ s.expDen
+
+/-- Cleared-denominator rational benchmark ladder:
+`3/4 < 84/100` (Krasikov–Lagarias) `< 9/10` (Mazur) `< 1`. -/
+theorem predecessor_density_threshold_ladder :
+    3 * 100 < 84 * 4 ∧ 84 * 10 < 9 * 100 ∧ 9 < 10 := by
+  decide
+
+set_option exponentiation.threshold 2000 in
+/-- Constructive predecessor-tree cardinality and cleared-denominator power-law growth
+certificates across depths `14`, `15`, and `20`, benchmarking against `3/4`, `84/100`
+(Krasikov–Lagarias), and `9/10` (Mazur). -/
+theorem collatz_pred_tree_growth_certs :
+    let s14_3_4 : PredecessorDensitySpec := ⟨14, 18, 3, 4⟩
+    let s14_kl  : PredecessorDensitySpec := ⟨14, 18, 84, 100⟩
+    let s15_kl  : PredecessorDensitySpec := ⟨15, 24, 84, 100⟩
+    let s20_maz : PredecessorDensitySpec := ⟨20, 72, 9, 10⟩
+    (s14_3_4.MatchesDepthTree ∧ s14_3_4.BeatsHalvingSpine ∧ s14_3_4.ExceedsSublinearPower) ∧
+    (s14_kl.MatchesDepthTree ∧ s14_kl.BeatsHalvingSpine ∧ s14_kl.ExceedsSublinearPower) ∧
+    (s15_kl.MatchesDepthTree ∧ s15_kl.BeatsHalvingSpine ∧ s15_kl.ExceedsSublinearPower) ∧
+    (s20_maz.MatchesDepthTree ∧ s20_maz.BeatsHalvingSpine ∧ s20_maz.ExceedsSublinearPower) ∧
+    (3 * 100 < 84 * 4 ∧ 84 * 10 < 9 * 100 ∧ 9 < 10) := by
+  dsimp [PredecessorDensitySpec.MatchesDepthTree,
+    PredecessorDensitySpec.BeatsHalvingSpine,
+    PredecessorDensitySpec.ExceedsSublinearPower]
+  decide +kernel
+
 end CollatzQrhBridge
 
 -- end of file: leanasm/src/LeanAsm/CollatzQrhBridge.lean

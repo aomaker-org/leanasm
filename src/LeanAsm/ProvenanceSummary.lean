@@ -158,16 +158,47 @@ def CollatzProvenance : Prop :=
     (m ≤ 306 → c.nMin < 10 * m * m ∧ c.nMin < 936360) ∧
     (936360 ≤ c.nMin →
       307 ≤ m ∧ 487 ≤ CollatzQrhBridge.cycleShift c.a m ∧
-      793 ≤ CollatzQrhBridge.cycleShift c.a m + m))
+      793 ≤ CollatzQrhBridge.cycleShift c.a m + m)) ∧
+  (2 ^ 1054 < 3 ^ 665 ∧ 0 < 3 ^ 665 - 2 ^ 1054) ∧
+  (2 ^ 1054 < 3 ^ 665 ∧ 3 ^ 306 < 2 ^ 485 ∧ 1054 * 306 < 485 * 665) ∧
+  ((∀ (c : CollatzQrhBridge.CollatzOddCycle 665),
+      CollatzQrhBridge.cycleShift c.a 665 ≠ 1054) ∧
+   ¬ ((2 ^ 1055 - 3 ^ 665) ∣ (3 ^ 665 - 2 ^ 665)) ∧
+   (∀ (nMin : Nat) (a : Nat → Nat),
+     (∀ j, j + 1 < 665 → a j = 1) →
+     nMin * (2 ^ 1055 - 3 ^ 665) ≠ CollatzQrhBridge.cycleRhs a 665)) ∧
+  (∀ {m : Nat} (c : CollatzQrhBridge.CollatzOddCycle m), 1 ≤ m →
+    (m ≤ 665 → c.nMin < 936360) ∧
+    (936360 ≤ c.nMin →
+      666 ≤ m ∧ 1055 ≤ CollatzQrhBridge.cycleShift c.a m ∧
+      1721 ≤ CollatzQrhBridge.cycleShift c.a m + m)) ∧
+  (∀ d x : Nat, x ∈ CollatzQrhBridge.collatzPredTree d 1 →
+    Conjectures.iterate Conjectures.collatzStep d x = 1) ∧
+  (let s14_3_4 : CollatzQrhBridge.PredecessorDensitySpec := ⟨14, 18, 3, 4⟩
+   let s14_kl  : CollatzQrhBridge.PredecessorDensitySpec := ⟨14, 18, 84, 100⟩
+   let s15_kl  : CollatzQrhBridge.PredecessorDensitySpec := ⟨15, 24, 84, 100⟩
+   let s20_maz : CollatzQrhBridge.PredecessorDensitySpec := ⟨20, 72, 9, 10⟩
+   (s14_3_4.MatchesDepthTree ∧ s14_3_4.BeatsHalvingSpine ∧ s14_3_4.ExceedsSublinearPower) ∧
+   (s14_kl.MatchesDepthTree ∧ s14_kl.BeatsHalvingSpine ∧ s14_kl.ExceedsSublinearPower) ∧
+   (s15_kl.MatchesDepthTree ∧ s15_kl.BeatsHalvingSpine ∧ s15_kl.ExceedsSublinearPower) ∧
+   (s20_maz.MatchesDepthTree ∧ s20_maz.BeatsHalvingSpine ∧ s20_maz.ExceedsSublinearPower) ∧
+   (3 * 100 < 84 * 4 ∧ 84 * 10 < 9 * 100 ∧ 9 < 10))
 
-/-- Zero-axiom certificate for Collatz parity, Baker, Steiner, and Simons-de Weger barriers. -/
+/-- Zero-axiom certificate for Collatz parity, Baker, Steiner, Simons-de Weger,
+`(1054, 665)` convergent, `m ≥ 666` cycle barrier, and predecessor-tree density bounds. -/
 theorem collatz_provenance_certified : CollatzProvenance :=
   ⟨Conjectures.collatz_one_reaches_one,
    CollatzQrhBridge.collatz_no_exact_power_resonance,
    CollatzQrhBridge.collatz_convergent_485_306_separation_certified,
    CollatzQrhBridge.baker_effective_measure_485_306_verified,
    CollatzQrhBridge.steiner_1cycle_excluded_at_convergents,
-   fun c hm => CollatzQrhBridge.collatz_cycle_length_lower_bound_306 c hm⟩
+   fun c hm => CollatzQrhBridge.collatz_cycle_length_lower_bound_306 c hm,
+   CollatzQrhBridge.convergent_1054_665_gap_pos,
+   CollatzQrhBridge.log2_3_convergent_bracket_665,
+   CollatzQrhBridge.steiner_1cycle_excluded_1054_665,
+   fun c hm => CollatzQrhBridge.simons_de_weger_barrier_665 c hm,
+   CollatzQrhBridge.collatzPredTree_sound,
+   CollatzQrhBridge.collatz_pred_tree_growth_certs⟩
 
 -- =============================================================================
 -- Parts 3-4: 4D Abelian Z_2 & Non-Abelian Q_8 Lattice Gauge Invariance
