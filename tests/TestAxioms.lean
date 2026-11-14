@@ -386,4 +386,13 @@ import LeanAsm
 #print axioms EulerFactorNonVanishing.fermat_tower_sigma_three_quarters_lower_bound
 #print axioms EulerFactorNonVanishing.fermat_tower_sigma_one_lower_bound
 
+-- Part 24: High-Height t ~ 10^12 2D Zero-Free Rectangles via PiChudnovsky Phase Reduction (Issue #29)
+#print axioms QuasiRiemann.reduceModTwoPiCentered72_sound
+#print axioms QuasiRiemann.high_height_phase_reduction_1e12
+#print axioms QuasiRiemann.isValidHighDirichletTreeN128_sound
+#print axioms QuasiRiemann.isValidDirichletRect2DN128_sound
+#print axioms QuasiRiemann.buildDirichletRect2DCertN128_implies_valid
+#print axioms QuasiRiemann.sweepDirichletRectangles2DN128_all_valid
+#print axioms QuasiRiemann.high_height_dirichlet_rects_1e12_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean
