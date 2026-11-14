@@ -12,6 +12,7 @@ import LeanAsm.QuasiRiemann.UltraDeep72
 import LeanAsm.QuasiRiemann.AsymptoticZfr
 import LeanAsm.QuasiRiemann.AsymptoticZfrBridge
 import LeanAsm.QuasiRiemann.ZeroDensityBridge
+import LeanAsm.QuasiRiemann.ShortIntervalPrimes
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.Genus2Jacobian
@@ -266,10 +267,51 @@ def ChebyshevBenchmarkProp : Prop :=
    10 * QuasiRiemann.qrhRemainderBoundAtTenPow s336_3 < 10 ^ 336 ∧
    10 * QuasiRiemann.qrhRemainderBoundAtTenPow s336_4 < 10 ^ 336)
 
+/-- Type alias bundling short-interval prime positivity, maximal prime-gap
+contrapositive bounds, and the strict `1/2 < 17/30 < 7/12 < 2/3 < 3/4 < 7/8 < 1`
+rational short-interval exponent ladder. -/
+def ShortIntervalPrimesProp : Prop :=
+  (QuasiRiemann.shortIntervalQrh78Spec.HasGuaranteedPrime ∧
+   QuasiRiemann.shortIntervalQrh34Spec.HasGuaranteedPrime ∧
+   QuasiRiemann.shortIntervalRh12Spec.HasGuaranteedPrime ∧
+   QuasiRiemann.tenPowThetaCeilExp 28 QuasiRiemann.qrhThresholdSevenEighths = 294 ∧
+   QuasiRiemann.tenPowThetaCeilExp 14 QuasiRiemann.qrhThresholdThreeQuarters = 126 ∧
+   QuasiRiemann.tenPowThetaCeilExp 14 (QuasiRiemann.QRat.mk' 1 2) = 84) ∧
+  (let eDH := QuasiRiemann.shortIntervalDensityExponent 2 1
+   let eGM := QuasiRiemann.shortIntervalDensityExponent 30 13
+   let eHux := QuasiRiemann.shortIntervalDensityExponent 12 5
+   let eIng := QuasiRiemann.shortIntervalDensityExponent 3 1
+   let θ34 := QuasiRiemann.qrhThresholdThreeQuarters
+   let θ78 := QuasiRiemann.qrhThresholdSevenEighths
+   QuasiRiemann.QRat.eqv eDH (QuasiRiemann.QRat.mk' 1 2) ∧
+   QuasiRiemann.QRat.eqv eGM (QuasiRiemann.QRat.mk' 17 30) ∧
+   QuasiRiemann.QRat.eqv eHux (QuasiRiemann.QRat.mk' 7 12) ∧
+   QuasiRiemann.QRat.eqv eIng (QuasiRiemann.QRat.mk' 2 3) ∧
+   eDH < eGM ∧ eGM < eHux ∧ eHux < eIng ∧ eIng < θ34 ∧
+   θ34 < θ78 ∧ θ78 < QuasiRiemann.QRat.ofInt 1 ∧
+   QuasiRiemann.QRat.eqv (eHux - eGM) (QuasiRiemann.QRat.mk' 1 60) ∧
+   QuasiRiemann.QRat.eqv (θ78 - eGM) (QuasiRiemann.QRat.mk' 37 120)) ∧
+  (∀ (spec : QuasiRiemann.ChebyshevRemainderSpec)
+      (s : QuasiRiemann.ShortIntervalChebyshevSpec),
+    s.hScaleExp ≤ s.xScaleExp →
+    QuasiRiemann.qrhRemainderBoundAtTwoTenPow spec ≤ s.errUpper →
+    ∀ (psiX psiXH thetaX thetaXH : Int),
+      Int.natAbs (psiX - ((10 ^ s.xScaleExp : Nat) : Int)) ≤ s.errUpper →
+      Int.natAbs (psiXH - ((10 ^ s.xScaleExp + 10 ^ s.hScaleExp : Nat) : Int)) ≤
+        s.errUpper →
+      (psiXH - psiX) - (thetaXH - thetaX) ≤ (s.primePowerCorr : Int) →
+      (thetaXH - thetaX ≤ 0 → ¬ s.HasGuaranteedPrime) ∧
+      (s.HasGuaranteedPrime →
+        ∀ pCurr pNext : Nat,
+          pCurr ≤ 10 ^ s.xScaleExp →
+          (10 ^ s.xScaleExp + 10 ^ s.hScaleExp < pNext → thetaXH - thetaX ≤ 0) →
+          pNext ≤ 10 ^ s.xScaleExp + 10 ^ s.hScaleExp ∧
+          (pCurr = 10 ^ s.xScaleExp → pNext - pCurr ≤ 10 ^ s.hScaleExp)))
+
 /-- Part 5 provenance specification bundling mollifier descent, 2D rectangles down to
 `σ = 0.501`, `t ~ 10^12` phase-reduced rectangles, DVP asymptotic strip, Dirichlet `L^2`
 diagonal dominance, rational zero-density descent (`15/26 < 3/5 < 2/3`), QRH threshold
-ladder `θ ∈ {3/4, 7/8, 11/12, 47/48}`, and Chebyshev remainder envelopes. -/
+ladder `θ ∈ {3/4, 7/8, 11/12, 47/48}`, Chebyshev envelopes, and short-interval primes. -/
 def QuasiRiemannProvenance : Prop :=
   (let th1 := QuasiRiemann.qrhThresholdFromMollifier (QuasiRiemann.QRat.ofInt 1)
    let thHalf := QuasiRiemann.qrhThresholdFromMollifier (QuasiRiemann.QRat.mk' 1 2)
@@ -404,7 +446,8 @@ def QuasiRiemannProvenance : Prop :=
      QuasiRiemann.chebyshevGap θ₂ < QuasiRiemann.chebyshevGap θ₁) ∧
     (θ₁ < zfr ∧ θ₂ < zfr ∧ θ₃ < zfr ∧ θ₄ < zfr)) ∧
   ChebyshevSavingsProp ∧
-  ChebyshevBenchmarkProp
+  ChebyshevBenchmarkProp ∧
+  ShortIntervalPrimesProp
 
 set_option exponentiation.threshold 2000 in
 /-- Zero-axiom certificate for Parts 3-5 analytic QRH, 2D rectangles, DVP, and Chebyshev. -/
@@ -419,7 +462,12 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
    QuasiRiemann.qrh_zero_density_benchmark_certs,
    fun t ht => QuasiRiemann.qrh_theta_ladder_certs t ht,
    QuasiRiemann.qrh_chebyshev_savings_certs,
-   QuasiRiemann.qrh_chebyshev_benchmark_certs⟩
+   QuasiRiemann.qrh_chebyshev_benchmark_certs,
+   ⟨QuasiRiemann.qrh_short_interval_positivity_certs,
+    QuasiRiemann.short_interval_density_ladder_strict,
+    fun spec s hH hE pX pXH tX tXH hBX hBXH hC =>
+      QuasiRiemann.qrh_maximal_prime_gap_bound
+        spec s hH hE pX pXH tX tXH hBX hBXH hC⟩⟩
 
 -- =============================================================================
 -- Parts 6 & 8: RNS Garner & Fermat-Tower / Dedekind Euler Non-Vanishing

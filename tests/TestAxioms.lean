@@ -458,4 +458,13 @@ import LeanAsm
 #print axioms LeanAsm.chudnovskyPi_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 32: Constructive Short-Interval Primes & Rational Exponent Ladder (Issue #49)
+#print axioms QuasiRiemann.qrhRemainderBoundAtTenPow_le_twoTenPow
+#print axioms QuasiRiemann.short_interval_psi_diff_bound
+#print axioms QuasiRiemann.short_interval_spec_guarantees_theta_pos
+#print axioms QuasiRiemann.qrh_maximal_prime_gap_bound
+#print axioms QuasiRiemann.qrh_short_interval_positivity_certs
+#print axioms QuasiRiemann.shortIntervalDensityExponent_eqv_primeGapExponent
+#print axioms QuasiRiemann.short_interval_density_ladder_strict
+
 -- end of file: leanasm/tests/TestAxioms.lean

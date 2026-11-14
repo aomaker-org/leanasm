@@ -208,6 +208,14 @@ def main : IO Unit := do
     s!"10^{e24_3 - e24_1} vs 11/12")
   IO.println (s!"                      x=10^48 θ=3/4 saves 10^{e48_4 - e48_1} vs 47/48; " ++
     "x=10^336 all-rung err < 10^-1")
+  let eDH := (QuasiRiemann.shortIntervalDensityExponent 2 1).reduce
+  let eGM := (QuasiRiemann.shortIntervalDensityExponent 30 13).reduce
+  let eHux := (QuasiRiemann.shortIntervalDensityExponent 12 5).reduce
+  let eIng := (QuasiRiemann.shortIntervalDensityExponent 3 1).reduce
+  IO.println ("  Short-Int Primes  : θ=7/8 [10^336, +10^308], θ=3/4 [10^168, +10^140], " ++
+    "θ=1/2 [10^168, +10^98]")
+  IO.println (s!"  Short-Int Ladder  : {repr eDH} < {repr eGM} (GM) < {repr eHux} (Hux) < " ++
+    s!"{repr eIng} (Ing) < 3/4 < 7/8 < 1 (ZERO axioms)")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"

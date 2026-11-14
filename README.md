@@ -32,13 +32,13 @@ source config_env hum
 # Check toolchain and workspace status
 make status
 
-# Build all 27 modules incrementally with timing budgets
+# Build all 28 modules incrementally with timing budgets
 make build-incremental
 
 # Full build & execute Parts 1-11 + unified provenance CLI demo
 make sync
 
-# Audit transitive axiom closures across Parts 1-31 (0 choice, 0 sorryAx)
+# Audit transitive axiom closures across Parts 1-32 (0 choice, 0 sorryAx)
 lake env lean tests/TestAxioms.lean
 
 # Check submodule hydration status
@@ -61,11 +61,13 @@ kernel-verified computations across all 11 parts:
 4. **Part 4 (`YangMillsQ8`)**: Non-abelian `Q_8 subset SU(2)` quaternion gauge
    multiplication, trace cyclicity, and conjugation invariance.
 5. **Part 5 (`QuasiRiemann`, `UltraDeep72`, `AsymptoticZfr`,
-   `ZeroDensityBridge`)**: Mollifier descent, 2D rectangles down to
-   `sigma = 0.501`, `t ~ 10^12` phase-reduced rectangles, DVP asymptotic ZFR,
-   Dirichlet `L^2` diagonal dominance, rational zero-density descent
-   (`15/26 < 3/5 < 2/3`), QRH threshold ladder `theta in {3/4, 7/8, 11/12,
-   47/48}`, and Chebyshev remainder envelopes (`10^12..10^336`).
+   `ZeroDensityBridge`, `ShortIntervalPrimes`)**: Mollifier descent, 2D
+   rectangles down to `sigma = 0.501`, `t ~ 10^12` phase-reduced rectangles,
+   DVP asymptotic ZFR, Dirichlet `L^2` diagonal dominance, rational
+   zero-density descent (`15/26 < 3/5 < 2/3`), QRH threshold ladder
+   `theta in {3/4, 7/8, 11/12, 47/48}`, Chebyshev remainder envelopes
+   (`10^12..10^336`), short-interval prime positivity (`10^336/10^308`), and
+   the `1/2 < 17/30 < 7/12 < 2/3 < 3/4 < 7/8 < 1` exponent ladder.
 6. **Part 6 (`RnsArithmetic`, `EulerFactorNonVanishing`)**: 3-channel Garner
    CRT execution and Fermat-tower `{5, 17, 257, 65537}` strip bounds
    (`sigma in {1/2, 3/4, 1}`) plus cyclotomic Dedekind splitting across
@@ -85,17 +87,17 @@ kernel-verified computations across all 11 parts:
     `pi`, universal `m >= 8` truncation trap, and unified master certificate
     `LeanAsm.leanasm_full_provenance_certified`.
 
-## 27-Module Theorem Inventory
+## 28-Module Theorem Inventory
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 `QuasiRiemann/`, `PC/` for `PiChudnovsky/`, and `Main.lean` +
-`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-31.
+`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-32.
 `NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `PC` = `PiChudnovsky`.
 
 | Module | NS | Flagship Theorem / Role |
 | --- | --- | --- |
 | `Main.lean` | `(root)` | CLI entrypoint (`Parts 1-11` + provenance) |
-| `LeanAsm.lean` | `(root)` | Library root exporting all 25 submodules |
+| `LeanAsm.lean` | `(root)` | Library root exporting all 26 submodules |
 | `MiniVM.lean` | `=` | `exec_garner_crt_sound`, `mul_mod_reg_correct` |
 | `MiniVMNttBridge.lean` | `=` | `intt4_ntt4_asm_F17_roundtrip` |
 | `Conjectures.lean` | `=` | `collatz_one_reaches_one` |
@@ -108,6 +110,7 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `QR/AsymptoticZfr.lean` | `QR` | `dvp_asymptotic_zero_free_region` |
 | `QR/AsymptoticZfrBridge.lean` | `QR` | `ln2Upper36Scaled_eq_lnInterval36_hi` |
 | `QR/ZeroDensityBridge.lean` | `QR` | `qrh_chebyshev_benchmark_certs` |
+| `QR/ShortIntervalPrimes.lean` | `QR` | `qrh_short_interval_positivity_certs` |
 | `RnsArithmetic.lean` | `=` | `garner_mul_concrete_soundness` |
 | `EulerFactorNonVanishing.lean` | `=` | `local_euler_disk_nonvanishing` |
 | `FiniteFieldRH.lean` | `=` | `hasse_weil_riemann_hypothesis` |
@@ -129,7 +132,8 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
   `steiner_1cycle_excluded_at_convergents`
 - `QuasiRiemann.high_height_dirichlet_rects_1e12_certified`,
   `dirichlet_l2_zeta_and_mobius_certs`,
-  `zero_density_and_dvp_combined_region`, & `qrh_chebyshev_savings_certs`
+  `zero_density_and_dvp_combined_region`, `qrh_chebyshev_savings_certs`,
+  `short_interval_density_ladder_strict`, & `qrh_maximal_prime_gap_bound`
 - `EulerFactorNonVanishing.fermat_tower_euler_product_strip_certs` &
   `fermat_tower_dedekind_euler_strip_certs`
 - `FiniteFieldRH.genus2_L_at_1_qrat` &
@@ -169,12 +173,12 @@ leanasm/
 ├── mk/                      # Modular makefile extensions (hydrate.mk)
 ├── Main.lean                # CLI entrypoint (Parts 1-11 + provenance)
 ├── src/
-│   ├── LeanAsm.lean         # Library root exporting 25 submodules
+│   ├── LeanAsm.lean         # Library root exporting 26 submodules
 │   └── LeanAsm/             # 17 domain modules + PiChudnovsky/ + QuasiRiemann/
 │       ├── ProvenanceSummary.lean
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
-│       └── QuasiRiemann/    # Rat, UltraDeep72, AsymptoticZfr, Bridge, ZD
-├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-31)
+│       └── QuasiRiemann/    # Rat, UltraDeep72, Zfr, Bridge, ZD, ShortInt
+├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-32)
 └── tools/                   # Build and logging utilities
 ```
 
