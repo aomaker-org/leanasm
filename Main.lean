@@ -174,6 +174,15 @@ def main : IO Unit := do
     s!"t=10^12+6.1 spanning σ∈[0.501,0.750]")
   IO.println (s!"                      Total certified 2D Lebesgue area Δσ·Δt = " ++
     s!"{highArea1e12 / 1000000000000}.{padHigh}")
+  let σ34 := QuasiRiemann.qrhThresholdThreeQuarters
+  let zdGM := (QuasiRiemann.zdGuthMaynard.exponent σ34).reduce
+  let zdHux := (QuasiRiemann.zdHuxley.exponent σ34).reduce
+  let zdIng := (QuasiRiemann.zdIngham34.exponent σ34).reduce
+  let gap4 := (QuasiRiemann.chebyshevGap QuasiRiemann.qrhThresholdFortySevenFortyEighths).reduce
+  IO.println (s!"  Zero-Density @3/4 : {repr zdGM} (GM) < {repr zdHux} (Hux) < " ++
+    s!"{repr zdIng} (Ingham), μ(1/2) ∈ \{13/84, 1/6, 1/4}")
+  IO.println (s!"  QRH θ Ladder      : 3/4 < 7/8 < 11/12 < 47/48 < 1 " ++
+    s!"(Chebyshev gaps \{1/4, 1/8, 1/12, {repr gap4}}, < DVP ZFR, ZERO axioms)")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"

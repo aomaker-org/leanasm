@@ -400,4 +400,19 @@ import LeanAsm
 #print axioms WeilZetaBridge.genus2_weil_zeta_functional_eq
 #print axioms WeilZetaBridge.genus2_completed_zeta_reflection
 
+-- Part 26: Zero-Density-to-QRH Descent Bridge (Issue #36)
+#print axioms QuasiRiemann.sublinearAt_iff_exponent_lt_one
+#print axioms QuasiRiemann.exponent_mono_sigma
+#print axioms QuasiRiemann.exponent_mono_slope
+#print axioms QuasiRiemann.sublinearAt_mono_right
+#print axioms QuasiRiemann.muAt_endpoints
+#print axioms QuasiRiemann.muAt_antitone
+#print axioms QuasiRiemann.chebyshevGap_pos_of_lt_one
+#print axioms QuasiRiemann.chebyshevGap_antitone
+#print axioms QuasiRiemann.qrh_zero_density_benchmark_certs
+#print axioms QuasiRiemann.zero_density_implies_qrh_threshold
+#print axioms QuasiRiemann.cDvp_div_octaveLnUpper36_le_inv168
+#print axioms QuasiRiemann.qrh_theta_ladder_certs
+#print axioms QuasiRiemann.zero_density_and_dvp_combined_region
+
 -- end of file: leanasm/tests/TestAxioms.lean
