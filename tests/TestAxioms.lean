@@ -281,9 +281,11 @@ import LeanAsm
 #print axioms PiChudnovsky.pi_105_traps_all_chudnovsky_truncations
 #print axioms PiChudnovsky.pi_100_digits_certified
 
--- Part 14: 72-Digit CRT-NTT Fixed-Point Intervals & N = 128 Down to σ = 0.501 (gemweb048)
+-- Part 14: 72-Digit CRT-NTT Fixed-Point Intervals, Chudnovsky 2π & N = 128 Down to σ = 0.501 (gemweb048)
 #print axioms QuasiRiemann.natMul192ViaCrtNtt_eq_mul
 #print axioms QuasiRiemann.mulInterval72_sound
+#print axioms QuasiRiemann.twoPiInterval72_valid
+#print axioms QuasiRiemann.twoPiInterval72_from_chudnovsky_sound
 #print axioms QuasiRiemann.ln_table_1_to_128_valid
 #print axioms QuasiRiemann.n128_pow_neg_sigma72_sound
 #print axioms QuasiRiemann.buildRect2DCertN128_implies_valid
