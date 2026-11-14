@@ -39,7 +39,7 @@ make build-incremental
 # Full build & execute Parts 1-11 + unified provenance CLI demo
 make sync
 
-# Audit transitive axiom closures across Parts 1-37 (0 choice, 0 sorryAx)
+# Audit transitive axiom closures across Parts 1-38 (0 choice, 0 sorryAx)
 lake env lean tests/TestAxioms.lean
 
 # Check submodule hydration status
@@ -100,7 +100,7 @@ kernel-verified computations across all 11 parts:
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 `QuasiRiemann/`, `PC/` for `PiChudnovsky/`, and `Main.lean` +
-`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-37.
+`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-38.
 `NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `PC` = `PiChudnovsky`.
 
 | Module | NS | Flagship Theorem / Role |
@@ -148,7 +148,8 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
   `ultra_deep_rects_down_to_0501_certified`,
   `high_height_dirichlet_rects_1e12_certified`,
   `crtNtt_phase_reduction_512_sound`, `euler_maclaurin_tail_shrinks_with_N`,
-  `crtNtt_highTrunc_2d_zero_free_rect`, `dirichlet_l2_zeta_and_mobius_certs`,
+  `crtNtt_highTrunc_2d_zero_free_rect`, `cauchy_box_interior_nonvanishing`,
+  `telescoping_box_contraction_cert`, `dirichlet_l2_zeta_and_mobius_certs`,
   `zero_density_and_dvp_combined_region`, `qrh_chebyshev_savings_certs`,
   `short_interval_density_ladder_strict`, `qrh_maximal_prime_gap_bound`,
   `fermat_tower_ap_short_interval_certs`, &
@@ -200,7 +201,7 @@ leanasm/
 │       ├── ProvenanceSummary.lean
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
 │       └── QuasiRiemann/    # Rat, UltraDeep72, Zfr, Bridge, ZD, ShortInt
-├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-37)
+├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-38)
 └── tools/                   # Build and logging utilities
 ```
 

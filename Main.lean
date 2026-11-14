@@ -229,6 +229,9 @@ def main : IO Unit := do
     s!"(mod tail={QuasiRiemann.spec05005_N256_mod.eTail}); " ++
     s!"N=512 (σ=0.50025, t~10^18) {tiles512.length}/4 tiles " ++
     s!"(mod tail={QuasiRiemann.spec050025_N512_mod.eTail})")
+  IO.println (s!"  Cauchy Telescoping: L1 radius {QuasiRiemann.nestedBox1e18_0.radL1} -> " ++
+    s!"{QuasiRiemann.nestedBox1e18_1.radL1} -> {QuasiRiemann.nestedBox1e18_2.radL1} -> " ++
+    s!"{QuasiRiemann.nestedBox1e18_3.radL1} down to σ=0.50025 (b/2 lower bound, ZERO axioms)")
   let σ34 := QuasiRiemann.qrhThresholdThreeQuarters
   let zdGM := (QuasiRiemann.zdGuthMaynard.exponent σ34).reduce
   let zdHux := (QuasiRiemann.zdHuxley.exponent σ34).reduce

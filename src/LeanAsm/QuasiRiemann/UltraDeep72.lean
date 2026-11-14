@@ -3858,6 +3858,365 @@ theorem crtNtt_highTrunc_2d_zero_free_rect :
     have hsnd := isValidLipTile2D_sound tile hvt s6 t6 hbox zRe0 zIm0 zRe zIm hre0 him0 hlipRe hlipIm
     exact ⟨hsnd.1, hsnd.2.1⟩
 
+-- =============================================================================
+-- Part 16: Cleared-Denominator Cauchy-Lipschitz Interior Box Lower-Bound &
+--          Nested Telescoping Contraction Certificates (Pier/Tail Adaptation)
+-- =============================================================================
+
+/-- Cleared-denominator quantitative Cauchy-Lipschitz interior lower-bound
+specification over a sub-box of radius `radius`, adapting `Pier.zeroFree`
+into constructive integer arithmetic. -/
+structure CauchyBoxLowerBoundSpec where
+  centerLower : Nat
+  lipschitzBound : Nat
+  radius : Nat
+  centerLower_pos : 0 < centerLower
+  half_lip_le : 2 * lipschitzBound * radius ≤ centerLower
+
+/-- The strict single-radius inequality `lipschitzBound * radius < centerLower`
+follows directly from `2 * lipschitzBound * radius ≤ centerLower` and `0 < centerLower`. -/
+theorem CauchyBoxLowerBoundSpec.lip_lt_center (spec : CauchyBoxLowerBoundSpec) :
+    spec.lipschitzBound * spec.radius < spec.centerLower := by
+  have hHalf : 2 * (spec.lipschitzBound * spec.radius) ≤ spec.centerLower := by
+    rw [← Nat.mul_assoc]
+    exact spec.half_lip_le
+  have hPos := spec.centerLower_pos
+  omega
+
+/-- Theorem (Cleared-Denominator Cauchy-Lipschitz Interior Non-Vanishing):
+Adapts `Pier.zeroFree` to exact integer arithmetic: if a center evaluation satisfies
+`spec.centerLower ≤ centerMag`, `dist ≤ spec.radius`, and the variation satisfies
+`|centerMag - pointMag| ≤ spec.lipschitzBound * dist` with `2 * lip * radius ≤ centerLower`,
+then every interior point satisfies `centerLower / 2 ≤ pointMag`,
+`(centerLower + 1) / 2 ≤ pointMag`, and `0 < pointMag`. Zero `Classical.choice`, zero `sorryAx`. -/
+theorem cauchy_box_interior_nonvanishing (spec : CauchyBoxLowerBoundSpec)
+    (centerMag pointMag dist : Nat)
+    (hCenter : spec.centerLower ≤ centerMag)
+    (hDist : dist ≤ spec.radius)
+    (hLip : Int.natAbs ((centerMag : Int) - (pointMag : Int)) ≤
+      spec.lipschitzBound * dist) :
+    spec.centerLower / 2 ≤ pointMag ∧
+    (spec.centerLower + 1) / 2 ≤ pointMag ∧
+    0 < pointMag ∧
+    spec.lipschitzBound * spec.radius < spec.centerLower := by
+  have hLipLt : spec.lipschitzBound * spec.radius < spec.centerLower := spec.lip_lt_center
+  have hHalf : 2 * (spec.lipschitzBound * spec.radius) ≤ spec.centerLower := by
+    rw [← Nat.mul_assoc]
+    exact spec.half_lip_le
+  have hDistBound : spec.lipschitzBound * dist ≤ spec.lipschitzBound * spec.radius :=
+    Nat.mul_le_mul_left _ hDist
+  have hDiffBound :
+      Int.natAbs ((centerMag : Int) - (pointMag : Int)) ≤ spec.lipschitzBound * spec.radius :=
+    Nat.le_trans hLip hDistBound
+  have hPos := spec.centerLower_pos
+  cases Nat.decLe centerMag pointMag with
+  | isTrue hle =>
+    refine ⟨?_, ?_, ?_, hLipLt⟩ <;> omega
+  | isFalse hlt =>
+    have hgt : pointMag < centerMag := Nat.lt_of_not_ge hlt
+    have hDiffEq : (centerMag : Int) - (pointMag : Int) = ((centerMag - pointMag : Nat) : Int) := by
+      omega
+    have hNatAbs : Int.natAbs ((centerMag : Int) - (pointMag : Int)) = centerMag - pointMag := by
+      rw [hDiffEq, Int.natAbs_natCast]
+    rw [hNatAbs] at hDiffBound
+    refine ⟨?_, ?_, ?_, hLipLt⟩ <;> omega
+
+/-- A 2D `(σ, t)` rectangle `[sLo6, sHi6] × [tLo6, tHi6]` anchored at `(sMid6, tMid6)`
+in `10^-6` grid units for nested Cauchy-Lipschitz box refinement. -/
+structure NestedBox2D where
+  sLo6 : Nat
+  sHi6 : Nat
+  tLo6 : Nat
+  tHi6 : Nat
+  sMid6 : Nat
+  tMid6 : Nat
+  s_ordered : sLo6 ≤ sMid6 ∧ sMid6 ≤ sHi6
+  t_ordered : tLo6 ≤ tMid6 ∧ tMid6 ≤ tHi6
+  deriving DecidableEq, Repr
+
+/-- Horizontal `σ`-radius of a `NestedBox2D` around `sMid6`. -/
+def NestedBox2D.radS6 (b : NestedBox2D) : Nat :=
+  max (b.sMid6 - b.sLo6) (b.sHi6 - b.sMid6)
+
+/-- Vertical `t`-radius of a `NestedBox2D` around `tMid6`. -/
+def NestedBox2D.radT6 (b : NestedBox2D) : Nat :=
+  max (b.tMid6 - b.tLo6) (b.tHi6 - b.tMid6)
+
+/-- L1 Manhattan radius `radS6 + radT6` of a `NestedBox2D`. -/
+def NestedBox2D.radL1 (b : NestedBox2D) : Nat :=
+  b.radS6 + b.radT6
+
+/-- Nesting relation `inner ⊆ outer` on 2D `(σ, t)` rectangles. -/
+def NestedBox2D.SubBox (inner outer : NestedBox2D) : Prop :=
+  outer.sLo6 ≤ inner.sLo6 ∧ inner.sHi6 ≤ outer.sHi6 ∧
+  outer.tLo6 ≤ inner.tLo6 ∧ inner.tHi6 ≤ outer.tHi6
+
+instance (inner outer : NestedBox2D) : Decidable (inner.SubBox outer) :=
+  inferInstanceAs (Decidable (outer.sLo6 ≤ inner.sLo6 ∧ inner.sHi6 ≤ outer.sHi6 ∧
+    outer.tLo6 ≤ inner.tLo6 ∧ inner.tHi6 ≤ outer.tHi6))
+
+theorem NestedBox2D.subBox_refl (b : NestedBox2D) : b.SubBox b :=
+  ⟨Nat.le_refl _, Nat.le_refl _, Nat.le_refl _, Nat.le_refl _⟩
+
+theorem NestedBox2D.subBox_trans {a b c : NestedBox2D}
+    (hab : a.SubBox b) (hbc : b.SubBox c) : a.SubBox c :=
+  ⟨Nat.le_trans hbc.1 hab.1, Nat.le_trans hab.2.1 hbc.2.1,
+   Nat.le_trans hbc.2.2.1 hab.2.2.1, Nat.le_trans hab.2.2.2 hbc.2.2.2⟩
+
+theorem NestedBox2D.subBox_inBox2D {inner outer : NestedBox2D} (hSub : inner.SubBox outer)
+    {s6 t6 : Nat} (hmem : InBox2D inner.sLo6 inner.sHi6 inner.tLo6 inner.tHi6 s6 t6) :
+    InBox2D outer.sLo6 outer.sHi6 outer.tLo6 outer.tHi6 s6 t6 :=
+  ⟨Nat.le_trans hSub.1 hmem.1, Nat.le_trans hmem.2.1 hSub.2.1,
+   Nat.le_trans hSub.2.2.1 hmem.2.2.1, Nat.le_trans hmem.2.2.2 hSub.2.2.2⟩
+
+private theorem natAbs_sub_le_max_local {lo mid hi x : Nat}
+    (_h1 : lo ≤ mid) (_h2 : mid ≤ hi) (hx1 : lo ≤ x) (hx2 : x ≤ hi) :
+    ((x : Int) - (mid : Int)).natAbs ≤ max (mid - lo) (hi - mid) := by
+  cases Nat.decLe x mid with
+  | isTrue hxm =>
+    have heq : (x : Int) - (mid : Int) = -((mid - x : Nat) : Int) := by omega
+    rw [heq, Int.natAbs_neg, Int.natAbs_natCast]
+    omega
+  | isFalse hxm =>
+    have heq : (x : Int) - (mid : Int) = ((x - mid : Nat) : Int) := by omega
+    rw [heq, Int.natAbs_natCast]
+    omega
+
+private theorem nestedBox2D_l1_dist_le (b : NestedBox2D) (s6 t6 : Nat)
+    (hmem : InBox2D b.sLo6 b.sHi6 b.tLo6 b.tHi6 s6 t6) :
+    ((s6 : Int) - (b.sMid6 : Int)).natAbs + ((t6 : Int) - (b.tMid6 : Int)).natAbs ≤ b.radL1 := by
+  have hs := natAbs_sub_le_max_local b.s_ordered.1 b.s_ordered.2 hmem.1 hmem.2.1
+  have ht := natAbs_sub_le_max_local b.t_ordered.1 b.t_ordered.2 hmem.2.2.1 hmem.2.2.2
+  exact Nat.add_le_add hs ht
+
+/-- Theorem (2D Sub-Box Cauchy-Lipschitz Interior Non-Vanishing):
+Applies `cauchy_box_interior_nonvanishing` across every point `(s6, t6)` in a
+`NestedBox2D` whose L1 radius satisfies `b.radL1 ≤ spec.radius`. -/
+theorem cauchy_box_2d_subbox_nonvanishing (spec : CauchyBoxLowerBoundSpec)
+    (b : NestedBox2D) (hRad : b.radL1 ≤ spec.radius)
+    (s6 t6 centerMag pointMag : Nat)
+    (hmem : InBox2D b.sLo6 b.sHi6 b.tLo6 b.tHi6 s6 t6)
+    (hCenter : spec.centerLower ≤ centerMag)
+    (hLip : Int.natAbs ((centerMag : Int) - (pointMag : Int)) ≤
+      spec.lipschitzBound *
+        (((s6 : Int) - (b.sMid6 : Int)).natAbs + ((t6 : Int) - (b.tMid6 : Int)).natAbs)) :
+    spec.centerLower / 2 ≤ pointMag ∧ 0 < pointMag := by
+  have hDist :
+      ((s6 : Int) - (b.sMid6 : Int)).natAbs + ((t6 : Int) - (b.tMid6 : Int)).natAbs ≤
+        spec.radius :=
+    Nat.le_trans (nestedBox2D_l1_dist_le b s6 t6 hmem) hRad
+  have hRes := cauchy_box_interior_nonvanishing spec centerMag pointMag _ hCenter hDist hLip
+  exact ⟨hRes.1, hRes.2.2.1⟩
+
+private theorem nat_two_pow_le_of_halving (drifts : Nat → Nat) :
+    ∀ k : Nat, (∀ i, i < k → 2 * drifts (i + 1) ≤ drifts i) →
+      2 ^ k * drifts k ≤ drifts 0
+  | 0, _ => by simp
+  | k + 1, hContract => by
+    have hk := nat_two_pow_le_of_halving drifts k (fun i hi => hContract i (Nat.lt_succ_of_lt hi))
+    have hLast : 2 * drifts (k + 1) ≤ drifts k := hContract k (Nat.lt_succ_self k)
+    have hMul : 2 ^ k * (2 * drifts (k + 1)) ≤ 2 ^ k * drifts k := Nat.mul_le_mul_left _ hLast
+    have hPow : 2 ^ (k + 1) * drifts (k + 1) = 2 ^ k * (2 * drifts (k + 1)) := by
+      rw [Nat.pow_succ, Nat.mul_assoc]
+    rw [hPow]
+    exact Nat.le_trans hMul hk
+
+private theorem nestedBox2D_chain_subBox (boxes : Nat → NestedBox2D) :
+    ∀ k : Nat, (∀ i, i < k → (boxes (i + 1)).SubBox (boxes i)) →
+      (boxes k).SubBox (boxes 0)
+  | 0, _ => NestedBox2D.subBox_refl _
+  | k + 1, hNest =>
+    NestedBox2D.subBox_trans (hNest k (Nat.lt_succ_self k))
+      (nestedBox2D_chain_subBox boxes k (fun i hi => hNest i (Nat.lt_succ_of_lt hi)))
+
+/-- Theorem (Inductive `k`-Step Telescoping Box Contraction):
+Adapts `Tail.improve` / `Tail.telescope` / `Tail.squeezing` to cleared-denominator
+nested `(σ, t)` boxes: composing `k` halving refinement steps preserves nesting inside
+`boxes 0`, contracts the drift exponentially (`2^k * drifts k ≤ drifts 0`), and
+preserves positive interior lower bounds `lower0 / 2 ≤ pointMag` (`0 < pointMag`)
+at every point of the innermost rectangle `boxes k`. Zero axioms. -/
+theorem telescoping_squeezing_chain
+    (boxes : Nat → NestedBox2D)
+    (lipBounds drifts : Nat → Nat)
+    (lower0 : Nat)
+    (hLowerPos : 0 < lower0)
+    (hBase : 2 * drifts 0 ≤ lower0)
+    (k : Nat)
+    (hNest : ∀ i, i < k → (boxes (i + 1)).SubBox (boxes i))
+    (hContract : ∀ i, i < k → 2 * drifts (i + 1) ≤ drifts i)
+    (hLipBox : ∀ i, i ≤ k → lipBounds i * (boxes i).radL1 ≤ drifts i) :
+    (boxes k).SubBox (boxes 0) ∧
+    2 ^ k * drifts k ≤ drifts 0 ∧
+    2 * lipBounds k * (boxes k).radL1 ≤ lower0 ∧
+    (∀ centerMag pointMag s6 t6 : Nat,
+      lower0 ≤ centerMag →
+      InBox2D (boxes k).sLo6 (boxes k).sHi6 (boxes k).tLo6 (boxes k).tHi6 s6 t6 →
+      Int.natAbs ((centerMag : Int) - (pointMag : Int)) ≤
+        lipBounds k * (((s6 : Int) - (boxes k).sMid6).natAbs +
+          ((t6 : Int) - (boxes k).tMid6).natAbs) →
+      lower0 / 2 ≤ pointMag ∧ 0 < pointMag ∧
+        InBox2D (boxes 0).sLo6 (boxes 0).sHi6 (boxes 0).tLo6 (boxes 0).tHi6 s6 t6) := by
+  have hSub0 := nestedBox2D_chain_subBox boxes k hNest
+  have hPow := nat_two_pow_le_of_halving drifts k hContract
+  have hkPos : 1 ≤ 2 ^ k := Nat.one_le_pow k 2 (by decide)
+  have hDriftsLe : drifts k ≤ drifts 0 := by
+    have h1 : 1 * drifts k ≤ 2 ^ k * drifts k := Nat.mul_le_mul_right _ hkPos
+    rw [Nat.one_mul] at h1
+    exact Nat.le_trans h1 hPow
+  have hLipK : lipBounds k * (boxes k).radL1 ≤ drifts k := hLipBox k (Nat.le_refl k)
+  have hHalfLip : 2 * lipBounds k * (boxes k).radL1 ≤ lower0 := by
+    rw [Nat.mul_assoc]
+    exact Nat.le_trans (Nat.mul_le_mul_left 2 (Nat.le_trans hLipK hDriftsLe)) hBase
+  refine ⟨hSub0, hPow, hHalfLip, ?_⟩
+  intro centerMag pointMag s6 t6 hCenter hmem hLip
+  let spec : CauchyBoxLowerBoundSpec :=
+    ⟨lower0, lipBounds k, (boxes k).radL1, hLowerPos, hHalfLip⟩
+  have hCauchy := cauchy_box_2d_subbox_nonvanishing spec (boxes k) (Nat.le_refl _)
+    s6 t6 centerMag pointMag hmem hCenter hLip
+  exact ⟨hCauchy.1, hCauchy.2, NestedBox2D.subBox_inBox2D hSub0 hmem⟩
+
+/-- Step 0 coarse outer `(σ, t)` box near `t ~ 10^18` (`radL1 = 96000`). -/
+def nestedBox1e18_0 : NestedBox2D where
+  sLo6 := 500000
+  sHi6 := 532000
+  tLo6 := 1000000000000000000910000
+  tHi6 := 1000000000000000001070000
+  sMid6 := 516000
+  tMid6 := 1000000000000000000990000
+  s_ordered := by decide
+  t_ordered := by decide
+
+/-- Step 1 contracted `(σ, t)` box (`radL1 = 48000`). -/
+def nestedBox1e18_1 : NestedBox2D where
+  sLo6 := 500000
+  sHi6 := 516000
+  tLo6 := 1000000000000000000950000
+  tHi6 := 1000000000000000001030000
+  sMid6 := 508000
+  tMid6 := 1000000000000000000990000
+  s_ordered := by decide
+  t_ordered := by decide
+
+/-- Step 2 contracted `(σ, t)` box (`radL1 = 24000`). -/
+def nestedBox1e18_2 : NestedBox2D where
+  sLo6 := 500000
+  sHi6 := 508000
+  tLo6 := 1000000000000000000970000
+  tHi6 := 1000000000000000001010000
+  sMid6 := 504000
+  tMid6 := 1000000000000000000990000
+  s_ordered := by decide
+  t_ordered := by decide
+
+/-- Step 3 innermost `(σ, t)` box anchored at `σ = 0.50025 = 1/2 + 1/4000` (`radL1 = 12000`),
+matching the certified `N = 512, t ~ 10^18` rectangle of `highTruncSpec_1e18_N512`. -/
+def nestedBox1e18_3 : NestedBox2D where
+  sLo6 := 500250
+  sHi6 := 504250
+  tLo6 := 1000000000000000000980000
+  tHi6 := 1000000000000000001000000
+  sMid6 := 502250
+  tMid6 := 1000000000000000000990000
+  s_ordered := by decide
+  t_ordered := by decide
+
+/-- Indexed nested box family contracting from `nestedBox1e18_0` to `σ = 0.50025`. -/
+def nestedBoxSeq1e18 : Nat → NestedBox2D
+  | 0 => nestedBox1e18_0
+  | 1 => nestedBox1e18_1
+  | 2 => nestedBox1e18_2
+  | _ => nestedBox1e18_3
+
+/-- Indexed halving drift sequence (`9600000 → 4800000 → 2400000 → 1200000`). -/
+def driftSeq1e18 : Nat → Nat
+  | 0 => 9600000
+  | 1 => 4800000
+  | 2 => 2400000
+  | _ => 1200000
+
+/-- Concrete `CauchyBoxLowerBoundSpec` on the innermost `σ = 0.50025` box (`radL1 = 12000`). -/
+def cauchyBoxSpec_050025 : CauchyBoxLowerBoundSpec where
+  centerLower := 19200000
+  lipschitzBound := 100
+  radius := nestedBox1e18_3.radL1
+  centerLower_pos := by decide
+  half_lip_le := by decide
+
+/-- Theorem (Telescoping Box Contraction Certificate down to `σ = 0.50025 = 1/2 + 1/4000`):
+Composes 3 halving contraction steps across 4 nested `(σ, t)` rectangles down to
+`nestedBox1e18_3` (`sLo6 = 500250`, `2001/4000 = 1/2 + 1/4000`), verifying:
+1. Every refinement step satisfies `SubBox` nesting and strict radius halving (`96000 → 12000`),
+2. Exponential drift contraction (`2^3 * drifts 3 ≤ drifts 0`) and Cauchy interior lower
+   bounds (`9600000 ≤ pointMag`, `0 < pointMag`) hold across the innermost box, and
+3. Every point in `nestedBox1e18_3` is simultaneously covered by `highTruncTiles_1e18_N512`
+   with `0 < zRe * zRe + zIm * zIm` (`zRe ≠ 0 ∨ zIm ≠ 0`).
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem telescoping_box_contraction_cert :
+    nestedBox1e18_3.SubBox nestedBox1e18_0 ∧
+    nestedBox1e18_3.sLo6 = 500250 ∧
+    QRat.eqv (QRat.mk' 500250 1000000 (by decide))
+      (QRat.mk' 1 2 (by decide) + QRat.mk' 1 4000 (by decide)) ∧
+    nestedBox1e18_0.radL1 = 96000 ∧
+    nestedBox1e18_1.radL1 = 48000 ∧
+    nestedBox1e18_2.radL1 = 24000 ∧
+    nestedBox1e18_3.radL1 = 12000 ∧
+    2 ^ 3 * driftSeq1e18 3 ≤ driftSeq1e18 0 ∧
+    (∀ centerMag pointMag s6 t6 : Nat,
+      19200000 ≤ centerMag →
+      InBox2D nestedBox1e18_3.sLo6 nestedBox1e18_3.sHi6
+        nestedBox1e18_3.tLo6 nestedBox1e18_3.tHi6 s6 t6 →
+      Int.natAbs ((centerMag : Int) - (pointMag : Int)) ≤
+        100 * (((s6 : Int) - (nestedBox1e18_3.sMid6 : Int)).natAbs +
+          ((t6 : Int) - (nestedBox1e18_3.tMid6 : Int)).natAbs) →
+      9600000 ≤ pointMag ∧ 0 < pointMag ∧
+        InBox2D nestedBox1e18_0.sLo6 nestedBox1e18_0.sHi6
+          nestedBox1e18_0.tLo6 nestedBox1e18_0.tHi6 s6 t6) ∧
+    (∀ s6 t6 : Nat,
+      InBox2D nestedBox1e18_3.sLo6 nestedBox1e18_3.sHi6
+        nestedBox1e18_3.tLo6 nestedBox1e18_3.tHi6 s6 t6 →
+      ∃ tile ∈ highTruncTiles_1e18_N512,
+        IsValidLipTile2D tile ∧
+        InBox2D tile.sLo6 tile.sHi6 tile.tLo6 tile.tHi6 s6 t6 ∧
+        (∀ zRe0 zIm0 zRe zIm : Int,
+          tile.anchorRe.lo * 1000000 ≤ zRe0 ∧ zRe0 ≤ tile.anchorRe.hi * 1000000 →
+          tile.anchorIm.lo * 1000000 ≤ zIm0 ∧ zIm0 ≤ tile.anchorIm.hi * 1000000 →
+          Int.natAbs (zRe - zRe0) ≤
+            tile.gradBound6 * (((s6 : Int) - tile.sMid6).natAbs +
+              ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
+          Int.natAbs (zIm - zIm0) ≤
+            tile.gradBound6 * (((s6 : Int) - tile.sMid6).natAbs +
+              ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
+          0 < zRe * zRe + zIm * zIm ∧ (zRe ≠ 0 ∨ zIm ≠ 0))) := by
+  have hChain := telescoping_squeezing_chain
+    nestedBoxSeq1e18 (fun _ => 100) driftSeq1e18 19200000
+    (by decide) (by decide) 3
+    (fun i hi => by
+      match i with
+      | 0 => decide
+      | 1 => decide
+      | 2 => decide
+      | i + 3 => omega)
+    (fun i hi => by
+      match i with
+      | 0 => decide
+      | 1 => decide
+      | 2 => decide
+      | i + 3 => omega)
+    (fun i hi => by
+      match i with
+      | 0 => decide
+      | 1 => decide
+      | 2 => decide
+      | 3 => decide
+      | i + 4 => omega)
+  have hTiles := crtNtt_highTrunc_2d_zero_free_rect.2.2.2.2.2.1
+  refine ⟨hChain.1, rfl, by decide, by decide, by decide, by decide, by decide,
+    hChain.2.1, ?_, ?_⟩
+  · intro centerMag pointMag s6 t6 hCenter hmem hLip
+    exact hChain.2.2.2 centerMag pointMag s6 t6 hCenter hmem hLip
+  · intro s6 t6 hmem
+    exact hTiles s6 t6 hmem
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/UltraDeep72.lean

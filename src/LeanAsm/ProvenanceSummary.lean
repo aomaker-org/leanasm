@@ -501,7 +501,51 @@ def HighTruncRectProvenanceProp : Prop :=
              ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
          0 < zRe * zRe + zIm * zIm ∧ (zRe ≠ 0 ∨ zIm ≠ 0))) ∧
    QuasiRiemann.highTruncSpec_1e12_N256.HasCertifiedNonVanishing ∧
-   QuasiRiemann.highTruncSpec_1e18_N512.HasCertifiedNonVanishing)
+   QuasiRiemann.highTruncSpec_1e18_N512.HasCertifiedNonVanishing) ∧
+  (∀ (spec : QuasiRiemann.CauchyBoxLowerBoundSpec) (centerMag pointMag dist : Nat),
+     spec.centerLower ≤ centerMag →
+     dist ≤ spec.radius →
+     Int.natAbs ((centerMag : Int) - (pointMag : Int)) ≤ spec.lipschitzBound * dist →
+     spec.centerLower / 2 ≤ pointMag ∧ (spec.centerLower + 1) / 2 ≤ pointMag ∧
+       0 < pointMag ∧ spec.lipschitzBound * spec.radius < spec.centerLower) ∧
+  (QuasiRiemann.nestedBox1e18_3.SubBox QuasiRiemann.nestedBox1e18_0 ∧
+   QuasiRiemann.nestedBox1e18_3.sLo6 = 500250 ∧
+   QuasiRiemann.QRat.eqv (QuasiRiemann.QRat.mk' 500250 1000000 (by decide))
+     (QuasiRiemann.QRat.mk' 1 2 (by decide) + QuasiRiemann.QRat.mk' 1 4000 (by decide)) ∧
+   QuasiRiemann.nestedBox1e18_0.radL1 = 96000 ∧
+   QuasiRiemann.nestedBox1e18_1.radL1 = 48000 ∧
+   QuasiRiemann.nestedBox1e18_2.radL1 = 24000 ∧
+   QuasiRiemann.nestedBox1e18_3.radL1 = 12000 ∧
+   2 ^ 3 * QuasiRiemann.driftSeq1e18 3 ≤ QuasiRiemann.driftSeq1e18 0 ∧
+   (∀ centerMag pointMag s6 t6 : Nat,
+     19200000 ≤ centerMag →
+     QuasiRiemann.InBox2D QuasiRiemann.nestedBox1e18_3.sLo6
+       QuasiRiemann.nestedBox1e18_3.sHi6 QuasiRiemann.nestedBox1e18_3.tLo6
+       QuasiRiemann.nestedBox1e18_3.tHi6 s6 t6 →
+     Int.natAbs ((centerMag : Int) - (pointMag : Int)) ≤
+       100 * (((s6 : Int) - (QuasiRiemann.nestedBox1e18_3.sMid6 : Int)).natAbs +
+         ((t6 : Int) - (QuasiRiemann.nestedBox1e18_3.tMid6 : Int)).natAbs) →
+     9600000 ≤ pointMag ∧ 0 < pointMag ∧
+       QuasiRiemann.InBox2D QuasiRiemann.nestedBox1e18_0.sLo6
+         QuasiRiemann.nestedBox1e18_0.sHi6 QuasiRiemann.nestedBox1e18_0.tLo6
+         QuasiRiemann.nestedBox1e18_0.tHi6 s6 t6) ∧
+   (∀ s6 t6 : Nat,
+     QuasiRiemann.InBox2D QuasiRiemann.nestedBox1e18_3.sLo6
+       QuasiRiemann.nestedBox1e18_3.sHi6 QuasiRiemann.nestedBox1e18_3.tLo6
+       QuasiRiemann.nestedBox1e18_3.tHi6 s6 t6 →
+     ∃ tile ∈ QuasiRiemann.highTruncTiles_1e18_N512,
+       QuasiRiemann.IsValidLipTile2D tile ∧
+       QuasiRiemann.InBox2D tile.sLo6 tile.sHi6 tile.tLo6 tile.tHi6 s6 t6 ∧
+       (∀ zRe0 zIm0 zRe zIm : Int,
+         tile.anchorRe.lo * 1000000 ≤ zRe0 ∧ zRe0 ≤ tile.anchorRe.hi * 1000000 →
+         tile.anchorIm.lo * 1000000 ≤ zIm0 ∧ zIm0 ≤ tile.anchorIm.hi * 1000000 →
+         Int.natAbs (zRe - zRe0) ≤
+           tile.gradBound6 * (((s6 : Int) - tile.sMid6).natAbs +
+             ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
+         Int.natAbs (zIm - zIm0) ≤
+           tile.gradBound6 * (((s6 : Int) - tile.sMid6).natAbs +
+             ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
+         0 < zRe * zRe + zIm * zIm ∧ (zRe ≠ 0 ∨ zIm ≠ 0))))
 
 /-- Part 5 provenance specification bundling mollifier descent, 2D rectangles down to
 `σ = 0.501`, `t ~ 10^12` phase-reduced rectangles, DVP asymptotic strip, Dirichlet `L^2`
@@ -672,7 +716,10 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
     QuasiRiemann.sub_three_quarters_qrh_ladder_certs⟩,
    ⟨QuasiRiemann.crtNtt_phase_reduction_512_sound,
     QuasiRiemann.euler_maclaurin_tail_shrinks_with_N,
-    QuasiRiemann.crtNtt_highTrunc_2d_zero_free_rect⟩⟩
+    QuasiRiemann.crtNtt_highTrunc_2d_zero_free_rect,
+    fun spec centerMag pointMag dist hC hD hL =>
+      QuasiRiemann.cauchy_box_interior_nonvanishing spec centerMag pointMag dist hC hD hL,
+    QuasiRiemann.telescoping_box_contraction_cert⟩⟩
 
 -- =============================================================================
 -- Parts 6 & 8: RNS Garner & Fermat-Tower / Dedekind Euler Non-Vanishing
