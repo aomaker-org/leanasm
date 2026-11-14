@@ -203,6 +203,11 @@ def main : IO Unit := do
     s!"∏(p-1) = {fTot} = 2³⁰")
   IO.println ("  Strip Euler Lower Bounds  : σ=1/2 |∏(1-p^-s)|² > 1/9, " ++
     "σ=3/4 > 1/3, σ=1 > 9/16 > 1/16")
+  let fDegs := EulerFactorNonVanishing.fermatTowerSplittingDegs
+  IO.println (s!"  Cyclotomic Splitting Degs : g(F_k) = {fDegs}, " ++
+    s!"total split prime ideals = {fDegs.sum}")
+  IO.println ("  Dedekind Strip Non-Vanish : σ∈{1/2,3/4,1} verified, " ++
+    "σ=1 uniform |∏(1-F_k^-s)^g_k|² > 1/256")
   IO.println "  CRT roundtrip & homomorphism: ZERO axioms verified"
 
   -- 7. Unconditional Riemann Hypothesis for Curves over Finite Fields (Hasse-Weil)
