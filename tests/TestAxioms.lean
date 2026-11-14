@@ -509,4 +509,13 @@ import LeanAsm
 #print axioms LeanAsm.quasiRiemann_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 37: Cauchy-Lipschitz Interior Box Lower-Bound & Telescoping Contraction
+#print axioms QuasiRiemann.CauchyBoxLowerBoundSpec.lip_lt_center
+#print axioms QuasiRiemann.cauchy_box_interior_nonvanishing
+#print axioms QuasiRiemann.cauchy_box_2d_subbox_nonvanishing
+#print axioms QuasiRiemann.telescoping_squeezing_chain
+#print axioms QuasiRiemann.telescoping_box_contraction_cert
+#print axioms LeanAsm.quasiRiemann_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean

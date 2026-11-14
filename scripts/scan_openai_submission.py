@@ -90,6 +90,17 @@ CONCEPT_WEIGHTS: dict[str, int] = {
 }
 
 WORD_TOKEN_CONCEPTS = {"psi", "theta", "zeta", "QRH"}
+COLLISION_PENALTIES: dict[str, int] = {
+    "Axis": 22,
+    "Wick": 22,
+    "WardBin": 22,
+    "SmallField": 20,
+    "Plaquette": 18,
+    "Wilson": 18,
+    "Fermion": 18,
+    "Gauge": 14,
+    "PriceCompiler": 20,
+}
 FRAC_PATTERNS = {
     "7/8": re.compile(r"(?:^|[^\d])7/8(?:[^\d]|$)"),
     "7 / 8": re.compile(r"(?:^|[^\d])7\s+/\s+8(?:[^\d]|$)"),
@@ -841,12 +852,23 @@ def classify_portability(
     return "CLEARED_DENOMINATOR_ADAPTATION"
 
 
+def match_collisions(text: str) -> list[str]:
+    """Return Yang-Mills lattice/field collision keywords found in text."""
+    if not text:
+        return []
+    lower = text.lower()
+    return sorted(
+        term for term in COLLISION_PENALTIES if term.lower() in lower
+    )
+
+
 def run_pass_c(toc: dict[str, Any]) -> dict[str, Any]:
     """Execute Pass C: score, map, and classify QRH 7/8 candidate declarations."""
     LOG.info("Pass C: scoring QRH 7/8 candidate declarations")
     candidates: list[dict[str, Any]] = []
     class_counts: Counter[str] = Counter()
     target_counts: Counter[str] = Counter()
+    penalized_count = 0
 
     for fdata in toc["files"]:
         rel_path = fdata["path"]
@@ -861,16 +883,30 @@ def run_pass_c(toc: dict[str, Any]) -> dict[str, Any]:
             if not all_hits:
                 continue
 
-            score = (
+            raw_score = (
                 sum(CONCEPT_WEIGHTS[c] * 3 for c in name_hits)
                 + sum(CONCEPT_WEIGHTS[c] * 2 for c in doc_hits)
                 + sum(CONCEPT_WEIGHTS[c] * 2 for c in sig_hits)
                 + sum(CONCEPT_WEIGHTS[c] for c in body_hits)
             )
             if d["kind"] in ("theorem", "lemma"):
-                score += 4
+                raw_score += 4
             elif d["kind"] in ("def", "structure"):
-                score += 2
+                raw_score += 2
+
+            meta_text = " ".join(
+                (
+                    d["full_name"],
+                    rel_path,
+                    d["signature"],
+                    d.get("docstring") or "",
+                )
+            )
+            collisions = match_collisions(meta_text)
+            penalty = sum(COLLISION_PENALTIES[c] for c in collisions)
+            if penalty > 0:
+                penalized_count += 1
+            score = raw_score - penalty
 
             portability = classify_portability(d, hyg)
             target_mod = map_target_module(all_hits)
@@ -881,6 +917,9 @@ def run_pass_c(toc: dict[str, Any]) -> dict[str, Any]:
             candidates.append(
                 {
                     "score": score,
+                    "raw_score": raw_score,
+                    "penalty": penalty,
+                    "collisions": collisions,
                     "path": rel_path,
                     "line": d["line"],
                     "kind": d["kind"],
@@ -897,9 +936,14 @@ def run_pass_c(toc: dict[str, Any]) -> dict[str, Any]:
     candidates.sort(
         key=lambda c: (-c["score"], c["path"], c["line"], c["full_name"])
     )
-    LOG.info("Pass C complete: %d matching declarations", len(candidates))
+    LOG.info(
+        "Pass C complete: %d matching declarations (%d collision-penalized)",
+        len(candidates),
+        penalized_count,
+    )
     return {
         "total_candidates": len(candidates),
+        "penalized_candidates": penalized_count,
         "classification_counts": dict(sorted(class_counts.items())),
         "target_module_counts": dict(sorted(target_counts.items())),
         "candidates": candidates,
@@ -1337,10 +1381,12 @@ def render_lean_toc_md(toc: dict[str, Any]) -> list[str]:
     return lines
 
 
-def render_qrh_candidates_md(report: dict[str, Any]) -> list[str]:
+def render_qrh_candidates_md(
+    report: dict[str, Any], pure_files: list[dict[str, Any]]
+) -> list[str]:
     """Render Pass C QRH_7_8_CANDIDATES.md body lines."""
     lines: list[str] = [
-        "# QRH 7/8 Relevance Scan & Portability Candidates",
+        "# QRH 7/8 Relevance Scan & Portability Candidates (v2)",
         "",
         "## 1. Summary & Classification Breakdown",
         "",
@@ -1350,8 +1396,18 @@ def render_qrh_candidates_md(report: dict[str, Any]) -> list[str]:
             [
                 ("Total Matched Decls", f"{report['total_candidates']:,}"),
                 (
+                    "YM Collision Penalized",
+                    f"{report.get('penalized_candidates', 0):,}",
+                ),
+                (
                     "Concepts Scanned",
                     ", ".join(sorted(CONCEPT_WEIGHTS.keys())),
+                ),
+                (
+                    "Collision Penalties",
+                    ", ".join(
+                        f"{k}(-{v})" for k, v in sorted(COLLISION_PENALTIES.items())
+                    ),
                 ),
             ]
         )
@@ -1425,6 +1481,32 @@ def render_qrh_candidates_md(report: dict[str, Any]) -> list[str]:
                 )
             )
         lines.append("")
+
+    lines.extend(
+        [
+            f"## 7. Pure Constructive Files & Declarations (All {len(pure_files)} Files)",
+            "",
+        ]
+    )
+    for idx, pf in enumerate(pure_files, start=1):
+        decls = pf["declarations"]
+        lines.extend(
+            wrap_text_lines(
+                f"{idx}. `{pf['path']}` ({pf['line_count']}L, {len(decls)} decls)",
+                sub_indent="   ",
+            )
+        )
+        if not decls:
+            lines.append("   - (no top-level declarations)")
+            continue
+        for d in decls:
+            lines.extend(
+                wrap_text_lines(
+                    f"- L{d['line']} `{d['kind']} {d['full_name']}`",
+                    indent="   ",
+                    sub_indent="     ",
+                )
+            )
     return lines
 
 
@@ -1495,10 +1577,13 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     qrh_report = run_pass_c(toc)
+    pure_files = [
+        f for f in toc["files"] if f["hygiene"]["leanasm_pure_constructive"]
+    ]
     write_checked_markdown(
         out_dir / "QRH_7_8_CANDIDATES.md",
         f"{repo_prefix}/QRH_7_8_CANDIDATES.md",
-        render_qrh_candidates_md(qrh_report),
+        render_qrh_candidates_md(qrh_report, pure_files),
     )
     LOG.info("All reports written to %s", out_dir)
     return 0
