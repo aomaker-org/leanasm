@@ -10,6 +10,7 @@ structure QRat where
   den : Nat
   den_pos : 0 < den
 
+/-- Raw display for `QRat` (`num` or `(num/den)` without automatic GCD reduction). -/
 instance : Repr QRat where
   reprPrec q _ :=
     if q.den = 1 then repr q.num else s!"({q.num}/{q.den})"
@@ -33,7 +34,8 @@ instance : DecidableEq QRat := fun a b =>
   else
     isFalse (by intro h; cases h; exact hn rfl)
 
-/-- Reduce a `QRat` by `Nat.gcd` for canonical display. -/
+/-- Explicit helper to reduce a `QRat` by `Nat.gcd` (`Repr QRat` does not call this
+automatically). -/
 def QRat.reduce (q : QRat) : QRat :=
   let g := Nat.gcd q.num.natAbs q.den
   if hg : 0 < g then

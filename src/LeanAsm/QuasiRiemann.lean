@@ -6,7 +6,6 @@
 import LeanAsm.CrtNttUniversal
 import LeanAsm.PiChudnovsky.CrtMulBridge
 import LeanAsm.QuasiRiemann.Rat
-import LeanAsm.QuasiRiemann.AsymptoticZfr
 
 namespace QuasiRiemann
 
@@ -3024,6 +3023,9 @@ def scale30Int : Int := (scale30 : Int)
 /-- Scaling constant `10^36` for 36-digit fixed-point intervals. -/
 def scale36 : Nat := 1000000000000000000000000000000000000
 
+/-- Integer copy of `10^36`. -/
+def scale36Int : Int := (scale36 : Int)
+
 private theorem scale36Int_pos : (0 : Int) < scale36Int := by decide
 private theorem scale36Int_ne_zero : scale36Int ≠ 0 := by decide
 
@@ -5225,25 +5227,6 @@ theorem ultra_deep_rects_down_to_0501_certified :
   · simp [totalCertifiedAreaScaled12, rectAreaScaled12,
       h0s, h0S, h0t, h0T, h1s, h1S, h1t, h1T, h2s, h2S, h2t, h2T,
       h3s, h3S, h3t, h3T, h4s, h4S, h4t, h4T, h5s, h5S, h5t, h5T, h6s, h6S, h6t, h6T]
-
-/-- Exact linkage between `AsymptoticZfr.ln2Upper36Scaled` and `(lnInterval36 2).hi`. -/
-theorem ln2Upper36Scaled_eq_lnInterval36_hi :
-    ln2Upper36Scaled = (lnInterval36 2).hi := by
-  decide
-
-/-- The constructive dyadic-octave upper envelope `octaveLnUpper36` agrees with multiples of
-`(lnInterval36 2).hi` and upper-bounds the certified 36-digit intervals for powers of 2. -/
-theorem octaveLnUpper36_bounds_lnInterval36 (t : Nat) :
-    octaveLnUpper36 t = ((Nat.log2 t + 1 : Nat) : Int) * (lnInterval36 2).hi ∧
-    (lnInterval36 2).hi ≤ octaveLnUpper36 t ∧
-    (lnInterval36 4).hi ≤ octaveLnUpper36 4 ∧
-    (lnInterval36 16).hi ≤ octaveLnUpper36 16 ∧
-    (lnInterval36 64).hi ≤ octaveLnUpper36 64 := by
-  refine ⟨?_, ?_, by decide, by decide, by decide⟩
-  · dsimp [octaveLnUpper36]
-    rw [ln2Upper36Scaled_eq_lnInterval36_hi]
-  · rw [← ln2Upper36Scaled_eq_lnInterval36_hi]
-    exact (octaveLnUpper36_pos t).2.2
 
 end QuasiRiemann
 
