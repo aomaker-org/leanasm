@@ -1173,7 +1173,6 @@ private theorem reduceModTwoPiRaw72With_ordered (tp xIv : RawIv72)
   dsimp [reduceModTwoPiRaw72With]
   split
   · rename_i hk
-    have hmul : (xIv.1 + xIv.2).ediv 2 + ((tp.1 + tp.2).ediv 2).ediv 2 ≥ 0 → True := fun _ => trivial
     have hkt : ((xIv.1 + xIv.2).ediv 2 + ((tp.1 + tp.2).ediv 2).ediv 2).ediv
         ((tp.1 + tp.2).ediv 2) * tp.1 ≤
       ((xIv.1 + xIv.2).ediv 2 + ((tp.1 + tp.2).ediv 2).ediv 2).ediv
@@ -1911,10 +1910,10 @@ private theorem intervalMinSq_le_sq_of_mem (iv : ScaledInterval) (z : Int)
       omega
 
 /-- Theorem (Soundness of `IsValidDirichletRect2DN128`):
-Every valid `N ≤ 128` 2D rectangle certificate guarantees that for EVERY realization `(a_n, c_n, s_n)`
-of `(n^{-σ}, cos(t ln n), sin(t ln n))` enclosed by `r.entries` at any `(σ, t)` in
-`[r.sLo6, r.sHi6] × [r.tLo6, r.tHi6]`, the Dirichlet polynomial `ζ_N(σ + i t)` satisfies a
-strictly positive squared-modulus lower bound `0 < |ζ_N(s)|^2` and hence `ζ_N(s) ≠ (0, 0)`. -/
+Every valid `N ≤ 128` 2D certificate satisfies `InHighHeightRect2D r.sLo6 r.sHi6 r.tLo6 r.tHi6`,
+`r.entries.length ≤ 128`, and guarantees that any witness list `terms` enclosed by `r.entries`
+(`TermWitnessesEnclosed r.entries terms`) evaluates via `zetaPartialEvalScaled12 terms` to a
+strictly positive squared modulus `0 < zRe * zRe + zIm * zIm` and `zRe ≠ 0 ∨ zIm ≠ 0`. -/
 theorem isValidDirichletRect2DN128_sound (r : DirichletRect2DCert)
     (hr : IsValidDirichletRect2DN128 r) :
     InHighHeightRect2D r.sLo6 r.sHi6 r.tLo6 r.tHi6 ∧
