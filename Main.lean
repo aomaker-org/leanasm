@@ -220,6 +220,15 @@ def main : IO Unit := do
     s!"t=10^12+6.1 spanning σ∈[0.501,0.750]")
   IO.println (s!"                      Total certified 2D Lebesgue area Δσ·Δt = " ++
     s!"{highArea1e12 / 1000000000000}.{padHigh}")
+  let tpWidth90 := QuasiRiemann.twoPiInterval90.hi - QuasiRiemann.twoPiInterval90.lo
+  let tiles256 := QuasiRiemann.highTruncTiles_1e12_N256
+  let tiles512 := QuasiRiemann.highTruncTiles_1e18_N512
+  IO.println (s!"  t~10^18 Phase Red.: 90-digit CRT-NTT twoPiInterval90 width={tpWidth90} ULP; " ++
+    s!"512-term error < 10^-60 rad")
+  IO.println (s!"  High-Trunc Tiles  : N=256 (σ=0.5005, t~10^12) {tiles256.length}/4 tiles " ++
+    s!"(mod tail={QuasiRiemann.spec05005_N256_mod.eTail}); " ++
+    s!"N=512 (σ=0.50025, t~10^18) {tiles512.length}/4 tiles " ++
+    s!"(mod tail={QuasiRiemann.spec050025_N512_mod.eTail})")
   let σ34 := QuasiRiemann.qrhThresholdThreeQuarters
   let zdGM := (QuasiRiemann.zdGuthMaynard.exponent σ34).reduce
   let zdHux := (QuasiRiemann.zdHuxley.exponent σ34).reduce

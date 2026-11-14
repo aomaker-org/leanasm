@@ -413,10 +413,100 @@ def ShortIntervalPrimesProp : Prop :=
     10 ^ 31 < 2 * QuasiRiemann.shortIntervalQrh916Spec.errUpper +
       QuasiRiemann.shortIntervalQrh916Spec.primePowerCorr))
 
+/-- Higher-truncation (`N ∈ {256, 512}`) 2D zero-free rectangle, 90-digit CRT-NTT phase
+reduction (`< 10^-60` rad), and monotonic Euler–Maclaurin contraction specification. -/
+def HighTruncRectProvenanceProp : Prop :=
+  ((QuasiRiemann.twoPiInterval90.hi - QuasiRiemann.twoPiInterval90.lo = 1 ∧
+    QuasiRiemann.twoPiInterval90.lo * 10 ^ 15 ≤ 2 * (PiChudnovsky.piLower105 : Int) ∧
+    2 * (PiChudnovsky.piUpper105 : Int) ≤ QuasiRiemann.twoPiInterval90.hi * 10 ^ 15) ∧
+   (∀ xIv : QuasiRiemann.ScaledInterval90,
+     0 ≤ xIv.lo →
+     xIv.hi ≤ 7 * (10 ^ 18 + 10) * QuasiRiemann.scale90Int →
+     xIv.hi - xIv.lo ≤ 4 * 10 ^ 21 →
+     (QuasiRiemann.reduceModTwoPiCentered90 xIv).hi -
+       (QuasiRiemann.reduceModTwoPiCentered90 xIv).lo ≤ 5 * 10 ^ 21) ∧
+   (∀ (t90Val lnVal twoPi : Int) (n : Nat),
+     ((10 ^ 12 * QuasiRiemann.scale90Int ≤ t90Val ∧
+       t90Val ≤ (10 ^ 12 + 10) * QuasiRiemann.scale90Int) ∨
+      (10 ^ 18 * QuasiRiemann.scale90Int ≤ t90Val ∧
+       t90Val ≤ (10 ^ 18 + 10) * QuasiRiemann.scale90Int)) →
+     1 ≤ n → n ≤ 512 →
+     (QuasiRiemann.lnInterval90_512 n).lo ≤ lnVal ∧
+       lnVal ≤ (QuasiRiemann.lnInterval90_512 n).hi →
+     QuasiRiemann.twoPiInterval90.lo ≤ twoPi ∧
+       twoPi ≤ QuasiRiemann.twoPiInterval90.hi →
+     let rIv90 := QuasiRiemann.reducePhaseModTwoPi90
+       ⟨t90Val, t90Val, Int.le_refl t90Val⟩ (QuasiRiemann.lnInterval90_512 n)
+     let rIv72 := QuasiRiemann.toIv72From90 rIv90
+     rIv90.hi - rIv90.lo ≤ 4 * 10 ^ 21 ∧
+     512 * (rIv90.hi - rIv90.lo) < 10 ^ 30 ∧
+     rIv72.hi - rIv72.lo ≤ 4 * 10 ^ 3 + 2 ∧
+     (QuasiRiemann.taylorCosInterval72 rIv72).lo ≤
+       (QuasiRiemann.taylorCosInterval72 rIv72).hi ∧
+     (QuasiRiemann.taylorSinInterval72 rIv72).lo ≤
+       (QuasiRiemann.taylorSinInterval72 rIv72).hi ∧
+     ∃ k p90 : Int,
+       p90 * QuasiRiemann.scale90Int ≤ t90Val * lnVal ∧
+       t90Val * lnVal ≤ (p90 + 1) * QuasiRiemann.scale90Int ∧
+       rIv90.lo ≤ p90 - k * twoPi ∧
+       p90 - k * twoPi ≤ rIv90.hi)) ∧
+  ((∀ sLo6 tLo6 tHi6 : Nat, 500000 ≤ sLo6 →
+     QuasiRiemann.eulerMaclaurinB2TailRect2DForN 512 sLo6 tLo6 tHi6 ≤
+       QuasiRiemann.eulerMaclaurinB2TailRect2DForN 256 sLo6 tLo6 tHi6 ∧
+     QuasiRiemann.eulerMaclaurinB2TailRect2DForN 256 sLo6 tLo6 tHi6 ≤
+       QuasiRiemann.eulerMaclaurinB2TailRect2DForN 128 sLo6 tLo6 tHi6) ∧
+   (QuasiRiemann.eulerMaclaurinB2TailRect2DForN 512 500250 108900000 108910000 <
+      QuasiRiemann.eulerMaclaurinB2TailRect2DForN 256 500250 108900000 108910000 ∧
+    QuasiRiemann.eulerMaclaurinB2TailRect2DForN 256 500250 108900000 108910000 <
+      QuasiRiemann.eulerMaclaurinB2TailRect2DForN 128 500250 108900000 108910000) ∧
+   (QuasiRiemann.eulerMaclaurinB2TailRect2DForN 512 500500 108900000 108910000 = 176912 ∧
+    QuasiRiemann.eulerMaclaurinB2TailRect2DForN 256 500500 108900000 108910000 = 293217 ∧
+    QuasiRiemann.eulerMaclaurinB2TailRect2DForN 128 500500 108900000 108910000 = 630769) ∧
+   QuasiRiemann.spec05005_N256_mod.HasCertifiedNonVanishing ∧
+   QuasiRiemann.spec050025_N512_mod.HasCertifiedNonVanishing) ∧
+  (QuasiRiemann.highTruncTiles_1e12_N256.length = 4 ∧
+   QuasiRiemann.highTruncTiles_1e18_N512.length = 4 ∧
+   (∀ t ∈ QuasiRiemann.highTruncTiles_1e12_N256, QuasiRiemann.IsValidLipTile2D t) ∧
+   (∀ t ∈ QuasiRiemann.highTruncTiles_1e18_N512, QuasiRiemann.IsValidLipTile2D t) ∧
+   (∀ s6 t6 : Nat,
+     QuasiRiemann.InBox2D 500500 504500 1000000000006090000 1000000000006130000 s6 t6 →
+     ∃ tile ∈ QuasiRiemann.highTruncTiles_1e12_N256,
+       QuasiRiemann.IsValidLipTile2D tile ∧
+       QuasiRiemann.InBox2D tile.sLo6 tile.sHi6 tile.tLo6 tile.tHi6 s6 t6 ∧
+       (∀ zRe0 zIm0 zRe zIm : Int,
+         tile.anchorRe.lo * 1000000 ≤ zRe0 ∧ zRe0 ≤ tile.anchorRe.hi * 1000000 →
+         tile.anchorIm.lo * 1000000 ≤ zIm0 ∧ zIm0 ≤ tile.anchorIm.hi * 1000000 →
+         Int.natAbs (zRe - zRe0) ≤
+           tile.gradBound6 * (((s6 : Int) - tile.sMid6).natAbs +
+             ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
+         Int.natAbs (zIm - zIm0) ≤
+           tile.gradBound6 * (((s6 : Int) - tile.sMid6).natAbs +
+             ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
+         0 < zRe * zRe + zIm * zIm ∧ (zRe ≠ 0 ∨ zIm ≠ 0))) ∧
+   (∀ s6 t6 : Nat,
+     QuasiRiemann.InBox2D 500250 504250
+       1000000000000000000980000 1000000000000000001000000 s6 t6 →
+     ∃ tile ∈ QuasiRiemann.highTruncTiles_1e18_N512,
+       QuasiRiemann.IsValidLipTile2D tile ∧
+       QuasiRiemann.InBox2D tile.sLo6 tile.sHi6 tile.tLo6 tile.tHi6 s6 t6 ∧
+       (∀ zRe0 zIm0 zRe zIm : Int,
+         tile.anchorRe.lo * 1000000 ≤ zRe0 ∧ zRe0 ≤ tile.anchorRe.hi * 1000000 →
+         tile.anchorIm.lo * 1000000 ≤ zIm0 ∧ zIm0 ≤ tile.anchorIm.hi * 1000000 →
+         Int.natAbs (zRe - zRe0) ≤
+           tile.gradBound6 * (((s6 : Int) - tile.sMid6).natAbs +
+             ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
+         Int.natAbs (zIm - zIm0) ≤
+           tile.gradBound6 * (((s6 : Int) - tile.sMid6).natAbs +
+             ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
+         0 < zRe * zRe + zIm * zIm ∧ (zRe ≠ 0 ∨ zIm ≠ 0))) ∧
+   QuasiRiemann.highTruncSpec_1e12_N256.HasCertifiedNonVanishing ∧
+   QuasiRiemann.highTruncSpec_1e18_N512.HasCertifiedNonVanishing)
+
 /-- Part 5 provenance specification bundling mollifier descent, 2D rectangles down to
 `σ = 0.501`, `t ~ 10^12` phase-reduced rectangles, DVP asymptotic strip, Dirichlet `L^2`
 diagonal dominance, rational zero-density descent (`15/26 < 3/5 < 2/3`), QRH threshold
-ladder `θ ∈ {3/4, 7/8, 11/12, 47/48}`, Chebyshev envelopes, and short-interval primes. -/
+ladder `θ ∈ {3/4, 7/8, 11/12, 47/48}`, Chebyshev envelopes, short-interval primes, and
+higher-truncation (`N ∈ {256, 512}`) CRT-NTT 2D zero-free rectangle certificates. -/
 def QuasiRiemannProvenance : Prop :=
   (let th1 := QuasiRiemann.qrhThresholdFromMollifier (QuasiRiemann.QRat.ofInt 1)
    let thHalf := QuasiRiemann.qrhThresholdFromMollifier (QuasiRiemann.QRat.mk' 1 2)
@@ -552,7 +642,8 @@ def QuasiRiemannProvenance : Prop :=
     (θ₁ < zfr ∧ θ₂ < zfr ∧ θ₃ < zfr ∧ θ₄ < zfr)) ∧
   ChebyshevSavingsProp ∧
   ChebyshevBenchmarkProp ∧
-  ShortIntervalPrimesProp
+  ShortIntervalPrimesProp ∧
+  HighTruncRectProvenanceProp
 
 set_option exponentiation.threshold 2000 in
 /-- Zero-axiom certificate for Parts 3-5 analytic QRH, 2D rectangles, DVP, and Chebyshev. -/
@@ -577,7 +668,10 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
     fun s pX pXH tX tXH hBX hBXH hC hP =>
       QuasiRiemann.ap_short_interval_psi_diff_bound
         s pX pXH tX tXH hBX hBXH hC hP,
-    QuasiRiemann.sub_three_quarters_qrh_ladder_certs⟩⟩
+    QuasiRiemann.sub_three_quarters_qrh_ladder_certs⟩,
+   ⟨QuasiRiemann.crtNtt_phase_reduction_512_sound,
+    QuasiRiemann.euler_maclaurin_tail_shrinks_with_N,
+    QuasiRiemann.crtNtt_highTrunc_2d_zero_free_rect⟩⟩
 
 -- =============================================================================
 -- Parts 6 & 8: RNS Garner & Fermat-Tower / Dedekind Euler Non-Vanishing

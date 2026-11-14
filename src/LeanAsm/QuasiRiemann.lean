@@ -4221,6 +4221,320 @@ theorem ultra_deep_rects_down_to_0505_certified :
       h0s, h0S, h0t, h0T, h1s, h1S, h1t, h1T, h2s, h2S, h2t, h2T,
       h3s, h3S, h3t, h3T, h4s, h4S, h4t, h4T, h5s, h5S, h5t, h5T, h6s, h6S, h6t, h6T]
 
+-- =============================================================================
+-- Part 17 Foundation: Higher-Truncation Specs & Lipschitz 2D Box Tiling
+-- =============================================================================
+
+/-- Specification for a higher-truncation (`N ∈ {128, 256, 512}`) 2D zero-free rectangle
+at rational threshold `σ = sigmaNum / sigmaDen`, height window `[tLoScaled, tHiScaled]`,
+truncated Dirichlet lower bound `deltaN`, Euler–Maclaurin tail envelope `eTail`, and
+4-prime CRT-NTT phase/rounding error budget `epsCrt` (all at uniform cleared-denominator
+scale, e.g. `10^6`). -/
+structure HighTruncZeroFreeRectSpec where
+  nTrunc : Nat
+  sigmaNum : Nat
+  sigmaDen : Nat
+  tLoScaled : Nat
+  tHiScaled : Nat
+  deltaN : Nat
+  eTail : Nat
+  epsCrt : Nat
+  nTrunc_valid : nTrunc = 128 ∨ nTrunc = 256 ∨ nTrunc = 512
+  sigma_above_half : sigmaDen < 2 * sigmaNum
+  t_ordered : tLoScaled ≤ tHiScaled
+  deriving DecidableEq, Repr
+
+/-- Decidable non-vanishing invariant `E_tail + eps_crt < delta_N`. -/
+def HighTruncZeroFreeRectSpec.HasCertifiedNonVanishing (s : HighTruncZeroFreeRectSpec) : Prop :=
+  s.eTail + s.epsCrt < s.deltaN
+
+instance (s : HighTruncZeroFreeRectSpec) : Decidable s.HasCertifiedNonVanishing :=
+  inferInstanceAs (Decidable (s.eTail + s.epsCrt < s.deltaN))
+
+/-- Constructive triangle-inequality non-vanishing theorem for any valid
+`HighTruncZeroFreeRectSpec`. -/
+theorem HighTruncZeroFreeRectSpec.nonvanishing_of_certified
+    (s : HighTruncZeroFreeRectSpec) (hcert : s.HasCertifiedNonVanishing)
+    (zetaMod dirMod tailErr crtErr : Nat)
+    (hdir : s.deltaN ≤ dirMod) (htail : tailErr ≤ s.eTail) (hcrt : crtErr ≤ s.epsCrt)
+    (htri : dirMod ≤ zetaMod + tailErr + crtErr) :
+    0 < zetaMod ∧ s.deltaN - (s.eTail + s.epsCrt) ≤ zetaMod := by
+  have h1 : s.eTail + s.epsCrt < s.deltaN := hcert
+  have h2 : s.deltaN ≤ zetaMod + (s.eTail + s.epsCrt) := by
+    have ha : tailErr + crtErr ≤ s.eTail + s.epsCrt := Nat.add_le_add htail hcrt
+    have hb : zetaMod + tailErr + crtErr = zetaMod + (tailErr + crtErr) := Nat.add_assoc _ _ _
+    exact Nat.le_trans hdir (Nat.le_trans htri (hb ▸ Nat.add_le_add_left ha zetaMod))
+  have hsub : s.deltaN - (s.eTail + s.epsCrt) ≤ zetaMod := Nat.sub_le_of_le_add h2
+  have hpos : 0 < s.deltaN - (s.eTail + s.epsCrt) := Nat.sub_pos_of_lt h1
+  exact ⟨Nat.lt_of_lt_of_le hpos hsub, hsub⟩
+
+/-- Pointwise membership in `[sLo6, sHi6] × [tLo6, tHi6]` (in `10^-6` grid units). -/
+def InBox2D (sLo6 sHi6 tLo6 tHi6 s6 t6 : Nat) : Prop :=
+  sLo6 ≤ s6 ∧ s6 ≤ sHi6 ∧ tLo6 ≤ t6 ∧ t6 ≤ tHi6
+
+instance (sLo6 sHi6 tLo6 tHi6 s6 t6 : Nat) :
+    Decidable (InBox2D sLo6 sHi6 tLo6 tHi6 s6 t6) :=
+  inferInstanceAs (Decidable (sLo6 ≤ s6 ∧ s6 ≤ sHi6 ∧ tLo6 ≤ t6 ∧ t6 ≤ tHi6))
+
+/-- A 2D `(σ, t)` Lipschitz sub-rectangle tile `[sLo6, sHi6] × [tLo6, tHi6]` anchored at
+`(sMid6, tMid6)` with certified Dirichlet anchor interval `(anchorRe, anchorIm)`, gradient
+Lipschitz bound `gradBound6` (`10^6`-scaled), and CRT/truncation error margin `epsCrt6`. -/
+structure LipTile2D where
+  sLo6 : Nat
+  sHi6 : Nat
+  tLo6 : Nat
+  tHi6 : Nat
+  sMid6 : Nat
+  tMid6 : Nat
+  anchorRe : ScaledInterval
+  anchorIm : ScaledInterval
+  gradBound6 : Nat
+  epsCrt6 : Nat
+  deriving DecidableEq, Repr
+
+/-- Horizontal `σ`-radius around `(sMid6, tMid6)` in `10^-6` units. -/
+def LipTile2D.radS6 (t : LipTile2D) : Nat :=
+  max (t.sMid6 - t.sLo6) (t.sHi6 - t.sMid6)
+
+/-- Vertical `t`-radius around `(sMid6, tMid6)` in `10^-6` units. -/
+def LipTile2D.radT6 (t : LipTile2D) : Nat :=
+  max (t.tMid6 - t.tLo6) (t.tHi6 - t.tMid6)
+
+/-- Outward cleared-denominator Lipschitz shift at `10^6` scale plus CRT margin. -/
+def LipTile2D.shift6 (t : LipTile2D) : Nat :=
+  (t.gradBound6 * (t.radS6 + t.radT6) + 999999) / 1000000 + t.epsCrt6
+
+/-- Outward-shifted real interval over the entire continuous tile `[sLo6, sHi6] × [tLo6, tHi6]`. -/
+def LipTile2D.reBox (t : LipTile2D) : ScaledInterval :=
+  ⟨t.anchorRe.lo - (t.shift6 : Int), t.anchorRe.hi + (t.shift6 : Int)⟩
+
+/-- Outward-shifted imaginary interval over `[sLo6, sHi6] × [tLo6, tHi6]`. -/
+def LipTile2D.imBox (t : LipTile2D) : ScaledInterval :=
+  ⟨t.anchorIm.lo - (t.shift6 : Int), t.anchorIm.hi + (t.shift6 : Int)⟩
+
+/-- Constructive validity predicate for a 2D Lipschitz sub-rectangle tile. -/
+def IsValidLipTile2D (t : LipTile2D) : Prop :=
+  t.sLo6 ≤ t.sMid6 ∧ t.sMid6 ≤ t.sHi6 ∧
+  t.tLo6 ≤ t.tMid6 ∧ t.tMid6 ≤ t.tHi6 ∧
+  t.anchorRe.isValid ∧ t.anchorIm.isValid ∧
+  0 < complexIntervalMinNormSq t.reBox t.imBox
+
+instance (t : LipTile2D) : Decidable (IsValidLipTile2D t) :=
+  inferInstanceAs (Decidable (t.sLo6 ≤ t.sMid6 ∧ t.sMid6 ≤ t.sHi6 ∧
+    t.tLo6 ≤ t.tMid6 ∧ t.tMid6 ≤ t.tHi6 ∧
+    t.anchorRe.isValid ∧ t.anchorIm.isValid ∧
+    0 < complexIntervalMinNormSq t.reBox t.imBox))
+
+theorem intervalMinSq_le_sq_of_scaled_mem (iv : ScaledInterval) (z : Int)
+    (hz : iv.lo * 1000000 ≤ z ∧ z ≤ iv.hi * 1000000) :
+    (intervalMinSq iv : Int) * 1000000000000 ≤ z * z := by
+  dsimp [intervalMinSq]
+  split
+  · simp
+    if h0 : 0 ≤ z then exact Int.mul_nonneg h0 h0
+    else
+      have hn : 0 ≤ -z := by omega
+      have hsq : 0 ≤ (-z) * (-z) := Int.mul_nonneg hn hn
+      have heq : (-z) * (-z) = z * z := by simp only [Int.neg_mul, Int.mul_neg, Int.neg_neg]
+      omega
+  · rename_i hnot
+    split
+    · rename_i hpos
+      have hnat : (iv.lo.natAbs : Int) = iv.lo := Int.natAbs_of_nonneg (by omega)
+      have hcast : ((iv.lo.natAbs * iv.lo.natAbs : Nat) : Int) = iv.lo * iv.lo := by
+        rw [Int.natCast_mul, hnat]
+      rw [hcast]
+      have hmul : (iv.lo * 1000000) * (iv.lo * 1000000) ≤ z * z :=
+        Int.mul_le_mul hz.1 hz.1 (by omega) (by omega)
+      have heq : (iv.lo * 1000000) * (iv.lo * 1000000) =
+          (iv.lo * iv.lo) * 1000000000000 := by ac_rfl
+      omega
+    · rename_i hnonpos
+      have hlo_neg : iv.lo ≤ 0 := by omega
+      have hhi_neg : iv.hi < 0 := by
+        cases Int.decLt iv.hi 0 with
+        | isTrue hlt => exact hlt
+        | isFalse hnlt => exact False.elim (hnot ⟨hlo_neg, by omega⟩)
+      clear hnot
+      have hnat : (iv.hi.natAbs : Int) = -iv.hi := Int.ofNat_natAbs_of_nonpos (by omega)
+      have hcast : ((iv.hi.natAbs * iv.hi.natAbs : Nat) : Int) = (-iv.hi) * (-iv.hi) := by
+        rw [Int.natCast_mul, hnat]
+      rw [hcast]
+      have hzneg : (-iv.hi) * 1000000 ≤ -z := by rw [Int.neg_mul]; omega
+      have hmul : ((-iv.hi) * 1000000) * ((-iv.hi) * 1000000) ≤ (-z) * (-z) :=
+        Int.mul_le_mul hzneg hzneg (by omega) (by omega)
+      have heq1 : ((-iv.hi) * 1000000) * ((-iv.hi) * 1000000) =
+          ((-iv.hi) * (-iv.hi)) * 1000000000000 := by ac_rfl
+      have heq2 : (-z) * (-z) = z * z := by simp only [Int.neg_mul, Int.mul_neg, Int.neg_neg]
+      omega
+
+private theorem nat_abs_sub_le_max {lo mid hi x : Nat}
+    (_h1 : lo ≤ mid) (_h2 : mid ≤ hi) (hx1 : lo ≤ x) (hx2 : x ≤ hi) :
+    ((x : Int) - (mid : Int)).natAbs ≤ max (mid - lo) (hi - mid) := by
+  cases Nat.decLe x mid with
+  | isTrue hxm =>
+    have hcast : ((x : Int) + ((mid - x : Nat) : Int)) = (mid : Int) := by
+      have hnat : x + (mid - x) = mid := Nat.add_sub_of_le hxm
+      have : ((x + (mid - x) : Nat) : Int) = (mid : Int) := congrArg Nat.cast hnat
+      rwa [Int.natCast_add] at this
+    have hdiff : ((x : Int) - (mid : Int)) = -((mid - x : Nat) : Int) := by
+      have hx : (x : Int) = -((mid - x : Nat) : Int) + (mid : Int) := by
+        rw [← hcast, Int.add_comm (x : Int), Int.neg_add_cancel_left]
+      exact Int.sub_eq_iff_eq_add.mpr hx
+    rw [hdiff, Int.natAbs_neg, Int.natAbs_natCast]
+    exact Nat.le_trans (Nat.sub_le_sub_left hx1 mid) (Nat.le_max_left _ _)
+  | isFalse hxm =>
+    have hmx : mid ≤ x := Nat.le_of_lt (Nat.lt_of_not_ge hxm)
+    have hcast : ((mid : Int) + ((x - mid : Nat) : Int)) = (x : Int) := by
+      have hnat : mid + (x - mid) = x := Nat.add_sub_of_le hmx
+      have : ((mid + (x - mid) : Nat) : Int) = (x : Int) := congrArg Nat.cast hnat
+      rwa [Int.natCast_add] at this
+    have hdiff : ((x : Int) - (mid : Int)) = ((x - mid : Nat) : Int) :=
+      Int.sub_eq_iff_eq_add.mpr (by rw [Int.add_comm, hcast])
+    rw [hdiff, Int.natAbs_natCast]
+    exact Nat.le_trans (Nat.sub_le_sub_right hx2 mid) (Nat.le_max_right _ _)
+
+private theorem int_bounds_of_natAbs_sub {z z0 shift : Int}
+    (h : ((Int.natAbs (z - z0) : Nat) : Int) ≤ shift) :
+    z0 - shift ≤ z ∧ z ≤ z0 + shift := by
+  have habs : -((Int.natAbs (z - z0) : Nat) : Int) ≤ z - z0 ∧
+      z - z0 ≤ ((Int.natAbs (z - z0) : Nat) : Int) := by
+    cases Int.decLe 0 (z - z0) with
+    | isTrue hn =>
+      have heq : ((Int.natAbs (z - z0) : Nat) : Int) = z - z0 := Int.natAbs_of_nonneg hn
+      rw [heq]
+      exact ⟨Int.le_trans (Int.neg_nonpos_of_nonneg hn) hn, Int.le_refl _⟩
+    | isFalse hn =>
+      have hle : z - z0 ≤ 0 := Int.le_of_lt (Int.lt_of_not_ge hn)
+      have heq : ((Int.natAbs (z - z0) : Nat) : Int) = -(z - z0) :=
+        Int.ofNat_natAbs_of_nonpos hle
+      rw [heq, Int.neg_neg]
+      exact ⟨Int.le_refl _, Int.le_trans hle (Int.neg_nonneg_of_nonpos hle)⟩
+  have hlo : z0 - shift ≤ z0 + (z - z0) :=
+    Int.add_le_add_left (Int.le_trans (Int.neg_le_neg h) habs.1) z0
+  have hhi : z0 + (z - z0) ≤ z0 + shift :=
+    Int.add_le_add_left (Int.le_trans habs.2 h) z0
+  have hcancel : z0 + (z - z0) = z := by rw [Int.add_comm, Int.sub_add_cancel]
+  rw [hcancel] at hlo hhi
+  exact ⟨hlo, hhi⟩
+
+private theorem div_1e6_ceil_le {a eps : Nat} :
+    a + eps * 1000000 ≤ ((a + 999999) / 1000000 + eps) * 1000000 := by
+  have hdm : 1000000 * ((a + 999999) / 1000000) + (a + 999999) % 1000000 = a + 999999 :=
+    Nat.div_add_mod (a + 999999) 1000000
+  have hmod : (a + 999999) % 1000000 ≤ 999999 :=
+    Nat.le_pred_of_lt (Nat.mod_lt _ (by decide : 0 < 1000000))
+  have h1 : a + 999999 ≤ ((a + 999999) / 1000000) * 1000000 + 999999 := by
+    have h1a := Nat.add_le_add_left hmod (1000000 * ((a + 999999) / 1000000))
+    rw [hdm, Nat.mul_comm 1000000 _] at h1a
+    exact h1a
+  have h2 : a ≤ ((a + 999999) / 1000000) * 1000000 := Nat.le_of_add_le_add_right h1
+  rw [Nat.add_mul]
+  exact Nat.add_le_add_right h2 _
+
+/-- Theorem (Soundness of a Single 2D Lipschitz Sub-Rectangle Tile):
+For EVERY continuous point `(s6, t6) ∈ [t.sLo6, t.sHi6] × [t.tLo6, t.tHi6]`, ANY `10^12`-scaled
+anchor evaluation `(zRe0, zIm0)` inside `(t.anchorRe, t.anchorIm)`, and ANY `10^12`-scaled target
+`(zRe, zIm)` satisfying the cleared-denominator Lipschitz bound from `(t.sMid6, t.tMid6)`, we have
+strictly positive squared modulus `0 < zRe * zRe + zIm * zIm` (`zRe ≠ 0 ∨ zIm ≠ 0`). -/
+theorem isValidLipTile2D_sound (t : LipTile2D) (ht : IsValidLipTile2D t)
+    (s6 t6 : Nat) (hmem : InBox2D t.sLo6 t.sHi6 t.tLo6 t.tHi6 s6 t6)
+    (zRe0 zIm0 zRe zIm : Int)
+    (hre0 : t.anchorRe.lo * 1000000 ≤ zRe0 ∧ zRe0 ≤ t.anchorRe.hi * 1000000)
+    (him0 : t.anchorIm.lo * 1000000 ≤ zIm0 ∧ zIm0 ≤ t.anchorIm.hi * 1000000)
+    (hlipRe : Int.natAbs (zRe - zRe0) ≤
+      t.gradBound6 * (((s6 : Int) - t.sMid6).natAbs + ((t6 : Int) - t.tMid6).natAbs) +
+        t.epsCrt6 * 1000000)
+    (hlipIm : Int.natAbs (zIm - zIm0) ≤
+      t.gradBound6 * (((s6 : Int) - t.sMid6).natAbs + ((t6 : Int) - t.tMid6).natAbs) +
+        t.epsCrt6 * 1000000) :
+    0 < zRe * zRe + zIm * zIm ∧ (zRe ≠ 0 ∨ zIm ≠ 0) ∧
+      ((complexIntervalMinNormSq t.reBox t.imBox : Int) * 1000000000000 ≤
+        zRe * zRe + zIm * zIm) := by
+  rcases ht with ⟨hsM1, hsM2, htM1, htM2, _, _, hnorm⟩
+  rcases hmem with ⟨hs1, hs2, ht1, ht2⟩
+  have hds : ((s6 : Int) - t.sMid6).natAbs ≤ t.radS6 := nat_abs_sub_le_max hsM1 hsM2 hs1 hs2
+  have hdt : ((t6 : Int) - t.tMid6).natAbs ≤ t.radT6 := nat_abs_sub_le_max htM1 htM2 ht1 ht2
+  have hgrad : t.gradBound6 * (((s6 : Int) - t.sMid6).natAbs + ((t6 : Int) - t.tMid6).natAbs) ≤
+      t.gradBound6 * (t.radS6 + t.radT6) :=
+    Nat.mul_le_mul_left t.gradBound6 (Nat.add_le_add hds hdt)
+  have hceil : t.gradBound6 * (t.radS6 + t.radT6) + t.epsCrt6 * 1000000 ≤
+      t.shift6 * 1000000 := div_1e6_ceil_le
+  have hshiftRe : ((Int.natAbs (zRe - zRe0) : Nat) : Int) ≤ (t.shift6 : Int) * 1000000 :=
+    Int.ofNat_le.mpr (Nat.le_trans hlipRe (Nat.le_trans (Nat.add_le_add_right hgrad _) hceil))
+  have hshiftIm : ((Int.natAbs (zIm - zIm0) : Nat) : Int) ≤ (t.shift6 : Int) * 1000000 :=
+    Int.ofNat_le.mpr (Nat.le_trans hlipIm (Nat.le_trans (Nat.add_le_add_right hgrad _) hceil))
+  have hzr := int_bounds_of_natAbs_sub hshiftRe
+  have hzi := int_bounds_of_natAbs_sub hshiftIm
+  have hboxRe : t.reBox.lo * 1000000 ≤ zRe ∧ zRe ≤ t.reBox.hi * 1000000 := by
+    dsimp [LipTile2D.reBox]
+    rw [Int.sub_mul, Int.add_mul]
+    exact ⟨Int.le_trans (Int.sub_le_sub_right hre0.1 _) hzr.1,
+      Int.le_trans hzr.2 (Int.add_le_add_right hre0.2 _)⟩
+  have hboxIm : t.imBox.lo * 1000000 ≤ zIm ∧ zIm ≤ t.imBox.hi * 1000000 := by
+    dsimp [LipTile2D.imBox]
+    rw [Int.sub_mul, Int.add_mul]
+    exact ⟨Int.le_trans (Int.sub_le_sub_right him0.1 _) hzi.1,
+      Int.le_trans hzi.2 (Int.add_le_add_right him0.2 _)⟩
+  have h1 := intervalMinSq_le_sq_of_scaled_mem t.reBox zRe hboxRe
+  have h2 := intervalMinSq_le_sq_of_scaled_mem t.imBox zIm hboxIm
+  dsimp [complexIntervalMinNormSq] at hnorm ⊢
+  have hm : (0 : Int) <
+      ((intervalMinSq t.reBox + intervalMinSq t.imBox : Nat) : Int) * 1000000000000 :=
+    Int.mul_pos (Int.natCast_pos.mpr hnorm) (by decide)
+  rw [Int.natCast_add, Int.add_mul] at hm
+  rw [Int.add_mul]
+  have hlb : ((intervalMinSq t.reBox : Int) * 1000000000000 +
+      (intervalMinSq t.imBox : Int) * 1000000000000) ≤ zRe * zRe + zIm * zIm :=
+    Int.add_le_add h1 h2
+  have hpos_z : 0 < zRe * zRe + zIm * zIm := Int.lt_of_lt_of_le hm hlb
+  refine ⟨hpos_z, ?_, hlb⟩
+  cases Int.decEq zRe 0 with
+  | isTrue hz =>
+    right; intro him0
+    have hbad := hpos_z
+    rw [hz, him0] at hbad
+    exact (by decide : ¬ (0 : Int) < 0 * 0 + 0 * 0) hbad
+  | isFalse hz => exact Or.inl hz
+
+/-- Exact `2 × 2` continuous partition of `[sLo6, sHi6] × [tLo6, tHi6]` into 4 `LipTile2D`
+sub-rectangles along cut coordinates `(sCut6, tCut6)`. -/
+def IsPartition2x2Tiles (sLo6 sCut6 sHi6 tLo6 tCut6 tHi6 : Nat) (tiles : List LipTile2D) : Prop :=
+  sLo6 ≤ sCut6 ∧ sCut6 ≤ sHi6 ∧ tLo6 ≤ tCut6 ∧ tCut6 ≤ tHi6 ∧
+  ∃ tile00 tile01 tile10 tile11,
+    tiles = [tile00, tile01, tile10, tile11] ∧
+    tile00.sLo6 = sLo6 ∧ tile00.sHi6 = sCut6 ∧ tile00.tLo6 = tLo6 ∧ tile00.tHi6 = tCut6 ∧
+    tile01.sLo6 = sLo6 ∧ tile01.sHi6 = sCut6 ∧ tile01.tLo6 = tCut6 ∧ tile01.tHi6 = tHi6 ∧
+    tile10.sLo6 = sCut6 ∧ tile10.sHi6 = sHi6 ∧ tile10.tLo6 = tLo6 ∧ tile10.tHi6 = tCut6 ∧
+    tile11.sLo6 = sCut6 ∧ tile11.sHi6 = sHi6 ∧ tile11.tLo6 = tCut6 ∧ tile11.tHi6 = tHi6
+
+/-- Coverage lemma: EVERY continuous point `(s6, t6)` inside `[sLo6, sHi6] × [tLo6, tHi6]` lies
+inside at least one validated `LipTile2D` tile of any valid `2 × 2` partition. -/
+theorem partition2x2_covers_all_points (sLo6 sCut6 sHi6 tLo6 tCut6 tHi6 : Nat)
+    (tiles : List LipTile2D)
+    (hpart : IsPartition2x2Tiles sLo6 sCut6 sHi6 tLo6 tCut6 tHi6 tiles)
+    (s6 t6 : Nat) (hmem : InBox2D sLo6 sHi6 tLo6 tHi6 s6 t6) :
+    ∃ tile ∈ tiles, InBox2D tile.sLo6 tile.sHi6 tile.tLo6 tile.tHi6 s6 t6 := by
+  rcases hpart with ⟨_, _, _, _, tile00, tile01, tile10, tile11, hlist,
+    h00s, h00S, h00t, h00T, h01s, h01S, h01t, h01T,
+    h10s, h10S, h10t, h10T, h11s, h11S, h11t, h11T⟩
+  rcases hmem with ⟨hs1, hs2, ht1, ht2⟩
+  subst hlist
+  cases Nat.decLe s6 sCut6 with
+  | isTrue hs =>
+    cases Nat.decLe t6 tCut6 with
+    | isTrue ht => exact ⟨tile00, by simp, h00s ▸ hs1, h00S ▸ hs, h00t ▸ ht1, h00T ▸ ht⟩
+    | isFalse ht =>
+      have hgt : tCut6 ≤ t6 := Nat.le_of_lt (Nat.lt_of_not_ge ht)
+      exact ⟨tile01, by simp, h01s ▸ hs1, h01S ▸ hs, h01t ▸ hgt, h01T ▸ ht2⟩
+  | isFalse hs =>
+    have hgs : sCut6 ≤ s6 := Nat.le_of_lt (Nat.lt_of_not_ge hs)
+    cases Nat.decLe t6 tCut6 with
+    | isTrue ht => exact ⟨tile10, by simp, h10s ▸ hgs, h10S ▸ hs2, h10t ▸ ht1, h10T ▸ ht⟩
+    | isFalse ht =>
+      have hgt : tCut6 ≤ t6 := Nat.le_of_lt (Nat.lt_of_not_ge ht)
+      exact ⟨tile11, by simp, h11s ▸ hgs, h11S ▸ hs2, h11t ▸ hgt, h11T ▸ ht2⟩
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann.lean

@@ -496,4 +496,17 @@ import LeanAsm
 #print axioms LeanAsm.collatz_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 36: Higher-Truncation (N = 256, 512) 2D Rectangles & CRT-NTT Phase (Issue #57)
+#print axioms QuasiRiemann.HighTruncZeroFreeRectSpec.nonvanishing_of_certified
+#print axioms QuasiRiemann.isValidLipTile2D_sound
+#print axioms QuasiRiemann.partition2x2_covers_all_points
+#print axioms QuasiRiemann.ln_table_1_to_512_valid
+#print axioms QuasiRiemann.crtNtt_phase_reduction_512_sound
+#print axioms QuasiRiemann.eulerMaclaurinB2TailRect2DForN_128_eq
+#print axioms QuasiRiemann.eulerMaclaurinB2TailRect2DForN_monotone
+#print axioms QuasiRiemann.euler_maclaurin_tail_shrinks_with_N
+#print axioms QuasiRiemann.crtNtt_highTrunc_2d_zero_free_rect
+#print axioms LeanAsm.quasiRiemann_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean
