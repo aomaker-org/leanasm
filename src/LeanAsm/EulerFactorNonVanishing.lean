@@ -801,26 +801,11 @@ private theorem fermatDeg_2 : fermatCyclotomicSplittingDeg 2 = 8 := rfl
 private theorem fermatDeg_3 : fermatCyclotomicSplittingDeg 3 = 128 := rfl
 private theorem fermatDeg_4 : fermatCyclotomicSplittingDeg 4 = 32768 := rfl
 
-private theorem fermat_4_cyclotomic_valid
-    (c1 c2 c3 c4 : CyclotomicSplitFactorSpec)
-    (h1 : ValidEulerLocalFactorSpec c1.base ∧ 1 ≤ c1.g)
-    (h2 : ValidEulerLocalFactorSpec c2.base ∧ 1 ≤ c2.g)
-    (h3 : ValidEulerLocalFactorSpec c3.base ∧ 1 ≤ c3.g)
-    (h4 : ValidEulerLocalFactorSpec c4.base ∧ 1 ≤ c4.g) :
-    0 < cyclotomicProdMarginPow [c1, c2, c3, c4] ∧
-    cyclotomicProdMarginPow [c1, c2, c3, c4] ≤ cyclotomicProdNormPow [c1, c2, c3, c4] ∧
-    0 < cyclotomicProdDenPow [c1, c2, c3, c4] := by
-  refine cyclotomic_euler_product_lower_bound [c1, c2, c3, c4] ?_
-  intro c hc
-  rcases List.mem_cons.mp hc with rfl | hc
-  · exact h1
-  · rcases List.mem_cons.mp hc with rfl | hc
-    · exact h2
-    · rcases List.mem_cons.mp hc with rfl | hc
-      · exact h3
-      · rcases List.mem_cons.mp hc with rfl | hc
-        · exact h4
-        · cases hc
+private theorem cyclotomic_factor_valid {p : Nat} {d rNum zx zy : Int} {g : Nat}
+    (hp : 2 ≤ p) (hd : 0 < d) (hr : 0 < rNum) (hrd : rNum < d) (hg : 1 ≤ g)
+    (hnorm : zx * zx + zy * zy ≤ rNum * rNum) :
+    ValidEulerLocalFactorSpec ⟨p, d, rNum, zx, zy⟩ ∧ 1 ≤ g :=
+  ⟨⟨hp, hd, hr, hrd, hnorm⟩, hg⟩
 
 /-- Theorem (Fermat-Tower Cyclotomic Dedekind Euler Product Certificates):
 Specializes `cyclotomic_split_euler_factor_nonvanishing` across the splitting prime ideals of
@@ -874,29 +859,38 @@ theorem fermat_tower_dedekind_euler_strip_certs
      cyclotomicProdDenPow fsOne < 256 * cyclotomicProdNormPow fsOne) := by
   refine ⟨?_, ?_, ?_⟩
   · intro h5 h17 h257 h65537 fsHalf
-    exact fermat_4_cyclotomic_valid
-      ⟨⟨5, 2, 1, zx5, zy5⟩, 2⟩ ⟨⟨17, 4, 1, zx17, zy17⟩, 8⟩
-      ⟨⟨257, 16, 1, zx257, zy257⟩, 128⟩ ⟨⟨65537, 256, 1, zx65537, zy65537⟩, 32768⟩
-      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h5⟩, by dsimp; omega⟩
-      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h17⟩, by dsimp; omega⟩
-      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h257⟩, by dsimp; omega⟩
-      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h65537⟩, by dsimp; omega⟩
+    refine cyclotomic_euler_product_lower_bound fsHalf ?_
+    intro c hc
+    dsimp [fsHalf] at hc
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at hc
+    rcases hc with rfl | rfl | rfl | rfl <;> dsimp only
+    · exact cyclotomic_factor_valid (by decide) (by decide) (by decide) (by decide) (by decide) h5
+    · exact cyclotomic_factor_valid (by decide) (by decide) (by decide) (by decide) (by decide) h17
+    · exact cyclotomic_factor_valid (by decide) (by decide) (by decide) (by decide) (by decide) h257
+    · exact cyclotomic_factor_valid (by decide) (by decide) (by decide) (by decide) (by decide) h65537
   · intro h5 h17 h257 h65537 fs34
-    exact fermat_4_cyclotomic_valid
-      ⟨⟨5, 10, 3, zx5, zy5⟩, 2⟩ ⟨⟨17, 8, 1, zx17, zy17⟩, 8⟩
-      ⟨⟨257, 64, 1, zx257, zy257⟩, 128⟩ ⟨⟨65537, 4096, 1, zx65537, zy65537⟩, 32768⟩
-      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h5⟩, by dsimp; omega⟩
-      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h17⟩, by dsimp; omega⟩
-      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h257⟩, by dsimp; omega⟩
-      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h65537⟩, by dsimp; omega⟩
+    refine cyclotomic_euler_product_lower_bound fs34 ?_
+    intro c hc
+    dsimp [fs34] at hc
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at hc
+    rcases hc with rfl | rfl | rfl | rfl <;> dsimp only
+    · exact cyclotomic_factor_valid (by decide) (by decide) (by decide) (by decide) (by decide) h5
+    · exact cyclotomic_factor_valid (by decide) (by decide) (by decide) (by decide) (by decide) h17
+    · exact cyclotomic_factor_valid (by decide) (by decide) (by decide) (by decide) (by decide) h257
+    · exact cyclotomic_factor_valid (by decide) (by decide) (by decide) (by decide) (by decide) h65537
   · intro h5 h17 h257 h65537 fsOne
-    have hlow := fermat_4_cyclotomic_valid
-      ⟨⟨5, 5, 1, zx5, zy5⟩, 2⟩ ⟨⟨17, 17, 1, zx17, zy17⟩, 8⟩
-      ⟨⟨257, 257, 1, zx257, zy257⟩, 128⟩ ⟨⟨65537, 65537, 1, zx65537, zy65537⟩, 32768⟩
-      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h5⟩, by dsimp; omega⟩
-      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h17⟩, by dsimp; omega⟩
-      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h257⟩, by dsimp; omega⟩
-      ⟨⟨by dsimp; omega, by dsimp; omega, by dsimp; omega, by dsimp; omega, h65537⟩, by dsimp; omega⟩
+    have hlow : 0 < cyclotomicProdMarginPow fsOne ∧
+        cyclotomicProdMarginPow fsOne ≤ cyclotomicProdNormPow fsOne ∧
+        0 < cyclotomicProdDenPow fsOne := by
+      refine cyclotomic_euler_product_lower_bound fsOne ?_
+      intro c hc
+      dsimp [fsOne] at hc
+      simp only [List.mem_cons, List.not_mem_nil, or_false] at hc
+      rcases hc with rfl | rfl | rfl | rfl <;> dsimp only
+      · exact cyclotomic_factor_valid (by decide) (by decide) (by decide) (by decide) (by decide) h5
+      · exact cyclotomic_factor_valid (by decide) (by decide) (by decide) (by decide) (by decide) h17
+      · exact cyclotomic_factor_valid (by decide) (by decide) (by decide) (by decide) (by decide) h257
+      · exact cyclotomic_factor_valid (by decide) (by decide) (by decide) (by decide) (by decide) h65537
     refine ⟨hlow.1, hlow.2.1, ?_⟩
     have q1 := fermat_sigma_one_uniform_quarter_bound 1 (by decide)
     have q2 := fermat_sigma_one_uniform_quarter_bound 2 (by decide)
