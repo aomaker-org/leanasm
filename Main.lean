@@ -58,6 +58,9 @@ def main : IO Unit := do
   let beat485 := CollatzQrhBridge.collatzBeatPeriodUpper72 485 306
   IO.println s!"  CRT-NTT |2^485 - 3^306|   : {gap485} (146-digit powers)"
   IO.println s!"  72-Digit Baker (485/306)  : |485 ln2 - 306 ln3|·10⁷² ≥ {lf485}, beat≤{repr beat485}"
+  IO.println ("  Steiner 1-Cycle Excluded  : (8,5) n_min≥17, (65,41) ≥87, (306,193) ≥14, " ++
+    "(485,306) ≥978")
+  IO.println "  Simons-de Weger Barrier   : n_min ≥ 936,360 ⇒ m ≥ 307 odd steps (K ≥ 793 total steps)"
   IO.println "  QRH Cancellation Ladder   : 1/2 < 3/4 < 5/6 < 7/8 < 11/12 < 1 (Collatz ↔ Mollifier)"
 
   -- 3. 4D Wilson Lattice Gauge Theory Simulation (Z2)
