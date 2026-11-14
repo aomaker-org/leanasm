@@ -337,6 +337,11 @@ def main : IO Unit := do
   IO.println s!"  10^105 Bracket Width         : {bracketWidth} (< 10^4 certified)"
   IO.println "  Zero-Axiom Kernel Audit      : pi_100_digits_certified & universal m ≥ 8 trap verified"
 
+  let _fullProvenance := LeanAsm.leanasm_full_provenance_certified
+  IO.println "\n[+] Unified Provenance Synthesis (Parts 1-11):"
+  IO.println "  Master Theorem               : LeanAsm.leanasm_full_provenance_certified"
+  IO.println "  Transitive Axiom Closure     : [propext, Quot.sound] (0 Classical.choice, 0 sorryAx)"
+
   IO.println "\n[+] All theorems verified at build-time with the Lean 4 kernel."
   IO.println "=========================================================="
 

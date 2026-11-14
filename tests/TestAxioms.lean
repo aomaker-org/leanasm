@@ -447,4 +447,15 @@ import LeanAsm
 #print axioms MiniVMNttBridge.intt4AsmF17_sound
 #print axioms MiniVMNttBridge.intt4_ntt4_asm_F17_roundtrip
 
+-- Part 31: Unified Top-Level Provenance Audit (Issue #45)
+#print axioms LeanAsm.miniVm_provenance_certified
+#print axioms LeanAsm.collatz_provenance_certified
+#print axioms LeanAsm.yangMills_provenance_certified
+#print axioms LeanAsm.quasiRiemann_provenance_certified
+#print axioms LeanAsm.eulerRns_provenance_certified
+#print axioms LeanAsm.finiteFieldWeil_provenance_certified
+#print axioms LeanAsm.crtNtt_provenance_certified
+#print axioms LeanAsm.chudnovskyPi_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean
