@@ -11,6 +11,11 @@ open QuasiRiemann
 open RnsArithmetic
 open FiniteFieldRH
 
+/-- Left-pad a decimal remainder with leading `'0'` characters to `width` digits. -/
+private def padZeros (width n : Nat) : String :=
+  let s := toString n
+  String.ofList (List.replicate (width - s.length) '0') ++ s
+
 def main : IO Unit := do
   IO.println "=========================================================="
   IO.println "   leanasm: Verified VM, Math, QFT, QRH, RNS & Weil Demo  "
@@ -142,17 +147,17 @@ def main : IO Unit := do
   let crtSq72 := QuasiRiemann.natMul192ViaCrtNtt scale72 scale72
   let sweptRects128 := sweepRectangles2DN128 ultraDeepStripRectGrid2D_N128
   let totalArea128 := totalCertifiedAreaScaled12 sweptRects128
-  let rem128Str := toString (totalArea128 % 1000000000000)
-  let pad128 := String.ofList (List.replicate (12 - rem128Str.length) '0') ++ rem128Str
+  let pad128 := padZeros 12 (totalArea128 % 1000000000000)
   IO.println s!"  ScaledInterval72  : 192-digit CRT-NTT Mul Check (10⁷²)² = {crtSq72} (exact)"
   IO.println s!"  N=128 Ultra-Deep  : Certified {sweptRects128.length}/7 2D rectangles down to σ=0.501"
   IO.println (s!"                      Total certified 2D Lebesgue area Δσ·Δt = " ++
     s!"{totalArea128 / 1000000000000}.{pad128} (CRT-NTT 10⁷² engine)")
   let zE := QuasiRiemann.dirichletDiagEnergy 4 QuasiRiemann.zetaDirichletCoeff
   let mE := QuasiRiemann.dirichletDiagEnergy 6 QuasiRiemann.altMobiusCoeff
-  let ln16 := QuasiRiemann.octaveLnUpper36 QuasiRiemann.dvpThresholdT0
+  let ln16Nat := (QuasiRiemann.octaveLnUpper36 QuasiRiemann.dvpThresholdT0).toNat
+  let padLn16 := padZeros 36 (ln16Nat % (10 ^ 36))
   IO.println (s!"  Asymptotic ZFR    : c_dvp = {repr QuasiRiemann.cDvp} for t ≥ " ++
-    s!"{QuasiRiemann.dvpThresholdT0} (octave ln_hi(16) = {ln16 / 10^36}.{ln16 % 10^36})")
+    s!"{QuasiRiemann.dvpThresholdT0} (octave ln_hi(16) = {ln16Nat / 10 ^ 36}.{padLn16})")
   IO.println (s!"  Dirichlet L^2     : Zeta(N=4, H=64) E={repr zE} sandwich [2, 6]; " ++
     s!"Mobius(N=6, H=144) E={repr mE} sandwich [5/2, 15/2]")
 

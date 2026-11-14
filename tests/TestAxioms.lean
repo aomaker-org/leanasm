@@ -346,4 +346,8 @@ import LeanAsm
 #print axioms QuasiRiemann.ln2Upper36Scaled_eq_lnInterval36_hi
 #print axioms QuasiRiemann.octaveLnUpper36_bounds_lnInterval36
 
+-- Part 20: Copilot Review Follow-Up Theorems (Issue #19)
+#print axioms FiniteFieldRH.genus2DerivF5_eq_neg_one
+#print axioms FiniteFieldRH.genus2_L_at_1_qrat
+
 -- end of file: leanasm/tests/TestAxioms.lean

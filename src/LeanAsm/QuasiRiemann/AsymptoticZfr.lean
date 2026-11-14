@@ -448,9 +448,6 @@ theorem qrat_div_le_of_le_mul {a b c : QRat}
 -- 1. Constructive Dyadic-Octave Logarithm Envelope (octaveLnUpper36)
 -- =============================================================================
 
-/-- 36-digit decimal scaling factor `10^36`. -/
-def scale36Int : Int := 10 ^ 36
-
 /-- Certified 36-digit upper bound `(lnInterval36 2).hi` for `ln(2) * 10^36`. -/
 def ln2Upper36Scaled : Int :=
   693147180559945309417232121458176622
