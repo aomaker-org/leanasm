@@ -328,4 +328,22 @@ import LeanAsm
 #print axioms WeilZetaBridge.genus2_L_poly_explicit_strip_certs
 #print axioms WeilZetaBridge.weil_zeta_punctured_strip_regular_and_nonzero
 
+-- Part 19: Asymptotic Zero-Free Region & Dirichlet L^2 Diagonal Dominance (Issue #16)
+#print axioms QuasiRiemann.octave_bracket_pow2
+#print axioms QuasiRiemann.octaveLnUpper36_pos
+#print axioms QuasiRiemann.octaveLnUpper36_mono
+#print axioms QuasiRiemann.ln2Upper36_envelope_certs
+#print axioms QuasiRiemann.trig_341_identity
+#print axioms QuasiRiemann.trig_341_positivity
+#print axioms QuasiRiemann.trig_341_positivity_qrat
+#print axioms QuasiRiemann.trig_341_dirichlet_weighted_sum_nonneg
+#print axioms QuasiRiemann.dvp_asymptotic_zero_free_region
+#print axioms QuasiRiemann.dirichlet_log_ratio_lower
+#print axioms QuasiRiemann.dirichlet_offdiag_sum_bound
+#print axioms QuasiRiemann.dirichlet_offdiag_envelope_le_half_diag
+#print axioms QuasiRiemann.dirichlet_l2_diagonal_dominance_sandwich
+#print axioms QuasiRiemann.dirichlet_l2_zeta_and_mobius_certs
+#print axioms QuasiRiemann.ln2Upper36Scaled_eq_lnInterval36_hi
+#print axioms QuasiRiemann.octaveLnUpper36_bounds_lnInterval36
+
 -- end of file: leanasm/tests/TestAxioms.lean

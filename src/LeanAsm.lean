@@ -6,6 +6,7 @@ import LeanAsm.Conjectures
 import LeanAsm.YangMillsToy
 import LeanAsm.YangMillsQ8
 import LeanAsm.QuasiRiemann
+import LeanAsm.QuasiRiemann.AsymptoticZfr
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.EulerFactorNonVanishing
