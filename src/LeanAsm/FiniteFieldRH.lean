@@ -489,14 +489,18 @@ theorem genus2_zeta_rational_identity (T : Int) :
   rw [b2, b3, c2, c3, r1]
   omega
 
-/-- Cleared-denominator witness for `L_C(1/5) = 1775/625 = 71/25`:
-formally proves `genus2LNumAtInv5 = 1775`, `1775 * 25 = 71 * 625`, and `1775 > 0`,
-which yields nonvanishing (`L(C, 1) = 71/25 ≠ 0`, analytic rank `0`). -/
+/-- Cleared-denominator witness for `genus2LNumAtInv5`:
+formally proves `genus2LNumAtInv5 = 1775`, `1775 * 25 = 71 * 625`, and `1775 > 0`
+(mathematical remark: corresponding to nonvanishing `L_C(1/5) = 71/25 ≠ 0` and
+analytic rank `0`). -/
 theorem genus2_L_at_1_eq_71_div_25 :
     genus2LNumAtInv5 = 1775 ∧ 1775 * 25 = 71 * 625 ∧ 1775 > 0 := by
   decide
 
-/-- Exact `QRat` equivalence certifying `genus2LNumAtInv5 / 625 = 71 / 25`. -/
+/-- Formally proves `QuasiRiemann.QRat.eqv` between `QRat.mk' genus2LNumAtInv5 625`
+and `QRat.mk' 71 25` (with nonzero-denominator proofs `by decide`), representing
+`genus2LNumAtInv5 / 625` and `71 / 25` respectively
+(mathematical remark: corresponding to `L_C(1/5) = 71/25 ≠ 0` and analytic rank `0`). -/
 theorem genus2_L_at_1_qrat :
     QuasiRiemann.QRat.eqv
       (QuasiRiemann.QRat.mk' genus2LNumAtInv5 625 (by decide))
