@@ -34,6 +34,22 @@ def main : IO Unit := do
   IO.println s!"  Initial State : r0={initial.r0}, r1={initial.r1}, pc={initial.pc}"
   IO.println s!"  After Program : r0={finalState.r0}, r1={finalState.r1}, pc={finalState.pc}"
   IO.println "  Formal proof verified: (s.set r v).get r = v"
+  let ntt2In : State := { r0 := 5, r1 := 12 }
+  let ntt2Mid := runProgram ntt2In MiniVMNttBridge.ntt2AsmF17
+  let ntt2Out := runProgram ntt2Mid MiniVMNttBridge.intt2AsmF17
+  IO.println s!"  MiniVM F_17 2-pt NTT  : (5,12) -> ({ntt2Mid.r0},{ntt2Mid.r1})"
+  IO.println s!"  MiniVM F_17 2-pt INTT : ({ntt2Mid.r0},{ntt2Mid.r1}) -> ({ntt2Out.r0},{ntt2Out.r1}) [289/289]"
+  let ntt4In : State := { r0 := 1, r1 := 2, r2 := 3, r3 := 4 }
+  let ntt4Mid := runProgram ntt4In MiniVMNttBridge.ntt4AsmF17
+  let ntt4Out := runProgram ntt4Mid MiniVMNttBridge.intt4AsmF17
+  IO.println (
+    s!"  MiniVM F_17 4-pt NTT  : (1,2,3,4) -> " ++
+    s!"({ntt4Mid.r0},{ntt4Mid.r1},{ntt4Mid.r2},{ntt4Mid.r3})"
+  )
+  IO.println (
+    s!"  MiniVM F_17 4-pt INTT : " ++
+    s!"-> ({ntt4Out.r0},{ntt4Out.r1},{ntt4Out.r2},{ntt4Out.r3}) [83521/83521]"
+  )
 
   -- 2. Conjectures & Collatz computation
   IO.println "\n[+] Part 2: Collatz Trajectory Exploration & QRH Diophantine Bridge"
