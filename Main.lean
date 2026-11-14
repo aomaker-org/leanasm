@@ -183,6 +183,15 @@ def main : IO Unit := do
     s!"{repr zdIng} (Ingham), μ(1/2) ∈ \{0, 13/84, 1/6, 1/4}")
   IO.println (s!"  QRH θ Ladder      : 3/4 < 7/8 < 11/12 < 47/48 < 1 " ++
     s!"(Chebyshev gaps \{1/4, 1/8, 1/12, {repr gap4}}, < DVP ZFR, ZERO axioms)")
+  let e24_1 := QuasiRiemann.tenPowThetaExactExp 2 σ34
+  let e24_2 := QuasiRiemann.tenPowThetaExactExp 2 QuasiRiemann.qrhThresholdSevenEighths
+  let e24_3 := QuasiRiemann.tenPowThetaExactExp 2 QuasiRiemann.qrhThresholdElevenTwelfths
+  let e48_1 := QuasiRiemann.tenPowThetaExactExp 4 σ34
+  let e48_4 := QuasiRiemann.tenPowThetaExactExp 4 QuasiRiemann.qrhThresholdFortySevenFortyEighths
+  IO.println (s!"  Chebyshev Bounds  : x=10^24 θ=3/4 saves 10^{e24_2 - e24_1} vs 7/8, " ++
+    s!"10^{e24_3 - e24_1} vs 11/12")
+  IO.println (s!"                      x=10^48 θ=3/4 saves 10^{e48_4 - e48_1} vs 47/48; " ++
+    "x=10^336 all-rung err < 10^-1")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"
