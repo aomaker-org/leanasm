@@ -180,7 +180,7 @@ def main : IO Unit := do
   let zdIng := (QuasiRiemann.zdIngham34.exponent σ34).reduce
   let gap4 := (QuasiRiemann.chebyshevGap QuasiRiemann.qrhThresholdFortySevenFortyEighths).reduce
   IO.println (s!"  Zero-Density @3/4 : {repr zdGM} (GM) < {repr zdHux} (Hux) < " ++
-    s!"{repr zdIng} (Ingham), μ(1/2) ∈ \{13/84, 1/6, 1/4}")
+    s!"{repr zdIng} (Ingham), μ(1/2) ∈ \{0, 13/84, 1/6, 1/4}")
   IO.println (s!"  QRH θ Ladder      : 3/4 < 7/8 < 11/12 < 47/48 < 1 " ++
     s!"(Chebyshev gaps \{1/4, 1/8, 1/12, {repr gap4}}, < DVP ZFR, ZERO axioms)")
 
