@@ -2,6 +2,7 @@
 -- Library root module aggregating MiniVM, Conjectures, YangMills, QuasiRiemann, Rns, and FiniteFieldRH.
 
 import LeanAsm.MiniVM
+import LeanAsm.MiniVMNttBridge
 import LeanAsm.Conjectures
 import LeanAsm.YangMillsToy
 import LeanAsm.YangMillsQ8

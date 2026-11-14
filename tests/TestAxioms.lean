@@ -438,4 +438,13 @@ import LeanAsm
 #print axioms CrtNtt.ntt_convolution_no_wraparound
 #print axioms CrtNtt.fermat_tower_conv_bound_certs
 
+-- Part 30: MiniVM F_17 2-Point & 4-Point NTT Assembly Soundness (Issue #11)
+#print axioms MiniVMNttBridge.runProgram_butterfly2AsmF17
+#print axioms MiniVMNttBridge.ntt2AsmF17_sound
+#print axioms MiniVMNttBridge.intt2AsmF17_sound
+#print axioms MiniVMNttBridge.intt2_ntt2_asm_F17_roundtrip
+#print axioms MiniVMNttBridge.ntt4AsmF17_sound
+#print axioms MiniVMNttBridge.intt4AsmF17_sound
+#print axioms MiniVMNttBridge.intt4_ntt4_asm_F17_roundtrip
+
 -- end of file: leanasm/tests/TestAxioms.lean

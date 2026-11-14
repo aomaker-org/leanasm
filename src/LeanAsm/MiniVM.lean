@@ -4,12 +4,17 @@
 
 namespace MiniVM
 
-/-- Register identifiers for a 4-register virtual machine. -/
+/--
+Register identifiers for the MiniVM (4 lane registers `r0..r3` plus
+2 scratch temporaries `t0, t1`).
+-/
 inductive Reg : Type
   | r0
   | r1
   | r2
   | r3
+  | t0
+  | t1
   deriving Repr, DecidableEq
 
 /-- Machine state: register values and program counter. -/
@@ -18,6 +23,8 @@ structure State where
   r1 : Nat := 0
   r2 : Nat := 0
   r3 : Nat := 0
+  t0 : Nat := 0
+  t1 : Nat := 0
   pc : Nat := 0
   deriving Repr, DecidableEq
 
@@ -27,6 +34,8 @@ def State.get (s : State) : Reg → Nat
   | Reg.r1 => s.r1
   | Reg.r2 => s.r2
   | Reg.r3 => s.r3
+  | Reg.t0 => s.t0
+  | Reg.t1 => s.t1
 
 /-- Write a value into a register in state. -/
 def State.set (s : State) (r : Reg) (v : Nat) : State :=
@@ -35,6 +44,8 @@ def State.set (s : State) (r : Reg) (v : Nat) : State :=
   | Reg.r1 => { s with r1 := v }
   | Reg.r2 => { s with r2 := v }
   | Reg.r3 => { s with r3 := v }
+  | Reg.t0 => { s with t0 := v }
+  | Reg.t1 => { s with t1 := v }
 
 /-- Update program counter. -/
 def State.setPc (s : State) (newPc : Nat) : State :=
@@ -89,6 +100,13 @@ theorem get_set_pc (s : State) (r : Reg) (newPc : Nat) :
 theorem add_comm_equiv (s : State) (dst src : Reg) :
     (s.get dst + s.get src) = (s.get src + s.get dst) := by
   omega
+
+/-- Sequential composition law for `runProgram`. -/
+theorem runProgram_append (s : State) (p q : List Instr) :
+    runProgram s (p ++ q) = runProgram (runProgram s p) q := by
+  induction p generalizing s with
+  | nil => rfl
+  | cons i rest ih => exact ih (step s i)
 
 /-- Theorem: Modular multiplication instruction evaluates correctly. -/
 theorem mul_mod_reg_correct (s : State) (dst src : Reg) (m : Nat) :
