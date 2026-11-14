@@ -319,4 +319,13 @@ import LeanAsm
 #print axioms FiniteFieldRH.genus2_jacobian_order_71_prime
 #print axioms FiniteFieldRH.genus2_basepoint_generates_jacobian
 
+-- Part 18: Weil Zeta / Euler-Factor Punctured-Strip Non-Vanishing (gemweb054)
+#print axioms WeilZetaBridge.genus2_L_poly_quad_factor_id
+#print axioms WeilZetaBridge.weil_denom_factor1_nonvanishing
+#print axioms WeilZetaBridge.weil_denom_factor2_nonvanishing
+#print axioms WeilZetaBridge.weil_denom_product_lower_bound
+#print axioms WeilZetaBridge.genus2_L_poly_lower_bound_off_half
+#print axioms WeilZetaBridge.genus2_L_poly_explicit_strip_certs
+#print axioms WeilZetaBridge.weil_zeta_punctured_strip_regular_and_nonzero
+
 -- end of file: leanasm/tests/TestAxioms.lean

@@ -179,6 +179,8 @@ def main : IO Unit := do
     "(rank 0, BSD 5^2*L = 71)")
   IO.println (s!"  Jacobian Group Order      : #J(C)(F_5) = {cardJacobianGenus2F5} " ++
     "(prime cyclic, basepoint (0, 1))")
+  IO.println (s!"  Weil Z(C/F_5, 5^-s) Strip : pole-free & zero-free on 0 < σ < 1, σ != 1/2 " ++
+    "(|L_C| >= 1/25 at σ=1/4, 1/100 at σ=3/4, 16/225 at σ=1)")
 
   -- 8. Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)
   IO.println "\n[+] Part 8: Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)"
