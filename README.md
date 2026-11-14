@@ -39,7 +39,7 @@ make build-incremental
 # Full build & execute Parts 1-11 + unified provenance CLI demo
 make sync
 
-# Audit transitive axiom closures across Parts 1-34 (0 choice, 0 sorryAx)
+# Audit transitive axiom closures across Parts 1-35 (0 choice, 0 sorryAx)
 lake env lean tests/TestAxioms.lean
 
 # Check submodule hydration status
@@ -56,8 +56,9 @@ kernel-verified computations across all 11 parts:
    `83,521` states) & parametric `{5, 17, 257, 65537}` 4-pt NTT/INTT and
    CRT-NTT cyclic convolution soundness.
 2. **Part 2 (`Conjectures`, `CollatzQrhBridge`)**: 144-digit CRT-NTT gap
-   `2^485 - 3^306 > 0`, 72-digit Baker measure, Steiner 1-cycle exclusions,
-   and the Simons-de Weger `m >= 307` (`K >= 793`) cycle-length barrier.
+   `2^485 - 3^306 > 0`, 318-digit `(1054, 665)` convergent bracket, 72-digit
+   Baker measure, Steiner 1-cycle exclusions, Simons-de Weger `m >= 666`
+   (`K >= 1721`) barrier, and constructive predecessor-tree density bounds.
 3. **Part 3 (`YangMillsToy`)**: 4D `Z_2` Wilson plaquette action & local gauge
    invariance.
 4. **Part 4 (`YangMillsQ8`)**: Non-abelian `Q_8 subset SU(2)` quaternion gauge
@@ -94,7 +95,7 @@ kernel-verified computations across all 11 parts:
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 `QuasiRiemann/`, `PC/` for `PiChudnovsky/`, and `Main.lean` +
-`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-34.
+`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-35.
 `NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `PC` = `PiChudnovsky`.
 
 | Module | NS | Flagship Theorem / Role |
@@ -133,8 +134,10 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
 
 - `MiniVMNttBridge.fermatTowerNtt4_asm_roundtrip_certs`,
   `garnerReconstruct4Asm_sound`, & `crtNtt4ChannelConvAsm_sound`
-- `CollatzQrhBridge.baker_effective_measure_485_306_verified` &
-  `steiner_1cycle_excluded_at_convergents`
+- `CollatzQrhBridge.baker_effective_measure_485_306_verified`,
+  `steiner_1cycle_excluded_at_convergents`, `log2_3_convergent_bracket_665`,
+  `simons_de_weger_barrier_665`, `collatzPredTree_sound`, &
+  `collatz_pred_tree_growth_certs`
 - `QuasiRiemann.high_height_dirichlet_rects_1e12_certified`,
   `dirichlet_l2_zeta_and_mobius_certs`,
   `zero_density_and_dvp_combined_region`, `qrh_chebyshev_savings_certs`,
@@ -185,7 +188,7 @@ leanasm/
 │       ├── ProvenanceSummary.lean
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
 │       └── QuasiRiemann/    # Rat, UltraDeep72, Zfr, Bridge, ZD, ShortInt
-├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-34)
+├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-35)
 └── tools/                   # Build and logging utilities
 ```
 

@@ -98,6 +98,15 @@ def main : IO Unit := do
   IO.println ("  Steiner 1-Cycle Excluded  : (8,5) n_min≥17, (65,41) ≥87, (306,193) ≥14, " ++
     "(485,306) ≥978")
   IO.println "  Simons-de Weger Barrier   : n_min ≥ 936,360 ⇒ m ≥ 307 odd steps (K ≥ 793 total steps)"
+  IO.println "  318-Digit Gap (1054/665)  : 3^665 - 2^1054 > 0 (313 digits), 1054/665 < log₂3 < 485/306"
+  IO.println "  Simons-de Weger (665)     : n_min ≥ 936,360 ⇒ m ≥ 666 odd steps, k ≥ 1055 (K ≥ 1721)"
+  let pred14 := (CollatzQrhBridge.collatzPredTree 14 1).length
+  let pred15 := (CollatzQrhBridge.collatzPredTree 15 1).length
+  let pred20 := (CollatzQrhBridge.collatzPredTree 20 1).length
+  IO.println (
+    s!"  Predecessor Tree Growth   : depth 14↦{pred14} (>15), 15↦{pred15} (>16), " ++
+    s!"20↦{pred20} (>21) [3/4 < 84/100 < 9/10]"
+  )
   IO.println "  QRH Cancellation Ladder   : 1/2 < 3/4 < 5/6 < 7/8 < 11/12 < 1 (Collatz ↔ Mollifier)"
 
   -- 3. 4D Wilson Lattice Gauge Theory Simulation (Z2)

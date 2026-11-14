@@ -484,4 +484,16 @@ import LeanAsm
 #print axioms LeanAsm.miniVm_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 35: Higher (1054, 665) Convergent Gaps & Predecessor-Tree Density (Issue #55)
+#print axioms CollatzQrhBridge.convergent_1054_665_gap_pos
+#print axioms CollatzQrhBridge.log2_3_convergent_bracket_665
+#print axioms CollatzQrhBridge.steiner_1cycle_excluded_1054_665
+#print axioms CollatzQrhBridge.simons_de_weger_barrier_665
+#print axioms CollatzQrhBridge.collatzPredTree_sound
+#print axioms CollatzQrhBridge.collatz_mod6_branching
+#print axioms CollatzQrhBridge.predecessor_density_threshold_ladder
+#print axioms CollatzQrhBridge.collatz_pred_tree_growth_certs
+#print axioms LeanAsm.collatz_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean
