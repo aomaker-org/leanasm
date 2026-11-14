@@ -375,4 +375,15 @@ import LeanAsm
 #print axioms CollatzQrhBridge.collatz_linear_form_uniform_306
 #print axioms CollatzQrhBridge.collatz_cycle_length_lower_bound_306
 
+-- Part 23: Fermat-Prime Tower {5, 17, 257, 65537} Euler Product Non-Vanishing (Issue #28)
+#print axioms EulerFactorNonVanishing.fermat_prefix_prod_eq
+#print axioms EulerFactorNonVanishing.fermat_tower_product_eq_2pow32_sub_1
+#print axioms EulerFactorNonVanishing.local_euler_disk_nonvanishing
+#print axioms EulerFactorNonVanishing.euler_product_finite_norm_lower_bound
+#print axioms EulerFactorNonVanishing.fermat_tower_euler_product_nonvanishing
+#print axioms EulerFactorNonVanishing.fermat_tower_euler_product_strip_certs
+#print axioms EulerFactorNonVanishing.fermat_tower_sigma_half_lower_bound
+#print axioms EulerFactorNonVanishing.fermat_tower_sigma_three_quarters_lower_bound
+#print axioms EulerFactorNonVanishing.fermat_tower_sigma_one_lower_bound
+
 -- end of file: leanasm/tests/TestAxioms.lean

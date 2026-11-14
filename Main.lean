@@ -177,6 +177,12 @@ def main : IO Unit := do
   IO.println s!"  Carry-Free RNS Product    : {repr rnsProd}"
   IO.println s!"  CRT Reconstructed Value   : {reconstructed} (expected {A * B})"
   IO.println s!"  Garner Mixed-Radix Recon  : {fromRnsTupleGarner rnsProd} (bounded operands < 169)"
+  let fProd := EulerFactorNonVanishing.fermatTowerPrimes.prod
+  let fTot := (EulerFactorNonVanishing.fermatTowerPrimes.map (· - 1)).prod
+  IO.println (s!"  Fermat-Prime Tower Euler  : ∏\{5,17,257,65537} = {fProd} ((2³²-1)/3), " ++
+    s!"∏(p-1) = {fTot} = 2³⁰")
+  IO.println ("  Strip Euler Lower Bounds  : σ=1/2 |∏(1-p^-s)|² > 1/9, " ++
+    "σ=3/4 > 1/3, σ=1 > 9/16 > 1/16")
   IO.println "  CRT roundtrip & homomorphism: ZERO axioms verified"
 
   -- 7. Unconditional Riemann Hypothesis for Curves over Finite Fields (Hasse-Weil)
