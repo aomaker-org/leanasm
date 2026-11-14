@@ -216,6 +216,11 @@ def main : IO Unit := do
     s!"(zero={Genus2Jacobian.divEqB jac71 Genus2Jacobian.MumfordDivisor.zero})")
   IO.println (s!"  Weil Z(C/F_5, 5^-s) Strip : pole-free & zero-free on 0 < σ < 1, σ != 1/2 " ++
     "(|L_C| >= 1/25 at σ=1/4, 1/100 at σ=3/4, 16/225 at σ=1)")
+  let imCrit := WeilZetaBridge.completedZetaImagPart (1, 2) 5
+  IO.println ("  Hasse-Weil Functional Eq  : 25 T^4 L_C(1/(5T)) = L_C(T) & " ++
+    "5 T^2 Z(C/F_5, 1/(5T)) = Z(C/F_5, T)")
+  IO.println (s!"  Completed Zeta Ξ_C(1-s)=Ξ_C(s): cleared Im-num((1+2i)/5) = {imCrit} " ++
+    "(=> Im Ξ_C = 0 on Re(s) = 1/2, ZERO axioms)")
 
   -- 8. Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)
   IO.println "\n[+] Part 8: Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)"

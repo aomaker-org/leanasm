@@ -395,4 +395,9 @@ import LeanAsm
 #print axioms QuasiRiemann.sweepDirichletRectangles2DN128_all_valid
 #print axioms QuasiRiemann.high_height_dirichlet_rects_1e12_certified
 
+-- Part 25: Genus-2 Hasse-Weil Functional Equation & Completed Zeta Reflection (Issue #34)
+#print axioms WeilZetaBridge.genus2_L_poly_functional_eq
+#print axioms WeilZetaBridge.genus2_weil_zeta_functional_eq
+#print axioms WeilZetaBridge.genus2_completed_zeta_reflection
+
 -- end of file: leanasm/tests/TestAxioms.lean
