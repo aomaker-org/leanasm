@@ -175,6 +175,10 @@ def main : IO Unit := do
     s!"(a_1 = {genus2TraceA1}, a_2 = {genus2TraceA2})")
   IO.println s!"  Frobenius Char Poly P_frob: P_frob(X) = X⁴ + 5X³ + 15X² + 25X + 25"
   IO.println s!"  Genus-2 RH Eigenvalues    : |α_i|² = 5 (Re(s) = 1/2, negative Δ_i = u_i² - 20 < 0)"
+  IO.println (s!"  Weil L-Value L(C, 1)      : L_C(1/5) = {genus2LNumAtInv5}/625 = 71/25 != 0 " ++
+    "(rank 0, BSD 5^2*L = 71)")
+  IO.println (s!"  Jacobian Group Order      : #J(C)(F_5) = {cardJacobianGenus2F5} " ++
+    "(prime cyclic, basepoint (0, 1))")
 
   -- 8. Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)
   IO.println "\n[+] Part 8: Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)"

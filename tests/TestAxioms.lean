@@ -310,4 +310,13 @@ import LeanAsm
 #print axioms CollatzQrhBridge.collatzBeatPeriodUpper72_sound
 #print axioms CollatzQrhBridge.collatz_qrh_phase_beat_72_verified
 
+-- Part 17: Genus-2 Weil L-Function & Jacobian Order #J(C)(F_5) = 71 (gemweb053)
+#print axioms FiniteFieldRH.genus2_L_poly_eq_recip_frob
+#print axioms FiniteFieldRH.genus2_zeta_rational_identity
+#print axioms FiniteFieldRH.genus2_L_at_1_eq_71_div_25
+#print axioms FiniteFieldRH.genus2_bsd_finite_field_identity
+#print axioms FiniteFieldRH.genus2_jacobian_order_eq_71
+#print axioms FiniteFieldRH.genus2_jacobian_order_71_prime
+#print axioms FiniteFieldRH.genus2_basepoint_generates_jacobian
+
 -- end of file: leanasm/tests/TestAxioms.lean
