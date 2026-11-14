@@ -3,6 +3,7 @@
 -- and 96-Digit 2x2 Karatsuba-over-CRT-NTT Multiplier (gemweb042 Stage 2 & Stage 3).
 
 import LeanAsm.CrtNtt
+import LeanAsm.EulerFactorNonVanishing
 
 namespace CrtNtt
 
@@ -2368,6 +2369,187 @@ theorem karatsuba_192_digit_max_verified :
       _ = 10 ^ 192 - 2 * 10 ^ 96 + 1 := by rw [hm, hpow96]
   refine ⟨?_, hmax⟩
   rw [karatsubaCrtNttMul192_universal_sound max96 max96 hnorm hnorm, hev96, hmax]
+
+-- =============================================================================
+-- Part H: Fermat-Tower 4-Prime Garner CRT & Convolution Wrap-Around Bounds
+-- =============================================================================
+
+/-- Exact 4-prime Fermat-tower CRT modulus `M_4 = 5 * 17 * 257 * 65537`. -/
+def fermatTowerMod4 : Nat :=
+  5 * 17 * 257 * 65537
+
+/-- Fermat-tower dynamic range & unsigned 31-bit embedding bounds:
+`M_4 = 1,431,655,765 = EulerFactorNonVanishing.fermatTowerPrimes.prod`,
+`3 * M_4 = 2^32 - 1 = 4,294,967,295`, and `2^30 < M_4 < 2^31`.
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem fermat_tower_crt_modulus_bounds :
+    fermatTowerMod4 = 1431655765 ∧
+    fermatTowerMod4 = EulerFactorNonVanishing.fermatTowerPrimes.prod ∧
+    3 * fermatTowerMod4 = 2 ^ 32 - 1 ∧
+    2 ^ 30 < fermatTowerMod4 ∧ fermatTowerMod4 < 2 ^ 31 := by
+  have hft := EulerFactorNonVanishing.fermat_tower_product_eq_2pow32_sub_1
+  have hm4 : fermatTowerMod4 = 1431655765 := by decide
+  refine ⟨hm4, ?_, by decide, by decide, by decide⟩
+  rw [hm4, hft.2.1]
+
+/-- Intermediate 3-prime Garner reconstruction for `{5, 17, 257}` (`M_3 = 21,845`):
+`(5 * 17)⁻¹ ≡ 127 (mod 257)`. -/
+def garner5_17_257 (r1 r2 r3 : Nat) : Nat :=
+  let x12 := garner5_17 r1 r2
+  let v3 := ((r3 % 257 + 257 - (x12 % 257)) * 127) % 257
+  x12 + 85 * v3
+
+/-- Constructive 4-prime Garner mixed-radix CRT reconstruction over `{5, 17, 257, 65537}`:
+- `c12 = 5⁻¹ mod 17 = 7`
+- `c123 = 85⁻¹ mod 257 = 127`
+- `c1234 = 21845⁻¹ mod 65537 = 32767`
+Avoids `O(M_4^2)` intermediate big-modulus multiplications. -/
+def garnerReconstruct4 (r1 r2 r3 r4 : Nat) : Nat :=
+  let x123 := garner5_17_257 r1 r2 r3
+  let v4 := ((r4 % 65537 + 65537 - (x123 % 65537)) * 32767) % 65537
+  x123 + 21845 * v4
+
+/-- Certified mixed-radix Garner inverses over `(5, 17, 257, 65537)`. -/
+theorem garner_4ch_inverses_sound :
+    (5 * 7) % 17 = 1 ∧
+    (85 * 127) % 257 = 1 ∧
+    (21845 * 32767) % 65537 = 1 := by
+  decide
+
+private theorem garner5_17_roundtrip (y : Nat) (hy : y < 85) :
+    garner5_17 (y % 5) (y % 17) = y := by
+  dsimp [garner5_17]
+  omega
+
+private theorem garner5_17_257_roundtrip (z : Nat) (hz : z < 21845) :
+    garner5_17_257 (z % 5) (z % 17) (z % 257) = z := by
+  dsimp [garner5_17_257]
+  let y := z % 85
+  have hy : y < 85 := Nat.mod_lt z (by decide)
+  have hd5 : 5 ∣ 85 := ⟨17, rfl⟩
+  have hd17 : 17 ∣ 85 := ⟨5, by decide⟩
+  have hpart : garner5_17 (z % 5) (z % 17) = y := by
+    rw [← Nat.mod_mod_of_dvd z hd5, ← Nat.mod_mod_of_dvd z hd17]
+    exact garner5_17_roundtrip y hy
+  rw [hpart]
+  omega
+
+/-- Output range bound: `garnerReconstruct4 r1 r2 r3 r4 < fermatTowerMod4` for all inputs. -/
+theorem garnerReconstruct4_lt (r1 r2 r3 r4 : Nat) :
+    garnerReconstruct4 r1 r2 r3 r4 < fermatTowerMod4 := by
+  dsimp [garnerReconstruct4, garner5_17_257, garner5_17, fermatTowerMod4]
+  omega
+
+/-- Constructive 4-Prime Garner Mixed-Radix CRT Roundtrip Soundness:
+Reconstructs every `x < M_4 = 1,431,655,765` from `(x % 5, x % 17, x % 257, x % 65537)`.
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem garnerReconstruct4_sound (x : Nat) (hx : x < fermatTowerMod4) :
+    garnerReconstruct4 (x % 5) (x % 17) (x % 257) (x % 65537) = x := by
+  dsimp [fermatTowerMod4] at hx
+  dsimp [garnerReconstruct4]
+  let z := x % 21845
+  have hz : z < 21845 := Nat.mod_lt x (by decide)
+  have hd5 : 5 ∣ 21845 := ⟨4369, rfl⟩
+  have hd17 : 17 ∣ 21845 := ⟨1285, by decide⟩
+  have hd257 : 257 ∣ 21845 := ⟨85, by decide⟩
+  have hpart : garner5_17_257 (x % 5) (x % 17) (x % 257) = z := by
+    rw [← Nat.mod_mod_of_dvd x hd5, ← Nat.mod_mod_of_dvd x hd17,
+        ← Nat.mod_mod_of_dvd x hd257]
+    exact garner5_17_257_roundtrip z hz
+  rw [hpart]
+  omega
+
+/-- Generic `m`-term convolution inner-product sum `∑_{i < m} a i * b (idx i)`
+covering cyclic/negacyclic index permutations `idx : Nat → Nat`. -/
+def convPairSum (a b : Nat → Nat) (idx : Nat → Nat) : Nat → Nat
+  | 0 => 0
+  | m + 1 => convPairSum a b idx m + a m * b (idx m)
+
+private theorem convPairSum_le_prefix (a b : Nat → Nat) (idx : Nat → Nat) (N B m : Nat)
+    (hm : m ≤ N) (ha : ∀ i, i < N → a i ≤ B) (hb : ∀ j, j < N → b j ≤ B)
+    (hidx : ∀ i, i < N → idx i < N) :
+    convPairSum a b idx m ≤ m * (B * B) := by
+  induction m with
+  | zero =>
+    dsimp [convPairSum]
+    exact Nat.zero_le _
+  | succ k ih =>
+    have hkN : k < N := hm
+    have hk_le : k ≤ N := Nat.le_of_lt hkN
+    have ihk := ih hk_le
+    have ha_k : a k ≤ B := ha k hkN
+    have hb_k : b (idx k) ≤ B := hb (idx k) (hidx k hkN)
+    have hprod : a k * b (idx k) ≤ B * B := Nat.mul_le_mul ha_k hb_k
+    dsimp [convPairSum]
+    calc convPairSum a b idx k + a k * b (idx k)
+        ≤ k * (B * B) + B * B := Nat.add_le_add ihk hprod
+      _ = (k + 1) * (B * B) := (Nat.succ_mul k (B * B)).symm
+
+/-- Constructive NTT Convolution Wrap-Around Safety Theorem:
+For any length-`N` integer polynomials with `0 ≤ a_i, b_j ≤ B` (`idx i < N`),
+every `N`-term convolution coefficient satisfies `c ≤ N * B^2`; whenever
+`N * B^2 < M_4`, `garnerReconstruct4` recovers `c` with zero wrap-around.
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem ntt_convolution_no_wraparound (a b : Nat → Nat) (idx : Nat → Nat) (N B : Nat)
+    (ha : ∀ i, i < N → a i ≤ B) (hb : ∀ j, j < N → b j ≤ B)
+    (hidx : ∀ i, i < N → idx i < N) (hfit : N * (B * B) < fermatTowerMod4) :
+    let c := convPairSum a b idx N
+    c ≤ N * (B * B) ∧
+    c < fermatTowerMod4 ∧
+    garnerReconstruct4 (c % 5) (c % 17) (c % 257) (c % 65537) = c := by
+  intro c
+  have hle : c ≤ N * (B * B) :=
+    convPairSum_le_prefix a b idx N B N (Nat.le_refl N) ha hb hidx
+  have hlt : c < fermatTowerMod4 := Nat.lt_of_le_of_lt hle hfit
+  exact ⟨hle, hlt, garnerReconstruct4_sound c hlt⟩
+
+/-- Sharp Fermat-Tower NTT Convolution Wrap-Around Certificates (`M_4 = 1,431,655,765`):
+Certifies the exact maximum single-limb bounds for `N ∈ {4, 8, 16}`:
+1. `N = 4`:  `B ≤ 18918` (`4 * 18918^2 = 1431562896 < M_4 < 4 * 18919^2`)
+2. `N = 8`:  `B ≤ 13377` (`8 * 13377^2 = 1431553032 < M_4 < 8 * 13378^2`)
+3. `N = 16`: `B ≤ 9459`  (`16 * 9459^2 = 1431562896 < M_4 < 16 * 9460^2`)
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem fermat_tower_conv_bound_certs :
+    (4 * (18918 * 18918) = 1431562896 ∧
+      4 * (18918 * 18918) < fermatTowerMod4 ∧
+      fermatTowerMod4 < 4 * (18919 * 18919)) ∧
+    (8 * (13377 * 13377) = 1431553032 ∧
+      8 * (13377 * 13377) < fermatTowerMod4 ∧
+      fermatTowerMod4 < 8 * (13378 * 13378)) ∧
+    (16 * (9459 * 9459) = 1431562896 ∧
+      16 * (9459 * 9459) < fermatTowerMod4 ∧
+      fermatTowerMod4 < 16 * (9460 * 9460)) ∧
+    (∀ (a b : Nat → Nat) (idx : Nat → Nat),
+      (∀ i, i < 4 → a i ≤ 18918) → (∀ j, j < 4 → b j ≤ 18918) →
+      (∀ i, i < 4 → idx i < 4) →
+      let c := convPairSum a b idx 4
+      c < fermatTowerMod4 ∧
+      garnerReconstruct4 (c % 5) (c % 17) (c % 257) (c % 65537) = c) ∧
+    (∀ (a b : Nat → Nat) (idx : Nat → Nat),
+      (∀ i, i < 8 → a i ≤ 13377) → (∀ j, j < 8 → b j ≤ 13377) →
+      (∀ i, i < 8 → idx i < 8) →
+      let c := convPairSum a b idx 8
+      c < fermatTowerMod4 ∧
+      garnerReconstruct4 (c % 5) (c % 17) (c % 257) (c % 65537) = c) ∧
+    (∀ (a b : Nat → Nat) (idx : Nat → Nat),
+      (∀ i, i < 16 → a i ≤ 9459) → (∀ j, j < 16 → b j ≤ 9459) →
+      (∀ i, i < 16 → idx i < 16) →
+      let c := convPairSum a b idx 16
+      c < fermatTowerMod4 ∧
+      garnerReconstruct4 (c % 5) (c % 17) (c % 257) (c % 65537) = c) := by
+  have hc4 : 4 * (18918 * 18918) < fermatTowerMod4 := by decide
+  have hc8 : 8 * (13377 * 13377) < fermatTowerMod4 := by decide
+  have hc16 : 16 * (9459 * 9459) < fermatTowerMod4 := by decide
+  refine ⟨⟨rfl, hc4, by decide⟩, ⟨rfl, hc8, by decide⟩, ⟨rfl, hc16, by decide⟩, ?_, ?_, ?_⟩
+  · intro a b idx ha hb hidx
+    have h := ntt_convolution_no_wraparound a b idx 4 18918 ha hb hidx hc4
+    exact ⟨h.2.1, h.2.2⟩
+  · intro a b idx ha hb hidx
+    have h := ntt_convolution_no_wraparound a b idx 8 13377 ha hb hidx hc8
+    exact ⟨h.2.1, h.2.2⟩
+  · intro a b idx ha hb hidx
+    have h := ntt_convolution_no_wraparound a b idx 16 9459 ha hb hidx hc16
+    exact ⟨h.2.1, h.2.2⟩
 
 end CrtNtt
 
