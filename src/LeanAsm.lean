@@ -9,6 +9,7 @@ import LeanAsm.QuasiRiemann
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.EulerFactorNonVanishing
+import LeanAsm.WeilZetaBridge
 import LeanAsm.NttArithmetic
 import LeanAsm.CrtNtt
 import LeanAsm.CrtNttUniversal
