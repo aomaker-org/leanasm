@@ -467,4 +467,9 @@ import LeanAsm
 #print axioms QuasiRiemann.shortIntervalDensityExponent_eqv_primeGapExponent
 #print axioms QuasiRiemann.short_interval_density_ladder_strict
 
+-- Part 33: Fermat-Tower AP Short-Interval Primes & Sub-3/4 QRH Ladder (Issue #51)
+#print axioms QuasiRiemann.ap_short_interval_psi_diff_bound
+#print axioms QuasiRiemann.fermat_tower_ap_short_interval_certs
+#print axioms QuasiRiemann.sub_three_quarters_qrh_ladder_certs
+
 -- end of file: leanasm/tests/TestAxioms.lean

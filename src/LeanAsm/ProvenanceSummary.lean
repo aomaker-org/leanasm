@@ -306,7 +306,54 @@ def ShortIntervalPrimesProp : Prop :=
           pCurr ≤ 10 ^ s.xScaleExp →
           (10 ^ s.xScaleExp + 10 ^ s.hScaleExp < pNext → thetaXH - thetaX ≤ 0) →
           pNext ≤ 10 ^ s.xScaleExp + 10 ^ s.hScaleExp ∧
-          (pCurr = 10 ^ s.xScaleExp → pNext - pCurr ≤ 10 ^ s.hScaleExp)))
+          (pCurr = 10 ^ s.xScaleExp → pNext - pCurr ≤ 10 ^ s.hScaleExp))) ∧
+  (EulerFactorNonVanishing.fermatTowerPrimes = [5, 17, 257, 65537] ∧
+   (EulerFactorNonVanishing.fermatTowerPrimes.map (· - 1)).prod = 2 ^ 30 ∧
+   EulerFactorNonVanishing.FermatTowerStripCert ∧
+   ((QuasiRiemann.fermatAp78Spec 5 (by decide)).HasGuaranteedApPrime ∧
+    (QuasiRiemann.fermatAp78Spec 17 (by decide)).HasGuaranteedApPrime ∧
+    (QuasiRiemann.fermatAp78Spec 257 (by decide)).HasGuaranteedApPrime ∧
+    (QuasiRiemann.fermatAp78Spec 65537 (by decide)).HasGuaranteedApPrime) ∧
+   ((QuasiRiemann.fermatAp34Spec 5 (by decide)).HasGuaranteedApPrime ∧
+    (QuasiRiemann.fermatAp34Spec 17 (by decide)).HasGuaranteedApPrime ∧
+    (QuasiRiemann.fermatAp34Spec 257 (by decide)).HasGuaranteedApPrime ∧
+    (QuasiRiemann.fermatAp34Spec 65537 (by decide)).HasGuaranteedApPrime)) ∧
+  (∀ (s : QuasiRiemann.ApShortIntervalSpec)
+      (psiApX psiApXH thetaApX thetaApXH : Int),
+    Int.natAbs ((s.phiQ : Int) * psiApX - ((10 ^ s.base.xScaleExp : Nat) : Int)) ≤
+      s.phiQ * s.base.errUpper →
+    Int.natAbs ((s.phiQ : Int) * psiApXH -
+        ((10 ^ s.base.xScaleExp + 10 ^ s.base.hScaleExp : Nat) : Int)) ≤
+      s.phiQ * s.base.errUpper →
+    (psiApXH - psiApX) - (thetaApXH - thetaApX) ≤ (s.base.primePowerCorr : Int) →
+    s.HasGuaranteedApPrime →
+    (0 : Int) < thetaApXH - thetaApX) ∧
+  (let θ12 := QuasiRiemann.QRat.mk' 1 2
+   let θ916 := QuasiRiemann.qrhThresholdNineSixteenths
+   let θ58 := QuasiRiemann.qrhThresholdFiveEighths
+   let θ23 := QuasiRiemann.qrhThresholdTwoThirds
+   let θ34 := QuasiRiemann.qrhThresholdThreeQuarters
+   let θ78 := QuasiRiemann.qrhThresholdSevenEighths
+   (θ12 < θ916 ∧ θ916 < θ58 ∧ θ58 < θ23 ∧
+    θ23 < θ34 ∧ θ34 < θ78 ∧ θ78 < QuasiRiemann.QRat.ofInt 1) ∧
+   (QuasiRiemann.QRat.ofInt 0 < QuasiRiemann.chebyshevGap θ78 ∧
+    QuasiRiemann.chebyshevGap θ78 < QuasiRiemann.chebyshevGap θ34 ∧
+    QuasiRiemann.chebyshevGap θ34 < QuasiRiemann.chebyshevGap θ23 ∧
+    QuasiRiemann.chebyshevGap θ23 < QuasiRiemann.chebyshevGap θ58 ∧
+    QuasiRiemann.chebyshevGap θ58 < QuasiRiemann.chebyshevGap θ916 ∧
+    QuasiRiemann.chebyshevGap θ916 < QuasiRiemann.chebyshevGap θ12) ∧
+   (QuasiRiemann.tenPowThetaCeilExp 2 θ23 = 16 ∧
+    QuasiRiemann.tenPowThetaCeilExp 2 θ58 = 15 ∧
+    QuasiRiemann.tenPowThetaCeilExp 4 θ916 = 27) ∧
+   (QuasiRiemann.shortIntervalQrh23Spec.HasGuaranteedPrime ∧
+    10 ^ 20 < 2 * QuasiRiemann.shortIntervalQrh23Spec.errUpper +
+      QuasiRiemann.shortIntervalQrh23Spec.primePowerCorr) ∧
+   (QuasiRiemann.shortIntervalQrh58Spec.HasGuaranteedPrime ∧
+    10 ^ 19 < 2 * QuasiRiemann.shortIntervalQrh58Spec.errUpper +
+      QuasiRiemann.shortIntervalQrh58Spec.primePowerCorr) ∧
+   (QuasiRiemann.shortIntervalQrh916Spec.HasGuaranteedPrime ∧
+    10 ^ 31 < 2 * QuasiRiemann.shortIntervalQrh916Spec.errUpper +
+      QuasiRiemann.shortIntervalQrh916Spec.primePowerCorr))
 
 /-- Part 5 provenance specification bundling mollifier descent, 2D rectangles down to
 `σ = 0.501`, `t ~ 10^12` phase-reduced rectangles, DVP asymptotic strip, Dirichlet `L^2`
@@ -467,7 +514,12 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
     QuasiRiemann.short_interval_density_ladder_strict,
     fun spec s hH hE pX pXH tX tXH hBX hBXH hC =>
       QuasiRiemann.qrh_maximal_prime_gap_bound
-        spec s hH hE pX pXH tX tXH hBX hBXH hC⟩⟩
+        spec s hH hE pX pXH tX tXH hBX hBXH hC,
+    QuasiRiemann.fermat_tower_ap_short_interval_certs,
+    fun s pX pXH tX tXH hBX hBXH hC hP =>
+      QuasiRiemann.ap_short_interval_psi_diff_bound
+        s pX pXH tX tXH hBX hBXH hC hP,
+    QuasiRiemann.sub_three_quarters_qrh_ladder_certs⟩⟩
 
 -- =============================================================================
 -- Parts 6 & 8: RNS Garner & Fermat-Tower / Dedekind Euler Non-Vanishing
