@@ -352,4 +352,15 @@ import LeanAsm
 #print axioms FiniteFieldRH.genus2DerivF5_eq_neg_one
 #print axioms FiniteFieldRH.genus2_L_at_1_qrat
 
+-- Part 21: Genus-2 Cantor-Mumford Jacobian Group Law (Issue #24)
+#print axioms Genus2Jacobian.polyDivMod_sound
+#print axioms Genus2Jacobian.polyXgcd_bezout
+#print axioms Genus2Jacobian.D0_is_reduced
+#print axioms Genus2Jacobian.orbitAt_cayley
+#print axioms Genus2Jacobian.cantorAdd_preserves_reduced
+#print axioms Genus2Jacobian.cantorSmul_preserves_reduced
+#print axioms Genus2Jacobian.jacobian_D0_order_71
+#print axioms Genus2Jacobian.jacobian_D0_primitive
+#print axioms Genus2Jacobian.jacobian_group_axioms_on_orbit
+
 -- end of file: leanasm/tests/TestAxioms.lean

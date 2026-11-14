@@ -191,6 +191,9 @@ def main : IO Unit := do
     "(rank 0, BSD 5^2*L = 71)")
   IO.println (s!"  Jacobian Group Order      : #J(C)(F_5) = {cardJacobianGenus2F5} " ++
     "(prime cyclic, basepoint (0, 1))")
+  let jac71 := Genus2Jacobian.cantorSmul 71 Genus2Jacobian.D0
+  IO.println (s!"  Cantor-Mumford Group Law  : 71 * [P_0 - ∞] = 0 on J(C)(F_5) " ++
+    s!"(zero={Genus2Jacobian.divEqB jac71 Genus2Jacobian.MumfordDivisor.zero})")
   IO.println (s!"  Weil Z(C/F_5, 5^-s) Strip : pole-free & zero-free on 0 < σ < 1, σ != 1/2 " ++
     "(|L_C| >= 1/25 at σ=1/4, 1/100 at σ=3/4, 16/225 at σ=1)")
 

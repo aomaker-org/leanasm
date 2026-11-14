@@ -11,6 +11,7 @@ import LeanAsm.QuasiRiemann.AsymptoticZfr
 import LeanAsm.QuasiRiemann.AsymptoticZfrBridge
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
+import LeanAsm.Genus2Jacobian
 import LeanAsm.EulerFactorNonVanishing
 import LeanAsm.WeilZetaBridge
 import LeanAsm.NttArithmetic
