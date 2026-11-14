@@ -24,6 +24,7 @@ import LeanAsm.CrtNttUniversal
 import LeanAsm.CollatzQrhBridge
 import LeanAsm.PiChudnovsky.CrtMulBridge
 import LeanAsm.PiChudnovsky
+import LeanAsm.GSp4FunctorialityBridge
 
 namespace LeanAsm
 
@@ -738,7 +739,8 @@ theorem eulerRns_provenance_certified : EulerRnsProvenance :=
 
 /-- Part 7 provenance specification bundling Hasse-Weil RH for `E / F_7`,
 genus-2 `C / F_5` negative discriminants, `L(C, 1) = 71/25`, Cantor-Mumford group axioms
-for `J(C)(F_5) ≅ Z/71Z`, punctured-strip zeta non-vanishing, and `Ξ_C` reflection. -/
+for `J(C)(F_5) ≅ Z/71Z`, punctured-strip zeta non-vanishing, `Ξ_C` reflection, and
+`GSp(4) -> SO(5)` functorial Euler lift + Selberg / Kim-Sarnak exponent ladder. -/
 def FiniteFieldWeilProvenance : Prop :=
   (FiniteFieldRH.frobeniusTrace * FiniteFieldRH.frobeniusTrace ≤
     4 * (FiniteFieldRH.p : Int)) ∧
@@ -808,9 +810,112 @@ def FiniteFieldWeilProvenance : Prop :=
       WeilZetaBridge.completedZetaImagPart u d = 0) ∧
    (5 * WeilZetaBridge.gNormSq (1, 2) = 5 * 5 ∧
     WeilZetaBridge.completedZetaGDenomHomog (1, 2) 5 ≠ (0, 0) ∧
-    WeilZetaBridge.completedZetaImagPart (1, 2) 5 = 0))
+    WeilZetaBridge.completedZetaImagPart (1, 2) 5 = 0)) ∧
+  (∀ q a1 a2 n d T : Int,
+    GSp4FunctorialityBridge.gsp4StandardEulerPoly q a1 a2 T =
+      (1 - T) * GSp4FunctorialityBridge.gsp4StdQuarticCofactor q a1 a2 T ∧
+    GSp4FunctorialityBridge.gsp4StandardEulerHomog q a1 a2 T 1 =
+      GSp4FunctorialityBridge.gsp4StandardEulerPoly q a1 a2 T ∧
+    GSp4FunctorialityBridge.gsp4StandardEulerHomog q a1 a2 d n =
+      -GSp4FunctorialityBridge.gsp4StandardEulerHomog q a1 a2 n d ∧
+    GSp4FunctorialityBridge.gsp4StdRecipEval q a1 a2 T =
+      -GSp4FunctorialityBridge.gsp4StandardEulerPoly q a1 a2 T ∧
+    GSp4FunctorialityBridge.gsp4StandardEulerPoly q a1 a2 1 = 0) ∧
+  (∀ T : Int,
+    GSp4FunctorialityBridge.gsp4SpinEulerPoly 5
+        (-FiniteFieldRH.genus2TraceA1) FiniteFieldRH.genus2TraceA2 T =
+      FiniteFieldRH.genus2LPoly T ∧
+    GSp4FunctorialityBridge.gsp4SpinEulerPoly 5
+        (-FiniteFieldRH.genus2TraceA1) FiniteFieldRH.genus2TraceA2 1 =
+      FiniteFieldRH.cardJacobianGenus2F5 ∧
+    Genus2Jacobian.cantorSmul 71 Genus2Jacobian.D0 =
+      Genus2Jacobian.MumfordDivisor.zero ∧
+    GSp4FunctorialityBridge.gsp4StdQuarticCofactor 5
+        (-FiniteFieldRH.genus2TraceA1) FiniteFieldRH.genus2TraceA2 T =
+      5 * GSp4FunctorialityBridge.cyclotomic10Poly T ∧
+    GSp4FunctorialityBridge.gsp4StandardEulerPoly 5
+        (-FiniteFieldRH.genus2TraceA1) FiniteFieldRH.genus2TraceA2 T =
+      5 * (1 - T) * GSp4FunctorialityBridge.cyclotomic10Poly T ∧
+    GSp4FunctorialityBridge.gsp4StandardEulerPoly 5 (-5) 15 T =
+      5 - 10 * T + 10 * T ^ 2 - 10 * T ^ 3 + 10 * T ^ 4 - 5 * T ^ 5) ∧
+  ((∀ T : Int,
+      (1 - T) * GSp4FunctorialityBridge.cyclotomic10Poly T *
+        ((1 + T) * GSp4FunctorialityBridge.cyclotomic5Poly T) = 1 - T ^ 10) ∧
+   (∀ T : Int,
+      GSp4FunctorialityBridge.gsp4StandardEulerPoly 5 (-5) 15 T *
+        ((1 + T) * GSp4FunctorialityBridge.cyclotomic5Poly T) = 5 * (1 - T ^ 10)) ∧
+   (∀ T : Int, 0 < GSp4FunctorialityBridge.cyclotomic10Poly T) ∧
+   (FiniteFieldRH.genus2TraceA1 * FiniteFieldRH.genus2TraceA1 ≤ 16 * 5) ∧
+   (∀ s d : Int, 0 < d → s * s ≤ 5 * (d * d) →
+     ((5 * d + s) * (5 * d + s) - 20 * ((2 * d) * (2 * d)) < 0 ∧
+      (5 * d - s) * (5 * d - s) - 20 * ((2 * d) * (2 * d)) < 0))) ∧
+  (GSp4FunctorialityBridge.thetaRamanujan <
+      GSp4FunctorialityBridge.thetaKimSarnakSym4 ∧
+   GSp4FunctorialityBridge.thetaKimSarnakSym4 <
+      GSp4FunctorialityBridge.thetaKimShahidiSym3 ∧
+   GSp4FunctorialityBridge.thetaKimShahidiSym3 <
+      GSp4FunctorialityBridge.thetaGelbartJacquetSym2 ∧
+   GSp4FunctorialityBridge.thetaGelbartJacquetSym2 <
+      GSp4FunctorialityBridge.thetaSelberg ∧
+   GSp4FunctorialityBridge.thetaSelberg <
+      GSp4FunctorialityBridge.thetaConvexity) ∧
+  (QuasiRiemann.QRat.eqv
+      (GSp4FunctorialityBridge.selbergLambda1
+        GSp4FunctorialityBridge.thetaConvexity)
+      (QuasiRiemann.QRat.ofInt 0) ∧
+   QuasiRiemann.QRat.eqv
+      (GSp4FunctorialityBridge.selbergLambda1
+        GSp4FunctorialityBridge.thetaSelberg)
+      (QuasiRiemann.QRat.mk' 3 16) ∧
+   QuasiRiemann.QRat.eqv
+      (GSp4FunctorialityBridge.selbergLambda1
+        GSp4FunctorialityBridge.thetaGelbartJacquetSym2)
+      (QuasiRiemann.QRat.mk' 21 100) ∧
+   QuasiRiemann.QRat.eqv
+      (GSp4FunctorialityBridge.selbergLambda1
+        GSp4FunctorialityBridge.thetaKimShahidiSym3)
+      (QuasiRiemann.QRat.mk' 77 324) ∧
+   QuasiRiemann.QRat.eqv
+      (GSp4FunctorialityBridge.selbergLambda1
+        GSp4FunctorialityBridge.thetaKimSarnakSym4)
+      (QuasiRiemann.QRat.mk' 975 4096) ∧
+   QuasiRiemann.QRat.eqv
+      (GSp4FunctorialityBridge.selbergLambda1
+        GSp4FunctorialityBridge.thetaRamanujan)
+      (QuasiRiemann.QRat.mk' 1 4) ∧
+   GSp4FunctorialityBridge.selbergLambda1 GSp4FunctorialityBridge.thetaSelberg <
+      GSp4FunctorialityBridge.selbergLambda1
+        GSp4FunctorialityBridge.thetaGelbartJacquetSym2 ∧
+   GSp4FunctorialityBridge.selbergLambda1
+        GSp4FunctorialityBridge.thetaGelbartJacquetSym2 <
+      GSp4FunctorialityBridge.selbergLambda1
+        GSp4FunctorialityBridge.thetaKimShahidiSym3 ∧
+   GSp4FunctorialityBridge.selbergLambda1
+        GSp4FunctorialityBridge.thetaKimShahidiSym3 <
+      GSp4FunctorialityBridge.selbergLambda1
+        GSp4FunctorialityBridge.thetaKimSarnakSym4 ∧
+   GSp4FunctorialityBridge.selbergLambda1
+        GSp4FunctorialityBridge.thetaKimSarnakSym4 <
+      GSp4FunctorialityBridge.selbergLambda1
+        GSp4FunctorialityBridge.thetaRamanujan ∧
+   QuasiRiemann.QRat.mk' 3 16 < QuasiRiemann.QRat.mk' 21 100 ∧
+   QuasiRiemann.QRat.mk' 21 100 < QuasiRiemann.QRat.mk' 77 324 ∧
+   QuasiRiemann.QRat.mk' 77 324 < QuasiRiemann.QRat.mk' 975 4096 ∧
+   QuasiRiemann.QRat.mk' 975 4096 < QuasiRiemann.QRat.mk' 1 4 ∧
+   QuasiRiemann.QRat.eqv
+      (GSp4FunctorialityBridge.selbergLambda1
+          GSp4FunctorialityBridge.thetaKimSarnakSym4 -
+        GSp4FunctorialityBridge.selbergLambda1
+          GSp4FunctorialityBridge.thetaKimShahidiSym3)
+      (QuasiRiemann.QRat.mk' 127 331776) ∧
+   QuasiRiemann.QRat.ofInt 0 <
+      GSp4FunctorialityBridge.selbergLambda1
+          GSp4FunctorialityBridge.thetaKimSarnakSym4 -
+        GSp4FunctorialityBridge.selbergLambda1
+          GSp4FunctorialityBridge.thetaKimShahidiSym3)
 
-/-- Zero-axiom certificate for Hasse-Weil RH, genus-2 Jacobian, and completed zeta. -/
+/-- Zero-axiom certificate for Hasse-Weil RH, genus-2 Jacobian, completed zeta,
+and `GSp(4) -> SO(5)` functoriality + Selberg / Kim-Sarnak ladder. -/
 theorem finiteFieldWeil_provenance_certified : FiniteFieldWeilProvenance :=
   ⟨FiniteFieldRH.hasse_weil_riemann_hypothesis,
    FiniteFieldRH.genus2_frob_negative_discriminants,
@@ -821,7 +926,12 @@ theorem finiteFieldWeil_provenance_certified : FiniteFieldWeilProvenance :=
      WeilZetaBridge.weil_zeta_punctured_strip_regular_and_nonzero
        d tx ty rNum px1 py1 px2 py2 px3 py3 px4 py4 num den
        hnum hden hd hr hrd h5r hoff hnormT h1 h2 h3 h4,
-   WeilZetaBridge.genus2_completed_zeta_reflection⟩
+   WeilZetaBridge.genus2_completed_zeta_reflection,
+   GSp4FunctorialityBridge.gsp4_std_functional_equation,
+   GSp4FunctorialityBridge.genus2_f5_so5_cyclotomic_lift,
+   GSp4FunctorialityBridge.genus2_f5_so5_ramanujan_tempered,
+   GSp4FunctorialityBridge.kim_sarnak_ramanujan_ladder_strict,
+   GSp4FunctorialityBridge.selberg_laplacian_eigenvalue_ladder⟩
 
 -- =============================================================================
 -- Parts 9-10: Universal NTT, 192-Digit Karatsuba CRT-NTT, & 4-Prime Garner

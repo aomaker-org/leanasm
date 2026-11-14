@@ -509,4 +509,16 @@ import LeanAsm
 #print axioms LeanAsm.quasiRiemann_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 37: GSp(4) -> SO(5) Functorial Lift & Selberg / Kim-Sarnak Ladder (Issue #61)
+#print axioms GSp4FunctorialityBridge.gsp4StandardEulerPoly_eq_one_sub_mul
+#print axioms GSp4FunctorialityBridge.gsp4StandardEulerHomog_one
+#print axioms GSp4FunctorialityBridge.gsp4StandardEulerHomog_anti_palindromic
+#print axioms GSp4FunctorialityBridge.gsp4_std_functional_equation
+#print axioms GSp4FunctorialityBridge.genus2_f5_so5_cyclotomic_lift
+#print axioms GSp4FunctorialityBridge.genus2_f5_so5_ramanujan_tempered
+#print axioms GSp4FunctorialityBridge.kim_sarnak_ramanujan_ladder_strict
+#print axioms GSp4FunctorialityBridge.selberg_laplacian_eigenvalue_ladder
+#print axioms LeanAsm.finiteFieldWeil_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean
