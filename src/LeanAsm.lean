@@ -23,6 +23,7 @@ import LeanAsm.CrtNttUniversal
 import LeanAsm.CollatzQrhBridge
 import LeanAsm.PiChudnovsky
 import LeanAsm.GSp4FunctorialityBridge
+import LeanAsm.ArtinFermatBridge
 import LeanAsm.ProvenanceSummary
 
 -- end of file: leanasm/src/LeanAsm.lean
