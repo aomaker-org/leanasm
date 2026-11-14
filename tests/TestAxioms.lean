@@ -422,4 +422,12 @@ import LeanAsm
 #print axioms EulerFactorNonVanishing.fermat_sigma_one_uniform_quarter_bound
 #print axioms EulerFactorNonVanishing.fermat_tower_dedekind_euler_strip_certs
 
+-- Part 28: Chebyshev Remainder Envelopes Across Benchmark Scales (Issue #40)
+#print axioms QuasiRiemann.tenPowThetaCeilExp_eq_exact
+#print axioms QuasiRiemann.tenPowThetaExactExp_lt_scale
+#print axioms QuasiRiemann.chebyshev_remainder_mono_theta
+#print axioms QuasiRiemann.tenPow_rel_err_lt_inv10
+#print axioms QuasiRiemann.qrh_chebyshev_savings_certs
+#print axioms QuasiRiemann.qrh_chebyshev_benchmark_certs
+
 -- end of file: leanasm/tests/TestAxioms.lean

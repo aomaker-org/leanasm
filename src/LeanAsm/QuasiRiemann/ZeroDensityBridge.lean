@@ -404,6 +404,313 @@ theorem zero_density_and_dvp_combined_region (spec : ZeroDensitySpec) (θ : QRat
   have hqrh := (zero_density_implies_qrh_threshold spec θ).2 hdens β hβ1 hviol
   exact ⟨hqrh.1, hdvp.2.1, hdvp.2.2, hqrh.2⟩
 
+-- =============================================================================
+-- 6. Constructive Chebyshev Remainder Envelopes Across Benchmark Scales
+-- =============================================================================
+
+/-- Conservative integer log envelope `ln(10^(12k)) < 28k` (since `ln 10 < 7/3`
+gives `12 * ln 10 < 28`). -/
+def chebyshevLogEnv (k : Nat) : Nat :=
+  28 * k
+
+/-- Conservative integer log-squared envelope `(ln 10^(12k))^2 ≤ (28k)^2`. -/
+def chebyshevLogSqEnv (k : Nat) : Nat :=
+  chebyshevLogEnv k * chebyshevLogEnv k
+
+/-- Exact integer exponent `(12 * k * θ.num.natAbs) / θ.den` when `θ.den ∣ 12 * k`,
+so `(10^(12k))^θ = 10^e` is an exact power of `10`. -/
+def tenPowThetaExactExp (k : Nat) (θ : QRat) : Nat :=
+  (12 * k * θ.num.natAbs) / θ.den
+
+/-- Ceiling integer exponent `⌈(12 * k * θ.num.natAbs) / θ.den⌉` for general
+positive `θ`, agreeing with `tenPowThetaExactExp` whenever `θ.den ∣ 12 * k`. -/
+def tenPowThetaCeilExp (k : Nat) (θ : QRat) : Nat :=
+  (12 * k * θ.num.natAbs + θ.den - 1) / θ.den
+
+/-- Saving exponent `12 * k - e` in `x / 10^e = 10^(12k - e)`. -/
+def tenPowGapExp (k : Nat) (θ : QRat) : Nat :=
+  12 * k - tenPowThetaCeilExp k θ
+
+/-- Constructive Chebyshev remainder model `|ψ(x) - x| ≤ C · x^θ · (ln x)^2`
+at `x = 10^(12k)` (`k ≥ 1`) with rational QRH exponent `0 < θ < 1`. -/
+structure ChebyshevRemainderSpec where
+  scaleK : Nat
+  scaleK_pos : 1 ≤ scaleK
+  prefactor : Nat
+  prefactor_pos : 1 ≤ prefactor
+  theta : QRat
+  theta_pos : (0 : Int) < theta.num
+  theta_lt_one : theta < QRat.ofInt 1
+
+/-- Explicit integer remainder envelope `C · 10^(tenPowThetaCeilExp k θ) · (28k)^2`
+bounding `|ψ(10^(12k)) - 10^(12k)|`. -/
+def qrhRemainderBoundAtTenPow (spec : ChebyshevRemainderSpec) : Nat :=
+  spec.prefactor * 10 ^ (tenPowThetaCeilExp spec.scaleK spec.theta) *
+    chebyshevLogSqEnv spec.scaleK
+
+theorem tenPowThetaCeilExp_eq_exact {k : Nat} {θ : QRat} (hdvd : θ.den ∣ 12 * k) :
+    tenPowThetaCeilExp k θ = tenPowThetaExactExp k θ := by
+  dsimp [tenPowThetaCeilExp, tenPowThetaExactExp]
+  have hd : 0 < θ.den := θ.den_pos
+  have hdvdMul : θ.den ∣ 12 * k * θ.num.natAbs :=
+    Nat.dvd_trans hdvd (Nat.dvd_mul_right _ _)
+  obtain ⟨q, hq⟩ := hdvdMul
+  rw [hq]
+  have hrew : θ.den * q + θ.den - 1 = θ.den * q + (θ.den - 1) := by omega
+  rw [hrew, Nat.mul_add_div hd, Nat.mul_div_right q hd,
+    Nat.div_eq_of_lt (by omega : θ.den - 1 < θ.den), Nat.add_zero]
+
+theorem tenPowThetaExactExp_lt_scale {k : Nat} (hk : 1 ≤ k) {θ : QRat}
+    (hpos : (0 : Int) < θ.num) (hlt : θ < QRat.ofInt 1) :
+    tenPowThetaExactExp k θ < 12 * k := by
+  dsimp [tenPowThetaExactExp]
+  have hd : 0 < θ.den := θ.den_pos
+  have hnum_lt : θ.num.natAbs < θ.den := by
+    change θ.num * 1 < 1 * (θ.den : Int) at hlt
+    omega
+  have hmul : 12 * k * θ.num.natAbs < 12 * k * θ.den :=
+    Nat.mul_lt_mul_of_pos_left hnum_lt (by omega)
+  exact (Nat.div_lt_iff_lt_mul hd).mpr hmul
+
+private theorem tenPowThetaExactExp_le_of_le {k : Nat} {θ₁ θ₂ : QRat}
+    (hpos1 : (0 : Int) < θ₁.num) (hpos2 : (0 : Int) < θ₂.num)
+    (hdvd1 : θ₁.den ∣ 12 * k) (hdvd2 : θ₂.den ∣ 12 * k) (hle : θ₁ ≤ θ₂) :
+    tenPowThetaExactExp k θ₁ ≤ tenPowThetaExactExp k θ₂ := by
+  dsimp [tenPowThetaExactExp]
+  obtain ⟨q1, hq1⟩ := hdvd1
+  obtain ⟨q2, hq2⟩ := hdvd2
+  have hd1 : 0 < θ₁.den := θ₁.den_pos
+  have hd2 : 0 < θ₂.den := θ₂.den_pos
+  have hden_eq : θ₁.den * q1 = θ₂.den * q2 := by rw [← hq1, ← hq2]
+  have he1 : (12 * k * θ₁.num.natAbs) / θ₁.den = q1 * θ₁.num.natAbs := by
+    rw [hq1, Nat.mul_assoc, Nat.mul_div_right _ hd1]
+  have he2 : (12 * k * θ₂.num.natAbs) / θ₂.den = q2 * θ₂.num.natAbs := by
+    rw [hq2, Nat.mul_assoc, Nat.mul_div_right _ hd2]
+  rw [he1, he2]
+  have hnum : θ₁.num.natAbs * θ₂.den ≤ θ₂.num.natAbs * θ₁.den := by
+    change θ₁.num * (θ₂.den : Int) ≤ θ₂.num * (θ₁.den : Int) at hle
+    have h1 : (θ₁.num.natAbs : Int) = θ₁.num := Int.natAbs_of_nonneg (Int.le_of_lt hpos1)
+    have h2 : (θ₂.num.natAbs : Int) = θ₂.num := Int.natAbs_of_nonneg (Int.le_of_lt hpos2)
+    have hz : ((θ₁.num.natAbs * θ₂.den : Nat) : Int) ≤
+        ((θ₂.num.natAbs * θ₁.den : Nat) : Int) := by
+      rw [Int.natCast_mul, Int.natCast_mul, h1, h2]
+      exact hle
+    exact Int.ofNat_le.mp hz
+  have hmul_le : (q1 * θ₁.num.natAbs) * (θ₁.den * θ₂.den) ≤
+      (q2 * θ₂.num.natAbs) * (θ₁.den * θ₂.den) := by
+    have lhs_eq : (q1 * θ₁.num.natAbs) * (θ₁.den * θ₂.den) =
+        (θ₁.den * q1) * (θ₁.num.natAbs * θ₂.den) := by ac_rfl
+    have rhs_eq : (q2 * θ₂.num.natAbs) * (θ₁.den * θ₂.den) =
+        (θ₂.den * q2) * (θ₂.num.natAbs * θ₁.den) := by ac_rfl
+    rw [lhs_eq, rhs_eq, hden_eq]
+    exact Nat.mul_le_mul_left _ hnum
+  exact Nat.le_of_mul_le_mul_right hmul_le (Nat.mul_pos hd1 hd2)
+
+/-- Constructive monotonicity & exact power-of-ten relative savings across the QRH ladder:
+for any `1 ≤ k`, `1 ≤ C`, and divisible rational exponents `θ₁ ≤ θ₂ < 1`,
+`spec₁`'s remainder bound is bounded by `spec₂`'s, with exact savings factor
+`10 ^ (e₂ - e₁)` where `eᵢ = tenPowThetaExactExp k θᵢ`. Zero `Classical.choice`, zero `sorryAx`. -/
+theorem chebyshev_remainder_mono_theta (k C : Nat) (hk : 1 ≤ k) (hC : 1 ≤ C)
+    (θ₁ θ₂ : QRat) (hpos1 : (0 : Int) < θ₁.num) (hpos2 : (0 : Int) < θ₂.num)
+    (hlt2 : θ₂ < QRat.ofInt 1) (hdvd1 : θ₁.den ∣ 12 * k) (hdvd2 : θ₂.den ∣ 12 * k)
+    (hle : θ₁ ≤ θ₂) :
+    let hlt1 : θ₁ < QRat.ofInt 1 := qrat_lt_of_le_of_lt hle hlt2
+    let e₁ := tenPowThetaExactExp k θ₁
+    let e₂ := tenPowThetaExactExp k θ₂
+    let s₁ : ChebyshevRemainderSpec := ⟨k, hk, C, hC, θ₁, hpos1, hlt1⟩
+    let s₂ : ChebyshevRemainderSpec := ⟨k, hk, C, hC, θ₂, hpos2, hlt2⟩
+    e₁ ≤ e₂ ∧
+    e₂ < 12 * k ∧
+    (10 : Nat) ^ e₂ = 10 ^ e₁ * 10 ^ (e₂ - e₁) ∧
+    qrhRemainderBoundAtTenPow s₂ = qrhRemainderBoundAtTenPow s₁ * 10 ^ (e₂ - e₁) ∧
+    qrhRemainderBoundAtTenPow s₁ ≤ qrhRemainderBoundAtTenPow s₂ := by
+  intro hlt1 e₁ e₂ s₁ s₂
+  have he : e₁ ≤ e₂ := tenPowThetaExactExp_le_of_le hpos1 hpos2 hdvd1 hdvd2 hle
+  have hlt_k : e₂ < 12 * k := tenPowThetaExactExp_lt_scale hk hpos2 hlt2
+  have hpow : (10 : Nat) ^ e₂ = 10 ^ e₁ * 10 ^ (e₂ - e₁) := by
+    have hadd : e₁ + (e₂ - e₁) = e₂ := Nat.add_sub_cancel' he
+    calc (10 : Nat) ^ e₂ = 10 ^ (e₁ + (e₂ - e₁)) := by rw [hadd]
+      _ = 10 ^ e₁ * 10 ^ (e₂ - e₁) := Nat.pow_add _ _ _
+  have hc1 : tenPowThetaCeilExp k θ₁ = e₁ := tenPowThetaCeilExp_eq_exact hdvd1
+  have hc2 : tenPowThetaCeilExp k θ₂ = e₂ := tenPowThetaCeilExp_eq_exact hdvd2
+  have hbeq : qrhRemainderBoundAtTenPow s₂ =
+      qrhRemainderBoundAtTenPow s₁ * 10 ^ (e₂ - e₁) := by
+    dsimp [qrhRemainderBoundAtTenPow, s₁, s₂]
+    rw [hc1, hc2, hpow]
+    ac_rfl
+  have hble : qrhRemainderBoundAtTenPow s₁ ≤ qrhRemainderBoundAtTenPow s₂ := by
+    rw [hbeq]
+    exact Nat.le_mul_of_pos_right _ (Nat.pow_pos (by decide))
+  exact ⟨he, hlt_k, hpow, hbeq, hble⟩
+
+/-- Helper: symbolic relative-error certificate `10 * qrhRemainderBoundAtTenPow spec < 10^(12k)`
+from the reduced saving inequality `10 * C * (28k)^2 < 10^(12k - e)` (no large power unfolding). -/
+theorem tenPow_rel_err_lt_inv10 (k m : Nat) (hk : 1 ≤ k) (hm : 12 * k = m) (C : Nat)
+    (hC : 1 ≤ C) (θ : QRat) (hpos : (0 : Int) < θ.num) (hlt : θ < QRat.ofInt 1)
+    (hdvd : θ.den ∣ 12 * k)
+    (hdom : 10 * (C * chebyshevLogSqEnv k) < 10 ^ (12 * k - tenPowThetaExactExp k θ)) :
+    10 * qrhRemainderBoundAtTenPow ⟨k, hk, C, hC, θ, hpos, hlt⟩ < 10 ^ m := by
+  have he_lt : tenPowThetaExactExp k θ < 12 * k :=
+    tenPowThetaExactExp_lt_scale hk hpos hlt
+  have he_le : tenPowThetaExactExp k θ ≤ 12 * k := Nat.le_of_lt he_lt
+  have hceil : tenPowThetaCeilExp k θ = tenPowThetaExactExp k θ :=
+    tenPowThetaCeilExp_eq_exact hdvd
+  have hx : 10 ^ (tenPowThetaExactExp k θ) * 10 ^ (12 * k - tenPowThetaExactExp k θ) =
+      (10 : Nat) ^ m := by
+    rw [← Nat.pow_add, Nat.add_sub_cancel' he_le, hm]
+  have hmul := Nat.mul_lt_mul_of_pos_left hdom
+    (Nat.pow_pos (by decide) : 0 < (10 : Nat) ^ (tenPowThetaExactExp k θ))
+  rw [hx] at hmul
+  have hlhs : 10 * qrhRemainderBoundAtTenPow ⟨k, hk, C, hC, θ, hpos, hlt⟩ =
+      10 ^ (tenPowThetaExactExp k θ) * (10 * (C * chebyshevLogSqEnv k)) := by
+    dsimp [qrhRemainderBoundAtTenPow]
+    rw [hceil]
+    ac_rfl
+  rw [hlhs]
+  exact hmul
+
+/-- Relative Savings Certificates across Benchmark Scales (`x = 10^24` and `x = 10^48`):
+1. At `x = 10^24` (`k = 2`), `θ = 3/4` reduces the Chebyshev remainder envelope by `10^3 = 1000`
+   relative to `θ = 7/8` and by `10^4 = 10000` relative to `θ = 11/12`.
+2. At `x = 10^48` (`k = 4`), `θ = 3/4` reduces the envelope by `10^11 = 100000000000`
+   relative to `θ = 47/48`.
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem qrh_chebyshev_savings_certs :
+    let θ₁ := qrhThresholdThreeQuarters
+    let θ₂ := qrhThresholdSevenEighths
+    let θ₃ := qrhThresholdElevenTwelfths
+    let θ₄ := qrhThresholdFortySevenFortyEighths
+    let s24_1 : ChebyshevRemainderSpec := ⟨2, by decide, 1, by decide, θ₁, by decide, by decide⟩
+    let s24_2 : ChebyshevRemainderSpec := ⟨2, by decide, 1, by decide, θ₂, by decide, by decide⟩
+    let s24_3 : ChebyshevRemainderSpec := ⟨2, by decide, 1, by decide, θ₃, by decide, by decide⟩
+    let s48_1 : ChebyshevRemainderSpec := ⟨4, by decide, 1, by decide, θ₁, by decide, by decide⟩
+    let s48_4 : ChebyshevRemainderSpec := ⟨4, by decide, 1, by decide, θ₄, by decide, by decide⟩
+    (tenPowThetaExactExp 2 θ₁ = 18 ∧ tenPowThetaExactExp 2 θ₂ = 21 ∧
+      qrhRemainderBoundAtTenPow s24_2 = qrhRemainderBoundAtTenPow s24_1 * 1000 ∧
+      qrhRemainderBoundAtTenPow s24_1 ≤ qrhRemainderBoundAtTenPow s24_2) ∧
+    (tenPowThetaExactExp 2 θ₃ = 22 ∧
+      qrhRemainderBoundAtTenPow s24_3 = qrhRemainderBoundAtTenPow s24_1 * 10000 ∧
+      qrhRemainderBoundAtTenPow s24_1 ≤ qrhRemainderBoundAtTenPow s24_3) ∧
+    (tenPowThetaExactExp 4 θ₁ = 36 ∧ tenPowThetaExactExp 4 θ₄ = 47 ∧
+      qrhRemainderBoundAtTenPow s48_4 = qrhRemainderBoundAtTenPow s48_1 * 10 ^ 11 ∧
+      qrhRemainderBoundAtTenPow s48_1 ≤ qrhRemainderBoundAtTenPow s48_4) := by
+  have h1 := chebyshev_remainder_mono_theta 2 1 (by decide) (by decide)
+    qrhThresholdThreeQuarters qrhThresholdSevenEighths
+    (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
+  have h2 := chebyshev_remainder_mono_theta 2 1 (by decide) (by decide)
+    qrhThresholdThreeQuarters qrhThresholdElevenTwelfths
+    (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
+  have h3 := chebyshev_remainder_mono_theta 4 1 (by decide) (by decide)
+    qrhThresholdThreeQuarters qrhThresholdFortySevenFortyEighths
+    (by decide) (by decide) (by decide) (by decide) (by decide) (by decide)
+  have he18 : tenPowThetaExactExp 2 qrhThresholdThreeQuarters = 18 := by decide
+  have he21 : tenPowThetaExactExp 2 qrhThresholdSevenEighths = 21 := by decide
+  have he22 : tenPowThetaExactExp 2 qrhThresholdElevenTwelfths = 22 := by decide
+  have he36 : tenPowThetaExactExp 4 qrhThresholdThreeQuarters = 36 := by decide
+  have he47 : tenPowThetaExactExp 4 qrhThresholdFortySevenFortyEighths = 47 := by decide
+  have hp3 : (10 : Nat) ^ (21 - 18) = 1000 := by decide
+  have hp4 : (10 : Nat) ^ (22 - 18) = 10000 := by decide
+  have hp11 : (10 : Nat) ^ (47 - 36) = 10 ^ 11 := by decide
+  refine ⟨⟨he18, he21, ?_, h1.2.2.2.2⟩, ⟨he22, ?_, h2.2.2.2.2⟩, ⟨he36, he47, ?_, h3.2.2.2.2⟩⟩
+  · have hb := h1.2.2.2.1
+    rw [he18, he21, hp3] at hb
+    exact hb
+  · have hb := h2.2.2.2.1
+    rw [he18, he22, hp4] at hb
+    exact hb
+  · have hb := h3.2.2.2.1
+    rw [he36, he47, hp11] at hb
+    exact hb
+
+/-- Constructive Benchmark Numerical Remainder Certificates (`C = 1`, `(ln x)^2 ≤ (28k)^2`):
+1. Exact symbolic envelopes `10^e * (28k)^2` at `x ∈ {10^12, 10^24, 10^36, 10^48}` (using exact
+   `10^e` when `θ.den ∣ 12k`, and integer ceiling `e_ceil` for `θ = 7/8` at `k = 1, 3`).
+2. Strict sub-linear relative error: `< 1` at `(10^12, 3/4)` (`784 < 1000`), and `< 10^-1`
+   at `(10^24, 3/4)`, `(10^36, 3/4)`, `(10^48, 3/4)`, and `(10^48, 7/8)`.
+3. Minimal all-rung `< 10^-1` crossover at `x = 10^336` (`k = 28`): certifies
+   `10 * bound < 10^336` simultaneously across ALL four rungs `θ ∈ {3/4, 7/8, 11/12, 47/48}`.
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem qrh_chebyshev_benchmark_certs :
+    let θ₁ := qrhThresholdThreeQuarters
+    let θ₂ := qrhThresholdSevenEighths
+    let θ₃ := qrhThresholdElevenTwelfths
+    let θ₄ := qrhThresholdFortySevenFortyEighths
+    let s12_1 : ChebyshevRemainderSpec := ⟨1, by decide, 1, by decide, θ₁, by decide, by decide⟩
+    let s12_2 : ChebyshevRemainderSpec := ⟨1, by decide, 1, by decide, θ₂, by decide, by decide⟩
+    let s12_3 : ChebyshevRemainderSpec := ⟨1, by decide, 1, by decide, θ₃, by decide, by decide⟩
+    let s24_1 : ChebyshevRemainderSpec := ⟨2, by decide, 1, by decide, θ₁, by decide, by decide⟩
+    let s24_2 : ChebyshevRemainderSpec := ⟨2, by decide, 1, by decide, θ₂, by decide, by decide⟩
+    let s24_3 : ChebyshevRemainderSpec := ⟨2, by decide, 1, by decide, θ₃, by decide, by decide⟩
+    let s36_1 : ChebyshevRemainderSpec := ⟨3, by decide, 1, by decide, θ₁, by decide, by decide⟩
+    let s36_2 : ChebyshevRemainderSpec := ⟨3, by decide, 1, by decide, θ₂, by decide, by decide⟩
+    let s36_3 : ChebyshevRemainderSpec := ⟨3, by decide, 1, by decide, θ₃, by decide, by decide⟩
+    let s48_1 : ChebyshevRemainderSpec := ⟨4, by decide, 1, by decide, θ₁, by decide, by decide⟩
+    let s48_2 : ChebyshevRemainderSpec := ⟨4, by decide, 1, by decide, θ₂, by decide, by decide⟩
+    let s48_3 : ChebyshevRemainderSpec := ⟨4, by decide, 1, by decide, θ₃, by decide, by decide⟩
+    let s48_4 : ChebyshevRemainderSpec := ⟨4, by decide, 1, by decide, θ₄, by decide, by decide⟩
+    let s336_1 : ChebyshevRemainderSpec := ⟨28, by decide, 1, by decide, θ₁, by decide, by decide⟩
+    let s336_2 : ChebyshevRemainderSpec := ⟨28, by decide, 1, by decide, θ₂, by decide, by decide⟩
+    let s336_3 : ChebyshevRemainderSpec := ⟨28, by decide, 1, by decide, θ₃, by decide, by decide⟩
+    let s336_4 : ChebyshevRemainderSpec := ⟨28, by decide, 1, by decide, θ₄, by decide, by decide⟩
+    (qrhRemainderBoundAtTenPow s12_1 = 10 ^ 9 * 784 ∧
+      qrhRemainderBoundAtTenPow s12_1 < 10 ^ 12 ∧
+      qrhRemainderBoundAtTenPow s12_2 = 10 ^ 11 * 784 ∧
+      qrhRemainderBoundAtTenPow s12_3 = 10 ^ 11 * 784) ∧
+    (qrhRemainderBoundAtTenPow s24_1 = 10 ^ 18 * 3136 ∧
+      10 * qrhRemainderBoundAtTenPow s24_1 < 10 ^ 24 ∧
+      qrhRemainderBoundAtTenPow s24_2 = 10 ^ 21 * 3136 ∧
+      qrhRemainderBoundAtTenPow s24_3 = 10 ^ 22 * 3136) ∧
+    (qrhRemainderBoundAtTenPow s36_1 = 10 ^ 27 * 7056 ∧
+      10 * qrhRemainderBoundAtTenPow s36_1 < 10 ^ 36 ∧
+      qrhRemainderBoundAtTenPow s36_2 = 10 ^ 32 * 7056 ∧
+      qrhRemainderBoundAtTenPow s36_3 = 10 ^ 33 * 7056) ∧
+    (qrhRemainderBoundAtTenPow s48_1 = 10 ^ 36 * 12544 ∧
+      10 * qrhRemainderBoundAtTenPow s48_1 < 10 ^ 48 ∧
+      qrhRemainderBoundAtTenPow s48_2 = 10 ^ 42 * 12544 ∧
+      10 * qrhRemainderBoundAtTenPow s48_2 < 10 ^ 48 ∧
+      qrhRemainderBoundAtTenPow s48_3 = 10 ^ 44 * 12544 ∧
+      qrhRemainderBoundAtTenPow s48_4 = 10 ^ 47 * 12544) ∧
+    (tenPowThetaExactExp 28 θ₁ = 252 ∧
+      tenPowThetaExactExp 28 θ₂ = 294 ∧
+      tenPowThetaExactExp 28 θ₃ = 308 ∧
+      tenPowThetaExactExp 28 θ₄ = 329 ∧
+      10 * qrhRemainderBoundAtTenPow s336_1 < 10 ^ 336 ∧
+      10 * qrhRemainderBoundAtTenPow s336_2 < 10 ^ 336 ∧
+      10 * qrhRemainderBoundAtTenPow s336_3 < 10 ^ 336 ∧
+      10 * qrhRemainderBoundAtTenPow s336_4 < 10 ^ 336) := by
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · have hb1 : qrhRemainderBoundAtTenPow ⟨1, by decide, 1, by decide,
+        qrhThresholdThreeQuarters, by decide, by decide⟩ = 10 ^ 9 * 784 := by
+      dsimp [qrhRemainderBoundAtTenPow, chebyshevLogSqEnv, chebyshevLogEnv,
+        tenPowThetaCeilExp, qrhThresholdThreeQuarters, QRat.mk']
+    have hlt12 : 10 ^ 9 * 784 < 10 ^ 12 := by
+      have hx : (10 : Nat) ^ 9 * 10 ^ 3 = 10 ^ 12 := (Nat.pow_add 10 9 3).symm
+      rw [← hx]
+      exact Nat.mul_lt_mul_of_pos_left (by decide : 784 < 10 ^ 3) (Nat.pow_pos (by decide))
+    refine ⟨hb1, ?_, by decide, by decide⟩
+    rw [hb1]
+    exact hlt12
+  · refine ⟨rfl, ?_, rfl, rfl⟩
+    exact tenPow_rel_err_lt_inv10 2 24 (by decide) rfl 1 (by decide)
+      qrhThresholdThreeQuarters (by decide) (by decide) (by decide) (by decide)
+  · refine ⟨rfl, ?_, rfl, rfl⟩
+    exact tenPow_rel_err_lt_inv10 3 36 (by decide) rfl 1 (by decide)
+      qrhThresholdThreeQuarters (by decide) (by decide) (by decide) (by decide)
+  · refine ⟨rfl, ?_, rfl, ?_, rfl, rfl⟩
+    · exact tenPow_rel_err_lt_inv10 4 48 (by decide) rfl 1 (by decide)
+        qrhThresholdThreeQuarters (by decide) (by decide) (by decide) (by decide)
+    · exact tenPow_rel_err_lt_inv10 4 48 (by decide) rfl 1 (by decide)
+        qrhThresholdSevenEighths (by decide) (by decide) (by decide) (by decide)
+  · refine ⟨rfl, rfl, rfl, rfl, ?_, ?_, ?_, ?_⟩
+    · exact tenPow_rel_err_lt_inv10 28 336 (by decide) rfl 1 (by decide)
+        qrhThresholdThreeQuarters (by decide) (by decide) (by decide) (by decide)
+    · exact tenPow_rel_err_lt_inv10 28 336 (by decide) rfl 1 (by decide)
+        qrhThresholdSevenEighths (by decide) (by decide) (by decide) (by decide)
+    · exact tenPow_rel_err_lt_inv10 28 336 (by decide) rfl 1 (by decide)
+        qrhThresholdElevenTwelfths (by decide) (by decide) (by decide) (by decide)
+    · exact tenPow_rel_err_lt_inv10 28 336 (by decide) rfl 1 (by decide)
+        qrhThresholdFortySevenFortyEighths (by decide) (by decide) (by decide) (by decide)
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/ZeroDensityBridge.lean
