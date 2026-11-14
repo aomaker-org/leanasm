@@ -406,6 +406,7 @@ def QuasiRiemannProvenance : Prop :=
   ChebyshevSavingsProp ∧
   ChebyshevBenchmarkProp
 
+set_option exponentiation.threshold 2000 in
 /-- Zero-axiom certificate for Parts 3-5 analytic QRH, 2D rectangles, DVP, and Chebyshev. -/
 theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
   ⟨QuasiRiemann.qrh_full_descent_chain_certified,
