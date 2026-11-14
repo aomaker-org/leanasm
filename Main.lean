@@ -306,6 +306,11 @@ def main : IO Unit := do
   IO.println "  Universal 192-Digit Karatsuba: ∀ A,B < 10^96 exact 2-tier 9-call CRT-NTT mul (ZERO axioms)"
   IO.println "  Universal CRT & Carries      : ∀ x < 286,331,153 Garner 3-channel roundtrip &"
   IO.println "                                 ∀ v : Vec16 Base-1000 Horner carry preservation verified"
+  let m4 := CrtNtt.fermatTowerMod4
+  IO.println (s!"  4-Prime Garner \{5,17,257,65537}: M_4={m4} (31-bit safe), " ++
+    "inverses (7, 127, 32767) verified")
+  IO.println ("  Sharp Conv Wrap-Around Safe  : N=4 B≤18918, N=8 B≤13377, " ++
+    "N=16 B≤9459 (ZERO axioms)")
 
   -- 11. Constructive 100-Digit Chudnovsky Pi via 192-Digit CRT-NTT
   IO.println "\n[+] Part 11: Constructive 100-Digit Chudnovsky Pi via 192-Digit CRT-NTT"

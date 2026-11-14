@@ -430,4 +430,12 @@ import LeanAsm
 #print axioms QuasiRiemann.qrh_chebyshev_savings_certs
 #print axioms QuasiRiemann.qrh_chebyshev_benchmark_certs
 
+-- Part 29: Garner Mixed-Radix CRT & Convolution Wrap-Around Bounds (Issue #42)
+#print axioms CrtNtt.fermat_tower_crt_modulus_bounds
+#print axioms CrtNtt.garner_4ch_inverses_sound
+#print axioms CrtNtt.garnerReconstruct4_lt
+#print axioms CrtNtt.garnerReconstruct4_sound
+#print axioms CrtNtt.ntt_convolution_no_wraparound
+#print axioms CrtNtt.fermat_tower_conv_bound_certs
+
 -- end of file: leanasm/tests/TestAxioms.lean
