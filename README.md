@@ -80,11 +80,12 @@ kernel-verified computations across all 11 parts:
    (`5/8 > 9/16 > 17/32 > 33/64 > 1/2`), dual ascent `7/8 < 15/16 < 31/32`,
    and Kim-Sarnak `7/64` coupling (`17/32` at `[10^96, +10^57]`), plus
    rational box contraction (`1/3`, `2/5`) & `UltraDeep72 -> ZD` (`0.50025`).
-6. **Part 6 (`RnsArithmetic`, `EulerFactorNonVanishing`, `ArtinFermatBridge`)**:
-   3-channel Garner CRT execution, Fermat-tower `{5, 17, 257, 65537}` strip
-   bounds (`sigma in {1/2, 3/4, 1}`), cyclotomic Dedekind splitting across
-   `32,906` split prime ideals, GL(1) Artin Euler collapse & order-4
-   cyclotomic factorization, and MiniVM 4-pt NTT character orthogonality.
+6. **Part 6 (`RnsArithmetic`, `EulerFactorNonVanishing`, `ArtinFermatBridge`,
+   `ArtinShortIntervalBridge`)**: 3-channel Garner CRT execution, Fermat-tower
+   `{5, 17, 257, 65537}` strip bounds (`sigma in {1/2, 3/4, 1}`), cyclotomic
+   Dedekind splitting across `32,906` split prime ideals, GL(1) Artin Euler
+   collapse, MiniVM 4-pt NTT character orthogonality, & character-twisted
+   short-interval prime bounds (`17/32 < 39/64 < 5/8 < 2/3 < 3/4 < 7/8`).
 7. **Part 7 (`FiniteFieldRH`, `Genus2Jacobian`, `WeilZetaBridge`,
    `GSp4FunctorialityBridge`, `EllipticModularityBridge`)**: Hasse-Weil RH
    for `E/F_7`, genus-2 `C : y^2 = x^5 - x + 1` over `F_5`, `L(C, 1) = 71/25`,
@@ -103,17 +104,17 @@ kernel-verified computations across all 11 parts:
     `pi`, universal `m >= 8` truncation trap, and unified master certificate
     `LeanAsm.leanasm_full_provenance_certified`.
 
-## 33-Module Theorem Inventory
+## 34-Module Theorem Inventory
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 `QuasiRiemann/`, `PC/` for `PiChudnovsky/`, and `Main.lean` +
-`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-44.
+`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-45.
 `NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `PC` = `PiChudnovsky`.
 
 | Module | NS | Flagship Theorem / Role |
 | --- | --- | --- |
 | `Main.lean` | `(root)` | CLI entrypoint (`Parts 1-11` + provenance) |
-| `LeanAsm.lean` | `(root)` | Library root exporting all 31 submodules |
+| `LeanAsm.lean` | `(root)` | Library root exporting all 32 submodules |
 | `MiniVM.lean` | `=` | `exec_garner_crt_sound`, `mul_mod_reg_correct` |
 | `MiniVMNttBridge.lean` | `=` | `crtNtt4ConvAsm_sound` |
 | `Conjectures.lean` | `=` | `collatz_one_reaches_one` |
@@ -137,6 +138,7 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `GSp4FunctorialityBridge.lean` | `=` | `gsp4_std_functional_equation` |
 | `EllipticModularityBridge.lean` | `=` | `eichler_shimura_trace_eq_11a1` |
 | `ArtinFermatBridge.lean` | `=` | `artin_char_orthogonality_minivm` |
+| `ArtinShortIntervalBridge.lean` | `=` | `artin_ntt4_residue_class_recovery` |
 | `NttArithmetic.lean` | `=` | `cyclic_conv4_ntt_universal_F17` |
 | `CrtNtt.lean` | `=` | `crt_ntt16_exact_integer_convolution` |
 | `CrtNttUniversal.lean` | `CrtNtt` | `karatsubaCrtNttMul192_universal_sound` |
@@ -180,6 +182,10 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
 - `ArtinFermatBridge.artin_split_euler_factor_collapse`,
   `artin_order4_cyclotomic_factorization`, `artin_char_transform_eq_ntt4`,
   & `artin_char_orthogonality_minivm`
+- `ArtinShortIntervalBridge.artin_gaussian_char_orthogonality`,
+  `artin_ntt4_residue_class_recovery`, `artin_twisted_ap_short_interval_pos`,
+  `artin_twisted_coset_short_interval_pos`, &
+  `fermat_tower_artin_short_interval_certs`
 - `FiniteFieldRH.genus2_L_at_1_qrat`,
   `WeilZetaBridge.weil_zeta_punctured_strip_regular_and_nonzero`,
   `GSp4FunctorialityBridge.genus2_f5_so5_ramanujan_tempered`,

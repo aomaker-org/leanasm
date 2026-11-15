@@ -27,6 +27,7 @@ import LeanAsm.PiChudnovsky.CrtMulBridge
 import LeanAsm.PiChudnovsky
 import LeanAsm.GSp4FunctorialityBridge
 import LeanAsm.ArtinFermatBridge
+import LeanAsm.ArtinShortIntervalBridge
 import LeanAsm.ConstructiveOpenaiBridge
 import LeanAsm.EllipticModularityBridge
 
@@ -889,6 +890,89 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
 -- Parts 6 & 8: RNS Garner & Fermat-Tower / Dedekind Euler Non-Vanishing
 -- =============================================================================
 
+/-- Part 6 GL(1) Artin character-twisted short-interval provenance specification bundling
+exact `ℤ[i]` orthogonality, `MiniVM` `ntt4`/`intt4` residue-class recovery, AP/coset
+short-interval positivity, and Fermat-tower beyond-`7/8` (`3/4, 2/3, 5/8, 39/64, 17/32`)
+certificates across `{5, 17, 257, 65537}`. -/
+def ArtinShortIntervalProvenanceProp : Prop :=
+  (∀ (v : Fin 4 → Int) (m : Fin 4),
+    ArtinShortIntervalBridge.artinInverseSumRe (ArtinShortIntervalBridge.artinTwistedSumRe v)
+      (ArtinShortIntervalBridge.artinTwistedSumIm v) m = 4 * v m ∧
+    ArtinShortIntervalBridge.artinInverseSumIm (ArtinShortIntervalBridge.artinTwistedSumRe v)
+      (ArtinShortIntervalBridge.artinTwistedSumIm v) m = 0) ∧
+  (∀ spec ∈ ArtinFermatBridge.artinFermatTowerSpecs,
+    ∀ (s : MiniVM.State) (v : NttArithmetic.Vec4),
+      v.x0 < spec.primeMod → v.x1 < spec.primeMod →
+      v.x2 < spec.primeMod → v.x3 < spec.primeMod →
+      s.r0 = v.x0 → s.r1 = v.x1 → s.r2 = v.x2 → s.r3 = v.x3 →
+      let s1 := MiniVM.runProgram s
+        (MiniVMNttBridge.ntt4AsmFermat spec.primeMod spec.omega4)
+      let s2 := MiniVM.runProgram s1
+        (MiniVMNttBridge.intt4AsmFermat spec.primeMod spec.invFour spec.invOmega4)
+      (⟨s1.r0, s1.r1, s1.r2, s1.r3⟩ : NttArithmetic.Vec4) =
+        ArtinFermatBridge.artinCharTransform4 spec.primeMod spec.omega4 v ∧
+      ArtinFermatBridge.artinCharTransform4 spec.primeMod spec.omega4 v =
+        NttArithmetic.ntt4 spec.primeMod spec.omega4 v ∧
+      (⟨s2.r0, s2.r1, s2.r2, s2.r3⟩ : NttArithmetic.Vec4) = v ∧
+      ((4 * s2.r0) % spec.primeMod = (4 * v.x0) % spec.primeMod ∧
+       (4 * s2.r1) % spec.primeMod = (4 * v.x1) % spec.primeMod ∧
+       (4 * s2.r2) % spec.primeMod = (4 * v.x2) % spec.primeMod ∧
+       (4 * s2.r3) % spec.primeMod = (4 * v.x3) % spec.primeMod)) ∧
+  (∀ (tw : ArtinShortIntervalBridge.ArtinTwistedShortIntervalSpec)
+     (psiApX psiApXH thetaApX thetaApXH : Int)
+     (re0X re1X re2X re3X re0XH re1XH re2XH re3XH : Int)
+     (e0 e1 e2 e3 : Nat),
+      4 * psiApX = re0X + re1X + re2X + re3X →
+      4 * psiApXH = re0XH + re1XH + re2XH + re3XH →
+      Int.natAbs ((tw.apSpec.phiQ : Int) * re0X -
+          4 * ((10 ^ tw.apSpec.base.xScaleExp : Nat) : Int)) ≤ tw.apSpec.phiQ * e0 →
+      Int.natAbs ((tw.apSpec.phiQ : Int) * re1X) ≤ tw.apSpec.phiQ * e1 →
+      Int.natAbs ((tw.apSpec.phiQ : Int) * re2X) ≤ tw.apSpec.phiQ * e2 →
+      Int.natAbs ((tw.apSpec.phiQ : Int) * re3X) ≤ tw.apSpec.phiQ * e3 →
+      Int.natAbs ((tw.apSpec.phiQ : Int) * re0XH -
+          4 * ((10 ^ tw.apSpec.base.xScaleExp + 10 ^ tw.apSpec.base.hScaleExp : Nat) : Int)) ≤
+          tw.apSpec.phiQ * e0 →
+      Int.natAbs ((tw.apSpec.phiQ : Int) * re1XH) ≤ tw.apSpec.phiQ * e1 →
+      Int.natAbs ((tw.apSpec.phiQ : Int) * re2XH) ≤ tw.apSpec.phiQ * e2 →
+      Int.natAbs ((tw.apSpec.phiQ : Int) * re3XH) ≤ tw.apSpec.phiQ * e3 →
+      e0 + e1 + e2 + e3 ≤ 4 * tw.apSpec.base.errUpper →
+      (psiApXH - psiApX) - (thetaApXH - thetaApX) ≤
+          (tw.apSpec.base.primePowerCorr : Int) →
+      Int.natAbs ((tw.apSpec.phiQ : Int) * psiApX -
+          ((10 ^ tw.apSpec.base.xScaleExp : Nat) : Int)) ≤
+        tw.apSpec.phiQ * tw.apSpec.base.errUpper ∧
+      Int.natAbs ((tw.apSpec.phiQ : Int) * psiApXH -
+          ((10 ^ tw.apSpec.base.xScaleExp + 10 ^ tw.apSpec.base.hScaleExp : Nat) : Int)) ≤
+        tw.apSpec.phiQ * tw.apSpec.base.errUpper ∧
+      (0 : Int) < thetaApXH - thetaApX) ∧
+  (∀ (cDiff : Fin 4 → Int) (mainTerm e0 e1 e2 e3 primeCorr : Nat),
+      Int.natAbs (ArtinShortIntervalBridge.artinTwistedSumRe cDiff 0 - (mainTerm : Int)) ≤ e0 →
+      Int.natAbs (ArtinShortIntervalBridge.artinTwistedSumRe cDiff 1) +
+          Int.natAbs (ArtinShortIntervalBridge.artinTwistedSumIm cDiff 1) ≤ e1 →
+      Int.natAbs (ArtinShortIntervalBridge.artinTwistedSumRe cDiff 2) ≤ e2 →
+      Int.natAbs (ArtinShortIntervalBridge.artinTwistedSumRe cDiff 3) +
+          Int.natAbs (ArtinShortIntervalBridge.artinTwistedSumIm cDiff 3) ≤ e3 →
+      e0 + e1 + e2 + e3 + primeCorr < mainTerm →
+      ∀ m : Fin 4, (0 : Int) < 4 * cDiff m - (primeCorr : Int)) ∧
+  (ArtinFermatBridge.artinFermatTowerSpecs.map (·.primeMod) = [5, 17, 257, 65537] ∧
+   (QuasiRiemann.qrhShortExponent 4 = QuasiRiemann.QRat.mk' 17 32 (by decide) ∧
+    QuasiRiemann.QRat.mk' 17 32 (by decide) < ArtinShortIntervalBridge.qrhThresholdKimSarnak ∧
+    ArtinShortIntervalBridge.qrhThresholdKimSarnak < QuasiRiemann.qrhThresholdFiveEighths ∧
+    QuasiRiemann.qrhThresholdFiveEighths < QuasiRiemann.qrhThresholdTwoThirds ∧
+    QuasiRiemann.qrhThresholdTwoThirds < QuasiRiemann.qrhThresholdThreeQuarters ∧
+    QuasiRiemann.qrhThresholdThreeQuarters < QuasiRiemann.qrhThresholdSevenEighths) ∧
+   (∀ spec ∈ ArtinFermatBridge.artinFermatTowerSpecs,
+     ∃ tw : ArtinShortIntervalBridge.ArtinTwistedShortIntervalSpec,
+       tw.artinSpec = spec ∧
+       tw.apSpec.base.thetaQRat = ArtinShortIntervalBridge.qrhThresholdKimSarnak ∧
+       tw.apSpec.base.thetaQRat < QuasiRiemann.qrhThresholdFiveEighths ∧
+       tw.apSpec.HasGuaranteedApPrime) ∧
+   (∀ spec ∈ ArtinFermatBridge.artinFermatTowerSpecs,
+     ∃ tw : ArtinShortIntervalBridge.ArtinTwistedShortIntervalSpec,
+       tw.artinSpec = spec ∧
+       tw.apSpec.base.thetaQRat = QuasiRiemann.qrhShortExponent 4 ∧
+       tw.apSpec.HasGuaranteedApPrime))
+
 /-- Parts 6 & 8 provenance specification bundling 3-channel Garner multiplication,
 `EulerFactorNonVanishing.FermatTowerStripCert` (`half`, `threeQuarters`, `one`),
 cyclotomic Dedekind Euler product bounds across all `32,906` split prime ideals,
@@ -1022,10 +1106,12 @@ def EulerRnsProvenance : Prop :=
          | 0 => s2.r0
          | 1 => s2.r1
          | 2 => s2.r2
-         | _ => s2.r3) = (if i.val = m.val then 1 else 0)))
+         | _ => s2.r3) = (if i.val = m.val then 1 else 0))) ∧
+  ArtinShortIntervalProvenanceProp
 
 /-- Zero-axiom certificate for RNS Garner, Fermat-tower / Dedekind strip bounds,
-and GL(1) Artin-Fermat Euler + MiniVM NTT orthogonality bridges. -/
+GL(1) Artin-Fermat Euler + MiniVM NTT orthogonality, and character-twisted
+short-interval prime bridges. -/
 theorem eulerRns_provenance_certified : EulerRnsProvenance :=
   ⟨RnsArithmetic.garner_mul_concrete_soundness,
    EulerFactorNonVanishing.fermat_tower_euler_product_strip_certs,
@@ -1033,7 +1119,18 @@ theorem eulerRns_provenance_certified : EulerRnsProvenance :=
    ArtinFermatBridge.artin_split_euler_factor_collapse,
    ArtinFermatBridge.artin_order4_cyclotomic_factorization,
    ArtinFermatBridge.artin_char_transform_eq_ntt4,
-   ArtinFermatBridge.artin_char_orthogonality_minivm⟩
+   ArtinFermatBridge.artin_char_orthogonality_minivm,
+   ⟨ArtinShortIntervalBridge.artin_gaussian_char_orthogonality,
+    fun spec hmem s v h0 h1 h2 h3 hr0 hr1 hr2 hr3 =>
+      let h := ArtinShortIntervalBridge.artin_ntt4_residue_class_recovery
+        spec hmem s v h0 h1 h2 h3 hr0 hr1 hr2 hr3
+      ⟨h.1, h.2.1, h.2.2.2.2.2.2.1, h.2.2.2.2.2.2.2.1⟩,
+    ArtinShortIntervalBridge.artin_twisted_ap_short_interval_pos,
+    ArtinShortIntervalBridge.artin_twisted_coset_short_interval_pos,
+    ⟨ArtinShortIntervalBridge.fermat_tower_artin_short_interval_certs.2.1,
+     ArtinShortIntervalBridge.fermat_tower_artin_short_interval_certs.2.2.1,
+     ArtinShortIntervalBridge.fermat_tower_artin_short_interval_certs.2.2.2.2.1,
+     ArtinShortIntervalBridge.fermat_tower_artin_short_interval_certs.2.2.2.2.2⟩⟩⟩
 
 -- =============================================================================
 -- Part 7: Finite-Field RH, Genus-2 L(C,1)=71/25, Cantor Jacobian & Weil Zeta

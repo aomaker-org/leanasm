@@ -25,6 +25,7 @@ import LeanAsm.CollatzQrhBridge
 import LeanAsm.PiChudnovsky
 import LeanAsm.GSp4FunctorialityBridge
 import LeanAsm.ArtinFermatBridge
+import LeanAsm.ArtinShortIntervalBridge
 import LeanAsm.ConstructiveOpenaiBridge
 import LeanAsm.EllipticModularityBridge
 import LeanAsm.ProvenanceSummary

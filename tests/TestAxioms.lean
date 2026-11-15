@@ -602,4 +602,13 @@ import LeanAsm
 #print axioms LeanAsm.quasiRiemann_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 45: GL(1) Artin Character-Twisted Short-Interval Bounds (Issue #70)
+#print axioms ArtinShortIntervalBridge.artin_gaussian_char_orthogonality
+#print axioms ArtinShortIntervalBridge.artin_ntt4_residue_class_recovery
+#print axioms ArtinShortIntervalBridge.artin_twisted_ap_short_interval_pos
+#print axioms ArtinShortIntervalBridge.artin_twisted_coset_short_interval_pos
+#print axioms ArtinShortIntervalBridge.fermat_tower_artin_short_interval_certs
+#print axioms LeanAsm.eulerRns_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean
