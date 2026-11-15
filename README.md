@@ -33,13 +33,13 @@ source config_env hum
 # Check toolchain and workspace status
 make status
 
-# Build all 33 modules incrementally with timing budgets
+# Build all 35 modules incrementally with timing budgets
 make build-incremental
 
 # Full build & execute Parts 1-11 + unified provenance CLI demo
 make sync
 
-# Audit transitive axiom closures across Parts 1-44 (0 choice, 0 sorryAx)
+# Audit transitive axiom closures across Parts 1-46 (0 choice, 0 sorryAx)
 lake env lean tests/TestAxioms.lean
 
 # Check submodule hydration status
@@ -204,6 +204,10 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
 
 ## Architecture Guides & External Verification
 
+- **v1.2.0 Architecture Roadmap**: Cross-pillar QRH plan (`#68`–`#71`):
+  [v1.2.0 Roadmap](docs/ROADMAP_V1_2_0.md).
+- **v1.2.0 Architecture Review**: Verified 35-module & 8-pillar review:
+  [v1.2.0 Architecture Review](docs/ARCH_REVIEW_V1_2_0.md).
 - **Yang-Mills QFT Formalization**: Analysis of 4D pure Yang-Mills scaling
   limits and independent verification suite:
   [Yang-Mills overview](docs/yang_mills_formalization_overview.md).
@@ -237,12 +241,12 @@ leanasm/
 ├── mk/                      # Modular makefile extensions (hydrate.mk)
 ├── Main.lean                # CLI entrypoint (Parts 1-11 + provenance)
 ├── src/
-│   ├── LeanAsm.lean         # Library root exporting 31 submodules
-│   └── LeanAsm/             # 21 domain modules + PiChudnovsky/ + QuasiRiemann/
+│   ├── LeanAsm.lean         # Library root aggregating 33 submodules
+│   └── LeanAsm/             # 22 domain modules + PiChudnovsky/ + QuasiRiemann/
 │       ├── ProvenanceSummary.lean
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
-│       └── QuasiRiemann/    # Rat, UltraDeep72, Zfr, Bridge, ZD, Short, PQL
-├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-44)
+│       └── QuasiRiemann/    # Rat, UltraDeep72, Zfr, ZD, Short, PQL, Abel
+├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-46)
 └── tools/                   # Build and logging utilities
 ```
 
