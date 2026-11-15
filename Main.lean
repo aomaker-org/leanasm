@@ -127,6 +127,8 @@ def main : IO Unit := do
   IO.println s!"  Non-abelian multiplication: i * j = {repr ab}, j * i = {repr ba}"
   IO.println s!"  Trace cyclicity verified  : ReTr(i * j) = {Q8.reTrace ab}, ReTr(j * i) = {Q8.reTrace ba}"
   IO.println "  Conjugation invariance   : ReTr(g * u * g⁻¹) = ReTr(u) (ZERO axioms verified)"
+  IO.println "  4D Lattice & Q8 Holonomy : routeWalk / slab_sum_foliation / holonomy_gauge_covariant"
+  IO.println "                             / q8_send_price_trace_invariant (OpenAI bridge, ZERO axioms)"
 
   -- 5. Quasi-Riemann Hypothesis (QRH, θ = 7/8)
   IO.println "\n[+] Part 5: Quasi-Riemann Hypothesis (θ = 7/8)"

@@ -26,6 +26,7 @@ import LeanAsm.PiChudnovsky.CrtMulBridge
 import LeanAsm.PiChudnovsky
 import LeanAsm.GSp4FunctorialityBridge
 import LeanAsm.ArtinFermatBridge
+import LeanAsm.ConstructiveOpenaiBridge
 
 namespace LeanAsm
 
@@ -206,8 +207,9 @@ theorem collatz_provenance_certified : CollatzProvenance :=
 -- Parts 3-4: 4D Abelian Z_2 & Non-Abelian Q_8 Lattice Gauge Invariance
 -- =============================================================================
 
-/-- Parts 3-4 provenance specification for `Z_2` Wilson plaquette gauge invariance
-and `Q_8 ⊂ SU(2)` trace conjugation invariance. -/
+/-- Parts 3-4 provenance specification for `Z_2` Wilson plaquette gauge invariance,
+`Q_8 ⊂ SU(2)` trace conjugation invariance, and the pure-constructive `openai-20261028`
+lattice/holonomy/foliation bridge. -/
 def YangMillsProvenance : Prop :=
   (∀ (g : YangMillsToy.GaugeTransform) (U : YangMillsToy.GaugeConfig)
       (x : YangMillsToy.Point4) (μ ν : YangMillsToy.Dir),
@@ -215,12 +217,69 @@ def YangMillsProvenance : Prop :=
       YangMillsToy.plaquetteAction U x μ ν) ∧
   (∀ (g u : YangMillsQ8.Q8),
     YangMillsQ8.Q8.reTrace (YangMillsQ8.Q8.mul (YangMillsQ8.Q8.mul g u) (YangMillsQ8.Q8.inv g)) =
-      YangMillsQ8.Q8.reTrace u)
+      YangMillsQ8.Q8.reTrace u) ∧
+  (∀ {G : Type} (L : ConstructiveOpenaiBridge.LatticeGroup G)
+      (g : ConstructiveOpenaiBridge.GaugeTransform G)
+      (U : ConstructiveOpenaiBridge.GaugeConnection G)
+      (p : ConstructiveOpenaiBridge.LatticePlaquette4),
+    ConstructiveOpenaiBridge.plaquetteHolonomy L
+        (ConstructiveOpenaiBridge.gaugeTransformConnection L g U) p =
+      L.mul (L.mul (g p.site) (ConstructiveOpenaiBridge.plaquetteHolonomy L U p))
+        (L.inv (g p.site))) ∧
+  (∀ (g : ConstructiveOpenaiBridge.GaugeTransform YangMillsQ8.Q8)
+      (U : ConstructiveOpenaiBridge.GaugeConnection YangMillsQ8.Q8)
+      (p : ConstructiveOpenaiBridge.LatticePlaquette4),
+    YangMillsQ8.Q8.reTrace
+        (ConstructiveOpenaiBridge.plaquetteHolonomy ConstructiveOpenaiBridge.q8LatticeGroup
+          (ConstructiveOpenaiBridge.gaugeTransformConnection
+            ConstructiveOpenaiBridge.q8LatticeGroup g U) p) =
+      YangMillsQ8.Q8.reTrace
+        (ConstructiveOpenaiBridge.plaquetteHolonomy ConstructiveOpenaiBridge.q8LatticeGroup U p)) ∧
+  (∀ (U : ConstructiveOpenaiBridge.GaugeConnection YangMillsQ8.Q8)
+      (p : ConstructiveOpenaiBridge.Face) (s : ConstructiveOpenaiBridge.SignedSym4)
+      (t : ConstructiveOpenaiBridge.Cover4),
+    YangMillsQ8.Q8.reTrace
+        (ConstructiveOpenaiBridge.faceValue ConstructiveOpenaiBridge.q8LatticeGroup
+          (ConstructiveOpenaiBridge.pullConnection ConstructiveOpenaiBridge.q8LatticeGroup s t U) p) =
+      YangMillsQ8.Q8.reTrace
+        (ConstructiveOpenaiBridge.faceValue ConstructiveOpenaiBridge.q8LatticeGroup U
+          (ConstructiveOpenaiBridge.Face.send s t p))) ∧
+  (∀ (r : Nat) (o : ConstructiveOpenaiBridge.Cover4) {i : ConstructiveOpenaiBridge.Axis}
+      {l : List ConstructiveOpenaiBridge.Axis},
+    i ∉ l → ∀ (f : ConstructiveOpenaiBridge.Cover4 → Int),
+    ConstructiveOpenaiBridge.listSum (ConstructiveOpenaiBridge.slabSites r o (l ++ [i])) f =
+      ConstructiveOpenaiBridge.listSum (ConstructiveOpenaiBridge.layerRange r)
+        (fun z => ConstructiveOpenaiBridge.listSum
+          (ConstructiveOpenaiBridge.slabSites r (o.update i z) l) f)) ∧
+  (∀ (l : List ConstructiveOpenaiBridge.Axis) (x y : ConstructiveOpenaiBridge.Cover4),
+    ConstructiveOpenaiBridge.axisRoute y x l.reverse =
+      ConstructiveOpenaiBridge.walkReverse (ConstructiveOpenaiBridge.axisRoute x y l)) ∧
+  (∀ (x : ConstructiveOpenaiBridge.Cover4) (a b : ConstructiveOpenaiBridge.Axis),
+    ConstructiveOpenaiBridge.walkVisits x (ConstructiveOpenaiBridge.squareWalk a b) =
+      [x,
+       ConstructiveOpenaiBridge.Cover4.add x (ConstructiveOpenaiBridge.Cover4.step a),
+       ConstructiveOpenaiBridge.Cover4.add
+         (ConstructiveOpenaiBridge.Cover4.add x (ConstructiveOpenaiBridge.Cover4.step a))
+         (ConstructiveOpenaiBridge.Cover4.step b),
+       ConstructiveOpenaiBridge.Cover4.add x (ConstructiveOpenaiBridge.Cover4.step b),
+       x]) ∧
+  (∀ (s : ConstructiveOpenaiBridge.SignedSym4) (t : ConstructiveOpenaiBridge.Cover4)
+      (p1 p2 : ConstructiveOpenaiBridge.Face),
+    ConstructiveOpenaiBridge.Face.send s t p1 = ConstructiveOpenaiBridge.Face.send s t p2 →
+      p1 = p2)
 
-/-- Zero-axiom certificate for 4D lattice gauge invariance across `Z_2` and `Q_8`. -/
+/-- Zero-axiom certificate for 4D lattice gauge invariance across `Z_2`, `Q_8`, and the
+pure-constructive `openai-20261028` lattice/holonomy/foliation bridge. -/
 theorem yangMills_provenance_certified : YangMillsProvenance :=
   ⟨YangMillsToy.plaquette_action_gauge_invariant,
-   YangMillsQ8.q8_trace_conjugation_invariant⟩
+   YangMillsQ8.q8_trace_conjugation_invariant,
+   fun L g U p => ConstructiveOpenaiBridge.holonomy_gauge_covariant L g U p,
+   ConstructiveOpenaiBridge.q8_plaquette_holonomy_gauge_invariant,
+   ConstructiveOpenaiBridge.q8_send_price_trace_invariant,
+   fun r o {_ _} hi f => ConstructiveOpenaiBridge.slab_sum_foliation r o hi f,
+   ConstructiveOpenaiBridge.axisRoute_reverse,
+   ConstructiveOpenaiBridge.squareWalk_corners,
+   ConstructiveOpenaiBridge.Face.injective_send⟩
 
 -- =============================================================================
 -- Part 5: Analytic QRH, Ultra-Deep 2D Rectangles, DVP ZFR, & Chebyshev Envelopes
