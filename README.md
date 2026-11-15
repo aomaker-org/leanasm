@@ -204,10 +204,14 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
 
 ## Architecture Guides & External Verification
 
+- **v1.3.0 Architecture Roadmap**: Closed-loop QRH, `UltraDeep72` split,
+  Rankin-Selberg, & 5-prime Proth NTT (`#78`–`#81`):
+  [v1.3.0 Roadmap](docs/ROADMAP_V1_3_0.md).
 - **v1.2.0 Architecture Roadmap**: Cross-pillar QRH plan (`#68`–`#71`):
   [v1.2.0 Roadmap](docs/ROADMAP_V1_2_0.md).
 - **v1.2.0 Architecture Review**: Verified 35-module & 8-pillar review:
-  [v1.2.0 Architecture Review](docs/ARCH_REVIEW_V1_2_0.md).
+  [v1.2.0 Architecture Review](docs/ARCH_REVIEW_V1_2_0.md)
+  ([v1.2.0 Code Digest](docs/V1_2_0_CODE_DIGEST.md)).
 - **Yang-Mills QFT Formalization**: Analysis of 4D pure Yang-Mills scaling
   limits and independent verification suite:
   [Yang-Mills overview](docs/yang_mills_formalization_overview.md).
