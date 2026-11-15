@@ -15,6 +15,7 @@ import LeanAsm.QuasiRiemann.ZeroDensityBridge
 import LeanAsm.QuasiRiemann.ShortIntervalPrimes
 import LeanAsm.QuasiRiemann.ParametricQrhLadder
 import LeanAsm.QuasiRiemann.DyadicAbelBridge
+import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.Genus2Jacobian
@@ -738,6 +739,49 @@ def DyadicAbelProvenanceProp : Prop :=
    QuasiRiemann.shortIntervalQrh23Spec.HasGuaranteedPrime ∧
    QuasiRiemann.shortIntervalQrh34Spec.HasGuaranteedPrime)
 
+/-- Reusable Part 5 specification for closed-loop dyadic-Abel rungs (`k = 5, 6`)
+and two-piece `QRat` variational mollifier optimization (`Issue #78`). -/
+def MollifierVariationalProp : Prop :=
+  (∀ (kCurr kNext : Nat) (specNext : QuasiRiemann.ChebyshevRemainderSpec)
+      (sNext : QuasiRiemann.ShortIntervalChebyshevSpec)
+      (_hLadderDrop : QuasiRiemann.qrhShortExponent kNext < QuasiRiemann.qrhShortExponent kCurr)
+      (a wNum : Nat → Int) (M N E D : Nat) (_hMN : M < N) (hD : 0 < D)
+      (_hw0 : 0 ≤ wNum N)
+      (_hwAnti : ∀ k, M + 1 ≤ k → k < N → wNum (k + 1) ≤ wNum k)
+      (_hRem : ∀ k, M ≤ k → k ≤ N → Int.natAbs (QuasiRiemann.partialSumInt a k - (k : Int)) ≤ E)
+      (gate : QuasiRiemann.InvSqrtTailGateSpec)
+      (_hHleX : sNext.hScaleExp ≤ sNext.xScaleExp)
+      (_hEnv : QuasiRiemann.qrhRemainderBoundAtTwoTenPow specNext ≤ sNext.errUpper)
+      (psiX psiXH thetaX thetaXH : Int)
+      (_hBX : Int.natAbs (psiX - ((10 ^ sNext.xScaleExp : Nat) : Int)) ≤ sNext.errUpper)
+      (_hBXH : Int.natAbs (psiXH - ((10 ^ sNext.xScaleExp + 10 ^ sNext.hScaleExp : Nat) : Int)) ≤
+        sNext.errUpper)
+      (_hCorr : (psiXH - psiX) - (thetaXH - thetaX) ≤ (sNext.primePowerCorr : Int))
+      (_hPrime : sNext.HasGuaranteedPrime),
+    QuasiRiemann.QRat.mk'
+      (Int.natAbs (QuasiRiemann.rangeSumInt (fun n => a n * wNum n) (M + 1) (N + 1) -
+        QuasiRiemann.rangeSumInt wNum (M + 1) (N + 1)) : Int) D hD ≤
+      QuasiRiemann.QRat.mk' ((2 * E * Int.natAbs (wNum (M + 1)) : Nat) : Int) D hD ∧
+    (4 * gate.scaleN) * (gate.tailBound * gate.tailBound) ≤
+      ((2 * gate.denomM) * (2 * gate.denomM)) * (gate.tailNum * gate.tailNum) ∧
+    (0 : Int) < thetaXH - thetaX) ∧
+  (QuasiRiemann.QRat.eqv (QuasiRiemann.qrhShortExponent 5) (QuasiRiemann.QRat.mk' 33 64) ∧
+   QuasiRiemann.QRat.eqv (QuasiRiemann.qrhShortExponent 6) (QuasiRiemann.QRat.mk' 65 128) ∧
+   QuasiRiemann.shortIntervalQrh3364Spec.HasGuaranteedPrime ∧
+   QuasiRiemann.shortIntervalQrh65128Spec.HasGuaranteedPrime) ∧
+  (∀ m : QuasiRiemann.TwoPieceMollifierSpec,
+    QuasiRiemann.QRat.ofInt 1 ≤ QuasiRiemann.mollifierDirichletEnergy m.c1 m.c2) ∧
+  (∀ m : QuasiRiemann.TwoPieceMollifierSpec,
+    (0 : Int) < m.c1.num → (0 : Int) < m.c2.num →
+    QuasiRiemann.mollifierVariationalEnergy m.c1 m.c2 < QuasiRiemann.QRat.ofInt 1) ∧
+  (QuasiRiemann.QRat.eqv
+      (QuasiRiemann.mollifierVariationalEnergy QuasiRiemann.variationalMollifier3414Spec.c1
+        QuasiRiemann.variationalMollifier3414Spec.c2) (QuasiRiemann.QRat.mk' 13 16) ∧
+   QuasiRiemann.variationalQrhThreshold QuasiRiemann.variationalMollifier3414Spec
+      GSp4FunctorialityBridge.thetaKimSarnakSym4 <
+      QuasiRiemann.qrhFromAutomorphic
+        GSp4FunctorialityBridge.thetaKimSarnakSym4)
+
 /-- Part 5 provenance specification bundling mollifier descent, 2D rectangles down to
 `σ = 0.501`, `t ~ 10^12` phase-reduced rectangles, DVP asymptotic strip, Dirichlet `L^2`
 diagonal dominance, rational zero-density descent (`15/26 < 3/5 < 2/3`), QRH threshold
@@ -882,7 +926,8 @@ def QuasiRiemannProvenance : Prop :=
   HighTruncRectProvenanceProp ∧
   ParametricQrhLadderProp ∧
   HighTruncRationalContractionProp ∧
-  DyadicAbelProvenanceProp
+  DyadicAbelProvenanceProp ∧
+  MollifierVariationalProp
 
 set_option exponentiation.threshold 2000 in
 /-- Zero-axiom certificate for Parts 3-5 analytic QRH, 2D rectangles, DVP, and Chebyshev. -/
@@ -956,7 +1001,19 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
      QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.1,
      QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.1,
      QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.2.1,
-     QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.2.2.1⟩⟩⟩
+     QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.2.2.1⟩⟩,
+   ⟨fun kC kN specN sN hD a w M N E D hMN hD0 hw0 hwA hR gate hHX hE pX pXH tX tXH hBX hBXH hC hP =>
+      let h := QuasiRiemann.dyadic_abel_unlocks_next_rung kC kN specN sN hD a w M N E D hMN hD0
+        hw0 hwA hR gate hHX hE pX pXH tX tXH hBX hBXH hC hP
+      ⟨h.1, h.2.1, h.2.2.2.2⟩,
+    ⟨QuasiRiemann.dyadic_abel_rungs_k5_k6_certs.1,
+     QuasiRiemann.dyadic_abel_rungs_k5_k6_certs.2.1,
+     QuasiRiemann.shortIntervalQrh3364Spec_has_prime,
+     QuasiRiemann.shortIntervalQrh65128Spec_has_prime⟩,
+    fun m => (QuasiRiemann.linear_minimizes_dirichlet_energy m).2,
+    fun m hc1 hc2 => QuasiRiemann.variational_energy_lt_one_of_pos m hc1 hc2,
+    ⟨QuasiRiemann.mollifier_variational_bridge_certs.2.2.2.2.1,
+     QuasiRiemann.mollifier_variational_bridge_certs.2.2.2.2.2.2⟩⟩⟩
 
 -- =============================================================================
 -- Parts 6 & 8: RNS Garner & Fermat-Tower / Dedekind Euler Non-Vanishing

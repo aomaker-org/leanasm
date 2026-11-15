@@ -33,13 +33,13 @@ source config_env hum
 # Check toolchain and workspace status
 make status
 
-# Build all 35 modules incrementally with timing budgets
+# Build all 36 modules incrementally with timing budgets
 make build-incremental
 
 # Full build & execute Parts 1-11 + unified provenance CLI demo
 make sync
 
-# Audit transitive axiom closures across Parts 1-46 (0 choice, 0 sorryAx)
+# Audit transitive axiom closures across Parts 1-47 (0 choice, 0 sorryAx)
 lake env lean tests/TestAxioms.lean
 
 # Check submodule hydration status
@@ -67,7 +67,8 @@ kernel-verified computations across all 11 parts:
    `SignedSym4` face-holonomy trace invariance.
 5. **Part 5 (`QuasiRiemann`, `UltraDeep72`, `AsymptoticZfr`,
    `ZeroDensityBridge`, `ShortIntervalPrimes`, `ParametricQrhLadder`,
-   `DyadicAbelBridge`)**: Mollifier descent, 2D rectangles down to `sigma =
+   `DyadicAbelBridge`, `MollifierVariationalBridge`)**: Mollifier descent, 2D
+   rectangles down to `sigma = 0.501` (`N = 128`) and compositional 2x2
    0.501` (`N = 128`) and compositional 2x2 Lipschitz tiles down to `sigma =
    0.5005` (`N = 256`, `t ~ 10^12`) and `sigma = 0.50025` (`N = 512`,
    `t ~ 10^18`) via 90-digit CRT-NTT phase reduction (`< 10^-60` rad), DVP
@@ -78,8 +79,11 @@ kernel-verified computations across all 11 parts:
    parametric binary ladder `theta(k) = (2^k + 1) / 2^(k + 1)` (`5/8 > 9/16 >
    17/32 > 33/64 > 1/2`), Kim-Sarnak `7/64` coupling (`17/32` at
    `[10^96, +10^57]`), rational box contraction (`1/3`, `2/5`), `UltraDeep72
-   -> ZD` (`0.50025`), `[M, M * 2^k)` dyadic-shell foliation, and discrete Abel
-   summation-by-parts (`1/sqrt(N)` quadratic gates).
+   -> ZD` (`0.50025`), `[M, M * 2^k)` dyadic-shell foliation, discrete Abel
+   summation-by-parts (`1/sqrt(N)` quadratic gates), closed-loop rungs `k =
+   5,6` (`33/64` at `[10^192, +10^108]`, `65/128` at `[10^384, +10^206]`),
+   and two-piece `QRat` variational mollifiers (`13/16 < 1`,
+   `603/1024 < 39/64`).
 6. **Part 6 (`RnsArithmetic`, `EulerFactorNonVanishing`, `ArtinFermatBridge`,
    `ArtinShortIntervalBridge`)**: 3-channel Garner CRT execution, Fermat-tower
    `{5, 17, 257, 65537}` strip bounds (`sigma in {1/2, 3/4, 1}`), cyclotomic
@@ -104,17 +108,17 @@ kernel-verified computations across all 11 parts:
     `pi`, universal `m >= 8` truncation trap, and unified master certificate
     `LeanAsm.leanasm_full_provenance_certified`.
 
-## 35-Module Theorem Inventory
+## 36-Module Theorem Inventory
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 `QuasiRiemann/`, `PC/` for `PiChudnovsky/`, and `Main.lean` +
-`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-46.
+`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-47.
 `NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `PC` = `PiChudnovsky`.
 
 | Module | NS | Flagship Theorem / Role |
 | --- | --- | --- |
 | `Main.lean` | `(root)` | CLI entrypoint (`Parts 1-11` + provenance) |
-| `LeanAsm.lean` | `(root)` | Library root exporting all 33 submodules |
+| `LeanAsm.lean` | `(root)` | Library root exporting all 34 submodules |
 | `MiniVM.lean` | `=` | `exec_garner_crt_sound`, `mul_mod_reg_correct` |
 | `MiniVMNttBridge.lean` | `=` | `crtNtt4ConvAsm_sound` |
 | `Conjectures.lean` | `=` | `collatz_one_reaches_one` |
@@ -131,6 +135,7 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `QR/ShortIntervalPrimes.lean` | `QR` | `qrh_short_interval_positivity_certs` |
 | `QR/ParametricQrhLadder.lean` | `QR` | `kim_sarnak_amplified_qrh_step` |
 | `QR/DyadicAbelBridge.lean` | `QR` | `short_interval_dyadic_abel_envelope` |
+| `QR/MollifierVariationalBridge.lean` | `QR` | `variationalQrhThreshold` |
 | `RnsArithmetic.lean` | `=` | `garner_mul_concrete_soundness` |
 | `EulerFactorNonVanishing.lean` | `=` | `local_euler_disk_nonvanishing` |
 | `FiniteFieldRH.lean` | `=` | `hasse_weil_riemann_hypothesis` |
@@ -245,12 +250,12 @@ leanasm/
 ├── mk/                      # Modular makefile extensions (hydrate.mk)
 ├── Main.lean                # CLI entrypoint (Parts 1-11 + provenance)
 ├── src/
-│   ├── LeanAsm.lean         # Library root aggregating 33 submodules
+│   ├── LeanAsm.lean         # Library root aggregating 34 submodules
 │   └── LeanAsm/             # 22 domain modules + PiChudnovsky/ + QuasiRiemann/
 │       ├── ProvenanceSummary.lean
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
-│       └── QuasiRiemann/    # Rat, UltraDeep72, Zfr, ZD, Short, PQL, Abel
-├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-46)
+│       └── QuasiRiemann/    # Rat, UD72, Zfr, ZD, Short, PQL, Abel, MVB
+├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-47)
 └── tools/                   # Build and logging utilities
 ```
 

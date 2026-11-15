@@ -14,6 +14,7 @@ import LeanAsm.QuasiRiemann.ZeroDensityBridge
 import LeanAsm.QuasiRiemann.ShortIntervalPrimes
 import LeanAsm.QuasiRiemann.ParametricQrhLadder
 import LeanAsm.QuasiRiemann.DyadicAbelBridge
+import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.Genus2Jacobian

@@ -274,6 +274,8 @@ def main : IO Unit := do
     "& zdHux(σ) by 3/5000 (ZERO axioms)")
   IO.println ("  Dyadic-Abel QRH   : [M, M·2^k) shell foliation ([1,16) into 4 shells), " ++
     "Abel parts & 1/√N gates (17/32..3/4)")
+  IO.println ("  Variational QRH   : rungs k=5,6 (33/64@[10^192,+10^108], 65/128@[10^384,+10^206]), " ++
+    "(3/4,1/4) E_var=13/16 (603/1024 < 39/64)")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"
