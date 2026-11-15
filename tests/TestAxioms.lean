@@ -563,4 +563,20 @@ import LeanAsm
 #print axioms LeanAsm.yangMills_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 42: GL(2) Elliptic Curve Modularity E_{11a1} & f_{11} (Issue #60)
+#print axioms EllipticModularityBridge.f11Coeffs_eq_table
+#print axioms EllipticModularityBridge.heckeCoeff11_bad_11
+#print axioms EllipticModularityBridge.isPointOnE11a1_iff_int_diff
+#print axioms EllipticModularityBridge.sumTree_eq_range_foldl
+#print axioms EllipticModularityBridge.ec11a1_point_cond_eq
+#print axioms EllipticModularityBridge.ec11a1_point_counts_97
+#print axioms EllipticModularityBridge.ec11a1_five_torsion_97
+#print axioms EllipticModularityBridge.eichler_shimura_trace_eq_11a1
+#print axioms EllipticModularityBridge.gl2_euler_quad_identity
+#print axioms EllipticModularityBridge.gl2_euler_homog_pos_of_ramanujan
+#print axioms EllipticModularityBridge.hasse_weil_ramanujan_11a1_certs
+#print axioms EllipticModularityBridge.hecke_multiplicativity_11a1_certs
+#print axioms LeanAsm.finiteFieldWeil_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean

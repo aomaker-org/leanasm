@@ -27,6 +27,7 @@ import LeanAsm.PiChudnovsky
 import LeanAsm.GSp4FunctorialityBridge
 import LeanAsm.ArtinFermatBridge
 import LeanAsm.ConstructiveOpenaiBridge
+import LeanAsm.EllipticModularityBridge
 
 namespace LeanAsm
 
@@ -937,8 +938,9 @@ theorem eulerRns_provenance_certified : EulerRnsProvenance :=
 
 /-- Part 7 provenance specification bundling Hasse-Weil RH for `E / F_7`,
 genus-2 `C / F_5` negative discriminants, `L(C, 1) = 71/25`, Cantor-Mumford group axioms
-for `J(C)(F_5) ≅ Z/71Z`, punctured-strip zeta non-vanishing, `Ξ_C` reflection, and
-`GSp(4) -> SO(5)` functorial Euler lift + Selberg / Kim-Sarnak exponent ladder. -/
+for `J(C)(F_5) ≅ Z/71Z`, punctured-strip zeta non-vanishing, `Ξ_C` reflection,
+`GSp(4) -> SO(5)` functorial Euler lift + Selberg / Kim-Sarnak ladder, and
+`E_{11a1}` / `f_{11}` GL(2) Eichler-Shimura modularity. -/
 def FiniteFieldWeilProvenance : Prop :=
   (FiniteFieldRH.frobeniusTrace * FiniteFieldRH.frobeniusTrace ≤
     4 * (FiniteFieldRH.p : Int)) ∧
@@ -1110,10 +1112,30 @@ def FiniteFieldWeilProvenance : Prop :=
       GSp4FunctorialityBridge.selbergLambda1
           GSp4FunctorialityBridge.thetaKimSarnakSym4 -
         GSp4FunctorialityBridge.selbergLambda1
-          GSp4FunctorialityBridge.thetaKimShahidiSym3)
+          GSp4FunctorialityBridge.thetaKimShahidiSym3) ∧
+  ((∀ p ∈ EllipticModularityBridge.goodPrimes97,
+      EllipticModularityBridge.heckeCoeff11 p =
+        EllipticModularityBridge.ec11a1FrobTrace p) ∧
+    EllipticModularityBridge.heckeCoeff11 11 = 1) ∧
+  ((∀ p ∈ EllipticModularityBridge.goodPrimes97,
+      EllipticModularityBridge.ec11a1FrobTrace p ^ 2 ≤ 4 * (p : Int)) ∧
+   (∀ p ∈ EllipticModularityBridge.goodPrimes97,
+      EllipticModularityBridge.ec11a1FrobTrace p ^ 2 < 4 * (p : Int)) ∧
+   (∀ p ∈ EllipticModularityBridge.goodPrimes97, ∀ u v : Int, 0 < v →
+      0 < EllipticModularityBridge.gl2EulerHomog
+        (p : Int) (EllipticModularityBridge.ec11a1FrobTrace p) u v)) ∧
+  (EllipticModularityBridge.heckeCoeff11 1 = 1 ∧
+   (∀ m n : Nat, 1 ≤ m → 1 ≤ n → m * n ≤ 100 → Nat.gcd m n = 1 →
+      EllipticModularityBridge.heckeCoeff11 (m * n) =
+        EllipticModularityBridge.heckeCoeff11 m *
+          EllipticModularityBridge.heckeCoeff11 n) ∧
+   (∀ p ∈ EllipticModularityBridge.goodSqPrimes100,
+      EllipticModularityBridge.heckeCoeff11 (p * p) =
+        EllipticModularityBridge.heckeCoeff11 p ^ 2 - (p : Int)))
 
 /-- Zero-axiom certificate for Hasse-Weil RH, genus-2 Jacobian, completed zeta,
-and `GSp(4) -> SO(5)` functoriality + Selberg / Kim-Sarnak ladder. -/
+`GSp(4) -> SO(5)` functoriality + Selberg / Kim-Sarnak ladder, and
+`E_{11a1}` / `f_{11}` GL(2) Eichler-Shimura modularity. -/
 theorem finiteFieldWeil_provenance_certified : FiniteFieldWeilProvenance :=
   ⟨FiniteFieldRH.hasse_weil_riemann_hypothesis,
    FiniteFieldRH.genus2_frob_negative_discriminants,
@@ -1129,7 +1151,10 @@ theorem finiteFieldWeil_provenance_certified : FiniteFieldWeilProvenance :=
    GSp4FunctorialityBridge.genus2_f5_so5_cyclotomic_lift,
    GSp4FunctorialityBridge.genus2_f5_so5_ramanujan_tempered,
    GSp4FunctorialityBridge.kim_sarnak_ramanujan_ladder_strict,
-   GSp4FunctorialityBridge.selberg_laplacian_eigenvalue_ladder⟩
+   GSp4FunctorialityBridge.selberg_laplacian_eigenvalue_ladder,
+   EllipticModularityBridge.eichler_shimura_trace_eq_11a1,
+   EllipticModularityBridge.hasse_weil_ramanujan_11a1_certs,
+   EllipticModularityBridge.hecke_multiplicativity_11a1_certs⟩
 
 -- =============================================================================
 -- Parts 9-10: Universal NTT, 192-Digit Karatsuba CRT-NTT, & 4-Prime Garner

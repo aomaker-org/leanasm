@@ -325,6 +325,14 @@ def main : IO Unit := do
     s!"5 L_std(2) = {so5At2} (T^10 = 1 unit-circle roots)")
   IO.println ("  Selberg / Kim-Sarnak Ladder : θ: 0 < 7/64 < 1/9 < 1/5 < 1/4 < 1/2 | " ++
     "λ_1: 3/16 < 21/100 < 77/324 < 975/4096 < 1/4 (ΔSym4-3 = 127/331776)")
+  let c13 := EllipticModularityBridge.heckeCoeff11 13
+  let a13 := EllipticModularityBridge.ec11a1FrobTrace 13
+  let c97 := EllipticModularityBridge.heckeCoeff11 97
+  let a97 := EllipticModularityBridge.ec11a1FrobTrace 97
+  IO.println ("  E_{11a1} / f_11 Modularity   : c_p = a_p across all 24 good primes p ≤ 97 " ++
+    s!"(c_13=a_13={c13}={a13}, c_97=a_97={c97}={a97}, c_11=1)")
+  IO.println ("  GL(2) Ramanujan & Hecke Alg : a_p^2 < 4p & v^2 - a_p u v + p u^2 > 0 (p ≤ 97), " ++
+    "c_{mn} = c_m c_n & c_{p^2} = c_p^2 - p (ZERO axioms)")
 
   -- 8. Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)
   IO.println "\n[+] Part 8: Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)"
