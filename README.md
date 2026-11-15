@@ -66,20 +66,20 @@ kernel-verified computations across all 11 parts:
    conjugation invariance, 4D lattice walks, box/slab foliation, and
    `SignedSym4` face-holonomy trace invariance.
 5. **Part 5 (`QuasiRiemann`, `UltraDeep72`, `AsymptoticZfr`,
-   `ZeroDensityBridge`, `ShortIntervalPrimes`, `ParametricQrhLadder`)**:
-   Mollifier descent, 2D rectangles down to `sigma = 0.501` (`N = 128`)
-   and compositional 2x2 Lipschitz tiles down to `sigma = 0.5005`
-   (`N = 256`, `t ~ 10^12`) and `sigma = 0.50025` (`N = 512`, `t ~ 10^18`)
-   via 90-digit CRT-NTT phase reduction (`< 10^-60` rad), DVP asymptotic ZFR,
-   Dirichlet `L^2` diagonal dominance, rational zero-density descent
-   (`15/26 < 3/5 < 2/3`), QRH threshold ladder
-   `theta in {3/4, 7/8, 11/12, 47/48}`, Chebyshev remainder envelopes
-   (`10^12..10^336`), short-interval prime positivity (`10^336/10^308`),
-   Fermat-tower AP primes (`q in {5, 17, 257, 65537}`), sub-3/4 ladder,
-   parametric beyond-7/8 binary ladder `theta(k) = (2^k + 1) / 2^(k + 1)`
-   (`5/8 > 9/16 > 17/32 > 33/64 > 1/2`), dual ascent `7/8 < 15/16 < 31/32`,
-   and Kim-Sarnak `7/64` coupling (`17/32` at `[10^96, +10^57]`), plus
-   rational box contraction (`1/3`, `2/5`) & `UltraDeep72 -> ZD` (`0.50025`).
+   `ZeroDensityBridge`, `ShortIntervalPrimes`, `ParametricQrhLadder`,
+   `DyadicAbelBridge`)**: Mollifier descent, 2D rectangles down to `sigma =
+   0.501` (`N = 128`) and compositional 2x2 Lipschitz tiles down to `sigma =
+   0.5005` (`N = 256`, `t ~ 10^12`) and `sigma = 0.50025` (`N = 512`,
+   `t ~ 10^18`) via 90-digit CRT-NTT phase reduction (`< 10^-60` rad), DVP
+   asymptotic ZFR, Dirichlet `L^2` diagonal dominance, rational zero-density
+   descent (`15/26 < 3/5 < 2/3`), QRH threshold ladder `theta in {3/4, 7/8,
+   11/12, 47/48}`, Chebyshev envelopes (`10^12..10^336`), short-interval primes
+   (`10^336/10^308`), Fermat-tower AP primes (`q in {5, 17, 257, 65537}`),
+   parametric binary ladder `theta(k) = (2^k + 1) / 2^(k + 1)` (`5/8 > 9/16 >
+   17/32 > 33/64 > 1/2`), Kim-Sarnak `7/64` coupling (`17/32` at
+   `[10^96, +10^57]`), rational box contraction (`1/3`, `2/5`), `UltraDeep72
+   -> ZD` (`0.50025`), `[M, M * 2^k)` dyadic-shell foliation, and discrete Abel
+   summation-by-parts (`1/sqrt(N)` quadratic gates).
 6. **Part 6 (`RnsArithmetic`, `EulerFactorNonVanishing`, `ArtinFermatBridge`,
    `ArtinShortIntervalBridge`)**: 3-channel Garner CRT execution, Fermat-tower
    `{5, 17, 257, 65537}` strip bounds (`sigma in {1/2, 3/4, 1}`), cyclotomic
@@ -104,17 +104,17 @@ kernel-verified computations across all 11 parts:
     `pi`, universal `m >= 8` truncation trap, and unified master certificate
     `LeanAsm.leanasm_full_provenance_certified`.
 
-## 34-Module Theorem Inventory
+## 35-Module Theorem Inventory
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 `QuasiRiemann/`, `PC/` for `PiChudnovsky/`, and `Main.lean` +
-`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-45.
+`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-46.
 `NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `PC` = `PiChudnovsky`.
 
 | Module | NS | Flagship Theorem / Role |
 | --- | --- | --- |
 | `Main.lean` | `(root)` | CLI entrypoint (`Parts 1-11` + provenance) |
-| `LeanAsm.lean` | `(root)` | Library root exporting all 32 submodules |
+| `LeanAsm.lean` | `(root)` | Library root exporting all 33 submodules |
 | `MiniVM.lean` | `=` | `exec_garner_crt_sound`, `mul_mod_reg_correct` |
 | `MiniVMNttBridge.lean` | `=` | `crtNtt4ConvAsm_sound` |
 | `Conjectures.lean` | `=` | `collatz_one_reaches_one` |
@@ -130,6 +130,7 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `QR/ZeroDensityBridge.lean` | `QR` | `qrh_chebyshev_benchmark_certs` |
 | `QR/ShortIntervalPrimes.lean` | `QR` | `qrh_short_interval_positivity_certs` |
 | `QR/ParametricQrhLadder.lean` | `QR` | `kim_sarnak_amplified_qrh_step` |
+| `QR/DyadicAbelBridge.lean` | `QR` | `short_interval_dyadic_abel_envelope` |
 | `RnsArithmetic.lean` | `=` | `garner_mul_concrete_soundness` |
 | `EulerFactorNonVanishing.lean` | `=` | `local_euler_disk_nonvanishing` |
 | `FiniteFieldRH.lean` | `=` | `hasse_weil_riemann_hypothesis` |
@@ -175,8 +176,12 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
   `rational_box_contraction_step`, `rational_telescoping_chain_cert`,
   `ultraDeep72_N256_rational_rect_cert`,
   `ultraDeep72_N512_rational_rect_cert`,
-  `ultradeep72_strip_to_zero_density_bridge`, &
-  `ultradeep72_N512_strip_zd_certs`
+  `ultradeep72_strip_to_zero_density_bridge`,
+  `ultradeep72_N512_strip_zd_certs`, `dyadic_shell_sum_partition`,
+  `dyadic_shell_sum_foliation`, `discrete_abel_summation_by_parts`,
+  `abel_summation_by_parts_list`, `abel_monotone_weight_envelope`,
+  `inv_sqrt_tail_gate_dyadic_step`, `short_interval_dyadic_abel_envelope`,
+  & `dyadic_abel_short_interval_certs`
 - `EulerFactorNonVanishing.fermat_tower_euler_product_strip_certs` &
   `fermat_tower_dedekind_euler_strip_certs`
 - `ArtinFermatBridge.artin_split_euler_factor_collapse`,

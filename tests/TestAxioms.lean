@@ -611,4 +611,20 @@ import LeanAsm
 #print axioms LeanAsm.eulerRns_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 46: Constructive Dyadic-Shell & Discrete Abel Summation Bridge (Issue #71)
+#print axioms QuasiRiemann.dyadicShellPartition_flatten
+#print axioms QuasiRiemann.dyadic_shell_sum_partition
+#print axioms QuasiRiemann.dyadic_shell_sum_foliation
+#print axioms QuasiRiemann.discrete_abel_summation_by_parts
+#print axioms QuasiRiemann.abel_summation_by_parts_list
+#print axioms QuasiRiemann.abel_monotone_weight_envelope
+#print axioms QuasiRiemann.abel_monotone_weight_envelope_qrat
+#print axioms QuasiRiemann.sqrt_tail_gate_of_sq_le
+#print axioms QuasiRiemann.inv_sqrt_tail_gate_dyadic_step
+#print axioms QuasiRiemann.sqrt_tail_gate_dyadic_step
+#print axioms QuasiRiemann.short_interval_dyadic_abel_envelope
+#print axioms QuasiRiemann.dyadic_abel_short_interval_certs
+#print axioms LeanAsm.quasiRiemann_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean

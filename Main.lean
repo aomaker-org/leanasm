@@ -272,6 +272,8 @@ def main : IO Unit := do
     "N=512 (q=2/5, σ=0.50025, grad=195620879)")
   IO.println ("  UD72 → ZD Strip   : σ=1/2+1/4000 tightens zdGM(σ) by 3/5200 " ++
     "& zdHux(σ) by 3/5000 (ZERO axioms)")
+  IO.println ("  Dyadic-Abel QRH   : [M, M·2^k) shell foliation ([1,16) into 4 shells), " ++
+    "Abel parts & 1/√N gates (17/32..3/4)")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"
