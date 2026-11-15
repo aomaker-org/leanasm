@@ -171,6 +171,41 @@ theorem pi_100_digits_certified :
   rw [piLower105_exact, piUpper105_exact]
   decide
 
+/-- Certified 108-digit lower bound on `π * 10^108` from `sqrt10005Scaled110` and `chud9`. -/
+def piLower108 : Nat :=
+  (426880 * sqrt10005Scaled110 * chud9Den) / (10 ^ 2 * chud9Num)
+
+/-- Certified 108-digit upper bound on `π * 10^108` from `sqrt10005Scaled110` and `chud8`. -/
+def piUpper108 : Nat :=
+  (426880 * (sqrt10005Scaled110 + 1) * chud8Den + (10 ^ 2 * chud8Num - 1)) /
+    (10 ^ 2 * chud8Num)
+
+set_option exponentiation.threshold 2000 in
+/-- Exact decimal value of `piLower108` (`108`-digit floor of `π`). -/
+theorem piLower108_exact :
+    piLower108 =
+      314159265358979323846264338327950288419716939937510582097494 * 10 ^ 49 +
+      4592307816406286208998628034825342117067982148086 := by
+  dsimp only [piLower108, sqrt10005Scaled110]
+  rw [isqrtNewton_eq_exact, chud9Num_exact, chud9Den_exact]
+  decide
+
+set_option exponentiation.threshold 2000 in
+/-- Exact decimal value of `piUpper108` (`108`-digit ceiling of `π`). -/
+theorem piUpper108_exact :
+    piUpper108 =
+      314159265358979323846264338327950288419716939937510582097494 * 10 ^ 49 +
+      4592307816406286208998628034825342117067982148087 := by
+  dsimp only [piUpper108, sqrt10005Scaled110]
+  rw [isqrtNewton_eq_exact, chud8Num_exact, chud8Den_exact]
+  decide
+
+/-- The 108-digit bracket `[piLower108, piUpper108]` has width `1` (`10^-108` ULP). -/
+theorem pi_108_bracket_valid :
+    piLower108 ≤ piUpper108 ∧ piUpper108 - piLower108 = 1 := by
+  rw [piLower108_exact, piUpper108_exact]
+  decide
+
 end PiChudnovsky
 
 -- end of file: leanasm/src/LeanAsm/PiChudnovsky.lean

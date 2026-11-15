@@ -58,6 +58,18 @@ def main : IO Unit := do
       s!"(1,2,3,4) -> ({fwd.r0},{fwd.r1},{fwd.r2},{fwd.r3}) " ++
       s!"-> ({inv.r0},{inv.r1},{inv.r2},{inv.r3})"
     )
+  let ntt8In : State :=
+    { r0 := 1, r1 := 2, r2 := 3, r3 := 4, r4 := 5, r5 := 6, r6 := 7, r7 := 8 }
+  for cfg in MiniVMNttBridge.fermatTowerNtt8Specs do
+    let fwd := runProgram ntt8In (MiniVMNttBridge.ntt8AsmFermat cfg.p cfg.w1 cfg.w2 cfg.w3)
+    let inv := runProgram fwd
+      (MiniVMNttBridge.intt8AsmFermat cfg.p cfg.inv8 cfg.iw1 cfg.iw2 cfg.iw3)
+    IO.println (
+      s!"  MiniVM F_{cfg.p} 8-pt NTT->INTT : " ++
+      s!"(1..8) -> ({fwd.r0},{fwd.r1},{fwd.r2},{fwd.r3},{fwd.r4},{fwd.r5}," ++
+      s!"{fwd.r6},{fwd.r7}) -> ({inv.r0},{inv.r1},{inv.r2},{inv.r3}," ++
+      s!"{inv.r4},{inv.r5},{inv.r6},{inv.r7})"
+    )
   let garnerIn : State := { r0 := 4, r1 := 8, r2 := 162, r3 := 63038 }
   let garnerOut := runProgram garnerIn MiniVMNttBridge.garnerReconstruct4Asm
   IO.println (
@@ -276,6 +288,12 @@ def main : IO Unit := do
     "Abel parts & 1/√N gates (17/32..3/4)")
   IO.println ("  Variational QRH   : rungs k=5,6 (33/64@[10^192,+10^108], 65/128@[10^384,+10^206]), " ++
     "(3/4,1/4) E_var=13/16 (603/1024 < 39/64)")
+  IO.println (s!"  UltraDeep108 N1024: N={QuasiRiemann.highTruncSpec_1e24_N1024.nTrunc}, " ++
+    s!"σ=0.500125, t~10^24, q=1/3 squeeze, grad=319421067, " ++
+    s!"zdGM Δ=3/10400")
+  IO.println (s!"  UltraDeep108 N2048: N={QuasiRiemann.highTruncSpec_1e30_N2048.nTrunc}, " ++
+    s!"σ=0.5000625, t~10^30 (<10^-75 rad), q=2/5 squeeze, grad=512891320, " ++
+    s!"zdGM Δ=3/20800 & zdHux Δ=3/20000")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"
