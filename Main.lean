@@ -301,6 +301,8 @@ def main : IO Unit := do
   let artinOmegas := ArtinFermatBridge.artinFermatTowerSpecs.map (·.omega4)
   IO.println (s!"  GL(1) Artin-Fermat Tower  : φ(F_k) = {artinOrders}, ω₄ = {artinOmegas}, " ++
     "MiniVM 4-pt NTT = χ-transform & δ_{i,m} ortho")
+  IO.println ("  GL(1) Artin Short-Interval: {5, 17, 257, 65537} across θ ∈ " ++
+    "{17/32, 39/64, 5/8, 2/3, 3/4}, MiniVM ntt4/intt4 coset recovery")
   IO.println "  CRT roundtrip & homomorphism: ZERO axioms verified"
 
   -- 7. Unconditional Riemann Hypothesis for Curves over Finite Fields (Hasse-Weil)
