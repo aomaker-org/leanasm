@@ -4239,7 +4239,7 @@ structure HighTruncZeroFreeRectSpec where
   deltaN : Nat
   eTail : Nat
   epsCrt : Nat
-  nTrunc_valid : nTrunc = 128 ∨ nTrunc = 256 ∨ nTrunc = 512
+  nTrunc_valid : nTrunc = 128 ∨ nTrunc = 256 ∨ nTrunc = 512 ∨ nTrunc = 1024 ∨ nTrunc = 2048
   sigma_above_half : sigmaDen < 2 * sigmaNum
   t_ordered : tLoScaled ≤ tHiScaled
   deriving DecidableEq, Repr

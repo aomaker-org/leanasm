@@ -5,7 +5,7 @@
 namespace MiniVM
 
 /--
-Register identifiers for the MiniVM (4 lane registers `r0..r3` plus
+Register identifiers for the MiniVM (8 lane registers `r0..r7` plus
 2 scratch temporaries `t0, t1`).
 -/
 inductive Reg : Type
@@ -13,6 +13,10 @@ inductive Reg : Type
   | r1
   | r2
   | r3
+  | r4
+  | r5
+  | r6
+  | r7
   | t0
   | t1
   deriving Repr, DecidableEq
@@ -23,6 +27,10 @@ structure State where
   r1 : Nat := 0
   r2 : Nat := 0
   r3 : Nat := 0
+  r4 : Nat := 0
+  r5 : Nat := 0
+  r6 : Nat := 0
+  r7 : Nat := 0
   t0 : Nat := 0
   t1 : Nat := 0
   pc : Nat := 0
@@ -34,6 +42,10 @@ def State.get (s : State) : Reg → Nat
   | Reg.r1 => s.r1
   | Reg.r2 => s.r2
   | Reg.r3 => s.r3
+  | Reg.r4 => s.r4
+  | Reg.r5 => s.r5
+  | Reg.r6 => s.r6
+  | Reg.r7 => s.r7
   | Reg.t0 => s.t0
   | Reg.t1 => s.t1
 
@@ -44,6 +56,10 @@ def State.set (s : State) (r : Reg) (v : Nat) : State :=
   | Reg.r1 => { s with r1 := v }
   | Reg.r2 => { s with r2 := v }
   | Reg.r3 => { s with r3 := v }
+  | Reg.r4 => { s with r4 := v }
+  | Reg.r5 => { s with r5 := v }
+  | Reg.r6 => { s with r6 := v }
+  | Reg.r7 => { s with r7 := v }
   | Reg.t0 => { s with t0 := v }
   | Reg.t1 => { s with t1 := v }
 

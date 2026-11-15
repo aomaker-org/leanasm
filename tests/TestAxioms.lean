@@ -641,4 +641,20 @@ import LeanAsm
 #print axioms LeanAsm.quasiRiemann_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 48: UltraDeep108 N=1024,2048 & MiniVM Parametric 8-Pt Fermat NTT (Issue #79)
+#print axioms MiniVMNttBridge.fermatTowerNtt8Specs_valid
+#print axioms MiniVMNttBridge.fermatTowerNtt8_asm_roundtrip_certs
+#print axioms LeanAsm.miniVm_provenance_certified
+#print axioms QuasiRiemann.twoPiInterval108_valid
+#print axioms QuasiRiemann.ln_table_1_to_2048_valid
+#print axioms QuasiRiemann.phase_reduction_width_1e30_under_1e75
+#print axioms QuasiRiemann.crtNtt_highTrunc108_N1024_rect
+#print axioms QuasiRiemann.crtNtt_highTrunc108_N2048_rect
+#print axioms QuasiRiemann.crtNtt_highTrunc108_2d_zero_free_rect
+#print axioms QuasiRiemann.ultraDeep72_N1024_rational_rect_cert
+#print axioms QuasiRiemann.ultraDeep72_N2048_rational_rect_cert
+#print axioms QuasiRiemann.ultradeep72_N2048_strip_zd_certs
+#print axioms LeanAsm.quasiRiemann_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean

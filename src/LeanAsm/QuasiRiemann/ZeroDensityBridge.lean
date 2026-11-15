@@ -929,6 +929,76 @@ theorem ultradeep72_N512_strip_zd_certs :
     h512.1, h512.2.2.2.2.2.1, certifiedStrip050025_N512.rect_certified,
     certifiedStrip05005_N256.rect_certified⟩
 
+-- =============================================================================
+-- Part 8: 108-Digit UltraDeep108 (N = 1024, 2048) Strip-Width -> ZD Bridge
+-- =============================================================================
+
+/-- Concrete `CertifiedStripWidthSpec` for `(σ = 0.500125 = 1/2 + 1/8000, N = 1024, t ~ 10^24)`. -/
+def certifiedStrip0500125_N1024 : CertifiedStripWidthSpec where
+  rectSpec := highTruncSpec_1e24_N1024
+  sigmaDen_pos := by decide
+  sigmaLo := QRat.mk' 4001 8000
+  halfWidth := QRat.mk' 1 8000
+  halfWidth_pos := by decide
+  sigma_eq_half_add := by decide
+  sigma_eq_rect := by decide
+  rect_certified := crtNtt_highTrunc108_N1024_rect.2.2.2
+
+/-- Concrete `CertifiedStripWidthSpec` for `(σ = 0.5000625 = 1/2 + 1/16000, N = 2048, t ~ 10^30)`. -/
+def certifiedStrip05000625_N2048 : CertifiedStripWidthSpec where
+  rectSpec := highTruncSpec_1e30_N2048
+  sigmaDen_pos := by decide
+  sigmaLo := QRat.mk' 8001 16000
+  halfWidth := QRat.mk' 1 16000
+  halfWidth_pos := by decide
+  sigma_eq_half_add := by decide
+  sigma_eq_rect := by decide
+  rect_certified := crtNtt_highTrunc108_N2048_rect.2.2.2
+
+/-- Concrete `N = 1024` (`σ = 0.500125 = 1/2 + 1/8000`, `t ~ 10^24`) and `N = 2048`
+(`σ = 0.5000625 = 1/2 + 1/16000`, `t ~ 10^30`) strip-to-zero-density tightening certificates
+coupling `UltraDeep108` rational contraction and 108-digit Chudnovsky CRT-NTT gradients
+(`319421067` and `512891320`) to `zdGuthMaynard` (`30/13`) and `zdHuxley` (`12/5`).
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem ultradeep72_N2048_strip_zd_certs :
+    certifiedStrip05000625_N2048.halfWidth < certifiedStrip0500125_N1024.halfWidth ∧
+    certifiedStrip0500125_N1024.halfWidth < certifiedStrip050025_N512.halfWidth ∧
+    certifiedStrip05000625_N2048.sigmaLo < certifiedStrip0500125_N1024.sigmaLo ∧
+    certifiedStrip0500125_N1024.sigmaLo < certifiedStrip050025_N512.sigmaLo ∧
+    QRat.eqv
+      (zdGuthMaynard.exponent (QRat.mk' 1 2) -
+        zdGuthMaynard.exponent certifiedStrip0500125_N1024.sigmaLo)
+      (QRat.mk' 3 10400) ∧
+    QRat.eqv
+      (zdHuxley.exponent (QRat.mk' 1 2) -
+        zdHuxley.exponent certifiedStrip0500125_N1024.sigmaLo)
+      (QRat.mk' 3 10000) ∧
+    QRat.eqv
+      (zdGuthMaynard.exponent (QRat.mk' 1 2) -
+        zdGuthMaynard.exponent certifiedStrip05000625_N2048.sigmaLo)
+      (QRat.mk' 3 20800) ∧
+    QRat.eqv
+      (zdHuxley.exponent (QRat.mk' 1 2) -
+        zdHuxley.exponent certifiedStrip05000625_N2048.sigmaLo)
+      (QRat.mk' 3 20000) ∧
+    zdGuthMaynard.exponent (QRat.mk' 3 4) <
+      zdGuthMaynard.exponent certifiedStrip05000625_N2048.sigmaLo ∧
+    zdGuthMaynard.exponent certifiedStrip05000625_N2048.sigmaLo <
+      zdGuthMaynard.exponent (QRat.mk' 1 2) ∧
+    nestedBox1e24_2.SubBox nestedBox1e24_0 ∧
+    nestedBox1e30_2.SubBox nestedBox1e30_0 ∧
+    dirichletGradBoundScaled6_2048 500125 1024 = 319421067 ∧
+    dirichletGradBoundScaled6_2048 500062 2048 = 512891320 ∧
+    certifiedStrip0500125_N1024.rectSpec.HasCertifiedNonVanishing ∧
+    certifiedStrip05000625_N2048.rectSpec.HasCertifiedNonVanishing := by
+  have h1024 := ultraDeep72_N1024_rational_rect_cert
+  have h2048 := ultraDeep72_N2048_rational_rect_cert
+  exact ⟨by decide, by decide, by decide, by decide, by decide, by decide,
+    by decide, by decide, by decide, by decide,
+    h1024.1, h2048.1, h1024.2.2.2.2.2.1, h2048.2.2.2.2.2.1,
+    certifiedStrip0500125_N1024.rect_certified,
+    certifiedStrip05000625_N2048.rect_certified⟩
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/ZeroDensityBridge.lean

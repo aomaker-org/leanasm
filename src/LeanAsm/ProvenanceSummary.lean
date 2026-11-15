@@ -82,6 +82,18 @@ def MiniVmProvenance : Prop :=
       let s2 := MiniVM.runProgram s1
         (MiniVMNttBridge.intt4AsmFermat cfg.p cfg.invFour cfg.invOmega4)
       (⟨s2.r0, s2.r1, s2.r2, s2.r3⟩ : NttArithmetic.Vec4) = ⟨a, b, c, d⟩) ∧
+  (∀ cfg ∈ MiniVMNttBridge.fermatTowerNtt8Specs, cfg.Valid) ∧
+  (∀ cfg ∈ MiniVMNttBridge.fermatTowerNtt8Specs,
+    ∀ (s : MiniVM.State) (x0 x1 x2 x3 x4 x5 x6 x7 : Nat),
+      x0 < cfg.p → x1 < cfg.p → x2 < cfg.p → x3 < cfg.p →
+      x4 < cfg.p → x5 < cfg.p → x6 < cfg.p → x7 < cfg.p →
+      s.r0 = x0 → s.r1 = x1 → s.r2 = x2 → s.r3 = x3 →
+      s.r4 = x4 → s.r5 = x5 → s.r6 = x6 → s.r7 = x7 →
+      let s1 := MiniVM.runProgram s (MiniVMNttBridge.ntt8AsmFermat cfg.p cfg.w1 cfg.w2 cfg.w3)
+      let s2 := MiniVM.runProgram s1
+        (MiniVMNttBridge.intt8AsmFermat cfg.p cfg.inv8 cfg.iw1 cfg.iw2 cfg.iw3)
+      (⟨s2.r0, s2.r1, s2.r2, s2.r3, s2.r4, s2.r5, s2.r6, s2.r7⟩ : CrtNtt.Vec8) =
+        ⟨x0, x1, x2, x3, x4, x5, x6, x7⟩) ∧
   (∀ (s : MiniVM.State) (x : Nat),
     x < CrtNtt.fermatTowerMod4 →
     s.r0 = x % 5 → s.r1 = x % 17 → s.r2 = x % 257 → s.r3 = x % 65537 →
@@ -106,6 +118,8 @@ theorem miniVm_provenance_certified : MiniVmProvenance :=
      MiniVMNttBridge.intt4_ntt4_asm_F17_roundtrip s a b c d ha hb hc hd hr0 hr1 hr2 hr3,
    MiniVMNttBridge.fermatTowerNtt4Specs_valid,
    MiniVMNttBridge.fermatTowerNtt4_asm_roundtrip_certs,
+   MiniVMNttBridge.fermatTowerNtt8Specs_valid,
+   MiniVMNttBridge.fermatTowerNtt8_asm_roundtrip_certs,
    MiniVMNttBridge.garnerReconstruct4Asm_sound,
    MiniVMNttBridge.crtNtt4ConvAsm_sound⟩
 
@@ -682,7 +696,33 @@ def HighTruncRationalContractionProp : Prop :=
     QuasiRiemann.QRat.eqv
       (QuasiRiemann.zdHuxley.exponent (QuasiRiemann.QRat.mk' 1 2) -
         QuasiRiemann.zdHuxley.exponent QuasiRiemann.certifiedStrip050025_N512.sigmaLo)
-      (QuasiRiemann.QRat.mk' 3 5000))
+      (QuasiRiemann.QRat.mk' 3 5000)) ∧
+  ((QuasiRiemann.twoPiInterval108.hi - QuasiRiemann.twoPiInterval108.lo = 2 ∧
+    QuasiRiemann.twoPiInterval108.lo = (2 * PiChudnovsky.piLower108 : Int) ∧
+    QuasiRiemann.twoPiInterval108.hi = (2 * PiChudnovsky.piUpper108 : Int)) ∧
+    ∀ (xIv : QuasiRiemann.ScaledInterval108),
+      0 ≤ xIv.lo →
+      xIv.hi ≤ 8 * (10 ^ 30 + 10) * QuasiRiemann.scale108Int →
+      xIv.hi - xIv.lo ≤ 6 * 10 ^ 31 →
+      (QuasiRiemann.reduceModTwoPiCentered108 xIv).hi -
+        (QuasiRiemann.reduceModTwoPiCentered108 xIv).lo ≤ 10 ^ 32 ∧
+      (10 ^ 32 : Int) < 10 ^ 33) ∧
+  (3 ^ 2 * QuasiRiemann.driftSeq1e24_N1024 2 ≤ 1 ^ 2 * QuasiRiemann.driftSeq1e24_N1024 0 ∧
+    QuasiRiemann.dirichletGradBoundScaled6_2048 500125 1024 = 319421067 ∧
+    QuasiRiemann.highTruncSpec_1e24_N1024.HasCertifiedNonVanishing) ∧
+  (5 ^ 2 * QuasiRiemann.driftSeq1e30_N2048 2 ≤ 2 ^ 2 * QuasiRiemann.driftSeq1e30_N2048 0 ∧
+    QuasiRiemann.dirichletGradBoundScaled6_2048 500062 2048 = 512891320 ∧
+    QuasiRiemann.highTruncSpec_1e30_N2048.HasCertifiedNonVanishing) ∧
+  (QuasiRiemann.certifiedStrip05000625_N2048.halfWidth <
+      QuasiRiemann.certifiedStrip0500125_N1024.halfWidth ∧
+    QuasiRiemann.QRat.eqv
+      (QuasiRiemann.zdGuthMaynard.exponent (QuasiRiemann.QRat.mk' 1 2) -
+        QuasiRiemann.zdGuthMaynard.exponent QuasiRiemann.certifiedStrip05000625_N2048.sigmaLo)
+      (QuasiRiemann.QRat.mk' 3 20800) ∧
+    QuasiRiemann.QRat.eqv
+      (QuasiRiemann.zdHuxley.exponent (QuasiRiemann.QRat.mk' 1 2) -
+        QuasiRiemann.zdHuxley.exponent QuasiRiemann.certifiedStrip05000625_N2048.sigmaLo)
+      (QuasiRiemann.QRat.mk' 3 20000))
 
 /-- Constructive `[M, M * 2^k)` dyadic-shell foliation, discrete Abel
 summation-by-parts, monotone-weight error contraction, cleared-denominator `1/√N`
@@ -986,7 +1026,18 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
       ⟨h.1, h.2.2.1, h.2.2.2.2.2.2.2.1⟩,
     ⟨QuasiRiemann.ultradeep72_N512_strip_zd_certs.1,
      QuasiRiemann.ultradeep72_N512_strip_zd_certs.2.2.1,
-     QuasiRiemann.ultradeep72_N512_strip_zd_certs.2.2.2.1⟩⟩,
+     QuasiRiemann.ultradeep72_N512_strip_zd_certs.2.2.2.1⟩,
+    ⟨QuasiRiemann.phase_reduction_width_1e30_under_1e75.1,
+     QuasiRiemann.phase_reduction_width_1e30_under_1e75.2.1⟩,
+    ⟨QuasiRiemann.ultraDeep72_N1024_rational_rect_cert.2.1,
+     QuasiRiemann.ultraDeep72_N1024_rational_rect_cert.2.2.2.2.2.1,
+     QuasiRiemann.ultraDeep72_N1024_rational_rect_cert.2.2.2.2.2.2.2.2.1⟩,
+    ⟨QuasiRiemann.ultraDeep72_N2048_rational_rect_cert.2.1,
+     QuasiRiemann.ultraDeep72_N2048_rational_rect_cert.2.2.2.2.2.1,
+     QuasiRiemann.ultraDeep72_N2048_rational_rect_cert.2.2.2.2.2.2.2.2.1⟩,
+    ⟨QuasiRiemann.ultradeep72_N2048_strip_zd_certs.1,
+     QuasiRiemann.ultradeep72_N2048_strip_zd_certs.2.2.2.2.2.2.1,
+     QuasiRiemann.ultradeep72_N2048_strip_zd_certs.2.2.2.2.2.2.2.1⟩⟩,
    ⟨QuasiRiemann.dyadic_shell_sum_partition,
     fun r o _i _l hi M k f g => QuasiRiemann.dyadic_shell_sum_foliation r o hi M k f g,
     QuasiRiemann.discrete_abel_summation_by_parts,
