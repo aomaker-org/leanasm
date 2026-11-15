@@ -264,6 +264,10 @@ def main : IO Unit := do
     "& θ=3/4 [10^168,+10^140]")
   IO.println ("  Sub-3/4 QRH Ladder: 1/2 < 9/16 [10^48,+10^32] < 5/8 [10^24,+10^20] < " ++
     "2/3 [10^24,+10^21] < 3/4 < 7/8 < 1")
+  IO.println ("  Parametric QRH    : θ(k) ↓ 1/2 (5/8 > 9/16 > 17/32 [10^96,+10^57] > 33/64); " ++
+    "ϑ(k) ↑ 1 (7/8 < 15/16 < 31/32)")
+  IO.println ("  Kim-Sarnak Couple : θ_auto=7/64 (λ₁=975/4096) → ϑ=25/32, θ=39/64 < 5/8 " ++
+    "(tightens Sym^3 1/9 → 11/18)")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"

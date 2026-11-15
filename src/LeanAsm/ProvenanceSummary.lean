@@ -13,6 +13,7 @@ import LeanAsm.QuasiRiemann.AsymptoticZfr
 import LeanAsm.QuasiRiemann.AsymptoticZfrBridge
 import LeanAsm.QuasiRiemann.ZeroDensityBridge
 import LeanAsm.QuasiRiemann.ShortIntervalPrimes
+import LeanAsm.QuasiRiemann.ParametricQrhLadder
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.Genus2Jacobian
@@ -608,6 +609,43 @@ def HighTruncRectProvenanceProp : Prop :=
              ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
          0 < zRe * zRe + zIm * zIm ∧ (zRe ≠ 0 ∨ zIm ≠ 0))))
 
+/-- Parametric beyond-`7/8` QRH binary ladder (`qrhShortExponent k = (2^k + 1) / 2^(k+1)`),
+dual mollifier/strip ascent, density benchmarks, `kim_sarnak_amplified_qrh_step`, and concrete
+`7/64` Kim-Sarnak short-interval certificates (`θ = 17/32` at `10^96 + 10^57`). -/
+def ParametricQrhLadderProp : Prop :=
+  (∀ k : Nat,
+    QuasiRiemann.QRat.mk' 1 2 (by decide) < QuasiRiemann.qrhShortExponent (k + 1) ∧
+    QuasiRiemann.qrhShortExponent (k + 1) < QuasiRiemann.qrhShortExponent k) ∧
+  (∀ k : Nat, 2 ≤ k →
+    QuasiRiemann.qrhShortExponent k < QuasiRiemann.qrhThresholdSevenEighths) ∧
+  (QuasiRiemann.QRat.eqv
+      (QuasiRiemann.QRat.ofInt 1 - QuasiRiemann.zdGuthMaynard.exponent (QuasiRiemann.QRat.mk' 3 4))
+      (QuasiRiemann.QRat.mk' 11 26) ∧
+    QuasiRiemann.qrhShortExponent 3 < QuasiRiemann.shortIntervalDensityExponent 30 13) ∧
+  (∀ k : Nat,
+    QuasiRiemann.qrhDualFraction k < QuasiRiemann.qrhDualFraction (k + 1) ∧
+    QuasiRiemann.qrhDualFraction (k + 1) < QuasiRiemann.QRat.ofInt 1) ∧
+  (∀ k : Nat,
+    QuasiRiemann.QRat.eqv
+      (QuasiRiemann.qrhThresholdFromMollifier (QuasiRiemann.qrhDualFraction k))
+      (QuasiRiemann.qrhShortExponent (k + 1))) ∧
+  (∀ (spec : QuasiRiemann.ParametricQrhBridgeSpec) (autoTheta' : QuasiRiemann.QRat),
+    (0 : Int) ≤ autoTheta'.num →
+    autoTheta' < spec.autoTheta →
+    GSp4FunctorialityBridge.selbergLambda1 spec.autoTheta <
+      GSp4FunctorialityBridge.selbergLambda1 autoTheta' ∧
+    QuasiRiemann.qrhFromAutomorphic autoTheta' <
+      QuasiRiemann.qrhFromAutomorphic spec.autoTheta ∧
+    spec.nextShortSpec.thetaQRat < spec.shortSpec.thetaQRat ∧
+    spec.nextShortSpec.thetaQRat < QuasiRiemann.qrhThresholdSevenEighths) ∧
+  (QuasiRiemann.QRat.eqv
+      (QuasiRiemann.qrhFromAutomorphic GSp4FunctorialityBridge.thetaKimSarnakSym4)
+      (QuasiRiemann.QRat.mk' 39 64 (by decide)) ∧
+    QuasiRiemann.QRat.eqv
+      (GSp4FunctorialityBridge.selbergLambda1 GSp4FunctorialityBridge.thetaKimSarnakSym4)
+      (QuasiRiemann.QRat.mk' 975 4096 (by decide)) ∧
+    QuasiRiemann.kimSarnakBridgeSpec.nextShortSpec.HasGuaranteedPrime)
+
 /-- Part 5 provenance specification bundling mollifier descent, 2D rectangles down to
 `σ = 0.501`, `t ~ 10^12` phase-reduced rectangles, DVP asymptotic strip, Dirichlet `L^2`
 diagonal dominance, rational zero-density descent (`15/26 < 3/5 < 2/3`), QRH threshold
@@ -749,7 +787,8 @@ def QuasiRiemannProvenance : Prop :=
   ChebyshevSavingsProp ∧
   ChebyshevBenchmarkProp ∧
   ShortIntervalPrimesProp ∧
-  HighTruncRectProvenanceProp
+  HighTruncRectProvenanceProp ∧
+  ParametricQrhLadderProp
 
 set_option exponentiation.threshold 2000 in
 /-- Zero-axiom certificate for Parts 3-5 analytic QRH, 2D rectangles, DVP, and Chebyshev. -/
@@ -780,7 +819,19 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
     QuasiRiemann.crtNtt_highTrunc_2d_zero_free_rect,
     fun spec centerMag pointMag dist hC hD hL =>
       QuasiRiemann.cauchy_box_interior_nonvanishing spec centerMag pointMag dist hC hD hL,
-    QuasiRiemann.telescoping_box_contraction_cert⟩⟩
+    QuasiRiemann.telescoping_box_contraction_cert⟩,
+   ⟨QuasiRiemann.qrhShortExponent_strict_anti.1,
+    QuasiRiemann.qrhShortExponent_strict_anti.2.1,
+    ⟨QuasiRiemann.qrhShortExponent_density_benchmarks.2.2.1,
+     QuasiRiemann.qrhShortExponent_density_benchmarks.2.2.2.2.2.2.1⟩,
+    QuasiRiemann.qrhDualFraction_strict_mono.1,
+    QuasiRiemann.qrhDualFraction_strict_mono.2.2.2.1,
+    fun spec autoTheta' hN hT =>
+      let h := QuasiRiemann.kim_sarnak_amplified_qrh_step spec autoTheta' hN hT
+      ⟨h.1, h.2.2.1, h.2.2.2.2.1, h.2.2.2.2.2.1⟩,
+    ⟨QuasiRiemann.parametric_qrh_kim_sarnak_certs.2.1,
+     QuasiRiemann.parametric_qrh_kim_sarnak_certs.2.2.2.2.1,
+     QuasiRiemann.shortIntervalQrh1732Spec_has_prime⟩⟩⟩
 
 -- =============================================================================
 -- Parts 6 & 8: RNS Garner & Fermat-Tower / Dedekind Euler Non-Vanishing
