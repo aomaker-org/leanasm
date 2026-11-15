@@ -39,7 +39,7 @@ make build-incremental
 # Full build & execute Parts 1-11 + unified provenance CLI demo
 make sync
 
-# Audit transitive axiom closures across Parts 1-43 (0 choice, 0 sorryAx)
+# Audit transitive axiom closures across Parts 1-44 (0 choice, 0 sorryAx)
 lake env lean tests/TestAxioms.lean
 
 # Check submodule hydration status
@@ -78,7 +78,8 @@ kernel-verified computations across all 11 parts:
    Fermat-tower AP primes (`q in {5, 17, 257, 65537}`), sub-3/4 ladder,
    parametric beyond-7/8 binary ladder `theta(k) = (2^k + 1) / 2^(k + 1)`
    (`5/8 > 9/16 > 17/32 > 33/64 > 1/2`), dual ascent `7/8 < 15/16 < 31/32`,
-   and Kim-Sarnak `7/64` coupling (`17/32` at `[10^96, +10^57]`).
+   and Kim-Sarnak `7/64` coupling (`17/32` at `[10^96, +10^57]`), plus
+   rational box contraction (`1/3`, `2/5`) & `UltraDeep72 -> ZD` (`0.50025`).
 6. **Part 6 (`RnsArithmetic`, `EulerFactorNonVanishing`, `ArtinFermatBridge`)**:
    3-channel Garner CRT execution, Fermat-tower `{5, 17, 257, 65537}` strip
    bounds (`sigma in {1/2, 3/4, 1}`), cyclotomic Dedekind splitting across
@@ -106,7 +107,7 @@ kernel-verified computations across all 11 parts:
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 `QuasiRiemann/`, `PC/` for `PiChudnovsky/`, and `Main.lean` +
-`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-43.
+`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-44.
 `NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `PC` = `PiChudnovsky`.
 
 | Module | NS | Flagship Theorem / Role |
@@ -168,7 +169,12 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
   `fermat_tower_ap_short_interval_certs`,
   `sub_three_quarters_qrh_ladder_certs`, `qrhShortExponent_strict_anti`,
   `qrhShortExponent_density_benchmarks`, `qrhDualFraction_strict_mono`,
-  `kim_sarnak_amplified_qrh_step`, & `parametric_qrh_kim_sarnak_certs`
+  `kim_sarnak_amplified_qrh_step`, `parametric_qrh_kim_sarnak_certs`,
+  `rational_box_contraction_step`, `rational_telescoping_chain_cert`,
+  `ultraDeep72_N256_rational_rect_cert`,
+  `ultraDeep72_N512_rational_rect_cert`,
+  `ultradeep72_strip_to_zero_density_bridge`, &
+  `ultradeep72_N512_strip_zd_certs`
 - `EulerFactorNonVanishing.fermat_tower_euler_product_strip_certs` &
   `fermat_tower_dedekind_euler_strip_certs`
 - `ArtinFermatBridge.artin_split_euler_factor_collapse`,
@@ -225,7 +231,7 @@ leanasm/
 │       ├── ProvenanceSummary.lean
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
 │       └── QuasiRiemann/    # Rat, UltraDeep72, Zfr, Bridge, ZD, Short, PQL
-├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-43)
+├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-44)
 └── tools/                   # Build and logging utilities
 ```
 

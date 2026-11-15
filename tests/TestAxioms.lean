@@ -590,4 +590,16 @@ import LeanAsm
 #print axioms LeanAsm.quasiRiemann_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 44: Higher-Truncation N=256,512 Rational Contraction & Strip Bridge (Issue #69)
+#print axioms QuasiRiemann.RationalBoxContractionSpec.lip_mul_radius_lt
+#print axioms QuasiRiemann.rational_box_contraction_step
+#print axioms QuasiRiemann.rational_telescoping_chain_cert
+#print axioms QuasiRiemann.ultraDeep72_N256_rational_rect_cert
+#print axioms QuasiRiemann.ultraDeep72_N512_rational_rect_cert
+#print axioms QuasiRiemann.exponent_strict_mono_sigma
+#print axioms QuasiRiemann.ultradeep72_strip_to_zero_density_bridge
+#print axioms QuasiRiemann.ultradeep72_N512_strip_zd_certs
+#print axioms LeanAsm.quasiRiemann_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean

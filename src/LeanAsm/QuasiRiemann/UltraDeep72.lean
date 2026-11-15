@@ -4217,6 +4217,467 @@ theorem telescoping_box_contraction_cert :
   · intro s6 t6 hmem
     exact hTiles s6 t6 hmem
 
+-- =============================================================================
+-- Part 19: General Rational-Ratio Box Contraction & Higher-Truncation
+--          N = 256, 512 Certificates down to σ = 0.50025 (Issue #69)
+-- =============================================================================
+
+/-- Cleared-denominator rational contraction specification adapting `Tail.improve`
+(`qNum / qDen < 1`) and `Holo.on_smaller_ball` (`M / (r - δ)`) into pure `Nat`/`Int`
+arithmetic over sub-boxes of radius `radius` shrinking by `deltaShrink`. -/
+structure RationalBoxContractionSpec where
+  qNum : Nat
+  qDen : Nat
+  qNum_pos : 0 < qNum
+  qNum_lt_qDen : qNum < qDen
+  lipNumerator : Nat
+  radius : Nat
+  deltaShrink : Nat
+  shrink_lt_radius : deltaShrink < radius
+  centerLower : Nat
+  centerLower_pos : 0 < centerLower
+  lip_margin_ok : 2 * lipNumerator * radius ≤ centerLower * (radius - deltaShrink)
+
+/-- Strict shrunk-ball Lipschitz margin: `2 * lipNumerator * radius ≤ centerLower * (r - δ)`
+and `0 < centerLower`, `0 < r - δ` imply `lipNumerator * radius < centerLower * (r - δ)`. -/
+theorem RationalBoxContractionSpec.lip_mul_radius_lt (rSpec : RationalBoxContractionSpec) :
+    rSpec.lipNumerator * rSpec.radius <
+      rSpec.centerLower * (rSpec.radius - rSpec.deltaShrink) := by
+  have hDiffPos : 0 < rSpec.radius - rSpec.deltaShrink :=
+    Nat.sub_pos_of_lt rSpec.shrink_lt_radius
+  have hHalf : 2 * (rSpec.lipNumerator * rSpec.radius) ≤
+      rSpec.centerLower * (rSpec.radius - rSpec.deltaShrink) := by
+    rw [← Nat.mul_assoc]
+    exact rSpec.lip_margin_ok
+  have hProdPos : 0 < rSpec.centerLower * (rSpec.radius - rSpec.deltaShrink) :=
+    Nat.mul_pos rSpec.centerLower_pos hDiffPos
+  omega
+
+/-- Theorem (Single-Step Cleared `M / (r - δ)` Interior Bound & Rational Drift Step):
+If `rSpec.centerLower ≤ centerMag`, `dist ≤ rSpec.radius`, and the shrunk-ball Lipschitz
+condition `(r - δ) * |centerMag - pointMag| ≤ lipNumerator * dist` holds, then every
+interior point satisfies `centerLower / 2 ≤ pointMag`, `(centerLower + 1) / 2 ≤ pointMag`,
+`0 < pointMag`, and any `nextDrift` with `qDen * nextDrift ≤ qNum * currDrift` strictly
+shrinks positive drift (`nextDrift < currDrift`) and preserves `2 * drift ≤ centerLower`.
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem rational_box_contraction_step (rSpec : RationalBoxContractionSpec)
+    (centerMag pointMag dist currDrift nextDrift : Nat)
+    (hCenter : rSpec.centerLower ≤ centerMag)
+    (hDist : dist ≤ rSpec.radius)
+    (hLip : (rSpec.radius - rSpec.deltaShrink) *
+        Int.natAbs ((centerMag : Int) - (pointMag : Int)) ≤ rSpec.lipNumerator * dist)
+    (hDrift : rSpec.qDen * nextDrift ≤ rSpec.qNum * currDrift) :
+    rSpec.centerLower / 2 ≤ pointMag ∧
+    (rSpec.centerLower + 1) / 2 ≤ pointMag ∧
+    0 < pointMag ∧
+    rSpec.lipNumerator * rSpec.radius < rSpec.centerLower * (rSpec.radius - rSpec.deltaShrink) ∧
+    nextDrift ≤ currDrift ∧
+    (0 < currDrift → nextDrift < currDrift) ∧
+    (2 * currDrift ≤ rSpec.centerLower → 2 * nextDrift ≤ rSpec.centerLower) := by
+  have hDiffPos : 0 < rSpec.radius - rSpec.deltaShrink :=
+    Nat.sub_pos_of_lt rSpec.shrink_lt_radius
+  have hDistBound : rSpec.lipNumerator * dist ≤ rSpec.lipNumerator * rSpec.radius :=
+    Nat.mul_le_mul_left _ hDist
+  have hMulLe : (rSpec.radius - rSpec.deltaShrink) *
+      (2 * Int.natAbs ((centerMag : Int) - (pointMag : Int))) ≤
+      (rSpec.radius - rSpec.deltaShrink) * rSpec.centerLower := by
+    have h1 : (rSpec.radius - rSpec.deltaShrink) *
+        (2 * Int.natAbs ((centerMag : Int) - (pointMag : Int))) =
+        2 * ((rSpec.radius - rSpec.deltaShrink) *
+          Int.natAbs ((centerMag : Int) - (pointMag : Int))) := by ac_rfl
+    have h2 : 2 * ((rSpec.radius - rSpec.deltaShrink) *
+        Int.natAbs ((centerMag : Int) - (pointMag : Int))) ≤
+        2 * (rSpec.lipNumerator * rSpec.radius) :=
+      Nat.mul_le_mul_left 2 (Nat.le_trans hLip hDistBound)
+    have h3 : 2 * (rSpec.lipNumerator * rSpec.radius) ≤
+        (rSpec.radius - rSpec.deltaShrink) * rSpec.centerLower := by
+      rw [← Nat.mul_assoc, Nat.mul_comm (rSpec.radius - rSpec.deltaShrink)]
+      exact rSpec.lip_margin_ok
+    exact Nat.le_trans (by rw [h1]; exact h2) h3
+  have hVar : 2 * Int.natAbs ((centerMag : Int) - (pointMag : Int)) ≤ rSpec.centerLower :=
+    Nat.le_of_mul_le_mul_left hMulLe hDiffPos
+  have hPos := rSpec.centerLower_pos
+  have hInt :
+      rSpec.centerLower / 2 ≤ pointMag ∧
+      (rSpec.centerLower + 1) / 2 ≤ pointMag ∧
+      0 < pointMag := by
+    cases Nat.decLe centerMag pointMag with
+    | isTrue hle =>
+      refine ⟨?_, ?_, ?_⟩ <;> omega
+    | isFalse hlt =>
+      have hgt : pointMag < centerMag := Nat.lt_of_not_ge hlt
+      have hDiffEq : (centerMag : Int) - (pointMag : Int) =
+          ((centerMag - pointMag : Nat) : Int) := by omega
+      have hNatAbs : Int.natAbs ((centerMag : Int) - (pointMag : Int)) =
+          centerMag - pointMag := by
+        rw [hDiffEq, Int.natAbs_natCast]
+      rw [hNatAbs] at hVar
+      refine ⟨?_, ?_, ?_⟩ <;> omega
+  have hDenPos : 0 < rSpec.qDen := Nat.lt_trans rSpec.qNum_pos rSpec.qNum_lt_qDen
+  have hNextLe : nextDrift ≤ currDrift := by
+    have hQ : rSpec.qNum * currDrift ≤ rSpec.qDen * currDrift :=
+      Nat.mul_le_mul_right _ (Nat.le_of_lt rSpec.qNum_lt_qDen)
+    exact Nat.le_of_mul_le_mul_left (Nat.le_trans hDrift hQ) hDenPos
+  have hStrict : 0 < currDrift → nextDrift < currDrift := by
+    intro hCurrPos
+    have hQ : rSpec.qNum * currDrift < rSpec.qDen * currDrift :=
+      Nat.mul_lt_mul_of_pos_right rSpec.qNum_lt_qDen hCurrPos
+    have hMul : rSpec.qDen * nextDrift < rSpec.qDen * currDrift :=
+      Nat.lt_of_le_of_lt hDrift hQ
+    cases Nat.decLt nextDrift currDrift with
+    | isTrue h => exact h
+    | isFalse hnot =>
+      have hge : currDrift ≤ nextDrift := Nat.le_of_not_lt hnot
+      have hgeMul : rSpec.qDen * currDrift ≤ rSpec.qDen * nextDrift :=
+        Nat.mul_le_mul_left _ hge
+      exact False.elim (Nat.lt_irrefl _ (Nat.lt_of_lt_of_le hMul hgeMul))
+  have hEnv : 2 * currDrift ≤ rSpec.centerLower → 2 * nextDrift ≤ rSpec.centerLower := by
+    intro hBase
+    omega
+  exact ⟨hInt.1, hInt.2.1, hInt.2.2, rSpec.lip_mul_radius_lt, hNextLe, hStrict, hEnv⟩
+
+private theorem nat_pow_contraction_le (qNum qDen : Nat) (hqPos : 0 < qDen)
+    (hqLe : qNum ≤ qDen) (drifts : Nat → Nat) :
+    ∀ k : Nat, (∀ i, i < k → qDen * drifts (i + 1) ≤ qNum * drifts i) →
+      qDen ^ k * drifts k ≤ qNum ^ k * drifts 0 ∧ drifts k ≤ drifts 0
+  | 0, _ => by simp
+  | k + 1, hContract => by
+    have hk := nat_pow_contraction_le qNum qDen hqPos hqLe drifts k
+      (fun i hi => hContract i (Nat.lt_succ_of_lt hi))
+    have hLast : qDen * drifts (k + 1) ≤ qNum * drifts k := hContract k (Nat.lt_succ_self k)
+    have hMul : qDen ^ k * (qDen * drifts (k + 1)) ≤ qDen ^ k * (qNum * drifts k) :=
+      Nat.mul_le_mul_left _ hLast
+    have hPowL : qDen ^ (k + 1) * drifts (k + 1) = qDen ^ k * (qDen * drifts (k + 1)) := by
+      rw [Nat.pow_succ, Nat.mul_assoc]
+    have hMulR : qDen ^ k * (qNum * drifts k) = qNum * (qDen ^ k * drifts k) := by ac_rfl
+    have hStep : qNum * (qDen ^ k * drifts k) ≤ qNum * (qNum ^ k * drifts 0) :=
+      Nat.mul_le_mul_left qNum hk.1
+    have hPowR : qNum ^ (k + 1) * drifts 0 = qNum * (qNum ^ k * drifts 0) := by
+      rw [Nat.pow_succ, Nat.mul_comm (qNum ^ k) qNum, Nat.mul_assoc]
+    have hExp : qDen ^ (k + 1) * drifts (k + 1) ≤ qNum ^ (k + 1) * drifts 0 := by
+      rw [hPowL, hPowR]
+      exact Nat.le_trans hMul (by rw [hMulR]; exact hStep)
+    have hPowMono : qNum ^ (k + 1) ≤ qDen ^ (k + 1) :=
+      Nat.pow_le_pow_left hqLe (k + 1)
+    have hDenPowPos : 0 < qDen ^ (k + 1) := Nat.pow_pos hqPos
+    have hLe0 : qDen ^ (k + 1) * drifts (k + 1) ≤ qDen ^ (k + 1) * drifts 0 :=
+      Nat.le_trans hExp (Nat.mul_le_mul_right _ hPowMono)
+    exact ⟨hExp, Nat.le_of_mul_le_mul_left hLe0 hDenPowPos⟩
+
+/-- Theorem (Inductive `k`-Step Rational-Ratio Telescoping Box Contraction):
+Generalizes `telescoping_squeezing_chain` from fixed `1/2` halving to arbitrary cleared
+rational contraction factors `0 < qNum < qDen`, proving `qDen^k * drifts k ≤ qNum^k * drifts 0`,
+`2 * qDen^k * (lipBounds k * (boxes k).radL1) ≤ qNum^k * lower0`, and positive interior
+Cauchy lower bounds across `boxes k ⊆ boxes 0`. Zero `Classical.choice`, zero `sorryAx`. -/
+theorem rational_telescoping_chain_cert
+    (qNum qDen : Nat) (hqPos : 0 < qNum) (hqLt : qNum < qDen)
+    (boxes : Nat → NestedBox2D) (lipBounds drifts : Nat → Nat)
+    (lower0 : Nat) (hLowerPos : 0 < lower0) (hBase : 2 * drifts 0 ≤ lower0)
+    (k : Nat)
+    (hNest : ∀ i, i < k → (boxes (i + 1)).SubBox (boxes i))
+    (hContract : ∀ i, i < k → qDen * drifts (i + 1) ≤ qNum * drifts i)
+    (hLipBox : ∀ i, i ≤ k → lipBounds i * (boxes i).radL1 ≤ drifts i) :
+    (boxes k).SubBox (boxes 0) ∧
+    qDen ^ k * drifts k ≤ qNum ^ k * drifts 0 ∧
+    2 * qDen ^ k * (lipBounds k * (boxes k).radL1) ≤ qNum ^ k * lower0 ∧
+    2 * lipBounds k * (boxes k).radL1 ≤ lower0 ∧
+    (∀ centerMag pointMag s6 t6 : Nat,
+      lower0 ≤ centerMag →
+      InBox2D (boxes k).sLo6 (boxes k).sHi6 (boxes k).tLo6 (boxes k).tHi6 s6 t6 →
+      Int.natAbs ((centerMag : Int) - (pointMag : Int)) ≤
+        lipBounds k * (((s6 : Int) - (boxes k).sMid6).natAbs +
+          ((t6 : Int) - (boxes k).tMid6).natAbs) →
+      lower0 / 2 ≤ pointMag ∧ 0 < pointMag ∧
+        InBox2D (boxes 0).sLo6 (boxes 0).sHi6 (boxes 0).tLo6 (boxes 0).tHi6 s6 t6) := by
+  have hSub0 := nestedBox2D_chain_subBox boxes k hNest
+  have hDenPos : 0 < qDen := Nat.lt_trans hqPos hqLt
+  have hPow := nat_pow_contraction_le qNum qDen hDenPos (Nat.le_of_lt hqLt) drifts k hContract
+  have hLipK : lipBounds k * (boxes k).radL1 ≤ drifts k := hLipBox k (Nat.le_refl k)
+  have hHalfLip : 2 * lipBounds k * (boxes k).radL1 ≤ lower0 := by
+    rw [Nat.mul_assoc]
+    exact Nat.le_trans (Nat.mul_le_mul_left 2 (Nat.le_trans hLipK hPow.2)) hBase
+  have hScaledLip : 2 * qDen ^ k * (lipBounds k * (boxes k).radL1) ≤ qNum ^ k * lower0 := by
+    have h1 : 2 * (qDen ^ k * (lipBounds k * (boxes k).radL1)) ≤
+        2 * (qDen ^ k * drifts k) :=
+      Nat.mul_le_mul_left 2 (Nat.mul_le_mul_left (qDen ^ k) hLipK)
+    have h2 : 2 * (qDen ^ k * drifts k) ≤ 2 * (qNum ^ k * drifts 0) :=
+      Nat.mul_le_mul_left 2 hPow.1
+    have h3 : 2 * (qNum ^ k * drifts 0) = qNum ^ k * (2 * drifts 0) := by ac_rfl
+    have h4 : qNum ^ k * (2 * drifts 0) ≤ qNum ^ k * lower0 :=
+      Nat.mul_le_mul_left (qNum ^ k) hBase
+    rw [Nat.mul_assoc]
+    exact Nat.le_trans h1 (Nat.le_trans h2 (by rw [h3]; exact h4))
+  refine ⟨hSub0, hPow.1, hScaledLip, hHalfLip, ?_⟩
+  intro centerMag pointMag s6 t6 hCenter hmem hLip
+  let spec : CauchyBoxLowerBoundSpec :=
+    ⟨lower0, lipBounds k, (boxes k).radL1, hLowerPos, hHalfLip⟩
+  have hCauchy := cauchy_box_2d_subbox_nonvanishing spec (boxes k) (Nat.le_refl _)
+    s6 t6 centerMag pointMag hmem hCenter hLip
+  exact ⟨hCauchy.1, hCauchy.2, NestedBox2D.subBox_inBox2D hSub0 hmem⟩
+
+/-- Coarse outer `t ~ 10^12` rectangle for `1/3` contraction (`radL1 = 198000`). -/
+def nestedBox1e12_0 : NestedBox2D where
+  sLo6 := 500000
+  sHi6 := 536000
+  tLo6 := 1000000000005930000
+  tHi6 := 1000000000006290000
+  sMid6 := 518000
+  tMid6 := 1000000000006110000
+  s_ordered := by decide
+  t_ordered := by decide
+
+/-- Step 1 `t ~ 10^12` rectangle after `1/3` contraction (`radL1 = 66000`). -/
+def nestedBox1e12_1 : NestedBox2D where
+  sLo6 := 500000
+  sHi6 := 512000
+  tLo6 := 1000000000006050000
+  tHi6 := 1000000000006170000
+  sMid6 := 506000
+  tMid6 := 1000000000006110000
+  s_ordered := by decide
+  t_ordered := by decide
+
+/-- Step 2 `N = 256`, `σ = 0.5005` (`radL1 = 22000`) box matching `highTruncTiles_1e12_N256`. -/
+def nestedBox1e12_2 : NestedBox2D where
+  sLo6 := 500500
+  sHi6 := 504500
+  tLo6 := 1000000000006090000
+  tHi6 := 1000000000006130000
+  sMid6 := 502500
+  tMid6 := 1000000000006110000
+  s_ordered := by decide
+  t_ordered := by decide
+
+/-- Indexed `1/3`-contraction family ending at `highTruncTiles_1e12_N256` (`σ = 0.5005`). -/
+def nestedBoxSeq1e12_N256 : Nat → NestedBox2D
+  | 0 => nestedBox1e12_0
+  | 1 => nestedBox1e12_1
+  | _ => nestedBox1e12_2
+
+/-- Drift sequence with exact `1/3` contraction (`19800000 → 6600000 → 2200000`). -/
+def driftSeq1e12_N256 : Nat → Nat
+  | 0 => 19800000
+  | 1 => 6600000
+  | _ => 2200000
+
+/-- Concrete `RationalBoxContractionSpec` (`q = 1/3`, shrunk `M / (r - δ)`) for `N = 256`. -/
+def rationalBoxSpec_N256 : RationalBoxContractionSpec where
+  qNum := 1
+  qDen := 3
+  qNum_pos := by decide
+  qNum_lt_qDen := by decide
+  lipNumerator := 2000000
+  radius := nestedBox1e12_2.radL1
+  deltaShrink := 2000
+  shrink_lt_radius := by decide
+  centerLower := 40000000
+  centerLower_pos := by decide
+  lip_margin_ok := by decide
+
+/-- Step 0 `t ~ 10^18` rectangle for `2/5` contraction (`radL1 = 75000`). -/
+def nestedBox1e18_rat_0 : NestedBox2D where
+  sLo6 := 500000
+  sHi6 := 525000
+  tLo6 := 1000000000000000000927500
+  tHi6 := 1000000000000000001052500
+  sMid6 := 512500
+  tMid6 := 1000000000000000000990000
+  s_ordered := by decide
+  t_ordered := by decide
+
+/-- Step 1 `t ~ 10^18` rectangle after `2/5` contraction (`radL1 = 30000`). -/
+def nestedBox1e18_rat_1 : NestedBox2D where
+  sLo6 := 500000
+  sHi6 := 510000
+  tLo6 := 1000000000000000000965000
+  tHi6 := 1000000000000000001015000
+  sMid6 := 505000
+  tMid6 := 1000000000000000000990000
+  s_ordered := by decide
+  t_ordered := by decide
+
+/-- Indexed `2/5`-contraction family ending at `nestedBox1e18_3` (`σ = 0.50025`). -/
+def nestedBoxSeq1e18_N512 : Nat → NestedBox2D
+  | 0 => nestedBox1e18_rat_0
+  | 1 => nestedBox1e18_rat_1
+  | _ => nestedBox1e18_3
+
+/-- Drift sequence with exact `2/5` contraction (`7500000 → 3000000 → 1200000`). -/
+def driftSeq1e18_N512 : Nat → Nat
+  | 0 => 7500000
+  | 1 => 3000000
+  | _ => 1200000
+
+/-- Concrete `RationalBoxContractionSpec` (`q = 2/5`, shrunk `M / (r - δ)`) for `N = 512`. -/
+def rationalBoxSpec_N512 : RationalBoxContractionSpec where
+  qNum := 2
+  qDen := 5
+  qNum_pos := by decide
+  qNum_lt_qDen := by decide
+  lipNumerator := 1000000
+  radius := nestedBox1e18_3.radL1
+  deltaShrink := 2000
+  shrink_lt_radius := by decide
+  centerLower := 19200000
+  centerLower_pos := by decide
+  lip_margin_ok := by decide
+
+/-- Theorem (Higher-Truncation `N = 256`, `σ = 0.5005`, `t ~ 10^12` 4-Prime CRT-NTT
+& `1/3` Rational Contraction Certificate):
+Certifies:
+1. `2`-step `1/3` rational box contraction `nestedBox1e12_2 ⊆ nestedBox1e12_0`
+   (`3^2 * drifts 2 ≤ 1^2 * drifts 0`) and `M / (r - δ)` shrunk-ball step margin
+   via `rational_box_contraction_step`,
+2. Exact CRT-NTT Lipschitz derivative bound `dirichletGradBoundScaled6_512 500500 256 = 117284435`
+   within the 4-prime CRT-NTT modulus `5 * 17 * 257 * 65537 = 1431655765`, and
+3. `highTruncSpec_1e12_N256.HasCertifiedNonVanishing` (`σ = 1001/2000 = 0.5005`) together
+   with continuous `2 × 2` CRT-NTT zero-free tile coverage over `nestedBox1e12_2`.
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem ultraDeep72_N256_rational_rect_cert :
+    nestedBox1e12_2.SubBox nestedBox1e12_0 ∧
+    3 ^ 2 * driftSeq1e12_N256 2 ≤ 1 ^ 2 * driftSeq1e12_N256 0 ∧
+    rationalBoxSpec_N256.lipNumerator * rationalBoxSpec_N256.radius <
+      rationalBoxSpec_N256.centerLower *
+        (rationalBoxSpec_N256.radius - rationalBoxSpec_N256.deltaShrink) ∧
+    (∀ centerMag pointMag dist : Nat,
+      40000000 ≤ centerMag →
+      dist ≤ 22000 →
+      20000 * Int.natAbs ((centerMag : Int) - (pointMag : Int)) ≤ 2000000 * dist →
+      20000000 ≤ pointMag ∧ 0 < pointMag) ∧
+    dirichletGradBoundScaled6_512 500500 256 = 117284435 ∧
+    16 * 999 * 999 < 5 * 17 * 257 * 65537 ∧
+    highTruncSpec_1e12_N256.HasCertifiedNonVanishing ∧
+    (∀ s6 t6 : Nat,
+      InBox2D nestedBox1e12_2.sLo6 nestedBox1e12_2.sHi6
+        nestedBox1e12_2.tLo6 nestedBox1e12_2.tHi6 s6 t6 →
+      ∃ tile ∈ highTruncTiles_1e12_N256,
+        IsValidLipTile2D tile ∧
+        InBox2D tile.sLo6 tile.sHi6 tile.tLo6 tile.tHi6 s6 t6 ∧
+        (∀ zRe0 zIm0 zRe zIm : Int,
+          tile.anchorRe.lo * 1000000 ≤ zRe0 ∧ zRe0 ≤ tile.anchorRe.hi * 1000000 →
+          tile.anchorIm.lo * 1000000 ≤ zIm0 ∧ zIm0 ≤ tile.anchorIm.hi * 1000000 →
+          Int.natAbs (zRe - zRe0) ≤
+            tile.gradBound6 * (((s6 : Int) - tile.sMid6).natAbs +
+              ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
+          Int.natAbs (zIm - zIm0) ≤
+            tile.gradBound6 * (((s6 : Int) - tile.sMid6).natAbs +
+              ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
+          0 < zRe * zRe + zIm * zIm ∧ (zRe ≠ 0 ∨ zIm ≠ 0))) := by
+  have hChain := rational_telescoping_chain_cert 1 3 (by decide) (by decide)
+    nestedBoxSeq1e12_N256 (fun _ => 100) driftSeq1e12_N256 40000000
+    (by decide) (by decide) 2
+    (fun i hi => by
+      match i with
+      | 0 => decide
+      | 1 => decide
+      | i + 2 => omega)
+    (fun i hi => by
+      match i with
+      | 0 => decide
+      | 1 => decide
+      | i + 2 => omega)
+    (fun i hi => by
+      match i with
+      | 0 => decide
+      | 1 => decide
+      | 2 => decide
+      | i + 3 => omega)
+  have hGrad : dirichletGradBoundScaled6_512 500500 256 = 117284435 := by
+    dsimp [dirichletGradBoundScaled6_512]
+    rw [lnPrimeTable90_eq, lnHighPrimes90_eq, intMul192ViaCrtNtt_fn_eq, rawMul18_fn_eq]
+    exact grad12_fast_valid
+  have hRect := crtNtt_highTrunc_2d_zero_free_rect
+  refine ⟨hChain.1, hChain.2.1, rationalBoxSpec_N256.lip_mul_radius_lt, ?_, hGrad,
+    by decide, hRect.2.2.2.2.2.2.1, ?_⟩
+  · intro centerMag pointMag dist hCenter hDist hLip
+    have hStep := rational_box_contraction_step rationalBoxSpec_N256
+      centerMag pointMag dist (driftSeq1e12_N256 0) (driftSeq1e12_N256 1)
+      hCenter hDist hLip (by decide)
+    exact ⟨hStep.1, hStep.2.2.1⟩
+  · intro s6 t6 hmem
+    exact hRect.2.2.2.2.1 s6 t6 hmem
+
+/-- Theorem (Higher-Truncation `N = 512`, `σ = 0.50025 = 1/2 + 1/4000`, `t ~ 10^18`
+4-Prime CRT-NTT & `2/5` Rational Contraction Certificate):
+Certifies:
+1. `2`-step `2/5` rational box contraction `nestedBox1e18_3 ⊆ nestedBox1e18_rat_0`
+   (`5^2 * drifts 2 ≤ 2^2 * drifts 0`) and `M / (r - δ)` shrunk-ball step margin
+   via `rational_box_contraction_step`,
+2. Exact 4-prime CRT-NTT gradient bound `dirichletGradBoundScaled6_512 500250 512 = 195620879`
+   within the 4-prime CRT-NTT modulus `1431655765` and monotonic Euler–Maclaurin tail
+   shrinkage `E_512 ≤ E_256 ≤ E_128`, and
+3. `highTruncSpec_1e18_N512.HasCertifiedNonVanishing` (`σ = 2001/4000 = 1/2 + 1/4000`)
+   together with continuous `2 × 2` CRT-NTT zero-free tile coverage over `nestedBox1e18_3`.
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem ultraDeep72_N512_rational_rect_cert :
+    nestedBox1e18_3.SubBox nestedBox1e18_rat_0 ∧
+    5 ^ 2 * driftSeq1e18_N512 2 ≤ 2 ^ 2 * driftSeq1e18_N512 0 ∧
+    QRat.eqv (QRat.mk' 2001 4000 (by decide))
+      (QRat.mk' 1 2 (by decide) + QRat.mk' 1 4000 (by decide)) ∧
+    rationalBoxSpec_N512.lipNumerator * rationalBoxSpec_N512.radius <
+      rationalBoxSpec_N512.centerLower *
+        (rationalBoxSpec_N512.radius - rationalBoxSpec_N512.deltaShrink) ∧
+    (∀ centerMag pointMag dist : Nat,
+      19200000 ≤ centerMag →
+      dist ≤ 12000 →
+      10000 * Int.natAbs ((centerMag : Int) - (pointMag : Int)) ≤ 1000000 * dist →
+      9600000 ≤ pointMag ∧ 0 < pointMag) ∧
+    dirichletGradBoundScaled6_512 500250 512 = 195620879 ∧
+    16 * 999 * 999 < 5 * 17 * 257 * 65537 ∧
+    eulerMaclaurinB2TailRect2DForN 512 500250 108900000 108910000 ≤
+      eulerMaclaurinB2TailRect2DForN 256 500250 108900000 108910000 ∧
+    highTruncSpec_1e18_N512.HasCertifiedNonVanishing ∧
+    (∀ s6 t6 : Nat,
+      InBox2D nestedBox1e18_3.sLo6 nestedBox1e18_3.sHi6
+        nestedBox1e18_3.tLo6 nestedBox1e18_3.tHi6 s6 t6 →
+      ∃ tile ∈ highTruncTiles_1e18_N512,
+        IsValidLipTile2D tile ∧
+        InBox2D tile.sLo6 tile.sHi6 tile.tLo6 tile.tHi6 s6 t6 ∧
+        (∀ zRe0 zIm0 zRe zIm : Int,
+          tile.anchorRe.lo * 1000000 ≤ zRe0 ∧ zRe0 ≤ tile.anchorRe.hi * 1000000 →
+          tile.anchorIm.lo * 1000000 ≤ zIm0 ∧ zIm0 ≤ tile.anchorIm.hi * 1000000 →
+          Int.natAbs (zRe - zRe0) ≤
+            tile.gradBound6 * (((s6 : Int) - tile.sMid6).natAbs +
+              ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
+          Int.natAbs (zIm - zIm0) ≤
+            tile.gradBound6 * (((s6 : Int) - tile.sMid6).natAbs +
+              ((t6 : Int) - tile.tMid6).natAbs) + tile.epsCrt6 * 1000000 →
+          0 < zRe * zRe + zIm * zIm ∧ (zRe ≠ 0 ∨ zIm ≠ 0))) := by
+  have hChain := rational_telescoping_chain_cert 2 5 (by decide) (by decide)
+    nestedBoxSeq1e18_N512 (fun _ => 100) driftSeq1e18_N512 19200000
+    (by decide) (by decide) 2
+    (fun i hi => by
+      match i with
+      | 0 => decide
+      | 1 => decide
+      | i + 2 => omega)
+    (fun i hi => by
+      match i with
+      | 0 => decide
+      | 1 => decide
+      | i + 2 => omega)
+    (fun i hi => by
+      match i with
+      | 0 => decide
+      | 1 => decide
+      | 2 => decide
+      | i + 3 => omega)
+  have hGrad : dirichletGradBoundScaled6_512 500250 512 = 195620879 := by
+    dsimp [dirichletGradBoundScaled6_512]
+    rw [lnPrimeTable90_eq, lnHighPrimes90_eq, intMul192ViaCrtNtt_fn_eq, rawMul18_fn_eq]
+    exact grad18_fast_valid
+  have hTail := (eulerMaclaurinB2TailRect2DForN_monotone 500250 108900000 108910000 (by decide)).1
+  have hRect := crtNtt_highTrunc_2d_zero_free_rect
+  refine ⟨hChain.1, hChain.2.1, by decide, rationalBoxSpec_N512.lip_mul_radius_lt, ?_, hGrad,
+    by decide, hTail, hRect.2.2.2.2.2.2.2, ?_⟩
+  · intro centerMag pointMag dist hCenter hDist hLip
+    have hStep := rational_box_contraction_step rationalBoxSpec_N512
+      centerMag pointMag dist (driftSeq1e18_N512 0) (driftSeq1e18_N512 1)
+      hCenter hDist hLip (by decide)
+    exact ⟨hStep.1, hStep.2.2.1⟩
+  · intro s6 t6 hmem
+    exact hRect.2.2.2.2.2.1 s6 t6 hmem
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/UltraDeep72.lean
