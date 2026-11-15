@@ -33,13 +33,13 @@ source config_env hum
 # Check toolchain and workspace status
 make status
 
-# Build all 31 modules incrementally with timing budgets
+# Build all 32 modules incrementally with timing budgets
 make build-incremental
 
 # Full build & execute Parts 1-11 + unified provenance CLI demo
 make sync
 
-# Audit transitive axiom closures across Parts 1-41 (0 choice, 0 sorryAx)
+# Audit transitive axiom closures across Parts 1-42 (0 choice, 0 sorryAx)
 lake env lean tests/TestAxioms.lean
 
 # Check submodule hydration status
@@ -83,11 +83,12 @@ kernel-verified computations across all 11 parts:
    `32,906` split prime ideals, GL(1) Artin Euler collapse & order-4
    cyclotomic factorization, and MiniVM 4-pt NTT character orthogonality.
 7. **Part 7 (`FiniteFieldRH`, `Genus2Jacobian`, `WeilZetaBridge`,
-   `GSp4FunctorialityBridge`)**: Hasse-Weil RH for `E/F_7`, genus-2
-   `C : y^2 = x^5 - x + 1` over `F_5`, `L(C, 1) = 71/25`, Cantor-Mumford
-   group axioms on `J(C)(F_5) ~= Z/71Z`, punctured-strip zeta bounds,
-   `Xi_C(1 - s) = Xi_C(s)`, `GSp(4) -> SO(5)` cyclotomic lift
-   `5(1 - T) Phi_10(T)`, and the Selberg / Kim-Sarnak `Sym^k` ladder.
+   `GSp4FunctorialityBridge`, `EllipticModularityBridge`)**: Hasse-Weil RH
+   for `E/F_7`, genus-2 `C : y^2 = x^5 - x + 1` over `F_5`, `L(C, 1) = 71/25`,
+   Cantor-Mumford group axioms on `J(C)(F_5) ~= Z/71Z`, punctured-strip zeta
+   bounds, `Xi_C(1 - s) = Xi_C(s)`, `GSp(4) -> SO(5)` cyclotomic lift
+   `5(1 - T) Phi_10(T)`, Selberg / Kim-Sarnak `Sym^k` ladder, and
+   `E_{11a1}` / `f_{11}` Eichler-Shimura trace equality (`p <= 97`).
 8. **Part 8 (`EulerFactorNonVanishing`)**: Local RNS channels `p in {7, 11,
    13}` non-vanishing at `sigma in {1/2, 7/8}`.
 9. **Part 9 (`NttArithmetic`)**: `F_17` primitive roots, butterfly, and
@@ -99,17 +100,17 @@ kernel-verified computations across all 11 parts:
     `pi`, universal `m >= 8` truncation trap, and unified master certificate
     `LeanAsm.leanasm_full_provenance_certified`.
 
-## 31-Module Theorem Inventory
+## 32-Module Theorem Inventory
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 `QuasiRiemann/`, `PC/` for `PiChudnovsky/`, and `Main.lean` +
-`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-41.
+`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-42.
 `NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `PC` = `PiChudnovsky`.
 
 | Module | NS | Flagship Theorem / Role |
 | --- | --- | --- |
 | `Main.lean` | `(root)` | CLI entrypoint (`Parts 1-11` + provenance) |
-| `LeanAsm.lean` | `(root)` | Library root exporting all 29 submodules |
+| `LeanAsm.lean` | `(root)` | Library root exporting all 30 submodules |
 | `MiniVM.lean` | `=` | `exec_garner_crt_sound`, `mul_mod_reg_correct` |
 | `MiniVMNttBridge.lean` | `=` | `crtNtt4ConvAsm_sound` |
 | `Conjectures.lean` | `=` | `collatz_one_reaches_one` |
@@ -130,6 +131,7 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `Genus2Jacobian.lean` | `=` | `jacobian_group_axioms_on_orbit` |
 | `WeilZetaBridge.lean` | `=` | `genus2_completed_zeta_reflection` |
 | `GSp4FunctorialityBridge.lean` | `=` | `gsp4_std_functional_equation` |
+| `EllipticModularityBridge.lean` | `=` | `eichler_shimura_trace_eq_11a1` |
 | `ArtinFermatBridge.lean` | `=` | `artin_char_orthogonality_minivm` |
 | `NttArithmetic.lean` | `=` | `cyclic_conv4_ntt_universal_F17` |
 | `CrtNtt.lean` | `=` | `crt_ntt16_exact_integer_convolution` |
@@ -172,6 +174,9 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
   `GSp4FunctorialityBridge.genus2_f5_so5_ramanujan_tempered`,
   `kim_sarnak_ramanujan_ladder_strict`, &
   `selberg_laplacian_eigenvalue_ladder`
+- `EllipticModularityBridge.eichler_shimura_trace_eq_11a1`,
+  `hasse_weil_ramanujan_11a1_certs`, &
+  `hecke_multiplicativity_11a1_certs`
 - `CrtNtt.garnerReconstruct4_sound` & `fermat_tower_conv_bound_certs`
 - `PiChudnovsky.pi_105_traps_all_chudnovsky_truncations`
 
@@ -210,12 +215,12 @@ leanasm/
 ├── mk/                      # Modular makefile extensions (hydrate.mk)
 ├── Main.lean                # CLI entrypoint (Parts 1-11 + provenance)
 ├── src/
-│   ├── LeanAsm.lean         # Library root exporting 29 submodules
-│   └── LeanAsm/             # 20 domain modules + PiChudnovsky/ + QuasiRiemann/
+│   ├── LeanAsm.lean         # Library root exporting 30 submodules
+│   └── LeanAsm/             # 21 domain modules + PiChudnovsky/ + QuasiRiemann/
 │       ├── ProvenanceSummary.lean
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
 │       └── QuasiRiemann/    # Rat, UltraDeep72, Zfr, Bridge, ZD, ShortInt
-├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-41)
+├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-42)
 └── tools/                   # Build and logging utilities
 ```
 
