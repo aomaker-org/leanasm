@@ -24,6 +24,7 @@ import LeanAsm.CollatzQrhBridge
 import LeanAsm.PiChudnovsky
 import LeanAsm.GSp4FunctorialityBridge
 import LeanAsm.ArtinFermatBridge
+import LeanAsm.ConstructiveOpenaiBridge
 import LeanAsm.ProvenanceSummary
 
 -- end of file: leanasm/src/LeanAsm.lean

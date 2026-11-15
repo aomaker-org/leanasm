@@ -33,13 +33,13 @@ source config_env hum
 # Check toolchain and workspace status
 make status
 
-# Build all 30 modules incrementally with timing budgets
+# Build all 31 modules incrementally with timing budgets
 make build-incremental
 
 # Full build & execute Parts 1-11 + unified provenance CLI demo
 make sync
 
-# Audit transitive axiom closures across Parts 1-39 (0 choice, 0 sorryAx)
+# Audit transitive axiom closures across Parts 1-41 (0 choice, 0 sorryAx)
 lake env lean tests/TestAxioms.lean
 
 # Check submodule hydration status
@@ -61,8 +61,10 @@ kernel-verified computations across all 11 parts:
    (`K >= 1721`) barrier, and constructive predecessor-tree density bounds.
 3. **Part 3 (`YangMillsToy`)**: 4D `Z_2` Wilson plaquette action & local gauge
    invariance.
-4. **Part 4 (`YangMillsQ8`)**: Non-abelian `Q_8 subset SU(2)` quaternion gauge
-   multiplication, trace cyclicity, and conjugation invariance.
+4. **Part 4 (`YangMillsQ8`, `ConstructiveOpenaiBridge`)**: Non-abelian
+   `Q_8 subset SU(2)` quaternion gauge multiplication, trace cyclicity,
+   conjugation invariance, 4D lattice walks, box/slab foliation, and
+   `SignedSym4` face-holonomy trace invariance.
 5. **Part 5 (`QuasiRiemann`, `UltraDeep72`, `AsymptoticZfr`,
    `ZeroDensityBridge`, `ShortIntervalPrimes`)**: Mollifier descent, 2D
    rectangles down to `sigma = 0.501` (`N = 128`) and compositional 2x2
@@ -97,23 +99,24 @@ kernel-verified computations across all 11 parts:
     `pi`, universal `m >= 8` truncation trap, and unified master certificate
     `LeanAsm.leanasm_full_provenance_certified`.
 
-## 30-Module Theorem Inventory
+## 31-Module Theorem Inventory
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 `QuasiRiemann/`, `PC/` for `PiChudnovsky/`, and `Main.lean` +
-`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-39.
+`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-41.
 `NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `PC` = `PiChudnovsky`.
 
 | Module | NS | Flagship Theorem / Role |
 | --- | --- | --- |
 | `Main.lean` | `(root)` | CLI entrypoint (`Parts 1-11` + provenance) |
-| `LeanAsm.lean` | `(root)` | Library root exporting all 28 submodules |
+| `LeanAsm.lean` | `(root)` | Library root exporting all 29 submodules |
 | `MiniVM.lean` | `=` | `exec_garner_crt_sound`, `mul_mod_reg_correct` |
 | `MiniVMNttBridge.lean` | `=` | `crtNtt4ConvAsm_sound` |
 | `Conjectures.lean` | `=` | `collatz_one_reaches_one` |
 | `CollatzQrhBridge.lean` | `=` | `collatz_cycle_length_lower_bound_306` |
 | `YangMillsToy.lean` | `=` | `plaquette_action_gauge_invariant` |
 | `YangMillsQ8.lean` | `=` | `q8_trace_conjugation_invariant` |
+| `ConstructiveOpenaiBridge.lean` | `=` | `holonomy_gauge_covariant` |
 | `QR/Rat.lean` | `QR` | `QRat` constructive rational field core |
 | `QuasiRiemann.lean` | `=` | `isValidLipTile2D_sound` |
 | `QR/UltraDeep72.lean` | `QR` | `crtNtt_highTrunc_2d_zero_free_rect` |
@@ -146,6 +149,9 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
   `steiner_1cycle_excluded_at_convergents`, `log2_3_convergent_bracket_665`,
   `simons_de_weger_barrier_665`, `collatzPredTree_sound`, &
   `collatz_pred_tree_growth_certs`
+- `ConstructiveOpenaiBridge.axisRoute_reverse`, `squareWalk_corners`,
+  `slab_sum_foliation`, `q8_plaquette_holonomy_gauge_invariant`, &
+  `q8_send_price_trace_invariant`
 - `QuasiRiemann.qrh_full_descent_chain_certified`,
   `ultra_deep_rects_down_to_0501_certified`,
   `high_height_dirichlet_rects_1e12_certified`,
@@ -175,6 +181,9 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
   limits and independent verification suite:
   [Yang-Mills overview](docs/yang_mills_formalization_overview.md).
   Check integrity: `make ym-integrity`; status: `make ym-status`.
+- **OpenAI-20261028 Constructive Audit**: Classification of all 21 pure
+  constructive files:
+  [Constructive audit](docs/openai-20261028/CONSTRUCTIVE_AUDIT.md).
 - **Local `llama.cpp` Prover**: Wiring `llama-server` to a Lean 4 REPL:
   [llama.cpp prover guide](docs/llama_cpp_prover_architecture.md).
 - **Lazy Submodule Hydration**: On-demand hydration (`make hydrate SUB=...`):
@@ -201,12 +210,12 @@ leanasm/
 ├── mk/                      # Modular makefile extensions (hydrate.mk)
 ├── Main.lean                # CLI entrypoint (Parts 1-11 + provenance)
 ├── src/
-│   ├── LeanAsm.lean         # Library root exporting 28 submodules
-│   └── LeanAsm/             # 19 domain modules + PiChudnovsky/ + QuasiRiemann/
+│   ├── LeanAsm.lean         # Library root exporting 29 submodules
+│   └── LeanAsm/             # 20 domain modules + PiChudnovsky/ + QuasiRiemann/
 │       ├── ProvenanceSummary.lean
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
 │       └── QuasiRiemann/    # Rat, UltraDeep72, Zfr, Bridge, ZD, ShortInt
-├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-39)
+├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-41)
 └── tools/                   # Build and logging utilities
 ```
 

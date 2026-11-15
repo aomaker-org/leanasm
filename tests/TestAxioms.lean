@@ -543,4 +543,24 @@ import LeanAsm
 #print axioms LeanAsm.eulerRns_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 41: Pure Constructive OpenAI-20261028 Bridge (Issue #65)
+#print axioms ConstructiveOpenaiBridge.straightWalk_stop
+#print axioms ConstructiveOpenaiBridge.axisRoute_support
+#print axioms ConstructiveOpenaiBridge.axisRoute_reverse
+#print axioms ConstructiveOpenaiBridge.squareWalk_corners
+#print axioms ConstructiveOpenaiBridge.boxSites_nodup
+#print axioms ConstructiveOpenaiBridge.slab_sum_foliation
+#print axioms ConstructiveOpenaiBridge.PlaqAxes.rotate_inv
+#print axioms ConstructiveOpenaiBridge.holonomy_gauge_covariant
+#print axioms ConstructiveOpenaiBridge.oriented_swap_transport
+#print axioms ConstructiveOpenaiBridge.oriented_next_transport
+#print axioms ConstructiveOpenaiBridge.classFn_price_flip
+#print axioms ConstructiveOpenaiBridge.classFn_price_shift_pos
+#print axioms ConstructiveOpenaiBridge.Face.injective_send
+#print axioms ConstructiveOpenaiBridge.classFn_send_price
+#print axioms ConstructiveOpenaiBridge.q8_plaquette_holonomy_gauge_invariant
+#print axioms ConstructiveOpenaiBridge.q8_send_price_trace_invariant
+#print axioms LeanAsm.yangMills_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean
