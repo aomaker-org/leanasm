@@ -268,6 +268,10 @@ def main : IO Unit := do
     "ϑ(k) ↑ 1 (7/8 < 15/16 < 31/32)")
   IO.println ("  Kim-Sarnak Couple : θ_auto=7/64 (λ₁=975/4096) → ϑ=25/32, θ=39/64 < 5/8 " ++
     "(tightens Sym^3 1/9 → 11/18)")
+  IO.println ("  Rational Squeeze  : N=256 (q=1/3, σ=0.5005, grad=117284435) & " ++
+    "N=512 (q=2/5, σ=0.50025, grad=195620879)")
+  IO.println ("  UD72 → ZD Strip   : σ=1/2+1/4000 tightens zdGM(σ) by 3/5200 " ++
+    "& zdHux(σ) by 3/5000 (ZERO axioms)")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"

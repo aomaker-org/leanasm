@@ -5,6 +5,7 @@
 
 import LeanAsm.QuasiRiemann
 import LeanAsm.QuasiRiemann.AsymptoticZfr
+import LeanAsm.QuasiRiemann.UltraDeep72
 
 namespace QuasiRiemann
 
@@ -710,6 +711,223 @@ theorem qrh_chebyshev_benchmark_certs :
         qrhThresholdElevenTwelfths (by decide) (by decide) (by decide) (by decide)
     · exact tenPow_rel_err_lt_inv10 28 336 (by decide) rfl 1 (by decide)
         qrhThresholdFortySevenFortyEighths (by decide) (by decide) (by decide) (by decide)
+
+-- =============================================================================
+-- 7. Certified Strip-Width Export Bridge from UltraDeep72 to ZeroDensityBridge
+-- =============================================================================
+
+/-- Strictly increasing `σ` strictly shrinks `A · (1 - σ)` whenever `A > 0`. -/
+theorem exponent_strict_mono_sigma (spec : ZeroDensitySpec) {σ₁ σ₂ : QRat} (hσ : σ₁ < σ₂) :
+    spec.exponent σ₂ < spec.exponent σ₁ := by
+  dsimp [ZeroDensitySpec.exponent, zeroDensityExponentAt]
+  change (spec.slope.num * ((1 : Int) * (σ₂.den : Int) - σ₂.num * 1)) *
+      ((spec.slope.den * (1 * σ₁.den) : Nat) : Int) <
+    (spec.slope.num * ((1 : Int) * (σ₁.den : Int) - σ₁.num * 1)) *
+      ((spec.slope.den * (1 * σ₂.den) : Nat) : Int)
+  change σ₁.num * (σ₂.den : Int) < σ₂.num * (σ₁.den : Int) at hσ
+  repeat rw [Int.natCast_mul]
+  rw [show ((1 : Nat) : Int) = 1 from rfl]
+  simp only [Int.one_mul, Int.mul_one]
+  have hDiff : ((σ₂.den : Int) - σ₂.num) * (σ₁.den : Int) <
+      ((σ₁.den : Int) - σ₁.num) * (σ₂.den : Int) := by
+    rw [Int.sub_mul, Int.sub_mul, Int.mul_comm (σ₂.den : Int) (σ₁.den : Int)]
+    omega
+  have hSlopePos : (0 : Int) < spec.slope.num * (spec.slope.den : Int) :=
+    Int.mul_pos spec.slope_pos (Int.natCast_pos.mpr spec.slope.den_pos)
+  have hScaled := Int.mul_lt_mul_of_pos_left hDiff hSlopePos
+  have hL : (spec.slope.num * (spec.slope.den : Int)) *
+      (((σ₂.den : Int) - σ₂.num) * (σ₁.den : Int)) =
+      (spec.slope.num * ((σ₂.den : Int) - σ₂.num)) *
+        ((spec.slope.den : Int) * (σ₁.den : Int)) := by ac_rfl
+  have hR : (spec.slope.num * (spec.slope.den : Int)) *
+      (((σ₁.den : Int) - σ₁.num) * (σ₂.den : Int)) =
+      (spec.slope.num * ((σ₁.den : Int) - σ₁.num)) *
+        ((spec.slope.den : Int) * (σ₂.den : Int)) := by ac_rfl
+  rw [← hL, ← hR]
+  exact hScaled
+
+private theorem half_lt_of_half_add_pos (s w : QRat) (hw : (0 : Int) < w.num)
+    (heq : QRat.eqv s (QRat.mk' 1 2 + w)) : QRat.mk' 1 2 < s := by
+  have hAdd : QRat.mk' 1 2 < QRat.mk' 1 2 + w := by
+    change (1 : Int) * ((2 * w.den : Nat) : Int) < ((1 : Int) * (w.den : Int) + w.num * 2) * 2
+    rw [Int.natCast_mul]
+    rw [show ((2 : Nat) : Int) = 2 from rfl]
+    omega
+  change (1 : Int) * (s.den : Int) < s.num * 2
+  change (1 : Int) * (((QRat.mk' 1 2 + w).den : Nat) : Int) <
+    (QRat.mk' 1 2 + w).num * 2 at hAdd
+  change s.num * (((QRat.mk' 1 2 + w).den : Nat) : Int) =
+    (QRat.mk' 1 2 + w).num * (s.den : Int) at heq
+  have hSDenPos : (0 : Int) < (s.den : Int) := Int.natCast_pos.mpr s.den_pos
+  have hADenPos : (0 : Int) < ((QRat.mk' 1 2 + w).den : Int) :=
+    Int.natCast_pos.mpr (QRat.mk' 1 2 + w).den_pos
+  have h1 : ((1 : Int) * (s.den : Int)) * ((QRat.mk' 1 2 + w).den : Int) <
+      ((QRat.mk' 1 2 + w).num * (s.den : Int)) * 2 := by
+    have hmul := Int.mul_lt_mul_of_pos_right hAdd hSDenPos
+    have hL : (1 * ((QRat.mk' 1 2 + w).den : Int)) * (s.den : Int) =
+        ((1 : Int) * (s.den : Int)) * ((QRat.mk' 1 2 + w).den : Int) := by ac_rfl
+    have hR : ((QRat.mk' 1 2 + w).num * 2) * (s.den : Int) =
+        ((QRat.mk' 1 2 + w).num * (s.den : Int)) * 2 := by ac_rfl
+    rw [← hL, ← hR]
+    exact hmul
+  rw [← heq] at h1
+  have hR2 : (s.num * ((QRat.mk' 1 2 + w).den : Int)) * 2 =
+      (s.num * 2) * ((QRat.mk' 1 2 + w).den : Int) := by ac_rfl
+  rw [hR2] at h1
+  exact Int.lt_of_mul_lt_mul_right h1 (Int.le_of_lt hADenPos)
+
+/-- Certified critical-strip width specification exported from `UltraDeep72`
+(`HighTruncZeroFreeRectSpec`) into `ZeroDensityBridge`: packages a certified zero-free
+rectangle anchored at `sigmaLo = 1/2 + halfWidth` (`halfWidth > 0`) together with its
+kernel-checked `HasCertifiedNonVanishing` proof. -/
+structure CertifiedStripWidthSpec where
+  rectSpec : HighTruncZeroFreeRectSpec
+  sigmaDen_pos : 0 < rectSpec.sigmaDen
+  sigmaLo : QRat
+  halfWidth : QRat
+  halfWidth_pos : (0 : Int) < halfWidth.num
+  sigma_eq_half_add : QRat.eqv sigmaLo (QRat.mk' 1 2 + halfWidth)
+  sigma_eq_rect : QRat.eqv sigmaLo
+    (QRat.mk' (rectSpec.sigmaNum : Int) rectSpec.sigmaDen sigmaDen_pos)
+  rect_certified : rectSpec.HasCertifiedNonVanishing
+
+/-- Concrete `CertifiedStripWidthSpec` for `(σ = 0.5005 = 1/2 + 1/2000, N = 256, t ~ 10^12)`. -/
+def certifiedStrip05005_N256 : CertifiedStripWidthSpec where
+  rectSpec := highTruncSpec_1e12_N256
+  sigmaDen_pos := by decide
+  sigmaLo := QRat.mk' 1001 2000
+  halfWidth := QRat.mk' 1 2000
+  halfWidth_pos := by decide
+  sigma_eq_half_add := by decide
+  sigma_eq_rect := by decide
+  rect_certified := crtNtt_highTrunc_2d_zero_free_rect.2.2.2.2.2.2.1
+
+/-- Concrete `CertifiedStripWidthSpec` for `(σ = 0.50025 = 1/2 + 1/4000, N = 512, t ~ 10^18)`. -/
+def certifiedStrip050025_N512 : CertifiedStripWidthSpec where
+  rectSpec := highTruncSpec_1e18_N512
+  sigmaDen_pos := by decide
+  sigmaLo := QRat.mk' 2001 4000
+  halfWidth := QRat.mk' 1 4000
+  halfWidth_pos := by decide
+  sigma_eq_half_add := by decide
+  sigma_eq_rect := by decide
+  rect_certified := crtNtt_highTrunc_2d_zero_free_rect.2.2.2.2.2.2.2
+
+/-- Theorem (UltraDeep72 Certified Strip-Width to Zero-Density & DVP Bridge):
+Composes any `CertifiedStripWidthSpec` (`σ_lo = 1/2 + halfWidth > 1/2`) with a
+`ZeroDensitySpec` and QRH threshold `σ_lo < θ < 1`, proving:
+1. Strict interior critical-strip advance `1/2 < strip.sigmaLo` and strict tightening of the
+   zero-density growth exponent `zdSpec.exponent strip.sigmaLo < zdSpec.exponent (1/2)`,
+2. Strict ordering `zdSpec.exponent θ < zdSpec.exponent strip.sigmaLo < zdSpec.exponent (1/2)`
+   and Chebyshev gap chain `chebyshevGap θ < chebyshevGap strip.sigmaLo < 1/2`,
+3. Strictly narrower uncovered width `θ - strip.sigmaLo < θ - 1/2`, and
+4. Full composition with `zero_density_and_dvp_combined_region` into uniform DVP +
+   zero-density strip exclusion `β ≤ θ` and `β ≤ 1 - c_dvp / octaveLnUpper36QRat t < 1`.
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem ultradeep72_strip_to_zero_density_bridge
+    (strip : CertifiedStripWidthSpec) (zdSpec : ZeroDensitySpec) (θ : QRat)
+    (hThetaLo : strip.sigmaLo < θ) (hThetaHi : θ < QRat.ofInt 1) :
+    QRat.mk' 1 2 < strip.sigmaLo ∧
+    zdSpec.exponent strip.sigmaLo < zdSpec.exponent (QRat.mk' 1 2) ∧
+    zdSpec.exponent θ < zdSpec.exponent strip.sigmaLo ∧
+    θ - strip.sigmaLo < θ - QRat.mk' 1 2 ∧
+    QRat.ofInt 0 < chebyshevGap θ ∧
+    chebyshevGap θ < chebyshevGap strip.sigmaLo ∧
+    chebyshevGap strip.sigmaLo < QRat.mk' 1 2 ∧
+    strip.rectSpec.HasCertifiedNonVanishing ∧
+    (∀ (_ : ∀ σ : QRat, θ < σ → σ ≤ QRat.ofInt 1 → zdSpec.sublinearAt σ)
+      (t : Nat), dvpThresholdT0 ≤ t → ∀ (β S0 S1 S2 : QRat),
+      QRat.ofInt 1 ≤ zdSpec.exponent β →
+      ∀ (hgap : QRat.ofInt 0 < QRat.ofInt 1 + dvpDelta t - β),
+      QRat.ofInt 0 ≤ QRat.ofInt 3 * S0 + QRat.ofInt 4 * S1 + S2 →
+      S0 ≤ QRat.div (QRat.ofInt 1) (dvpDelta t)
+        (Int.ne_of_gt ((qrat_pos_iff _).mp (dvpDelta_pos_local t))) + QRat.ofInt 1 →
+      S1 ≤ -(QRat.div (QRat.ofInt 1) (QRat.ofInt 1 + dvpDelta t - β)
+        (Int.ne_of_gt ((qrat_pos_iff _).mp hgap))) +
+          QRat.mk' 1 2 * octaveLnUpper36QRat t →
+      S2 ≤ QRat.mk' 3 4 * (octaveLnUpper36QRat t + ln2Upper36QRat) →
+      β ≤ θ ∧
+      β ≤ QRat.ofInt 1 - QRat.div cDvp (octaveLnUpper36QRat t)
+        (Int.ne_of_gt ((qrat_pos_iff _).mp (octaveLnUpper36_pos t).2.1)) ∧
+      β < QRat.ofInt 1 ∧
+      chebyshevGap θ ≤ chebyshevGap β) := by
+  have hHalfLt : QRat.mk' 1 2 < strip.sigmaLo :=
+    half_lt_of_half_add_pos strip.sigmaLo strip.halfWidth strip.halfWidth_pos
+      strip.sigma_eq_half_add
+  have hExp1 : zdSpec.exponent strip.sigmaLo < zdSpec.exponent (QRat.mk' 1 2) :=
+    exponent_strict_mono_sigma zdSpec hHalfLt
+  have hExp2 : zdSpec.exponent θ < zdSpec.exponent strip.sigmaLo :=
+    exponent_strict_mono_sigma zdSpec hThetaLo
+  have hWidth : θ - strip.sigmaLo < θ - QRat.mk' 1 2 := by
+    change (θ.num * (strip.sigmaLo.den : Int) - strip.sigmaLo.num * (θ.den : Int)) *
+        ((θ.den * 2 : Nat) : Int) <
+      (θ.num * 2 - 1 * (θ.den : Int)) * ((θ.den * strip.sigmaLo.den : Nat) : Int)
+    change (1 : Int) * (strip.sigmaLo.den : Int) < strip.sigmaLo.num * 2 at hHalfLt
+    rw [Int.natCast_mul, Int.natCast_mul]
+    rw [show ((2 : Nat) : Int) = 2 from rfl]
+    have hTDenPos : (0 : Int) < (θ.den : Int) * (θ.den : Int) :=
+      Int.mul_pos (Int.natCast_pos.mpr θ.den_pos) (Int.natCast_pos.mpr θ.den_pos)
+    have hMul := Int.mul_lt_mul_of_pos_left hHalfLt hTDenPos
+    have h1 : (θ.num * (strip.sigmaLo.den : Int) - strip.sigmaLo.num * (θ.den : Int)) *
+        ((θ.den : Int) * 2) =
+        θ.num * 2 * ((θ.den : Int) * (strip.sigmaLo.den : Int)) -
+          (θ.den : Int) * (θ.den : Int) * (strip.sigmaLo.num * 2) := by
+      rw [Int.sub_mul]
+      have hL : θ.num * (strip.sigmaLo.den : Int) * ((θ.den : Int) * 2) =
+          θ.num * 2 * ((θ.den : Int) * (strip.sigmaLo.den : Int)) := by ac_rfl
+      have hR : strip.sigmaLo.num * (θ.den : Int) * ((θ.den : Int) * 2) =
+          (θ.den : Int) * (θ.den : Int) * (strip.sigmaLo.num * 2) := by ac_rfl
+      rw [hL, hR]
+    have h2 : (θ.num * 2 - (1 : Int) * (θ.den : Int)) *
+        ((θ.den : Int) * (strip.sigmaLo.den : Int)) =
+        θ.num * 2 * ((θ.den : Int) * (strip.sigmaLo.den : Int)) -
+          (θ.den : Int) * (θ.den : Int) * ((1 : Int) * (strip.sigmaLo.den : Int)) := by
+      rw [Int.sub_mul]
+      have hR : (1 : Int) * (θ.den : Int) * ((θ.den : Int) * (strip.sigmaLo.den : Int)) =
+          (θ.den : Int) * (θ.den : Int) * ((1 : Int) * (strip.sigmaLo.den : Int)) := by ac_rfl
+      rw [hR]
+    rw [h1, h2]
+    omega
+  have hGap0 : QRat.ofInt 0 < chebyshevGap θ := chebyshevGap_pos_of_lt_one hThetaHi
+  have hGap1 : chebyshevGap θ < chebyshevGap strip.sigmaLo := chebyshevGap_antitone hThetaLo
+  have hGap2 : chebyshevGap strip.sigmaLo < QRat.mk' 1 2 := by
+    change ((1 : Int) * (strip.sigmaLo.den : Int) - strip.sigmaLo.num * 1) * 2 <
+      1 * ((1 * strip.sigmaLo.den : Nat) : Int)
+    change (1 : Int) * (strip.sigmaLo.den : Int) < strip.sigmaLo.num * 2 at hHalfLt
+    rw [Nat.one_mul]
+    omega
+  refine ⟨hHalfLt, hExp1, hExp2, hWidth, hGap0, hGap1, hGap2, strip.rect_certified, ?_⟩
+  intro hdens t ht β S0 S1 S2 hviol hgap hpos341 hS0 hS1 hS2
+  exact zero_density_and_dvp_combined_region zdSpec θ hdens t ht β S0 S1 S2
+    hviol hgap hpos341 hS0 hS1 hS2
+
+/-- Concrete `N = 512` (`σ = 0.50025 = 1/2 + 1/4000`, `t ~ 10^18`) and `N = 256` (`σ = 0.5005`)
+strip-to-zero-density tightening certificates coupling `UltraDeep72` rational contraction and
+4-prime CRT-NTT gradient (`195620879`) to `zdGuthMaynard` (`30/13`) and `zdHuxley` (`12/5`).
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem ultradeep72_N512_strip_zd_certs :
+    certifiedStrip050025_N512.halfWidth < certifiedStrip05005_N256.halfWidth ∧
+    certifiedStrip050025_N512.sigmaLo < certifiedStrip05005_N256.sigmaLo ∧
+    QRat.eqv
+      (zdGuthMaynard.exponent (QRat.mk' 1 2) -
+        zdGuthMaynard.exponent certifiedStrip050025_N512.sigmaLo)
+      (QRat.mk' 3 5200) ∧
+    QRat.eqv
+      (zdHuxley.exponent (QRat.mk' 1 2) -
+        zdHuxley.exponent certifiedStrip050025_N512.sigmaLo)
+      (QRat.mk' 3 5000) ∧
+    zdGuthMaynard.exponent (QRat.mk' 3 4) <
+      zdGuthMaynard.exponent certifiedStrip050025_N512.sigmaLo ∧
+    zdGuthMaynard.exponent certifiedStrip050025_N512.sigmaLo <
+      zdGuthMaynard.exponent (QRat.mk' 1 2) ∧
+    nestedBox1e18_3.SubBox nestedBox1e18_rat_0 ∧
+    dirichletGradBoundScaled6_512 500250 512 = 195620879 ∧
+    certifiedStrip050025_N512.rectSpec.HasCertifiedNonVanishing ∧
+    certifiedStrip05005_N256.rectSpec.HasCertifiedNonVanishing := by
+  have h512 := ultraDeep72_N512_rational_rect_cert
+  exact ⟨by decide, by decide, by decide, by decide, by decide, by decide,
+    h512.1, h512.2.2.2.2.2.1, certifiedStrip050025_N512.rect_certified,
+    certifiedStrip05005_N256.rect_certified⟩
 
 end QuasiRiemann
 

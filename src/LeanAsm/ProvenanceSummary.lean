@@ -646,6 +646,41 @@ def ParametricQrhLadderProp : Prop :=
       (QuasiRiemann.QRat.mk' 975 4096 (by decide)) ∧
     QuasiRiemann.kimSarnakBridgeSpec.nextShortSpec.HasGuaranteedPrime)
 
+/-- Part 5 rational-contraction and higher-truncation N=256,512 strip export
+into zero-density bounds (`UltraDeep72` Part 19 and `ZeroDensityBridge` Part 7). -/
+def HighTruncRationalContractionProp : Prop :=
+  (∀ (rSpec : QuasiRiemann.RationalBoxContractionSpec)
+      (centerMag pointMag dist currDrift nextDrift : Nat),
+      rSpec.centerLower ≤ centerMag →
+      dist ≤ rSpec.radius →
+      (rSpec.radius - rSpec.deltaShrink) * Int.natAbs ((centerMag : Int) - (pointMag : Int)) ≤
+        rSpec.lipNumerator * dist →
+      rSpec.qDen * nextDrift ≤ rSpec.qNum * currDrift →
+      0 < pointMag ∧ (0 < currDrift → nextDrift < currDrift)) ∧
+  (3 ^ 2 * QuasiRiemann.driftSeq1e12_N256 2 ≤ 1 ^ 2 * QuasiRiemann.driftSeq1e12_N256 0 ∧
+    QuasiRiemann.dirichletGradBoundScaled6_512 500500 256 = 117284435 ∧
+    QuasiRiemann.highTruncSpec_1e12_N256.HasCertifiedNonVanishing) ∧
+  (5 ^ 2 * QuasiRiemann.driftSeq1e18_N512 2 ≤ 2 ^ 2 * QuasiRiemann.driftSeq1e18_N512 0 ∧
+    QuasiRiemann.dirichletGradBoundScaled6_512 500250 512 = 195620879 ∧
+    QuasiRiemann.highTruncSpec_1e18_N512.HasCertifiedNonVanishing) ∧
+  (∀ (strip : QuasiRiemann.CertifiedStripWidthSpec)
+      (zdSpec : QuasiRiemann.ZeroDensitySpec) (θ : QuasiRiemann.QRat),
+      strip.sigmaLo < θ →
+      θ < QuasiRiemann.QRat.ofInt 1 →
+      QuasiRiemann.QRat.mk' 1 2 < strip.sigmaLo ∧
+        zdSpec.exponent θ < zdSpec.exponent strip.sigmaLo ∧
+        strip.rectSpec.HasCertifiedNonVanishing) ∧
+  (QuasiRiemann.certifiedStrip050025_N512.halfWidth <
+      QuasiRiemann.certifiedStrip05005_N256.halfWidth ∧
+    QuasiRiemann.QRat.eqv
+      (QuasiRiemann.zdGuthMaynard.exponent (QuasiRiemann.QRat.mk' 1 2) -
+        QuasiRiemann.zdGuthMaynard.exponent QuasiRiemann.certifiedStrip050025_N512.sigmaLo)
+      (QuasiRiemann.QRat.mk' 3 5200) ∧
+    QuasiRiemann.QRat.eqv
+      (QuasiRiemann.zdHuxley.exponent (QuasiRiemann.QRat.mk' 1 2) -
+        QuasiRiemann.zdHuxley.exponent QuasiRiemann.certifiedStrip050025_N512.sigmaLo)
+      (QuasiRiemann.QRat.mk' 3 5000))
+
 /-- Part 5 provenance specification bundling mollifier descent, 2D rectangles down to
 `σ = 0.501`, `t ~ 10^12` phase-reduced rectangles, DVP asymptotic strip, Dirichlet `L^2`
 diagonal dominance, rational zero-density descent (`15/26 < 3/5 < 2/3`), QRH threshold
@@ -788,7 +823,8 @@ def QuasiRiemannProvenance : Prop :=
   ChebyshevBenchmarkProp ∧
   ShortIntervalPrimesProp ∧
   HighTruncRectProvenanceProp ∧
-  ParametricQrhLadderProp
+  ParametricQrhLadderProp ∧
+  HighTruncRationalContractionProp
 
 set_option exponentiation.threshold 2000 in
 /-- Zero-axiom certificate for Parts 3-5 analytic QRH, 2D rectangles, DVP, and Chebyshev. -/
@@ -831,7 +867,23 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
       ⟨h.1, h.2.2.1, h.2.2.2.2.1, h.2.2.2.2.2.1⟩,
     ⟨QuasiRiemann.parametric_qrh_kim_sarnak_certs.2.1,
      QuasiRiemann.parametric_qrh_kim_sarnak_certs.2.2.2.2.1,
-     QuasiRiemann.shortIntervalQrh1732Spec_has_prime⟩⟩⟩
+     QuasiRiemann.shortIntervalQrh1732Spec_has_prime⟩⟩,
+   ⟨fun rSpec centerMag pointMag dist currDrift nextDrift hCenter hDist hLip hDrift =>
+      let h := QuasiRiemann.rational_box_contraction_step rSpec centerMag pointMag dist currDrift
+        nextDrift hCenter hDist hLip hDrift
+      ⟨h.2.2.1, h.2.2.2.2.2.1⟩,
+    ⟨QuasiRiemann.ultraDeep72_N256_rational_rect_cert.2.1,
+     QuasiRiemann.ultraDeep72_N256_rational_rect_cert.2.2.2.2.1,
+     QuasiRiemann.ultraDeep72_N256_rational_rect_cert.2.2.2.2.2.2.1⟩,
+    ⟨QuasiRiemann.ultraDeep72_N512_rational_rect_cert.2.1,
+     QuasiRiemann.ultraDeep72_N512_rational_rect_cert.2.2.2.2.2.1,
+     QuasiRiemann.ultraDeep72_N512_rational_rect_cert.2.2.2.2.2.2.2.2.1⟩,
+    fun strip zdSpec θ hLo hHi =>
+      let h := QuasiRiemann.ultradeep72_strip_to_zero_density_bridge strip zdSpec θ hLo hHi
+      ⟨h.1, h.2.2.1, h.2.2.2.2.2.2.2.1⟩,
+    ⟨QuasiRiemann.ultradeep72_N512_strip_zd_certs.1,
+     QuasiRiemann.ultradeep72_N512_strip_zd_certs.2.2.1,
+     QuasiRiemann.ultradeep72_N512_strip_zd_certs.2.2.2.1⟩⟩⟩
 
 -- =============================================================================
 -- Parts 6 & 8: RNS Garner & Fermat-Tower / Dedekind Euler Non-Vanishing
