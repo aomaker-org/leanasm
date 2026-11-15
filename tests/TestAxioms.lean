@@ -627,4 +627,18 @@ import LeanAsm
 #print axioms LeanAsm.quasiRiemann_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 47: Closed-Loop Dyadic-Abel Rungs k=5,6 & Variational Mollifier (Issue #78)
+#print axioms QuasiRiemann.dyadic_abel_unlocks_next_rung
+#print axioms QuasiRiemann.chebyshevSpec192_3364_env_le
+#print axioms QuasiRiemann.shortIntervalQrh3364Spec_has_prime
+#print axioms QuasiRiemann.chebyshevSpec384_65128_env_le
+#print axioms QuasiRiemann.shortIntervalQrh65128Spec_has_prime
+#print axioms QuasiRiemann.dyadic_abel_rungs_k5_k6_certs
+#print axioms QuasiRiemann.linear_minimizes_dirichlet_energy
+#print axioms QuasiRiemann.variational_energy_lt_one_of_pos
+#print axioms QuasiRiemann.variational_mollifier_beats_linear
+#print axioms QuasiRiemann.mollifier_variational_bridge_certs
+#print axioms LeanAsm.quasiRiemann_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean
