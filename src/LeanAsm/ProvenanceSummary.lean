@@ -14,6 +14,7 @@ import LeanAsm.QuasiRiemann.AsymptoticZfrBridge
 import LeanAsm.QuasiRiemann.ZeroDensityBridge
 import LeanAsm.QuasiRiemann.ShortIntervalPrimes
 import LeanAsm.QuasiRiemann.ParametricQrhLadder
+import LeanAsm.QuasiRiemann.DyadicAbelBridge
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.Genus2Jacobian
@@ -682,6 +683,61 @@ def HighTruncRationalContractionProp : Prop :=
         QuasiRiemann.zdHuxley.exponent QuasiRiemann.certifiedStrip050025_N512.sigmaLo)
       (QuasiRiemann.QRat.mk' 3 5000))
 
+/-- Constructive `[M, M * 2^k)` dyadic-shell foliation, discrete Abel
+summation-by-parts, monotone-weight error contraction, cleared-denominator `1/√N`
+quadratic tail gates, and beyond-`7/8` short-interval tightening (Issue #71). -/
+def DyadicAbelProvenanceProp : Prop :=
+  (∀ (M k : Nat) (f : Nat → Int),
+    QuasiRiemann.rangeSumInt f M (M * 2 ^ k) =
+      ConstructiveOpenaiBridge.listSum (List.range k) (fun j =>
+        ConstructiveOpenaiBridge.listSum (QuasiRiemann.dyadicShell M j) f)) ∧
+  (∀ (r : Nat) (o : ConstructiveOpenaiBridge.Cover4) (i : ConstructiveOpenaiBridge.Axis)
+     (l : List ConstructiveOpenaiBridge.Axis),
+    i ∉ l → ∀ (M k : Nat) (f : ConstructiveOpenaiBridge.Cover4 → Int) (g : Nat → Int),
+    ConstructiveOpenaiBridge.listSum (ConstructiveOpenaiBridge.slabSites r o (l ++ [i]))
+        (fun x => f x * QuasiRiemann.rangeSumInt g M (M * 2 ^ k)) =
+      ConstructiveOpenaiBridge.listSum (ConstructiveOpenaiBridge.layerRange r) (fun z0 =>
+        ConstructiveOpenaiBridge.listSum
+          (ConstructiveOpenaiBridge.slabSites r (o.update i z0) l) f) *
+      ConstructiveOpenaiBridge.listSum (List.range k) (fun j =>
+        ConstructiveOpenaiBridge.listSum (QuasiRiemann.dyadicShell M j) g)) ∧
+  (∀ (f g : Nat → Int) (a b : Nat), a ≤ b →
+    QuasiRiemann.rangeSumInt (fun n => f n * g n) a (b + 1) =
+      QuasiRiemann.rangeSumInt f a (b + 1) * g b +
+        QuasiRiemann.rangeSumInt
+          (fun k => QuasiRiemann.rangeSumInt f a (k + 1) * (g k - g (k + 1))) a b) ∧
+  (∀ (a w : Nat → Int) (M N E : Nat), M < N →
+    0 ≤ w N →
+    (∀ k, M + 1 ≤ k → k < N → w (k + 1) ≤ w k) →
+    (∀ k, M ≤ k → k ≤ N → Int.natAbs (QuasiRiemann.partialSumInt a k - (k : Int)) ≤ E) →
+    Int.natAbs (QuasiRiemann.rangeSumInt (fun n => a n * w n) (M + 1) (N + 1) -
+        QuasiRiemann.rangeSumInt w (M + 1) (N + 1)) ≤
+      2 * E * Int.natAbs (w (M + 1))) ∧
+  (∀ (spec : QuasiRiemann.ChebyshevRemainderSpec) (s : QuasiRiemann.ShortIntervalChebyshevSpec)
+     (psiStep : Nat → Int) (M k : Nat) (gate : QuasiRiemann.SqrtTailGateSpec) (effErr : Nat),
+    s.hScaleExp ≤ s.xScaleExp →
+    QuasiRiemann.qrhRemainderBoundAtTwoTenPow spec ≤ s.errUpper →
+    gate.tailBound = effErr →
+    effErr ≤ s.errUpper →
+    ∀ (psiX psiXH thetaX thetaXH : Int),
+    Int.natAbs (psiX - ((10 ^ s.xScaleExp : Nat) : Int)) ≤ effErr →
+    Int.natAbs (psiXH - ((10 ^ s.xScaleExp + 10 ^ s.hScaleExp : Nat) : Int)) ≤ effErr →
+    (psiXH - psiX) - (thetaXH - thetaX) ≤ (s.primePowerCorr : Int) →
+    s.HasGuaranteedPrime →
+    QuasiRiemann.rangeSumInt psiStep M (M * 2 ^ k) =
+      ConstructiveOpenaiBridge.listSum (List.range k) (fun j =>
+        ConstructiveOpenaiBridge.listSum (QuasiRiemann.dyadicShell M j) psiStep) ∧
+    gate.denomM * gate.denomM * (effErr * effErr) ≤
+      gate.scaleN * (gate.tailNum * gate.tailNum) ∧
+    Int.natAbs (psiXH - psiX - ((10 ^ s.hScaleExp : Nat) : Int)) ≤ 2 * effErr ∧
+    (0 : Int) < thetaXH - thetaX) ∧
+  ((QuasiRiemann.dyadicShellPartition 1 4).flatten = QuasiRiemann.halfOpenRange 1 16 ∧
+   QuasiRiemann.shortIntervalQrh1732Spec.HasGuaranteedPrime ∧
+   QuasiRiemann.shortIntervalQrh916Spec.HasGuaranteedPrime ∧
+   QuasiRiemann.shortIntervalQrh58Spec.HasGuaranteedPrime ∧
+   QuasiRiemann.shortIntervalQrh23Spec.HasGuaranteedPrime ∧
+   QuasiRiemann.shortIntervalQrh34Spec.HasGuaranteedPrime)
+
 /-- Part 5 provenance specification bundling mollifier descent, 2D rectangles down to
 `σ = 0.501`, `t ~ 10^12` phase-reduced rectangles, DVP asymptotic strip, Dirichlet `L^2`
 diagonal dominance, rational zero-density descent (`15/26 < 3/5 < 2/3`), QRH threshold
@@ -825,7 +881,8 @@ def QuasiRiemannProvenance : Prop :=
   ShortIntervalPrimesProp ∧
   HighTruncRectProvenanceProp ∧
   ParametricQrhLadderProp ∧
-  HighTruncRationalContractionProp
+  HighTruncRationalContractionProp ∧
+  DyadicAbelProvenanceProp
 
 set_option exponentiation.threshold 2000 in
 /-- Zero-axiom certificate for Parts 3-5 analytic QRH, 2D rectangles, DVP, and Chebyshev. -/
@@ -884,7 +941,22 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
       ⟨h.1, h.2.2.1, h.2.2.2.2.2.2.2.1⟩,
     ⟨QuasiRiemann.ultradeep72_N512_strip_zd_certs.1,
      QuasiRiemann.ultradeep72_N512_strip_zd_certs.2.2.1,
-     QuasiRiemann.ultradeep72_N512_strip_zd_certs.2.2.2.1⟩⟩⟩
+     QuasiRiemann.ultradeep72_N512_strip_zd_certs.2.2.2.1⟩⟩,
+   ⟨QuasiRiemann.dyadic_shell_sum_partition,
+    fun r o _i _l hi M k f g => QuasiRiemann.dyadic_shell_sum_foliation r o hi M k f g,
+    QuasiRiemann.discrete_abel_summation_by_parts,
+    fun a w M N E hMN hw0 hwa hRem =>
+      (QuasiRiemann.abel_monotone_weight_envelope a w M N E hMN hw0 hwa hRem).2.2,
+    fun spec s psiStep M k gate effErr hH hE hG hL pX pXH tX tXH hX hXH hC hP =>
+      let h := QuasiRiemann.short_interval_dyadic_abel_envelope spec s psiStep M k gate effErr
+        hH hE hG hL pX pXH tX tXH hX hXH hC hP
+      ⟨h.1, h.2.1, h.2.2.1, h.2.2.2.2⟩,
+    ⟨QuasiRiemann.dyadic_abel_short_interval_certs.1,
+     QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.1,
+     QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.1,
+     QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.1,
+     QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.2.1,
+     QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.2.2.1⟩⟩⟩
 
 -- =============================================================================
 -- Parts 6 & 8: RNS Garner & Fermat-Tower / Dedekind Euler Non-Vanishing
