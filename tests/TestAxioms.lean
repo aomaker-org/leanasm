@@ -579,4 +579,15 @@ import LeanAsm
 #print axioms LeanAsm.finiteFieldWeil_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
 
+-- Part 43: Parametric Beyond-7/8 QRH Ladder & Kim-Sarnak Bridge (Issue #68)
+#print axioms QuasiRiemann.qrhShortExponent_strict_anti
+#print axioms QuasiRiemann.qrhShortExponent_density_benchmarks
+#print axioms QuasiRiemann.qrhDualFraction_strict_mono
+#print axioms QuasiRiemann.shortIntervalQrh1732Spec_has_prime
+#print axioms QuasiRiemann.qrhFromAutomorphic_eqv_half_add
+#print axioms QuasiRiemann.kim_sarnak_amplified_qrh_step
+#print axioms QuasiRiemann.parametric_qrh_kim_sarnak_certs
+#print axioms LeanAsm.quasiRiemann_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean

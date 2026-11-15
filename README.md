@@ -33,13 +33,13 @@ source config_env hum
 # Check toolchain and workspace status
 make status
 
-# Build all 32 modules incrementally with timing budgets
+# Build all 33 modules incrementally with timing budgets
 make build-incremental
 
 # Full build & execute Parts 1-11 + unified provenance CLI demo
 make sync
 
-# Audit transitive axiom closures across Parts 1-42 (0 choice, 0 sorryAx)
+# Audit transitive axiom closures across Parts 1-43 (0 choice, 0 sorryAx)
 lake env lean tests/TestAxioms.lean
 
 # Check submodule hydration status
@@ -66,17 +66,19 @@ kernel-verified computations across all 11 parts:
    conjugation invariance, 4D lattice walks, box/slab foliation, and
    `SignedSym4` face-holonomy trace invariance.
 5. **Part 5 (`QuasiRiemann`, `UltraDeep72`, `AsymptoticZfr`,
-   `ZeroDensityBridge`, `ShortIntervalPrimes`)**: Mollifier descent, 2D
-   rectangles down to `sigma = 0.501` (`N = 128`) and compositional 2x2
-   Lipschitz tiles down to `sigma = 0.5005` (`N = 256`, `t ~ 10^12`) and
-   `sigma = 0.50025` (`N = 512`, `t ~ 10^18`) via 90-digit CRT-NTT phase
-   reduction (`< 10^-60` rad), DVP asymptotic ZFR, Dirichlet `L^2` diagonal
-   dominance, rational zero-density descent (`15/26 < 3/5 < 2/3`), QRH
-   threshold ladder `theta in {3/4, 7/8, 11/12, 47/48}`, Chebyshev remainder
-   envelopes (`10^12..10^336`), short-interval prime positivity
-   (`10^336/10^308`), Fermat-tower AP short-interval primes
-   (`q in {5, 17, 257, 65537}`), and the
-   `1/2 < 9/16 < 5/8 < 2/3 < 3/4 < 7/8 < 1` sub-3/4 QRH ladder.
+   `ZeroDensityBridge`, `ShortIntervalPrimes`, `ParametricQrhLadder`)**:
+   Mollifier descent, 2D rectangles down to `sigma = 0.501` (`N = 128`)
+   and compositional 2x2 Lipschitz tiles down to `sigma = 0.5005`
+   (`N = 256`, `t ~ 10^12`) and `sigma = 0.50025` (`N = 512`, `t ~ 10^18`)
+   via 90-digit CRT-NTT phase reduction (`< 10^-60` rad), DVP asymptotic ZFR,
+   Dirichlet `L^2` diagonal dominance, rational zero-density descent
+   (`15/26 < 3/5 < 2/3`), QRH threshold ladder
+   `theta in {3/4, 7/8, 11/12, 47/48}`, Chebyshev remainder envelopes
+   (`10^12..10^336`), short-interval prime positivity (`10^336/10^308`),
+   Fermat-tower AP primes (`q in {5, 17, 257, 65537}`), sub-3/4 ladder,
+   parametric beyond-7/8 binary ladder `theta(k) = (2^k + 1) / 2^(k + 1)`
+   (`5/8 > 9/16 > 17/32 > 33/64 > 1/2`), dual ascent `7/8 < 15/16 < 31/32`,
+   and Kim-Sarnak `7/64` coupling (`17/32` at `[10^96, +10^57]`).
 6. **Part 6 (`RnsArithmetic`, `EulerFactorNonVanishing`, `ArtinFermatBridge`)**:
    3-channel Garner CRT execution, Fermat-tower `{5, 17, 257, 65537}` strip
    bounds (`sigma in {1/2, 3/4, 1}`), cyclotomic Dedekind splitting across
@@ -100,17 +102,17 @@ kernel-verified computations across all 11 parts:
     `pi`, universal `m >= 8` truncation trap, and unified master certificate
     `LeanAsm.leanasm_full_provenance_certified`.
 
-## 32-Module Theorem Inventory
+## 33-Module Theorem Inventory
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 `QuasiRiemann/`, `PC/` for `PiChudnovsky/`, and `Main.lean` +
-`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-42.
+`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-43.
 `NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `PC` = `PiChudnovsky`.
 
 | Module | NS | Flagship Theorem / Role |
 | --- | --- | --- |
 | `Main.lean` | `(root)` | CLI entrypoint (`Parts 1-11` + provenance) |
-| `LeanAsm.lean` | `(root)` | Library root exporting all 30 submodules |
+| `LeanAsm.lean` | `(root)` | Library root exporting all 31 submodules |
 | `MiniVM.lean` | `=` | `exec_garner_crt_sound`, `mul_mod_reg_correct` |
 | `MiniVMNttBridge.lean` | `=` | `crtNtt4ConvAsm_sound` |
 | `Conjectures.lean` | `=` | `collatz_one_reaches_one` |
@@ -125,6 +127,7 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `QR/AsymptoticZfrBridge.lean` | `QR` | `ln2Upper36Scaled_eq_lnInterval36_hi` |
 | `QR/ZeroDensityBridge.lean` | `QR` | `qrh_chebyshev_benchmark_certs` |
 | `QR/ShortIntervalPrimes.lean` | `QR` | `qrh_short_interval_positivity_certs` |
+| `QR/ParametricQrhLadder.lean` | `QR` | `kim_sarnak_amplified_qrh_step` |
 | `RnsArithmetic.lean` | `=` | `garner_mul_concrete_soundness` |
 | `EulerFactorNonVanishing.lean` | `=` | `local_euler_disk_nonvanishing` |
 | `FiniteFieldRH.lean` | `=` | `hasse_weil_riemann_hypothesis` |
@@ -162,8 +165,10 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
   `telescoping_box_contraction_cert`, `dirichlet_l2_zeta_and_mobius_certs`,
   `zero_density_and_dvp_combined_region`, `qrh_chebyshev_savings_certs`,
   `short_interval_density_ladder_strict`, `qrh_maximal_prime_gap_bound`,
-  `fermat_tower_ap_short_interval_certs`, &
-  `sub_three_quarters_qrh_ladder_certs`
+  `fermat_tower_ap_short_interval_certs`,
+  `sub_three_quarters_qrh_ladder_certs`, `qrhShortExponent_strict_anti`,
+  `qrhShortExponent_density_benchmarks`, `qrhDualFraction_strict_mono`,
+  `kim_sarnak_amplified_qrh_step`, & `parametric_qrh_kim_sarnak_certs`
 - `EulerFactorNonVanishing.fermat_tower_euler_product_strip_certs` &
   `fermat_tower_dedekind_euler_strip_certs`
 - `ArtinFermatBridge.artin_split_euler_factor_collapse`,
@@ -215,12 +220,12 @@ leanasm/
 ├── mk/                      # Modular makefile extensions (hydrate.mk)
 ├── Main.lean                # CLI entrypoint (Parts 1-11 + provenance)
 ├── src/
-│   ├── LeanAsm.lean         # Library root exporting 30 submodules
+│   ├── LeanAsm.lean         # Library root exporting 31 submodules
 │   └── LeanAsm/             # 21 domain modules + PiChudnovsky/ + QuasiRiemann/
 │       ├── ProvenanceSummary.lean
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
-│       └── QuasiRiemann/    # Rat, UltraDeep72, Zfr, Bridge, ZD, ShortInt
-├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-42)
+│       └── QuasiRiemann/    # Rat, UltraDeep72, Zfr, Bridge, ZD, Short, PQL
+├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-43)
 └── tools/                   # Build and logging utilities
 ```
 
