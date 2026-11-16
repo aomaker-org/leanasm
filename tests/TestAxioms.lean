@@ -812,4 +812,10 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.romik_lacunary_n1_matches_classical
 #print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.romik_n2_symm_val
 
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_32_8
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_32_5
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_32_2
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m3
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.romik_lacunary_n2_ratio
+
 -- end of file: leanasm/tests/TestAxioms.lean

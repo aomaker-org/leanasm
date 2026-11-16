@@ -310,6 +310,54 @@ theorem romik_n2_symm_val :
     romikCoeff 2 1 = romikCoeff 2 2 :=
   romikCoeff_symm 2 1 (by decide) (by decide)
 
+/-! ## 6. Extension to `m = 3` (`k = 32`) & Romik `n = 2` (`k = 14`) -/
+
+set_option maxRecDepth 8192 in
+theorem weight_32_8 :
+    eisensteinWeight 8 32 = QRat.mk' 18063 43908059 := by decide
+
+set_option maxRecDepth 8192 in
+theorem weight_32_5 :
+    eisensteinWeight 5 32 = QRat.mk' 16297669800 2321726435743 := by decide
+
+set_option maxRecDepth 8192 in
+theorem weight_32_2 :
+    eisensteinWeight 2 32 = QRat.mk' 12157525500 2321726435743 := by decide
+
+/-- Exact rational weights at `k = 32` (`m = 3`, `2^(m+2) = 32`):
+    diagonal `a = 8` (`G_4^8`) has odd numerator and odd denominator (`v2 = 0`),
+    while off-diagonal `a = 5` (`G_4^5 G_6^2`) and `a = 2` (`G_4^2 G_6^4`) have `v2 > 0`. -/
+theorem prop4_computed_m3 :
+    qratV2 (eisensteinWeight 8 32) = 0 ∧
+    0 < qratV2 (eisensteinWeight 5 32) ∧
+    0 < qratV2 (eisensteinWeight 2 32) := by
+  rw [weight_32_8, weight_32_5, weight_32_2]
+  dsimp only [qratV2, QRat.mk', Int.natAbs]
+  constructor
+  · have h1 : v2 18063 = 0 := v2_odd rfl
+    have h2 : v2 43908059 = 0 := v2_odd rfl
+    omega
+  · constructor
+    · have h1 : v2 2321726435743 = 0 := v2_odd rfl
+      have h2 : 16297669800 = 2 * 8148834900 := rfl
+      have h3 : v2 16297669800 = v2 8148834900 + 1 := by
+        rw [h2, v2_two_mul (by decide)]; omega
+      have h4 : v2 2321726435743 = 0 := h1
+      omega
+    · have h1 : v2 2321726435743 = 0 := v2_odd rfl
+      have h2 : 12157525500 = 2 * 6078762750 := rfl
+      have h3 : v2 12157525500 = v2 6078762750 + 1 := by
+        rw [h2, v2_two_mul (by decide)]; omega
+      have h4 : v2 2321726435743 = 0 := h1
+      omega
+
+/-- At `n = 2` (`k = 14`), `c_1 = c_2`, so the sparse Romik convolution reproduces
+    the ratio `w(2, 14) / w(0, 14) = 30 / 25 = 6 / 5` across both monomials `G_4^2 G_6` and `G_6^2`. -/
+theorem romik_lacunary_n2_ratio :
+    QRat.reduce (QRat.mul (romikLacunaryRaw 2 2) (eisensteinWeight 0 14)) =
+      QRat.reduce (QRat.mul (romikLacunaryRaw 0 2) (eisensteinWeight 2 14)) := by
+  decide
+
 end LeanAsm.QuasiRiemann.Valuation.EisensteinWeights
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/Valuation/EisensteinWeights.lean
