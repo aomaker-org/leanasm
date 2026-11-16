@@ -12,7 +12,7 @@ CHUNK_SECS ?= 900
 # Include lazy hydration module
 -include $(REPO_ROOT)/mk/hydrate.mk
 
-.PHONY: help build build-chunk build-incremental build-status run test check clean status sync
+.PHONY: help build build-chunk build-incremental build-status run test axioms check clean status sync
 
 help:
 	@echo "leanasm Development Targets:"
@@ -22,6 +22,7 @@ help:
 	@echo "  make build-status      - Show per-module .olean cache status and build timings"
 	@echo "  make run               - Run the compiled Lean executable"
 	@echo "  make test              - Run workspace verification and tests"
+	@echo "  make axioms            - Verify zero-axiom cone via tests/TestAxioms.lean"
 	@echo "  make check             - Typecheck and verify Lean files without full link"
 	@echo "  make clean             - Remove lake build artifacts"
 	@echo "  make status            - Show repository and toolchain status"
@@ -51,6 +52,9 @@ test: build
 	@$(LAKE) exe leanasm
 	@echo "[+] Lean executable ran successfully."
 
+axioms:
+	$(LAKE) env $(LEAN) tests/TestAxioms.lean
+
 check:
 	$(LEAN) Main.lean
 
@@ -60,17 +64,15 @@ clean:
 status:
 	@echo "=== Leanasm Environment Status ==="
 	@echo "Node:      $$(hostname)"
-	@echo "Lean:      $$(which $(LEAN) 2>/dev/null || echo 'Not found')"
-	@if command -v $(LEAN) >/dev/null 2>&1; then $(LEAN) --version; fi
-	@echo "Lake:      $$(which $(LAKE) 2>/dev/null || echo 'Not found')"
-	@if command -v $(LAKE) >/dev/null 2>&1; then $(LAKE) --version; fi
-	@echo "Git Head:  $$(git rev-parse --short HEAD 2>/dev/null || echo 'Pending')"
+	@echo "Lean:      $$(command -v $(LEAN))"
+	@$(LEAN) --version
+	@echo "Lake:      $$(command -v $(LAKE))"
+	@$(LAKE) --version
+	@echo "Git Head:  $$(git rev-parse --short HEAD)"
 	@git status --short
 
 sync: status test
 	@echo "[+] Workspace synced and verified."
-
-# end of file: leanasm/Makefile
 
 # ------------------------------------------------------------------------------
 # Yang-Mills Verification & Exploration Targets

@@ -1,5 +1,6 @@
 -- Path: leanasm/src/LeanAsm.lean
--- Library root module aggregating MiniVM, Conjectures, YangMills, QuasiRiemann, Rns, and FiniteFieldRH.
+-- Library root module aggregating MiniVM, Conjectures, YangMills,
+-- QuasiRiemann, Rns, and FiniteFieldRH.
 
 import LeanAsm.MiniVM
 import LeanAsm.MiniVMNttBridge
@@ -22,6 +23,9 @@ import LeanAsm.QuasiRiemann.ShortIntervalPrimes
 import LeanAsm.QuasiRiemann.ParametricQrhLadder
 import LeanAsm.QuasiRiemann.DyadicAbelBridge
 import LeanAsm.QuasiRiemann.MollifierVariationalBridge
+import LeanAsm.QuasiRiemann.Valuation.Ultrametric
+import LeanAsm.QuasiRiemann.Valuation.Contraction
+import LeanAsm.QuasiRiemann.Valuation.Hensel
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.Genus2Jacobian

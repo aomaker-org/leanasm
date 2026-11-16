@@ -2,6 +2,9 @@
 -- Kernel verification test auditing that proofs only rely on standard axioms.
 
 import LeanAsm
+import LeanAsm.QuasiRiemann.Valuation.Ultrametric
+import LeanAsm.QuasiRiemann.Valuation.Contraction
+import LeanAsm.QuasiRiemann.Valuation.Hensel
 
 #print axioms MiniVM.get_set_same
 #print axioms MiniVM.get_set_other
@@ -281,7 +284,7 @@ import LeanAsm
 #print axioms PiChudnovsky.pi_105_traps_all_chudnovsky_truncations
 #print axioms PiChudnovsky.pi_100_digits_certified
 
--- Part 14: 72-Digit CRT-NTT Fixed-Point Intervals, Chudnovsky 2π & N = 128 Down to σ = 0.501 (gemweb048)
+-- Part 14: 72-Digit CRT-NTT Fixed-Point Intervals, Chudnovsky 2π & N = 128 (gemweb048)
 #print axioms QuasiRiemann.natMul192ViaCrtNtt_eq_mul
 #print axioms QuasiRiemann.mulInterval72_sound
 #print axioms QuasiRiemann.twoPiInterval72_valid
@@ -386,7 +389,7 @@ import LeanAsm
 #print axioms EulerFactorNonVanishing.fermat_tower_sigma_three_quarters_lower_bound
 #print axioms EulerFactorNonVanishing.fermat_tower_sigma_one_lower_bound
 
--- Part 24: High-Height t ~ 10^12 2D Zero-Free Rectangles via PiChudnovsky Phase Reduction (Issue #29)
+-- Part 24: High-Height t ~ 10^12 2D Zero-Free Rectangles via PiChudnovsky (Issue #29)
 #print axioms QuasiRiemann.reduceModTwoPiCentered72_sound
 #print axioms QuasiRiemann.high_height_phase_reduction_1e12
 #print axioms QuasiRiemann.isValidHighDirichletTreeN128_sound
@@ -656,5 +659,168 @@ import LeanAsm
 #print axioms QuasiRiemann.ultradeep72_N2048_strip_zd_certs
 #print axioms LeanAsm.quasiRiemann_provenance_certified
 #print axioms LeanAsm.leanasm_full_provenance_certified
+
+-- Part 49: Constructive p-Adic Ultrametric Valuation & Contraction (inbox/gemweb100-101)
+#print axioms QuasiRiemann.Valuation.IsPrime.dvd_mul
+#print axioms QuasiRiemann.Valuation.padicValNat_mul
+#print axioms QuasiRiemann.Valuation.padicValInt_add_ge_min
+#print axioms QuasiRiemann.Valuation.pAdicVal_eq_none_iff
+#print axioms QuasiRiemann.Valuation.pAdicVal_neg
+#print axioms QuasiRiemann.Valuation.pAdicVal_sub_comm
+#print axioms QuasiRiemann.Valuation.pAdicVal_mul
+#print axioms QuasiRiemann.Valuation.ultrametric_ineq
+#print axioms QuasiRiemann.Valuation.pow_dvd_den_iff_le_denVal
+#print axioms QuasiRiemann.Valuation.not_pow_succ_denVal_dvd_den
+#print axioms QuasiRiemann.Valuation.denVal_add
+#print axioms QuasiRiemann.Valuation.denVal_sub
+#print axioms QuasiRiemann.Valuation.denVal_mul
+#print axioms QuasiRiemann.Valuation.denVal_and_pAdicVal_add_bound
+#print axioms QuasiRiemann.Valuation.denVal_and_pAdicVal_mul_bound
+#print axioms QuasiRiemann.Valuation.denVal_foldl_add_le
+#print axioms QuasiRiemann.Valuation.denVal_foldl_mul_le
+#print axioms QuasiRiemann.Valuation.denVal_hornerEval_le
+#print axioms QuasiRiemann.Valuation.denVal_hornerEval_deg_le
+#print axioms QuasiRiemann.Valuation.hornerEval_and_pAdicVal_bound
+#print axioms QuasiRiemann.Valuation.denVal_hornerEval_eq_zero
+#print axioms QuasiRiemann.Valuation.denVal_hornerEvalTight_le
+#print axioms QuasiRiemann.Valuation.denVal_hornerEvalTight_deg_le
+#print axioms QuasiRiemann.Valuation.hornerEvalTight_and_pAdicVal_bound
+#print axioms QuasiRiemann.Valuation.pAdicVal_eq_of_cross_mul
+#print axioms QuasiRiemann.Valuation.pAdicVal_sub_add_sub
+#print axioms QuasiRiemann.Valuation.iterate_val_growth
+#print axioms QuasiRiemann.Valuation.iterate_val_ge_of_init
+#print axioms QuasiRiemann.Valuation.iterate_val_mono
+#print axioms QuasiRiemann.Valuation.iterate_val_range
+#print axioms QuasiRiemann.Valuation.iterate_val_range_of_init
+#print axioms QuasiRiemann.Valuation.stationary_isStepContraction
+#print axioms QuasiRiemann.Valuation.stationary_residual_growth
+#print axioms QuasiRiemann.Valuation.stationary_iterate_cauchy_range
+#print axioms QuasiRiemann.Valuation.nsStep_residual_val_double
+#print axioms QuasiRiemann.Valuation.hensel_newton_schulz_quadratic_residual
+#print axioms QuasiRiemann.Valuation.hensel_newton_schulz_step_bound
+#print axioms QuasiRiemann.Valuation.hensel_newton_schulz_cauchy_range
+#print axioms QuasiRiemann.Valuation.prime_pow_dvd_mul_of_ne
+#print axioms QuasiRiemann.Valuation.mkJointCrtCongruence
+#print axioms QuasiRiemann.Valuation.hensel_joint_crt_combine
+#print axioms QuasiRiemann.Valuation.crt_fuse_inverse_seeds
+#print axioms QuasiRiemann.Valuation.hensel_crt_inv_5_mod_3937_pow
+#print axioms QuasiRiemann.Valuation.prime_tower_pow_dvd_of_all
+#print axioms QuasiRiemann.Valuation.prime_tower_graded_dvd_num
+#print axioms QuasiRiemann.Valuation.prime_tower_list_pow_dvd_num
+#print axioms QuasiRiemann.Valuation.hensel_prime_tower_crt
+#print axioms QuasiRiemann.Valuation.hensel_mersenne_tower_inv_5_mod_27559_pow
+#print axioms QuasiRiemann.Valuation.CrossEq.mul_left
+#print axioms QuasiRiemann.Valuation.CrossEq.add_left
+#print axioms QuasiRiemann.Valuation.hornerEval_cross_eq_tight
+#print axioms QuasiRiemann.Valuation.pAdicVal_hornerEval_eq_tight
+#print axioms QuasiRiemann.Valuation.pAdicVal_hornerEval_ge_tight_floor
+#print axioms QuasiRiemann.Valuation.pow_dvd_crtCofactor
+#print axioms QuasiRiemann.Valuation.crtIdempotent_self_residual
+#print axioms QuasiRiemann.Valuation.crtIdempotent_other_val
+#print axioms QuasiRiemann.Valuation.crtIdempotent_integrality_all
+#print axioms QuasiRiemann.Valuation.buildCrtSeed_integrality
+#print axioms QuasiRiemann.Valuation.buildCrtSeed_residual_at
+#print axioms QuasiRiemann.Valuation.sumCrtIdempotents_tower_dvd
+#print axioms QuasiRiemann.Valuation.hensel_build_prime_tower_crt
+#print axioms QuasiRiemann.Valuation.hensel_mersenne_tower_crt_built_inv_5
+#print axioms QuasiRiemann.Valuation.hornerEval_cons_sub_val_eq
+#print axioms QuasiRiemann.Valuation.hornerEval_cons_sub_ultrametric
+#print axioms QuasiRiemann.Valuation.hornerEval_integrality
+#print axioms QuasiRiemann.Valuation.hornerEval_sub_val_ge_of_integral
+#print axioms QuasiRiemann.Valuation.hornerEval_zero_const_sub_val_ge
+#print axioms QuasiRiemann.Valuation.hornerEval_sub_val_ge_of_denVal
+#print axioms QuasiRiemann.Valuation.hornerEval_sub_val_ge_of_deg_denVal
+#print axioms QuasiRiemann.Valuation.pAdicVal_hornerEvalTight_sub_eq_hornerEval
+#print axioms QuasiRiemann.Valuation.polyNewtonStep_linear_cross_eq
+#print axioms QuasiRiemann.Valuation.hornerEval_sub_cross_eq_slope
+#print axioms QuasiRiemann.Valuation.polySlope_diag_cross_eq_deriv
+#print axioms QuasiRiemann.Valuation.polyDeriv_sub_slope_val_ge_min
+#print axioms QuasiRiemann.Valuation.polyNewtonStep_ball_contraction
+#print axioms QuasiRiemann.Valuation.hensel_poly_simple_root_lift
+#print axioms QuasiRiemann.Valuation.hensel_poly_simple_root_pow_dvd
+#print axioms QuasiRiemann.Valuation.hensel_sqrt2_mod_pow_7
+#print axioms LeanAsm.quasiRiemann_provenance_certified
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
+-- Part 48: Constructive p-Adic Ultrametric Valuation, Telescoping Contraction & Prime Tower Hensel
+#print axioms QuasiRiemann.Valuation.IsPrime.dvd_mul
+#print axioms QuasiRiemann.Valuation.padicValNat_mul
+#print axioms QuasiRiemann.Valuation.pAdicVal_eq_none_iff
+#print axioms QuasiRiemann.Valuation.pAdicVal_neg
+#print axioms QuasiRiemann.Valuation.pAdicVal_sub_comm
+#print axioms QuasiRiemann.Valuation.pAdicVal_mul
+#print axioms QuasiRiemann.Valuation.ultrametric_ineq
+#print axioms QuasiRiemann.Valuation.pow_dvd_den_iff_le_denVal
+#print axioms QuasiRiemann.Valuation.not_pow_succ_denVal_dvd_den
+#print axioms QuasiRiemann.Valuation.denVal_add
+#print axioms QuasiRiemann.Valuation.denVal_sub
+#print axioms QuasiRiemann.Valuation.denVal_mul
+#print axioms QuasiRiemann.Valuation.denVal_and_pAdicVal_add_bound
+#print axioms QuasiRiemann.Valuation.denVal_and_pAdicVal_mul_bound
+#print axioms QuasiRiemann.Valuation.denVal_foldl_add_le
+#print axioms QuasiRiemann.Valuation.denVal_foldl_mul_le
+#print axioms QuasiRiemann.Valuation.denVal_hornerEval_le
+#print axioms QuasiRiemann.Valuation.denVal_hornerEval_deg_le
+#print axioms QuasiRiemann.Valuation.hornerEval_and_pAdicVal_bound
+#print axioms QuasiRiemann.Valuation.denVal_hornerEval_eq_zero
+#print axioms QuasiRiemann.Valuation.denVal_hornerEvalTight_deg_le
+#print axioms QuasiRiemann.Valuation.hornerEvalTight_and_pAdicVal_bound
+#print axioms QuasiRiemann.Valuation.pAdicVal_eq_of_cross_mul
+#print axioms QuasiRiemann.Valuation.pAdicVal_sub_add_sub
+#print axioms QuasiRiemann.Valuation.iterate_val_growth
+#print axioms QuasiRiemann.Valuation.iterate_val_ge_of_init
+#print axioms QuasiRiemann.Valuation.iterate_val_mono
+#print axioms QuasiRiemann.Valuation.iterate_val_range
+#print axioms QuasiRiemann.Valuation.iterate_val_range_of_init
+#print axioms QuasiRiemann.Valuation.stationary_isStepContraction
+#print axioms QuasiRiemann.Valuation.stationary_residual_growth
+#print axioms QuasiRiemann.Valuation.stationary_iterate_cauchy_range
+#print axioms QuasiRiemann.Valuation.nsStep_residual_val_double
+#print axioms QuasiRiemann.Valuation.hensel_newton_schulz_quadratic_residual
+#print axioms QuasiRiemann.Valuation.hensel_newton_schulz_step_bound
+#print axioms QuasiRiemann.Valuation.hensel_newton_schulz_cauchy_range
+#print axioms QuasiRiemann.Valuation.prime_mersenne_7
+#print axioms QuasiRiemann.Valuation.prime_mersenne_31
+#print axioms QuasiRiemann.Valuation.prime_mersenne_127
+#print axioms QuasiRiemann.Valuation.prime_pow_dvd_mul_of_ne
+#print axioms QuasiRiemann.Valuation.mkJointCrtCongruence
+#print axioms QuasiRiemann.Valuation.hensel_joint_crt_combine
+#print axioms QuasiRiemann.Valuation.crt_fuse_inverse_seeds
+#print axioms QuasiRiemann.Valuation.hensel_crt_inv_5_mod_3937_pow
+#print axioms QuasiRiemann.Valuation.prime_tower_pow_dvd_of_all
+#print axioms QuasiRiemann.Valuation.prime_tower_graded_dvd_num
+#print axioms QuasiRiemann.Valuation.prime_tower_list_pow_dvd_num
+#print axioms QuasiRiemann.Valuation.hensel_prime_tower_crt
+#print axioms QuasiRiemann.Valuation.hensel_mersenne_tower_inv_5_mod_27559_pow
+#print axioms QuasiRiemann.Valuation.hornerEval_cross_eq_tight
+#print axioms QuasiRiemann.Valuation.pAdicVal_hornerEval_eq_tight
+#print axioms QuasiRiemann.Valuation.pAdicVal_hornerEval_ge_tight_floor
+#print axioms QuasiRiemann.Valuation.pow_dvd_crtCofactor
+#print axioms QuasiRiemann.Valuation.crtIdempotent_self_residual
+#print axioms QuasiRiemann.Valuation.crtIdempotent_other_val
+#print axioms QuasiRiemann.Valuation.crtIdempotent_integrality_all
+#print axioms QuasiRiemann.Valuation.buildCrtSeed_integrality
+#print axioms QuasiRiemann.Valuation.buildCrtSeed_residual_at
+#print axioms QuasiRiemann.Valuation.sumCrtIdempotents_tower_dvd
+#print axioms QuasiRiemann.Valuation.hensel_build_prime_tower_crt
+#print axioms QuasiRiemann.Valuation.hensel_mersenne_tower_crt_built_inv_5
+#print axioms QuasiRiemann.Valuation.hornerEval_cons_sub_ultrametric
+#print axioms QuasiRiemann.Valuation.hornerEval_sub_val_ge_of_integral
+#print axioms QuasiRiemann.Valuation.hornerEval_zero_const_sub_val_ge
+#print axioms QuasiRiemann.Valuation.hornerEval_sub_val_ge_of_deg_denVal
+#print axioms QuasiRiemann.Valuation.polyNewtonStep_linear_cross_eq
+#print axioms QuasiRiemann.Valuation.hornerEval_sub_cross_eq_slope
+#print axioms QuasiRiemann.Valuation.polySlope_diag_cross_eq_deriv
+#print axioms QuasiRiemann.Valuation.polyDeriv_sub_slope_val_ge_min
+#print axioms QuasiRiemann.Valuation.polyNewtonStep_ball_contraction
+#print axioms QuasiRiemann.Valuation.hensel_poly_simple_root_lift
+#print axioms QuasiRiemann.Valuation.hensel_poly_simple_root_pow_dvd
+#print axioms QuasiRiemann.Valuation.hensel_sqrt2_mod_pow_7
+#print axioms QuasiRiemann.Valuation.prime_tower_list_pow_dvd_of_all
+#print axioms QuasiRiemann.Valuation.hensel_poly_prime_tower_crt
+#print axioms QuasiRiemann.Valuation.buildCrtSeed_approx_at
+#print axioms QuasiRiemann.Valuation.hensel_poly_build_prime_tower_crt
+#print axioms QuasiRiemann.Valuation.hensel_mersenne_tower_sqrt2_lift
+#print axioms QuasiRiemann.Valuation.hensel_mersenne_tower_sqrt2_built
 
 -- end of file: leanasm/tests/TestAxioms.lean

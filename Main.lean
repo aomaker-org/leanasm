@@ -294,6 +294,13 @@ def main : IO Unit := do
   IO.println (s!"  UltraDeep108 N2048: N={QuasiRiemann.highTruncSpec_1e30_N2048.nTrunc}, " ++
     s!"σ=0.5000625, t~10^30 (<10^-75 rad), q=2/5 squeeze, grad=512891320, " ++
     s!"zdGM Δ=3/20800 & zdHux Δ=3/20000")
+  let q5a := QRat.mk' 75 2
+  let q5b := QRat.mk' 50 3
+  let v5a := QuasiRiemann.Valuation.pAdicVal 5 q5a
+  let v5b := QuasiRiemann.Valuation.pAdicVal 5 q5b
+  let v5ab := QuasiRiemann.Valuation.pAdicVal 5 (q5a + q5b)
+  IO.println (s!"  p-Adic Ultrametric: ν_5(75/2)={repr v5a}, ν_5(50/3)={repr v5b} " ++
+    s!"⇒ ν_5(325/6)={repr v5ab} ≥ min (ZERO axioms)")
 
   -- 6. Residue Number System (RNS) & Chinese Remainder Theorem (CRT)
   IO.println "\n[+] Part 6: Residue Number System (RNS) & CRT Execution"
