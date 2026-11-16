@@ -375,6 +375,9 @@ def main : IO Unit := do
   let _langlands := LeanAsm.langlandsRankinSelberg_provenance_certified
   IO.println ("  Langlands Rankin-Selberg     : f_11 x chi_4 & Sym^2 cleared Euler factors > 0 " ++
     "(p ≤ 97), GL2xGL2 -> GSp4 spinor product, Hecke-Abel |Σ c_n φ(n)| ≤ 2Bφ(M) (ZERO axioms)")
+  let _proth := LeanAsm.prothNttTower_provenance_certified
+  IO.println ("  Proth NTT Tower (Part 51)    : {5,17,257,65537,2013265921}, M_5 > 2^61, " ++
+    "2^27-th root, garnerReconstruct5Asm_sound, Dedekind strip bounds (ZERO axioms)")
 
   -- 8. Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)
   IO.println "\n[+] Part 8: Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)"

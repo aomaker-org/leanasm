@@ -774,4 +774,18 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms LanglandsRankinSelbergBridge.hecke_chi4_short_interval_bound
 #print axioms LeanAsm.langlandsRankinSelberg_provenance_certified
 
+-- Part 51: 5-Prime Proth NTT Tower & Dedekind Strip Bounds (Issue #81)
+#print axioms ProthNttTowerBridge.prothPrime5_coprime_M4
+#print axioms ProthNttTowerBridge.prothTowerMod5_gt_2pow61
+#print axioms ProthNttTowerBridge.prothGen_primitive_root
+#print axioms ProthNttTowerBridge.prothOmega27_order
+#print axioms ProthNttTowerBridge.garnerReconstruct5Asm_lt
+#print axioms ProthNttTowerBridge.garnerReconstruct5Asm_sound
+#print axioms ProthNttTowerBridge.garnerReconstruct5Asm_residues
+#print axioms ProthNttTowerBridge.garnerReconstruct5Asm_mod_P5
+#print axioms ProthNttTowerBridge.proth_tower_euler_margin_pos
+#print axioms ProthNttTowerBridge.proth_tower_euler_product_nonvanishing
+#print axioms ProthNttTowerBridge.proth_tower_euler_strip_certs
+#print axioms LeanAsm.prothNttTower_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean
