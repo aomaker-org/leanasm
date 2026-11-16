@@ -794,5 +794,7 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.romik_cj_valuation_balance
 #print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.proposition_4
 #print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.proposition_4_unique
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.v2_eq_padicValNat_two
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.legendre_padicValNat_two_factorial
 
 -- end of file: leanasm/tests/TestAxioms.lean

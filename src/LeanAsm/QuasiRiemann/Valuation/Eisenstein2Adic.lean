@@ -1,4 +1,6 @@
 -- Path: leanasm/src/LeanAsm/QuasiRiemann/Valuation/Eisenstein2Adic.lean
+import LeanAsm.QuasiRiemann.Valuation.Ultrametric
+
 /-!
 # Constructive 2-Adic Valuations and Binary Hamming Weights for Eisenstein Series
 
@@ -17,6 +19,9 @@ of Eisenstein series" (arXiv:2605.09738v2, May 2026):
 Axiom footprint: strictly constructive (`propext`, `Quot.sound` only;
 zero `sorry`, zero `Classical.choice`).
 -/
+
+
+open _root_.QuasiRiemann.Valuation
 
 namespace LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic
 
@@ -239,6 +244,79 @@ theorem proposition_4_unique (m : Nat) :
   cases h : isUnitMod2 m a with
   | false => rfl
   | true => exact False.elim (hne ((proposition_4 m a).mp h))
+
+/-! ## 5. Equivalence with `QuasiRiemann.Valuation.padicValNat 2` -/
+
+private theorem padicValNat_two_zero : padicValNat 2 0 = 0 := rfl
+
+private theorem padicValNat_two_odd {n : Nat} (hodd : n % 2 = 1) :
+    padicValNat 2 n = 0 := by
+  cases n with
+  | zero => simp at hodd
+  | succ m =>
+    unfold padicValNat padicValNatAux
+    have hmod : ((m + 1) % 2 == 0) = false := by
+      cases h : (m + 1) % 2 with
+      | zero => omega
+      | succ _ => rfl
+    simp [hmod]
+
+private theorem padicValNat_two_mul {n : Nat} (hpos : 0 < n) :
+    padicValNat 2 (2 * n) = 1 + padicValNat 2 n := by
+  obtain ⟨k, hk⟩ : ∃ k, 2 * n = k + 1 := ⟨2 * n - 1, by omega⟩
+  have h1 : padicValNat 2 (2 * n) = padicValNatAux 2 (k + 1) (2 * n) := by
+    unfold padicValNat
+    rw [hk]
+  rw [h1]
+  simp only [padicValNatAux]
+  have hcond : (2 ≤ 1 || (2 * n == 0)) = false := by
+    have hm : (2 * n == 0) = false := by
+      cases h : 2 * n with
+      | zero => omega
+      | succ _ => rfl
+    simp [hm]
+  have hmod : ((2 * n) % 2 == 0) = true := by
+    simp [Nat.mul_mod_right]
+  have hdiv : (2 * n) / 2 = n := Nat.mul_div_cancel_left n (by decide)
+  rw [hcond, hmod, hdiv]
+  simp only [Bool.false_eq_true, ite_false, ite_true]
+  congr 1
+  have hp2 : (2 : Nat) ≤ 2 := Nat.le_refl 2
+  exact padicValNatAux_eq_of_le (p := 2) (fuel := k) (n := n) hp2 hpos (by omega)
+
+private theorem eq_v2_of_spec_aux (g : Nat → Nat)
+    (hg0 : g 0 = 0)
+    (hg_odd : ∀ n, n % 2 = 1 → g n = 0)
+    (hg_two_mul : ∀ n, 0 < n → g (2 * n) = 1 + g n) :
+    ∀ bound n, n ≤ bound → v2 n = g n
+  | 0, n, hle => by
+    have hn : n = 0 := by omega
+    subst hn
+    rw [v2_zero, hg0]
+  | bound + 1, n, hle => by
+    cases n with
+    | zero => rw [v2_zero, hg0]
+    | succ m =>
+      by_cases hmod : (m + 1) % 2 = 1
+      · rw [v2_odd hmod, hg_odd (m + 1) hmod]
+      · have heven : (m + 1) % 2 = 0 := by omega
+        obtain ⟨k, hk⟩ : ∃ k, m + 1 = 2 * k := ⟨(m + 1) / 2, by omega⟩
+        have hkpos : 0 < k := by omega
+        rw [hk, v2_two_mul hkpos, hg_two_mul k hkpos,
+            eq_v2_of_spec_aux g hg0 hg_odd hg_two_mul bound k (by omega)]
+
+/-- Exact API equivalence: `Eisenstein2Adic.v2` agrees identically with
+    `QuasiRiemann.Valuation.padicValNat 2` for all `n : Nat`. -/
+theorem v2_eq_padicValNat_two (n : Nat) :
+    v2 n = padicValNat 2 n :=
+  eq_v2_of_spec_aux (padicValNat 2) padicValNat_two_zero
+    (@padicValNat_two_odd) (@padicValNat_two_mul) n n (Nat.le_refl n)
+
+/-- Legendre's formula expressed directly in `QuasiRiemann.Valuation.padicValNat 2`. -/
+theorem legendre_padicValNat_two_factorial (m : Nat) :
+    padicValNat 2 (fact m) + hammingWeight m = m := by
+  rw [← v2_eq_padicValNat_two]
+  exact legendre_v2_factorial m
 
 end LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/Valuation/Eisenstein2Adic.lean
