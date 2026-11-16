@@ -41,6 +41,7 @@ import LeanAsm.ArtinFermatBridge
 import LeanAsm.ArtinShortIntervalBridge
 import LeanAsm.ConstructiveOpenaiBridge
 import LeanAsm.EllipticModularityBridge
+import LeanAsm.LanglandsRankinSelbergBridge
 import LeanAsm.ProvenanceSummary
 
 -- end of file: leanasm/src/LeanAsm.lean
