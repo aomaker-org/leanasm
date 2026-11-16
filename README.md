@@ -18,10 +18,12 @@ The Lean toolchain is managed via [elan](https://github.com/leanprover/elan):
 
 - **Lean Version**: `leanprover/lean4:v4.35.0` (pinned in `lean-toolchain`)
 - **Build Manager**: Lake (Lean's package and build manager)
-- **Local Neural Prover Engine**: `llama.cpp` (`llama-server`)
+- **Local Neural Prover Engines**: Windows-hosted Ollama (`deepseek-prover:7b`
+  via `http://localhost:11434`, see [Local Ollama guide](docs/ollama_local.md))
+  and `llama.cpp` (`llama-server`)
 
-To activate `elan`, `lake`, and your workspace environment, source
-`config_env`:
+To activate `elan`, `lake`, `agy` Ollama defaults, and your workspace
+environment, source `config_env` (set `LEANASM_USE_OLLAMA=0` to disable Ollama):
 ```bash
 # Optional tag argument: hum, dev, test, etc.
 source config_env hum
@@ -239,6 +241,9 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
 - **OpenAI-20261028 Constructive Audit**: Classification of all 21 pure
   constructive files:
   [Constructive audit](docs/openai-20261028/CONSTRUCTIVE_AUDIT.md).
+- **Local Ollama & `agy` Prover**: Windows-hosted Ollama (`deepseek-prover:7b`)
+  over WSL2 mirrored networking:
+  [Local Ollama guide](docs/ollama_local.md).
 - **Local `llama.cpp` Prover**: Wiring `llama-server` to a Lean 4 REPL:
   [llama.cpp prover guide](docs/llama_cpp_prover_architecture.md).
 - **Lazy Submodule Hydration**: On-demand hydration (`make hydrate SUB=...`):

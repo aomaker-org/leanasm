@@ -1,3 +1,4 @@
+# Path: leanasm/config_env
 # ==============================================================================
 # leanasm: config_env
 # Target: Ubuntu Linux / POSIX shell
@@ -15,10 +16,249 @@ get_node_name() {
 }
 export NODE_NAME="$(get_node_name)"
 
-# 2. Workspace root, prompt file, and run type tag
+# 2. Workspace root, prompt file, and CLI/tag argument parsing
 export LEANASM_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export PROMPT_FILE="$LEANASM_ROOT/AI.md"
-export LEANASM_RUN_TYPE="${1:-dev}"
+
+_cfg_is_sourced=0
+if [ "${BASH_SOURCE[0]}" != "$0" ]; then
+    _cfg_is_sourced=1
+fi
+_cfg_abort() {
+    if [ "${_cfg_is_sourced}" -eq 1 ]; then
+        unset _cfg_is_sourced _cfg_run_tag _cfg_preset_tag \
+              _cfg_use_ollama _cfg_model _cfg_host _cfg_cli_model \
+              _cfg_cli_effort
+        unset -f _cfg_abort
+        return "$1"
+    else
+        exit "$1"
+    fi
+}
+
+_cfg_run_tag=""
+_cfg_preset_tag=""
+_cfg_use_ollama="${LEANASM_USE_OLLAMA:-1}"
+_cfg_model=""
+_cfg_host=""
+_cfg_cli_model="${AGY_CLI_MODEL:-}"
+_cfg_cli_effort="${AGY_CLI_EFFORT:-}"
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            cat <<'EOF'
+Usage: source config_env [TAG...] [OPTIONS...]
+
+Tags:
+  dev | hum | test | ...   Set LEANASM_RUN_TYPE (default: dev)
+  deepseek | prover        Enable Ollama with deepseek-prover:7b
+  qwen | qwen-coder        Enable Ollama with qwen2.5-coder:7b
+  ollama                   Enable Ollama with current/default model
+  gemini | cloud | no-ollama
+                           Disable Ollama (unset OLLAMA_HOST / AGY_*)
+  argon | argon-low        Set AGY_CLI_MODEL=gemini-4-argon-medium (or -low)
+  sonnet | opus            Set AGY_CLI_MODEL=claude-sonnet-5-5-high (or opus)
+  flash | hydrogen         Set AGY_CLI_MODEL for agy_session (non-mutating)
+
+Options:
+  --ollama                 Enable local Ollama exports
+  --no-ollama, --gemini    Disable local Ollama (use cloud/Gemini defaults)
+  --deepseek, --prover     Select deepseek-prover:7b via Ollama
+  --qwen                   Select qwen2.5-coder:7b via Ollama
+  --model <name>           Select explicit Ollama model name
+  --host <url>             Set OLLAMA_HOST and AGY_OLLAMA_BASE_URL
+  --argon                  Set AGY_CLI_MODEL=gemini-4-argon-medium (effort=medium)
+  --argon-low              Set AGY_CLI_MODEL=gemini-4-argon-low (effort=low)
+  --sonnet                 Set AGY_CLI_MODEL=claude-sonnet-5-5-high
+  --opus                   Set AGY_CLI_MODEL=claude-opus-5-5-high
+  --flash                  Set AGY_CLI_MODEL=gemini-3.8-flash-high
+  --hydrogen               Set AGY_CLI_MODEL=gemini-4-hydrogen-high
+  --cli-model <id>         Set explicit AGY_CLI_MODEL for agy_session
+  --effort <level>         Set AGY_CLI_EFFORT (low|medium|high) for agy_session
+  --reset-cli-model        Clear AGY_CLI_MODEL and AGY_CLI_EFFORT
+  --tag <name>             Set LEANASM_RUN_TYPE explicitly
+  -h, --help               Show this help message
+EOF
+            _cfg_abort 0
+            return 0
+            ;;
+        --ollama|--enable-ollama)
+            _cfg_use_ollama="1"
+            ;;
+        --no-ollama|--disable-ollama|--gemini)
+            _cfg_use_ollama="0"
+            ;;
+        --deepseek|--prover)
+            _cfg_use_ollama="1"
+            _cfg_model="deepseek-prover:7b"
+            ;;
+        --qwen)
+            _cfg_use_ollama="1"
+            _cfg_model="qwen2.5-coder:7b"
+            ;;
+        --argon)
+            _cfg_cli_model="gemini-4-argon-medium"
+            _cfg_cli_effort="medium"
+            ;;
+        --argon-low)
+            _cfg_cli_model="gemini-4-argon-low"
+            _cfg_cli_effort="low"
+            ;;
+        --sonnet)
+            _cfg_cli_model="claude-sonnet-5-5-high"
+            _cfg_cli_effort=""
+            ;;
+        --opus)
+            _cfg_cli_model="claude-opus-5-5-high"
+            _cfg_cli_effort=""
+            ;;
+        --flash)
+            _cfg_cli_model="gemini-3.8-flash-high"
+            ;;
+        --hydrogen)
+            _cfg_cli_model="gemini-4-hydrogen-high"
+            ;;
+        --reset-cli-model)
+            _cfg_cli_model=""
+            _cfg_cli_effort=""
+            ;;
+        --effort=*)
+            _cfg_cli_effort="${1#*=}"
+            ;;
+        --effort)
+            if [ "$#" -lt 2 ] || [ -z "$2" ]; then
+                echo "[!] Error: --effort requires a level (low|medium|high)." >&2
+                _cfg_abort 1
+                return 1
+            fi
+            _cfg_cli_effort="$2"
+            shift
+            ;;
+        --cli-model=*)
+            _cfg_cli_model="${1#*=}"
+            if [ -z "${_cfg_cli_model}" ]; then
+                echo "[!] Error: --cli-model requires a non-empty value." >&2
+                _cfg_abort 1
+                return 1
+            fi
+            ;;
+        --cli-model)
+            if [ "$#" -lt 2 ] || [ -z "$2" ]; then
+                echo "[!] Error: --cli-model requires a model ID." >&2
+                _cfg_abort 1
+                return 1
+            fi
+            _cfg_cli_model="$2"
+            shift
+            ;;
+        --model=*)
+            _cfg_use_ollama="1"
+            _cfg_model="${1#*=}"
+            if [ -z "${_cfg_model}" ]; then
+                echo "[!] Error: --model requires a non-empty value." >&2
+                _cfg_abort 1
+                return 1
+            fi
+            ;;
+        --model)
+            if [ "$#" -lt 2 ] || [ -z "$2" ]; then
+                echo "[!] Error: --model requires a model name." >&2
+                _cfg_abort 1
+                return 1
+            fi
+            _cfg_use_ollama="1"
+            _cfg_model="$2"
+            shift
+            ;;
+        --host=*)
+            _cfg_host="${1#*=}"
+            if [ -z "${_cfg_host}" ]; then
+                echo "[!] Error: --host requires a non-empty URL." >&2
+                _cfg_abort 1
+                return 1
+            fi
+            ;;
+        --host)
+            if [ "$#" -lt 2 ] || [ -z "$2" ]; then
+                echo "[!] Error: --host requires a URL." >&2
+                _cfg_abort 1
+                return 1
+            fi
+            _cfg_host="$2"
+            shift
+            ;;
+        --tag=*)
+            _cfg_run_tag="${1#*=}"
+            ;;
+        --tag)
+            if [ "$#" -lt 2 ] || [ -z "$2" ]; then
+                echo "[!] Error: --tag requires a tag name." >&2
+                _cfg_abort 1
+                return 1
+            fi
+            _cfg_run_tag="$2"
+            shift
+            ;;
+        --*)
+            echo "[!] Error: Unknown option '$1'. Run with --help." >&2
+            _cfg_abort 1
+            return 1
+            ;;
+        qwen|qwen2.5|qwen-coder)
+            _cfg_use_ollama="1"
+            _cfg_model="qwen2.5-coder:7b"
+            _cfg_preset_tag="$1"
+            ;;
+        deepseek|prover|deepseek-prover)
+            _cfg_use_ollama="1"
+            _cfg_model="deepseek-prover:7b"
+            _cfg_preset_tag="$1"
+            ;;
+        ollama)
+            _cfg_use_ollama="1"
+            _cfg_preset_tag="$1"
+            ;;
+        no-ollama|gemini|cloud)
+            _cfg_use_ollama="0"
+            _cfg_preset_tag="$1"
+            ;;
+        flash)
+            _cfg_cli_model="gemini-3.8-flash-high"
+            _cfg_preset_tag="$1"
+            ;;
+        hydrogen)
+            _cfg_cli_model="gemini-4-hydrogen-high"
+            _cfg_preset_tag="$1"
+            ;;
+        argon)
+            _cfg_cli_model="gemini-4-argon-medium"
+            _cfg_cli_effort="medium"
+            _cfg_preset_tag="$1"
+            ;;
+        argon-low)
+            _cfg_cli_model="gemini-4-argon-low"
+            _cfg_cli_effort="low"
+            _cfg_preset_tag="$1"
+            ;;
+        sonnet)
+            _cfg_cli_model="claude-sonnet-5-5-high"
+            _cfg_cli_effort=""
+            _cfg_preset_tag="$1"
+            ;;
+        opus)
+            _cfg_cli_model="claude-opus-5-5-high"
+            _cfg_cli_effort=""
+            _cfg_preset_tag="$1"
+            ;;
+        *)
+            _cfg_run_tag="$1"
+            ;;
+    esac
+    shift
+done
+
+export LEANASM_RUN_TYPE="${_cfg_run_tag:-${_cfg_preset_tag:-dev}}"
 
 # 3. Lean / Lake environment path
 if [ -d "${HOME}/.elan/bin" ]; then
@@ -31,7 +271,56 @@ if [ -f "${VENV_PATH}/bin/activate" ]; then
     source "${VENV_PATH}/bin/activate"
 fi
 
-# 5. Interactive prompt styling (PS1 with node, tag, timestamp, and ; line)
+# 5. Local Ollama / agy LLM configuration (Windows host via WSL2 mirrored net)
+# Set LEANASM_USE_OLLAMA=0 or pass tags/flags (gemini, --no-ollama, --qwen).
+export LEANASM_USE_OLLAMA="${_cfg_use_ollama}"
+case "$(printf '%s' "${LEANASM_USE_OLLAMA}" | tr '[:upper:]' '[:lower:]')" in
+    1|true|yes|on|enable|enabled)
+        export LEANASM_USE_OLLAMA="1"
+        export OLLAMA_HOST="${_cfg_host:-${OLLAMA_HOST:-http://localhost:11434}}"
+        export AGY_LLM_PROVIDER="ollama"
+        export AGY_MODEL="${_cfg_model:-${AGY_MODEL:-deepseek-prover:7b}}"
+        export AGY_OLLAMA_BASE_URL="${_cfg_host:-${AGY_OLLAMA_BASE_URL:-http://localhost:11434}}"
+        ;;
+    0|false|no|off|disable|disabled)
+        export LEANASM_USE_OLLAMA="0"
+        unset OLLAMA_HOST AGY_LLM_PROVIDER AGY_MODEL AGY_OLLAMA_BASE_URL
+        ;;
+    *)
+        echo "[!] Warning: Invalid LEANASM_USE_OLLAMA='${LEANASM_USE_OLLAMA}';" \
+             "disabling Ollama." >&2
+        export LEANASM_USE_OLLAMA="0"
+        unset OLLAMA_HOST AGY_LLM_PROVIDER AGY_MODEL AGY_OLLAMA_BASE_URL
+        ;;
+esac
+if [ -n "${_cfg_cli_model}" ]; then
+    export AGY_CLI_MODEL="${_cfg_cli_model}"
+else
+    unset AGY_CLI_MODEL
+fi
+if [ -n "${_cfg_cli_effort}" ]; then
+    export AGY_CLI_EFFORT="${_cfg_cli_effort}"
+else
+    unset AGY_CLI_EFFORT
+fi
+
+# Launch agy using session-only --model/--effort override without mutating settings.json
+agy_session() {
+    local _args=()
+    if [ -n "${AGY_CLI_MODEL:-}" ]; then
+        _args+=("--model" "${AGY_CLI_MODEL}")
+    fi
+    if [ -n "${AGY_CLI_EFFORT:-}" ]; then
+        _args+=("--effort" "${AGY_CLI_EFFORT}")
+    fi
+    command agy "${_args[@]}" "$@"
+}
+
+unset _cfg_is_sourced _cfg_run_tag _cfg_preset_tag \
+      _cfg_use_ollama _cfg_model _cfg_host _cfg_cli_model _cfg_cli_effort
+unset -f _cfg_abort
+
+# 6. Interactive prompt styling (PS1 with node, tag, timestamp, and ; line)
 if [[ $- == *i* ]]; then
     _P_USR='\[\e]0;\u@'"${NODE_NAME}"': \w\a\]\n'
     _P_USR+='\[\033[01;32m\]\u@'"${NODE_NAME}"'\[\033[00m\]:'
@@ -44,9 +333,30 @@ if [[ $- == *i* ]]; then
     unset _P_USR _P_TAG _P_PTH _P_END
 fi
 
+if _lean_bin="$(command -v lean)"; then
+    _lean_ver="$(lean --version)"
+else
+    _lean_ver="Not in PATH"
+fi
+if _lake_bin="$(command -v lake)"; then
+    _lake_ver="$(lake --version)"
+else
+    _lake_ver="Not in PATH"
+fi
+unset _lean_bin _lake_bin
+
 echo "[+] leanasm environment engaged."
 echo "    Node:    ${NODE_NAME}"
 echo "    Tag:     ${LEANASM_RUN_TYPE}"
-echo "    Lean:    $(command -v lean >/dev/null 2>&1 && lean --version || echo 'Not in PATH')"
-echo "    Lake:    $(command -v lake >/dev/null 2>&1 && lake --version || echo 'Not in PATH')"
+echo "    Lean:    ${_lean_ver}"
+echo "    Lake:    ${_lake_ver}"
 echo "    Root:    ${LEANASM_ROOT}"
+if [ "${LEANASM_USE_OLLAMA}" = "1" ]; then
+    echo "    Ollama:  enabled (${AGY_LLM_PROVIDER}: ${AGY_MODEL} @ ${AGY_OLLAMA_BASE_URL})"
+else
+    echo "    Ollama:  disabled (LEANASM_USE_OLLAMA=${LEANASM_USE_OLLAMA})"
+fi
+echo "    AGY CLI: ${AGY_CLI_MODEL:-default (settings.json)}"
+unset _lean_ver _lake_ver
+
+# end of file: leanasm/config_env

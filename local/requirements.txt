@@ -1,0 +1,3 @@
+# Path: leanasm/local/requirements.txt
+google-antigravity
+# end of file: leanasm/local/requirements.txt
