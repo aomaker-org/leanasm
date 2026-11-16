@@ -7,6 +7,9 @@ import LeanAsm.CrtNttUniversal
 import LeanAsm.PiChudnovsky.CrtMulBridge
 import LeanAsm.QuasiRiemann.Rat
 
+import LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic
+import LeanAsm.QuasiRiemann.Valuation.EisensteinWeights
+
 namespace QuasiRiemann
 
 /-- A complex zero coordinate in the critical strip 0 < Re(s) < 1. -/

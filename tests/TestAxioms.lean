@@ -788,4 +788,34 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms ProthNttTowerBridge.proth_tower_euler_strip_certs
 #print axioms LeanAsm.prothNttTower_provenance_certified
 
+-- Part 52: Chiriac-Jorza Eisenstein 2-Adic & Hamming Weight Bounds (arXiv:2605.09738v2)
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.hammingWeight_step
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.legendre_v2_factorial
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.romik_cj_valuation_balance
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.proposition_4
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.proposition_4_unique
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.v2_eq_padicValNat_two
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.legendre_padicValNat_two_factorial
+
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.romikCoeff_symm
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.v2_mul_pos
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.v2_fact
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.v2_romikCoeffRaw_num
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.v2_romikCoeffRaw_den
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.qratV2_romikCoeffRaw
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_16_4
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_16_1
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m0
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m1
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m2
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.romik_n1_j1_val
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.romik_lacunary_n1_matches_classical
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.romik_n2_symm_val
+
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_32_8
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_32_5
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_32_2
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m3
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.romik_lacunary_n2_ratio
+
 -- end of file: leanasm/tests/TestAxioms.lean
