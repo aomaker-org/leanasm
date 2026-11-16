@@ -92,7 +92,7 @@ cross-pillar synthesis modules (`MollifierVariationalBridge`,
 - **New Module**: `src/LeanAsm/ProthNttTowerBridge.lean` (exported in
   `src/LeanAsm.lean`, wired into `EulerFactorNonVanishing.lean`,
   `ProvenanceSummary.lean`, `Main.lean`, and `tests/TestAxioms.lean`
-  (**Part 50**).
+  (**Part 51**).
 - **Scope**:
   - Extend the 4-prime Fermat tower `{5, 17, 257, 65537}` with 31-bit Proth
     NTT prime `P_5 = 15 * 2^27 + 1 = 2,013,265,921` (`M_5 > 2^61`).
@@ -105,7 +105,7 @@ cross-pillar synthesis modules (`MollifierVariationalBridge`,
 
 Every `v1.3.0` PR must preserve all repository governance and kernel rules:
 1. **Zero-Axiom Kernel Audit**: `lake env lean tests/TestAxioms.lean` passes
-   **Parts 1-50** strictly within `[]`, `[propext]`, or `[propext, Quot.sound]`
+   **Parts 1-51** strictly within `[]`, `[propext]`, or `[propext, Quot.sound]`
    (`0` `Classical.choice`, `0` `sorryAx`, `0` warnings).
 2. **Hygiene & Wrapping (`AI.md`)**: `-- Path:` / `-- end of file:` markers on
    every file, `<= 120` chars/line (`.lean`), `<= 80` cols (`.md`), zero

@@ -36,6 +36,7 @@ import LeanAsm.ArtinShortIntervalBridge
 import LeanAsm.ConstructiveOpenaiBridge
 import LeanAsm.EllipticModularityBridge
 import LeanAsm.LanglandsRankinSelbergBridge
+import LeanAsm.ProthNttTowerBridge
 
 namespace LeanAsm
 
@@ -1445,6 +1446,24 @@ theorem langlandsRankinSelberg_provenance_certified : LanglandsRankinSelbergProv
    LanglandsRankinSelbergBridge.spin_eq_product,
    fun phi B hS hm hn M N =>
      LanglandsRankinSelbergBridge.hecke_chi4_short_interval_bound phi B hS hm hn M N⟩
+
+/-- Part 51 provenance: 5-prime Proth NTT tower `{5, 17, 257, 65537, 2013265921}` with `M_5 > 2^61`,
+`2^27`-th twiddle root, exact 5-channel Garner CRT, and Dedekind Euler strip bounds. -/
+def ProthNttTowerProvenance : Prop :=
+  Nat.gcd ProthNttTowerBridge.prothPrime5 CrtNtt.fermatTowerMod4 = 1 ∧
+  2 ^ 61 < ProthNttTowerBridge.prothTowerMod5 ∧
+  ProthNttTowerBridge.sqrIter ProthNttTowerBridge.prothOmega27 ProthNttTowerBridge.prothPrime5 27 = 1 ∧
+  (∀ x : Nat, x < ProthNttTowerBridge.prothTowerMod5 →
+    ProthNttTowerBridge.garnerReconstruct5Asm (x % 5) (x % 17) (x % 257) (x % 65537)
+      (x % ProthNttTowerBridge.prothPrime5) = x) ∧
+  ProthNttTowerBridge.ProthTowerStripCert
+
+theorem prothNttTower_provenance_certified : ProthNttTowerProvenance :=
+  ⟨ProthNttTowerBridge.prothPrime5_coprime_M4.1,
+   ProthNttTowerBridge.prothTowerMod5_gt_2pow61.2.2.1,
+   ProthNttTowerBridge.prothOmega27_order.2.1,
+   ProthNttTowerBridge.garnerReconstruct5Asm_sound,
+   ProthNttTowerBridge.proth_tower_euler_strip_certs⟩
 
 /-- Part 7 provenance specification bundling Hasse-Weil RH for `E / F_7`,
 genus-2 `C / F_5` negative discriminants, `L(C, 1) = 71/25`, Cantor-Mumford group axioms
