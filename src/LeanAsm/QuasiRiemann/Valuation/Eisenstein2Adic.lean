@@ -268,21 +268,27 @@ private theorem padicValNat_two_mul {n : Nat} (hpos : 0 < n) :
     unfold padicValNat
     rw [hk]
   rw [h1]
-  simp only [padicValNatAux]
+  dsimp only [padicValNatAux]
   have hcond : (2 ≤ 1 || (2 * n == 0)) = false := by
-    have hm : (2 * n == 0) = false := by
-      cases h : 2 * n with
-      | zero => omega
-      | succ _ => rfl
-    simp [hm]
+    cases h : 2 * n with
+    | zero => omega
+    | succ _ => rfl
   have hmod : ((2 * n) % 2 == 0) = true := by
-    simp [Nat.mul_mod_right]
+    have hm : (2 * n) % 2 = 0 := Nat.mul_mod_right 2 n
+    rw [hm]
+    rfl
+  rw [hcond, hmod]
   have hdiv : (2 * n) / 2 = n := Nat.mul_div_cancel_left n (by decide)
-  rw [hcond, hmod, hdiv]
-  simp only [Bool.false_eq_true, ite_false, ite_true]
+  rw [hdiv]
+  change 1 + padicValNatAux 2 k n = 1 + padicValNat 2 n
   congr 1
   have hp2 : (2 : Nat) ≤ 2 := Nat.le_refl 2
-  exact padicValNatAux_eq_of_le (p := 2) (fuel := k) (n := n) hp2 hpos (by omega)
+  have hle : n ≤ k := by
+    have hlt : n < k + 1 := by
+      rw [← hk, Nat.two_mul]
+      exact Nat.lt_add_of_pos_left hpos
+    exact Nat.le_of_lt_succ hlt
+  exact padicValNatAux_eq_of_le (p := 2) (fuel := k) (n := n) hp2 hpos hle
 
 private theorem eq_v2_of_spec_aux (g : Nat → Nat)
     (hg0 : g 0 = 0)
