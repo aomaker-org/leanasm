@@ -372,6 +372,9 @@ def main : IO Unit := do
     s!"(c_13=a_13={c13}={a13}, c_97=a_97={c97}={a97}, c_11=1)")
   IO.println ("  GL(2) Ramanujan & Hecke Alg : a_p^2 < 4p & v^2 - a_p u v + p u^2 > 0 (p ≤ 97), " ++
     "c_{mn} = c_m c_n & c_{p^2} = c_p^2 - p (ZERO axioms)")
+  let _langlands := LeanAsm.langlandsRankinSelberg_provenance_certified
+  IO.println ("  Langlands Rankin-Selberg     : f_11 x chi_4 & Sym^2 cleared Euler factors > 0 " ++
+    "(p ≤ 97), GL2xGL2 -> GSp4 spinor product, Hecke-Abel |Σ c_n φ(n)| ≤ 2Bφ(M) (ZERO axioms)")
 
   -- 8. Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)
   IO.println "\n[+] Part 8: Prime-Tower Local Euler Factor Non-Vanishing (RNS ↔ QRH)"

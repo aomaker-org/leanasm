@@ -35,6 +35,7 @@ import LeanAsm.ArtinFermatBridge
 import LeanAsm.ArtinShortIntervalBridge
 import LeanAsm.ConstructiveOpenaiBridge
 import LeanAsm.EllipticModularityBridge
+import LeanAsm.LanglandsRankinSelbergBridge
 
 namespace LeanAsm
 
@@ -893,7 +894,17 @@ def UltrametricValuationProp : Prop :=
    (∀ n k : Nat,
      7 ^ (1 + n * 1) ∣
        (Nat.repeat f (n + k) (QuasiRiemann.Valuation.qOfInt 3) -
-        Nat.repeat f n (QuasiRiemann.Valuation.qOfInt 3)).num.natAbs))
+        Nat.repeat f n (QuasiRiemann.Valuation.qOfInt 3)).num.natAbs)) ∧
+  (let e : Nat → QuasiRiemann.QRat := fun p =>
+     QuasiRiemann.Valuation.crtIdempotent QuasiRiemann.Valuation.mersenneTower p 1 0
+       (QuasiRiemann.Valuation.mersenneCofactorInv p)
+   QuasiRiemann.Valuation.PrimeTowerPolyRootCert QuasiRiemann.Valuation.mersenneTower 1 1
+     [QuasiRiemann.Valuation.qOfInt (-2), QuasiRiemann.Valuation.qZero,
+      QuasiRiemann.Valuation.qOne]
+     (QuasiRiemann.Valuation.buildCrtSeed QuasiRiemann.Valuation.mersenneTower e
+       QuasiRiemann.Valuation.mersenneSqrt2RootSeed)
+     (QuasiRiemann.Valuation.buildCrtSeed QuasiRiemann.Valuation.mersenneTower e
+       QuasiRiemann.Valuation.mersenneSqrt2DerivInvSeed))
 
 /-- Part 5 provenance specification bundling mollifier descent, 2D rectangles down to
 `σ = 0.501`, `t ~ 10^12` phase-reduced rectangles, DVP asymptotic strip, Dirichlet `L^2`
@@ -1153,7 +1164,8 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
     QuasiRiemann.Valuation.hensel_crt_inv_5_mod_3937_pow,
     QuasiRiemann.Valuation.hensel_mersenne_tower_inv_5_mod_27559_pow,
     QuasiRiemann.Valuation.hensel_mersenne_tower_crt_built_inv_5,
-    QuasiRiemann.Valuation.hensel_sqrt2_mod_pow_7⟩⟩
+    QuasiRiemann.Valuation.hensel_sqrt2_mod_pow_7,
+    QuasiRiemann.Valuation.hensel_mersenne_tower_sqrt2_built⟩⟩
 
 -- =============================================================================
 -- Parts 6 & 8: RNS Garner & Fermat-Tower / Dedekind Euler Non-Vanishing
@@ -1405,6 +1417,35 @@ theorem eulerRns_provenance_certified : EulerRnsProvenance :=
 -- Part 7: Finite-Field RH, Genus-2 L(C,1)=71/25, Cantor Jacobian & Weil Zeta
 -- =============================================================================
 
+/-- Issue #80 Langlands bridge: Rankin-Selberg / `Sym^2` positivity on `p <= 97`, the
+`GL(2) x GL(2) -> GSp(4)` spinor product identity, and Hecke-weighted Abel bounds. -/
+def LanglandsRankinSelbergProvenance : Prop :=
+  (∀ p ∈ EllipticModularityBridge.goodPrimes97, ∀ u v : Int, 0 < v →
+      0 < LanglandsRankinSelbergBridge.rsClearedEuler p
+        (EllipticModularityBridge.heckeCoeff11 p) u v) ∧
+  (∀ p ∈ EllipticModularityBridge.goodPrimes97, ∀ u v : Int, 0 ≤ u →
+      0 < v - (p : Int) * u →
+      0 < LanglandsRankinSelbergBridge.sym2ClearedEuler p
+        (EllipticModularityBridge.heckeCoeff11 p) u v) ∧
+  (∀ al1 al2 lam T : Int,
+    GSp4FunctorialityBridge.gsp4SpinEulerPoly lam (al1 + al2) (al1 * al2 + 2 * lam) T =
+      (1 - al1 * T + lam * T ^ 2) * (1 - al2 * T + lam * T ^ 2)) ∧
+  (∀ (phi : Nat → Int) (B : Int),
+    (∀ m, -B ≤ LanglandsRankinSelbergBridge.heckeChi4PartialSum m ∧
+      LanglandsRankinSelbergBridge.heckeChi4PartialSum m ≤ B) →
+    (∀ k, phi (k + 1) ≤ phi k) → (∀ k, 0 ≤ phi k) → ∀ M N : Nat,
+      -(2 * B * phi M) ≤ LanglandsRankinSelbergBridge.blockSum
+        (fun k => LanglandsRankinSelbergBridge.heckeChi4Coeff k * phi k) M N ∧
+      LanglandsRankinSelbergBridge.blockSum
+        (fun k => LanglandsRankinSelbergBridge.heckeChi4Coeff k * phi k) M N ≤ 2 * B * phi M)
+
+theorem langlandsRankinSelberg_provenance_certified : LanglandsRankinSelbergProvenance :=
+  ⟨LanglandsRankinSelbergBridge.rs_pos_goodPrimes,
+   LanglandsRankinSelbergBridge.sym2_pos_goodPrimes,
+   LanglandsRankinSelbergBridge.spin_eq_product,
+   fun phi B hS hm hn M N =>
+     LanglandsRankinSelbergBridge.hecke_chi4_short_interval_bound phi B hS hm hn M N⟩
+
 /-- Part 7 provenance specification bundling Hasse-Weil RH for `E / F_7`,
 genus-2 `C / F_5` negative discriminants, `L(C, 1) = 71/25`, Cantor-Mumford group axioms
 for `J(C)(F_5) ≅ Z/71Z`, punctured-strip zeta non-vanishing, `Ξ_C` reflection,
@@ -1600,7 +1641,8 @@ def FiniteFieldWeilProvenance : Prop :=
           EllipticModularityBridge.heckeCoeff11 n) ∧
    (∀ p ∈ EllipticModularityBridge.goodSqPrimes100,
       EllipticModularityBridge.heckeCoeff11 (p * p) =
-        EllipticModularityBridge.heckeCoeff11 p ^ 2 - (p : Int)))
+        EllipticModularityBridge.heckeCoeff11 p ^ 2 - (p : Int))) ∧
+  LanglandsRankinSelbergProvenance
 
 /-- Zero-axiom certificate for Hasse-Weil RH, genus-2 Jacobian, completed zeta,
 `GSp(4) -> SO(5)` functoriality + Selberg / Kim-Sarnak ladder, and
@@ -1623,7 +1665,8 @@ theorem finiteFieldWeil_provenance_certified : FiniteFieldWeilProvenance :=
    GSp4FunctorialityBridge.selberg_laplacian_eigenvalue_ladder,
    EllipticModularityBridge.eichler_shimura_trace_eq_11a1,
    EllipticModularityBridge.hasse_weil_ramanujan_11a1_certs,
-   EllipticModularityBridge.hecke_multiplicativity_11a1_certs⟩
+   EllipticModularityBridge.hecke_multiplicativity_11a1_certs,
+   langlandsRankinSelberg_provenance_certified⟩
 
 -- =============================================================================
 -- Parts 9-10: Universal NTT, 192-Digit Karatsuba CRT-NTT, & 4-Prime Garner
