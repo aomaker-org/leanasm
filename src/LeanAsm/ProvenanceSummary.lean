@@ -16,6 +16,9 @@ import LeanAsm.QuasiRiemann.ShortIntervalPrimes
 import LeanAsm.QuasiRiemann.ParametricQrhLadder
 import LeanAsm.QuasiRiemann.DyadicAbelBridge
 import LeanAsm.QuasiRiemann.MollifierVariationalBridge
+import LeanAsm.QuasiRiemann.Valuation.Ultrametric
+import LeanAsm.QuasiRiemann.Valuation.Contraction
+import LeanAsm.QuasiRiemann.Valuation.Hensel
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.Genus2Jacobian
@@ -259,7 +262,8 @@ def YangMillsProvenance : Prop :=
       (t : ConstructiveOpenaiBridge.Cover4),
     YangMillsQ8.Q8.reTrace
         (ConstructiveOpenaiBridge.faceValue ConstructiveOpenaiBridge.q8LatticeGroup
-          (ConstructiveOpenaiBridge.pullConnection ConstructiveOpenaiBridge.q8LatticeGroup s t U) p) =
+          (ConstructiveOpenaiBridge.pullConnection
+            ConstructiveOpenaiBridge.q8LatticeGroup s t U) p) =
       YangMillsQ8.Q8.reTrace
         (ConstructiveOpenaiBridge.faceValue ConstructiveOpenaiBridge.q8LatticeGroup U
           (ConstructiveOpenaiBridge.Face.send s t p))) ∧
@@ -822,6 +826,75 @@ def MollifierVariationalProp : Prop :=
       QuasiRiemann.qrhFromAutomorphic
         GSp4FunctorialityBridge.thetaKimSarnakSym4)
 
+/-- Sub-specification for constructive p-adic ultrametric valuation & contraction on `QRat`. -/
+def UltrametricValuationProp : Prop :=
+  (∀ (p : Nat) (_hp : QuasiRiemann.Valuation.IsPrime p) (x y : QuasiRiemann.QRat),
+    QuasiRiemann.Valuation.pAdicVal p (-x) = QuasiRiemann.Valuation.pAdicVal p x ∧
+    QuasiRiemann.Valuation.pAdicVal p (x * y) =
+      QuasiRiemann.Valuation.valAdd
+        (QuasiRiemann.Valuation.pAdicVal p x)
+        (QuasiRiemann.Valuation.pAdicVal p y) ∧
+    QuasiRiemann.Valuation.valLe
+      (QuasiRiemann.Valuation.valMin
+        (QuasiRiemann.Valuation.pAdicVal p x)
+        (QuasiRiemann.Valuation.pAdicVal p y))
+      (QuasiRiemann.Valuation.pAdicVal p (x + y))) ∧
+  (∀ (p : Nat) (_hp : QuasiRiemann.Valuation.IsPrime p) (step : Int)
+      (f : QuasiRiemann.QRat → QuasiRiemann.QRat)
+      (_h_cont : QuasiRiemann.Valuation.IsPAdicStepContraction p step f)
+      (x₀ : QuasiRiemann.QRat) (n k : Nat),
+    QuasiRiemann.Valuation.valLe
+      (QuasiRiemann.Valuation.valAdd
+        (QuasiRiemann.Valuation.pAdicVal p (f x₀ - x₀))
+        (some (Int.ofNat n * step)))
+      (QuasiRiemann.Valuation.pAdicVal p (Nat.repeat f (n + 1) x₀ - Nat.repeat f n x₀)) ∧
+    QuasiRiemann.Valuation.valLe
+      (QuasiRiemann.Valuation.pAdicVal p (Nat.repeat f (n + 1) x₀ - Nat.repeat f n x₀))
+      (QuasiRiemann.Valuation.pAdicVal p (Nat.repeat f (n + 2) x₀ - Nat.repeat f (n + 1) x₀)) ∧
+    QuasiRiemann.Valuation.valLe
+      (QuasiRiemann.Valuation.valAdd
+        (QuasiRiemann.Valuation.pAdicVal p (f x₀ - x₀))
+        (some (Int.ofNat n * step)))
+      (QuasiRiemann.Valuation.pAdicVal p (Nat.repeat f (n + k) x₀ - Nat.repeat f n x₀))) ∧
+  (∀ (p : Nat) (_hp : QuasiRiemann.Valuation.IsPrime p) (m : Int) (_hm : 1 ≤ m)
+      (a x₀ : QuasiRiemann.QRat)
+      (_ha : QuasiRiemann.Valuation.valLe (some 0) (QuasiRiemann.Valuation.pAdicVal p a))
+      (_hx₀ : QuasiRiemann.Valuation.valLe (some 0) (QuasiRiemann.Valuation.pAdicVal p x₀))
+      (_h_init : QuasiRiemann.Valuation.valLe (some m)
+        (QuasiRiemann.Valuation.pAdicVal p (QuasiRiemann.Valuation.qOne - a * x₀)))
+      (n k : Nat),
+    QuasiRiemann.Valuation.valLe (some (Int.ofNat (2 ^ n) * m))
+      (QuasiRiemann.Valuation.pAdicVal p
+        (QuasiRiemann.Valuation.qOne - a *
+          Nat.repeat (QuasiRiemann.Valuation.nsStep a) n x₀)) ∧
+    QuasiRiemann.Valuation.valLe (some (Int.ofNat (2 ^ n) * m))
+      (QuasiRiemann.Valuation.pAdicVal p
+        (Nat.repeat (QuasiRiemann.Valuation.nsStep a) (n + k) x₀ -
+         Nat.repeat (QuasiRiemann.Valuation.nsStep a) n x₀))) ∧
+  QuasiRiemann.Valuation.JointCrtHenselCert 31 127 1 1
+    (QuasiRiemann.Valuation.qOfInt 5) (QuasiRiemann.Valuation.qOfInt 1575) ∧
+  QuasiRiemann.Valuation.PrimeTowerHenselCert [7, 31, 127] 1
+    (QuasiRiemann.Valuation.qOfInt 5) (QuasiRiemann.Valuation.qOfInt 5512) ∧
+  QuasiRiemann.Valuation.PrimeTowerHenselCert QuasiRiemann.Valuation.mersenneTower 1
+    (QuasiRiemann.Valuation.qOfInt 5)
+    (QuasiRiemann.Valuation.buildCrtSeed QuasiRiemann.Valuation.mersenneTower
+      (fun p => QuasiRiemann.Valuation.crtIdempotent
+        QuasiRiemann.Valuation.mersenneTower p 1 0
+        (QuasiRiemann.Valuation.mersenneCofactorInv p))
+      QuasiRiemann.Valuation.mersenneFiveInv) ∧
+  (let P := [QuasiRiemann.Valuation.qOfInt (-2),
+             QuasiRiemann.Valuation.qZero,
+             QuasiRiemann.Valuation.qOne]
+   let f := QuasiRiemann.Valuation.polyNewtonStep P (QuasiRiemann.Valuation.qOfInt 6)
+   (∀ n : Nat,
+     7 ^ (1 + n * 1) ∣
+       (QuasiRiemann.Valuation.hornerEval P
+         (Nat.repeat f n (QuasiRiemann.Valuation.qOfInt 3))).num.natAbs) ∧
+   (∀ n k : Nat,
+     7 ^ (1 + n * 1) ∣
+       (Nat.repeat f (n + k) (QuasiRiemann.Valuation.qOfInt 3) -
+        Nat.repeat f n (QuasiRiemann.Valuation.qOfInt 3)).num.natAbs))
+
 /-- Part 5 provenance specification bundling mollifier descent, 2D rectangles down to
 `σ = 0.501`, `t ~ 10^12` phase-reduced rectangles, DVP asymptotic strip, Dirichlet `L^2`
 diagonal dominance, rational zero-density descent (`15/26 < 3/5 < 2/3`), QRH threshold
@@ -967,7 +1040,8 @@ def QuasiRiemannProvenance : Prop :=
   ParametricQrhLadderProp ∧
   HighTruncRationalContractionProp ∧
   DyadicAbelProvenanceProp ∧
-  MollifierVariationalProp
+  MollifierVariationalProp ∧
+  UltrametricValuationProp
 
 set_option exponentiation.threshold 2000 in
 /-- Zero-axiom certificate for Parts 3-5 analytic QRH, 2D rectangles, DVP, and Chebyshev. -/
@@ -1064,7 +1138,22 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
     fun m => (QuasiRiemann.linear_minimizes_dirichlet_energy m).2,
     fun m hc1 hc2 => QuasiRiemann.variational_energy_lt_one_of_pos m hc1 hc2,
     ⟨QuasiRiemann.mollifier_variational_bridge_certs.2.2.2.2.1,
-     QuasiRiemann.mollifier_variational_bridge_certs.2.2.2.2.2.2⟩⟩⟩
+     QuasiRiemann.mollifier_variational_bridge_certs.2.2.2.2.2.2⟩⟩,
+   ⟨fun p hp x y =>
+      ⟨QuasiRiemann.Valuation.pAdicVal_neg p x,
+       QuasiRiemann.Valuation.pAdicVal_mul p hp x y,
+       QuasiRiemann.Valuation.ultrametric_ineq p hp x y⟩,
+    fun p hp step f h_cont x₀ n k =>
+      ⟨QuasiRiemann.Valuation.iterate_val_growth p step f h_cont x₀ n,
+       QuasiRiemann.Valuation.iterate_val_mono p step f h_cont x₀ n,
+       QuasiRiemann.Valuation.iterate_val_range p hp step f h_cont x₀ n k⟩,
+    fun p hp m hm a x₀ ha hx₀ h_init n k =>
+      ⟨QuasiRiemann.Valuation.hensel_newton_schulz_quadratic_residual p hp m hm a x₀ h_init n,
+       QuasiRiemann.Valuation.hensel_newton_schulz_cauchy_range p hp m hm a x₀ ha hx₀ h_init n k⟩,
+    QuasiRiemann.Valuation.hensel_crt_inv_5_mod_3937_pow,
+    QuasiRiemann.Valuation.hensel_mersenne_tower_inv_5_mod_27559_pow,
+    QuasiRiemann.Valuation.hensel_mersenne_tower_crt_built_inv_5,
+    QuasiRiemann.Valuation.hensel_sqrt2_mod_pow_7⟩⟩
 
 -- =============================================================================
 -- Parts 6 & 8: RNS Garner & Fermat-Tower / Dedekind Euler Non-Vanishing
