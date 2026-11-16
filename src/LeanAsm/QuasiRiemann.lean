@@ -8,6 +8,7 @@ import LeanAsm.PiChudnovsky.CrtMulBridge
 import LeanAsm.QuasiRiemann.Rat
 
 import LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic
+import LeanAsm.QuasiRiemann.Valuation.EisensteinWeights
 
 namespace QuasiRiemann
 

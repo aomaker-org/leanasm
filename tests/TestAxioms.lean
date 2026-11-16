@@ -797,4 +797,19 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.v2_eq_padicValNat_two
 #print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.legendre_padicValNat_two_factorial
 
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.romikCoeff_symm
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.v2_mul_pos
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.v2_fact
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.v2_romikCoeffRaw_num
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.v2_romikCoeffRaw_den
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.qratV2_romikCoeffRaw
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_16_4
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_16_1
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m0
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m1
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m2
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.romik_n1_j1_val
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.romik_lacunary_n1_matches_classical
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.romik_n2_symm_val
+
 -- end of file: leanasm/tests/TestAxioms.lean
