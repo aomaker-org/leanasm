@@ -788,4 +788,11 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms ProthNttTowerBridge.proth_tower_euler_strip_certs
 #print axioms LeanAsm.prothNttTower_provenance_certified
 
+-- Part 52: Chiriac-Jorza Eisenstein 2-Adic & Hamming Weight Bounds (arXiv:2605.09738v2)
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.hammingWeight_step
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.legendre_v2_factorial
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.romik_cj_valuation_balance
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.proposition_4
+#print axioms LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic.proposition_4_unique
+
 -- end of file: leanasm/tests/TestAxioms.lean
