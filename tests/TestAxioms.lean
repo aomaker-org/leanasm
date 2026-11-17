@@ -826,4 +826,21 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_64_1
 #print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m4
 
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.preperiodic_partition_sound
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.preperiodic_partition_n1_sound
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.generalized_partition_m1_n2_sound
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.proposition41_lower_bound_m2_n3_sound
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.preperiodic_partition_zero_sound
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.andersen_garton_prop22_q5_d2
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.andersen_garton_prop22_q5_d2_reduced
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.iter0_val
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.iter1_val
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.iter2_val
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_iterate_valuation_growth
+
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.reconstruct
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsQRat.toQRat
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.add
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.zero
+
 -- end of file: leanasm/tests/TestAxioms.lean
