@@ -28,7 +28,6 @@ import LeanAsm.QuasiRiemann.Valuation.Contraction
 import LeanAsm.QuasiRiemann.Valuation.Hensel
 import LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic
 import LeanAsm.QuasiRiemann.Valuation.EisensteinWeights
-import LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics
 import LeanAsm.QuasiRiemann.Valuation.RNS
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
