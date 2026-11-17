@@ -818,4 +818,12 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m3
 #print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.romik_lacunary_n2_ratio
 
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_64_16
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_64_13
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_64_10
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_64_7
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_64_4
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_64_1
+#print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m4
+
 -- end of file: leanasm/tests/TestAxioms.lean
