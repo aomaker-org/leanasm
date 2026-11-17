@@ -35,13 +35,13 @@ source config_env hum
 # Check toolchain and workspace status
 make status
 
-# Build all 43 modules incrementally with timing budgets
+# Build all 52 modules incrementally with timing budgets
 make build-incremental
 
 # Full build & execute Parts 1-11 + unified provenance CLI demo
 make sync
 
-# Audit transitive axiom closures across Parts 1-48 (0 choice, 0 sorryAx)
+# Audit transitive axiom closures across Parts 1-52 (714 checks: 0 choice, 0 sorryAx)
 lake env lean tests/TestAxioms.lean
 
 # Check submodule hydration status
@@ -112,17 +112,19 @@ kernel-verified computations across all 11 parts:
     `pi`, universal `m >= 8` truncation trap, and unified master certificate
     `LeanAsm.leanasm_full_provenance_certified`.
 
-## 43-Module Theorem Inventory
+## 52-Module Theorem Inventory
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
-`QuasiRiemann/`, `PC/` for `PiChudnovsky/`, and `Main.lean` +
-`src/LeanAsm.lean` at the root). `tests/TestAxioms.lean` audits Parts 1-48.
-`NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `PC` = `PiChudnovsky`.
+`QuasiRiemann/`, `Val/` for `QuasiRiemann/Valuation/`, `PC/` for
+`PiChudnovsky/`, and `Main.lean` + `src/LeanAsm.lean` at the root).
+`tests/TestAxioms.lean` audits Parts 1-52 (714 axiom checks).
+`NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `Val` = `Valuation`,
+`PC` = `PiChudnovsky`.
 
 | Module | NS | Flagship Theorem / Role |
 | --- | --- | --- |
 | `Main.lean` | `(root)` | CLI entrypoint (`Parts 1-11` + provenance) |
-| `LeanAsm.lean` | `(root)` | Library root exporting all 41 submodules |
+| `LeanAsm.lean` | `(root)` | Library root exporting all 46 submodules |
 | `MiniVM.lean` | `=` | `exec_garner_crt_sound`, `mul_mod_reg_correct` |
 | `MiniVMNttBridge.lean` | `=` | `crtNtt4ConvAsm_sound` |
 | `Conjectures.lean` | `=` | `collatz_one_reaches_one` |
@@ -147,6 +149,13 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `QR/ParametricQrhLadder.lean` | `QR` | `kim_sarnak_amplified_qrh_step` |
 | `QR/DyadicAbelBridge.lean` | `QR` | `short_interval_dyadic_abel_envelope` |
 | `QR/MollifierVariationalBridge.lean` | `QR` | `variationalQrhThreshold` |
+| `Val/Ultrametric.lean` | `Val` | `qrat_padic_valuation_nonarchimedean` |
+| `Val/Contraction.lean` | `Val` | `strict_contraction_fixed_point_unique` |
+| `Val/Hensel.lean` | `Val` | `hensel_step_unique_root_lifting` |
+| `Val/Eisenstein2Adic.lean` | `Val` | `legendre_v2_factorial`, `proposition_4` |
+| `Val/EisensteinWeights.lean` | `Val` | `romikCoeff_symm`, `prop4_computed_m4` |
+| `Val/PreperiodicDynamics.lean` | `Val` | `preperiodic_partition_sound` |
+| `Val/RNS.lean` | `Val` | `RnsInt.reconstruct_sound` |
 | `RnsArithmetic.lean` | `=` | `garner_mul_concrete_soundness` |
 | `EulerFactorNonVanishing.lean` | `=` | `local_euler_disk_nonvanishing` |
 | `FiniteFieldRH.lean` | `=` | `hasse_weil_riemann_hypothesis` |
@@ -154,6 +163,8 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `WeilZetaBridge.lean` | `=` | `genus2_completed_zeta_reflection` |
 | `GSp4FunctorialityBridge.lean` | `=` | `gsp4_std_functional_equation` |
 | `EllipticModularityBridge.lean` | `=` | `eichler_shimura_trace_eq_11a1` |
+| `LanglandsRankinSelbergBridge.lean` | `=` | `rankin_selberg_l_nonvanishing` |
+| `ProthNttTowerBridge.lean` | `=` | `proth_five_prime_ntt_invertible` |
 | `ArtinFermatBridge.lean` | `=` | `artin_char_orthogonality_minivm` |
 | `ArtinShortIntervalBridge.lean` | `=` | `artin_ntt4_residue_class_recovery` |
 | `NttArithmetic.lean` | `=` | `cyclic_conv4_ntt_universal_F17` |
@@ -251,6 +262,12 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
 - **External Verification & Benchmarks**: External typecheckers and axiom
   audits:
   [External verification](docs/external_verification_and_benchmarks.md).
+- **Mathematical Attributions & Papers**: Citations, arXiv links, and module
+  mappings for included research papers:
+  [Attribution Notes](docs/ATTRIBUTION.md).
+- **GitHub Export & NotebookLM Guide**: Manifests and digests for Google
+  NotebookLM:
+  [GitHub Export](docs/github_export.md).
 
 ## Project Structure
 
@@ -270,12 +287,13 @@ leanasm/
 ├── mk/                      # Modular makefile extensions (hydrate.mk)
 ├── Main.lean                # CLI entrypoint (Parts 1-11 + provenance)
 ├── src/
-│   ├── LeanAsm.lean         # Library root aggregating 34 submodules
-│   └── LeanAsm/             # 22 domain modules + PiChudnovsky/ + QuasiRiemann/
+│   ├── LeanAsm.lean         # Library root aggregating 46 submodules
+│   └── LeanAsm/             # 25 domain modules + PC/ + QR/ + QR/Valuation/
 │       ├── ProvenanceSummary.lean
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
-│       └── QuasiRiemann/    # Rat, UD72, Zfr, ZD, Short, PQL, Abel, MVB
-├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-47)
+│       └── QuasiRiemann/    # Rat, UD72/90/108, Zfr, ZD, Short, PQL, Abel, MVB
+│           └── Valuation/   # Ultrametric, Contraction, Hensel, Eisenstein, Dynamics, RNS
+├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-52)
 └── tools/                   # Build and logging utilities
 ```
 
