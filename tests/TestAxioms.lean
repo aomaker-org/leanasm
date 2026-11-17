@@ -826,4 +826,9 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.weight_64_1
 #print axioms LeanAsm.QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m4
 
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.reconstruct
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsQRat.toQRat
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.add
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.zero
+
 -- end of file: leanasm/tests/TestAxioms.lean
