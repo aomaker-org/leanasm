@@ -12,13 +12,14 @@ CHUNK_SECS ?= 900
 # Include lazy hydration module
 -include $(REPO_ROOT)/mk/hydrate.mk
 
-.PHONY: help build build-chunk build-incremental build-status run test axioms check clean status sync
+.PHONY: help build build-chunk build-incremental build-seq build-status run test axioms check clean status sync
 
 help:
 	@echo "leanasm Development Targets:"
 	@echo "  make build             - Build the Lean executable and packages via lake"
 	@echo "  make build-chunk       - Build incrementally up to CHUNK_SECS (default 900s = 15m)"
 	@echo "  make build-incremental - Build all modules incrementally; fail if slice incomplete"
+	@echo "  make build-seq         - Sequential build with heap capping and telemetry warnings"
 	@echo "  make build-status      - Show per-module .olean cache status and build timings"
 	@echo "  make run               - Run the compiled Lean executable"
 	@echo "  make test              - Run workspace verification and tests"
@@ -40,6 +41,9 @@ build-chunk:
 
 build-incremental:
 	python3 tools/incremental_build.py --budget-secs $(CHUNK_SECS) --require-complete
+
+build-seq:
+	python3 tools/incremental_build.py
 
 build-status:
 	python3 tools/incremental_build.py --status

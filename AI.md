@@ -17,6 +17,14 @@ boundaries, and repository hygiene for all assistants operating within the
 - **Mandatory Toolchain Hygiene**: Use `lake` and `lean` via `elan` for all
   Lean package builds, verification, and executions. If Python scripts are
   used, execute via `uv` or standard virtual environments.
+- **Preferred Build Strategy**: To prevent RAM thrashing and OOM terminations
+  on heavy modules (e.g., `Genus2Jacobian`, `PiChudnovsky`), assistants MUST
+  prefer sequential, heap-capped elaboration via `make build-seq` or
+  `python3 tools/incremental_build.py` (enforcing `-M 4096` / `LEAN_OPTS="-M4096"`
+  and checking rolling build telemetry regression against
+  `.lake/build-history.json`). Full unbounded concurrent builds (`lake build`)
+  risk exhausting system memory. Ongoing architecture work targets finer-grained
+  modularization so individual units remain fast and lightweight.
 - **Safe Shell Usage**: Always use standard Linux bash.
 
 ### [Directive 02] LOGGING & DIAGNOSTIC OBSERVABILITY

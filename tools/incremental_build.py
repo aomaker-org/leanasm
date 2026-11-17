@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # Path: leanasm/tools/incremental_build.py
-"""Time-boxed incremental Lake build runner for interruptible Lean 4 builds."""
+"""Time-boxed incremental Lake build runner for interruptible Lean 4 builds.
+
+Supports sequential module elaboration, memory heap capping, and rolling telemetry
+regression warning detection against .lake/build-history.json.
+"""
 
 import argparse
 from datetime import datetime, timezone
@@ -16,6 +20,8 @@ from typing import Dict, List, Optional, Set, Tuple
 
 IMPORT_RE = re.compile(r"^\s*import\s+([A-Za-z0-9_.]+)\s*$")
 DEFAULT_BUDGET_SECS = 900  # 15 minutes per collectible increment
+DEFAULT_LEAN_MEM_MB = 4096  # 4096 MB heap cap default to prevent thrashing
+HISTORY_FILE_REL = Path(".lake/build-history.json")
 
 
 def utc_now_iso() -> str:
@@ -68,6 +74,45 @@ def lake_target_for(mod: str) -> str:
     return f"+{mod}"
 
 
+def load_history(repo_root: Path) -> Dict[str, List[float]]:
+    """Load historical module build durations."""
+    history_file = repo_root / HISTORY_FILE_REL
+    if history_file.is_file():
+        try:
+            return json.loads(history_file.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+
+def save_history(repo_root: Path, history: Dict[str, List[float]]) -> None:
+    """Persist historical module build durations."""
+    history_file = repo_root / HISTORY_FILE_REL
+    history_file.parent.mkdir(parents=True, exist_ok=True)
+    history_file.write_text(json.dumps(history, indent=2) + "\n", encoding="utf-8")
+
+
+def check_regression(repo_root: Path, mod_name: str, current_duration: float) -> None:
+    """Detect elapsed time regressions exceeding +10% against build history."""
+    history = load_history(repo_root)
+    baselines = history.get(mod_name, [])
+
+    if baselines and len(baselines) >= 2:
+        avg_baseline = sum(baselines) / len(baselines)
+        threshold = avg_baseline * 1.10  # +10% regression threshold
+
+        if current_duration > threshold and current_duration > 5.0:  # Ignore trivial sub-5s noise
+            pct_increase = ((current_duration - avg_baseline) / avg_baseline) * 100
+            print(
+                f"  ⚠️  [REGRESSION WARNING] {mod_name} took {current_duration:.2f}s "
+                f"(+{pct_increase:.1f}% vs baseline {avg_baseline:.2f}s)"
+            )
+
+    baselines.append(current_duration)
+    history[mod_name] = baselines[-10:]  # Keep rolling window of last 10 builds
+    save_history(repo_root, history)
+
+
 def is_target_cached(repo_root: Path, target: str) -> Tuple[bool, str]:
     """Query whether a Lake target is already up to date without building."""
     proc = subprocess.run(
@@ -91,13 +136,11 @@ def run_module_build(
 ) -> Tuple[str, int, float, str]:
     """Build a single Lake target with a strict wall-clock cap and group cleanup."""
     cmd = ["lake", "build", "-v", target]
+    os_env = dict(os.environ)
     if lean_mem_mb is not None:
-        os_env = dict(os.environ)
         existing = os_env.get("LEAN_OPTS", "").strip()
         mem_flag = f"-M{lean_mem_mb}"
         os_env["LEAN_OPTS"] = f"{existing} {mem_flag}".strip()
-    else:
-        os_env = None
 
     t0 = time.monotonic()
     proc = subprocess.Popen(
@@ -135,7 +178,11 @@ def run_module_build(
     except subprocess.TimeoutExpired as exc:
         kill_group()
         elapsed = time.monotonic() - t0
-        partial = exc.stdout.decode("utf-8", errors="replace") if isinstance(exc.stdout, bytes) else (exc.stdout or "")
+        partial = (
+            exc.stdout.decode("utf-8", errors="replace")
+            if isinstance(exc.stdout, bytes)
+            else (exc.stdout or "")
+        )
         if partial:
             sys.stdout.write(partial)
             sys.stdout.flush()
@@ -152,7 +199,9 @@ def save_progress(progress_path: Path, payload: dict) -> None:
     progress_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
-def print_status_report(repo_root: Path, ordered: List[Tuple[str, Path]], progress_path: Path) -> int:
+def print_status_report(
+    repo_root: Path, ordered: List[Tuple[str, Path]], progress_path: Path
+) -> int:
     """Display cached vs pending status for every module in topological order."""
     prior_timings: Dict[str, float] = {}
     if progress_path.is_file():
@@ -173,10 +222,15 @@ def print_status_report(repo_root: Path, ordered: List[Tuple[str, Path]], progre
         t_str = f" ({prior_timings[target]:.2f}s)" if target in prior_timings else ""
         print(f"  [{state:7s}] {target}{t_str}")
 
-    print(f"Summary: {cached_count}/{len(ordered)} targets cached, {len(pending)} pending.")
+    print(
+        f"Summary: {cached_count}/{len(ordered)} targets cached, {len(pending)} pending."
+    )
     if prior_timings:
         slowest = sorted(prior_timings.items(), key=lambda kv: kv[1], reverse=True)[:5]
-        print("Slowest recorded builds: " + ", ".join(f"{k}={v:.2f}s" for k, v in slowest))
+        print(
+            "Slowest recorded builds: "
+            + ", ".join(f"{k}={v:.2f}s" for k, v in slowest)
+        )
     return 0
 
 
@@ -199,8 +253,8 @@ def main() -> int:
     parser.add_argument(
         "--lean-mem-mb",
         type=int,
-        default=None,
-        help="Optional Lean -M heap cap in MB exported via LEAN_OPTS.",
+        default=DEFAULT_LEAN_MEM_MB,
+        help=f"Lean -M heap cap in MB exported via LEAN_OPTS (default: {DEFAULT_LEAN_MEM_MB}).",
     )
     parser.add_argument(
         "--require-complete",
@@ -235,7 +289,7 @@ def main() -> int:
 
     print(
         f"[*] Incremental build started at {utc_now_iso()} "
-        f"(budget={args.budget_secs}s, modules={len(ordered)})"
+        f"(budget={args.budget_secs}s, mem_cap={args.lean_mem_mb}MB, modules={len(ordered)})"
     )
 
     for idx, (mod, _) in enumerate(ordered):
@@ -262,6 +316,7 @@ def main() -> int:
 
         if status == "built":
             built.append(target)
+            check_regression(repo_root, mod, mod_elapsed)
             print(f"  [DONE]    {target} in {mod_elapsed:.2f}s")
         elif status == "timeout":
             paused = True
