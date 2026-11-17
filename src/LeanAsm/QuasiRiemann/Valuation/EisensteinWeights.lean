@@ -358,6 +358,74 @@ theorem romik_lacunary_n2_ratio :
       QRat.reduce (QRat.mul (romikLacunaryRaw 0 2) (eisensteinWeight 2 14)) := by
   decide
 
+/-! ## 7. Extension to `m = 4` (`k = 64`) -/
+
+set_option maxRecDepth 8192 in
+theorem weight_64_16 :
+    eisensteinWeight 16 64 = QRat.mk' 2913885327735 68873858806309696867 := by decide
+
+set_option maxRecDepth 8192 in
+theorem weight_64_13 :
+    eisensteinWeight 13 64 = QRat.mk' 600121535239657362071423070000 182366210209966086621041627701355557 := by decide
+
+set_option maxRecDepth 8192 in
+theorem weight_64_10 :
+    eisensteinWeight 10 64 = QRat.mk' 3727457709186834823657216329000 147160378123100046732809653241634407 := by decide
+
+set_option maxRecDepth 8192 in
+theorem weight_64_7 :
+    eisensteinWeight 7 64 = QRat.mk' 25836415074618238879673986008000000 658837012857118909222788817562797240139 := by decide
+
+set_option maxRecDepth 8192 in
+theorem weight_64_4 :
+    eisensteinWeight 4 64 = QRat.mk' 64914423658947331536966724687500 5444933990554701729113957169940473059 := by decide
+
+set_option maxRecDepth 8192 in
+theorem weight_64_1 :
+    eisensteinWeight 1 64 = QRat.mk' 4855259205271031250000 13732027066273772079835632049 := by decide
+
+/-- Exact rational weights at `k = 64` (`m = 4`, `2^(m+2) = 64`):
+    diagonal `a = 16` (`G_4^16`) has odd numerator and odd denominator (`v2 = 0`),
+    while all off-diagonal weights (`a = 13, 10, 7, 4, 1`) have `v2 > 0`. -/
+theorem prop4_computed_m4 :
+    qratV2 (eisensteinWeight 16 64) = 0 ∧
+    0 < qratV2 (eisensteinWeight 13 64) ∧
+    0 < qratV2 (eisensteinWeight 10 64) ∧
+    0 < qratV2 (eisensteinWeight 7 64) ∧
+    0 < qratV2 (eisensteinWeight 4 64) ∧
+    0 < qratV2 (eisensteinWeight 1 64) := by
+  rw [weight_64_16, weight_64_13, weight_64_10, weight_64_7, weight_64_4, weight_64_1]
+  dsimp only [qratV2, QRat.mk', Int.natAbs]
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
+  · have h1 : v2 2913885327735 = 0 := v2_odd rfl
+    have h2 : v2 68873858806309696867 = 0 := v2_odd rfl
+    omega
+  · have h1 : v2 182366210209966086621041627701355557 = 0 := v2_odd rfl
+    have h2 : (600121535239657362071423070000 : Nat) = 2 * 300060767619828681035711535000 := rfl
+    have h3 : v2 600121535239657362071423070000 = v2 300060767619828681035711535000 + 1 := by
+      rw [h2, v2_two_mul (by decide)]; omega
+    omega
+  · have h1 : v2 147160378123100046732809653241634407 = 0 := v2_odd rfl
+    have h2 : (3727457709186834823657216329000 : Nat) = 2 * 1863728854593417411828608164500 := rfl
+    have h3 : v2 3727457709186834823657216329000 = v2 1863728854593417411828608164500 + 1 := by
+      rw [h2, v2_two_mul (by decide)]; omega
+    omega
+  · have h1 : v2 658837012857118909222788817562797240139 = 0 := v2_odd rfl
+    have h2 : (25836415074618238879673986008000000 : Nat) = 2 * 12918207537309119439836993004000000 := rfl
+    have h3 : v2 25836415074618238879673986008000000 = v2 12918207537309119439836993004000000 + 1 := by
+      rw [h2, v2_two_mul (by decide)]; omega
+    omega
+  · have h1 : v2 5444933990554701729113957169940473059 = 0 := v2_odd rfl
+    have h2 : (64914423658947331536966724687500 : Nat) = 2 * 32457211829473665768483362343750 := rfl
+    have h3 : v2 64914423658947331536966724687500 = v2 32457211829473665768483362343750 + 1 := by
+      rw [h2, v2_two_mul (by decide)]; omega
+    omega
+  · have h1 : v2 13732027066273772079835632049 = 0 := v2_odd rfl
+    have h2 : (4855259205271031250000 : Nat) = 2 * 2427629602635515625000 := rfl
+    have h3 : v2 4855259205271031250000 = v2 2427629602635515625000 + 1 := by
+      rw [h2, v2_two_mul (by decide)]; omega
+    omega
+
 end LeanAsm.QuasiRiemann.Valuation.EisensteinWeights
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/Valuation/EisensteinWeights.lean
