@@ -483,8 +483,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms MiniVMNttBridge.garnerReconstruct4Asm_sound
 #print axioms MiniVMNttBridge.crtNtt4ChannelConvAsm_sound
 #print axioms MiniVMNttBridge.crtNtt4ConvAsm_sound
-#print axioms LeanAsm.miniVm_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 35: Higher (1054, 665) Convergent Gaps & Predecessor-Tree Density (Issue #55)
 #print axioms CollatzQrhBridge.convergent_1054_665_gap_pos
@@ -495,8 +493,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms CollatzQrhBridge.collatz_mod6_branching
 #print axioms CollatzQrhBridge.predecessor_density_threshold_ladder
 #print axioms CollatzQrhBridge.collatz_pred_tree_growth_certs
-#print axioms LeanAsm.collatz_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 36: Higher-Truncation (N = 256, 512) 2D Rectangles & CRT-NTT Phase (Issue #57)
 #print axioms QuasiRiemann.HighTruncZeroFreeRectSpec.nonvanishing_of_certified
@@ -508,8 +504,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms QuasiRiemann.eulerMaclaurinB2TailRect2DForN_monotone
 #print axioms QuasiRiemann.euler_maclaurin_tail_shrinks_with_N
 #print axioms QuasiRiemann.crtNtt_highTrunc_2d_zero_free_rect
-#print axioms LeanAsm.quasiRiemann_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 37: GSp(4) -> SO(5) Functorial Lift & Selberg / Kim-Sarnak Ladder (Issue #61)
 #print axioms GSp4FunctorialityBridge.gsp4StandardEulerPoly_eq_one_sub_mul
@@ -520,8 +514,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms GSp4FunctorialityBridge.genus2_f5_so5_ramanujan_tempered
 #print axioms GSp4FunctorialityBridge.kim_sarnak_ramanujan_ladder_strict
 #print axioms GSp4FunctorialityBridge.selberg_laplacian_eigenvalue_ladder
-#print axioms LeanAsm.finiteFieldWeil_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 38: Cauchy-Lipschitz Interior Box Lower-Bound & Telescoping Contraction
 #print axioms QuasiRiemann.CauchyBoxLowerBoundSpec.lip_lt_center
@@ -529,8 +521,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms QuasiRiemann.cauchy_box_2d_subbox_nonvanishing
 #print axioms QuasiRiemann.telescoping_squeezing_chain
 #print axioms QuasiRiemann.telescoping_box_contraction_cert
-#print axioms LeanAsm.quasiRiemann_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 39: GL(1) Artin-Fermat Euler Factor & MiniVM NTT Bridge (Issue #59)
 #print axioms ArtinFermatBridge.ArtinFermatCharacterSpec.toNttSpec_valid
@@ -542,8 +532,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms ArtinFermatBridge.artinCharTransform4_eq_ntt4_generic
 #print axioms ArtinFermatBridge.artin_char_transform_eq_ntt4
 #print axioms ArtinFermatBridge.artin_char_orthogonality_minivm
-#print axioms LeanAsm.eulerRns_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 41: Pure Constructive OpenAI-20261028 Bridge (Issue #65)
 #print axioms ConstructiveOpenaiBridge.straightWalk_stop
@@ -562,8 +550,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms ConstructiveOpenaiBridge.classFn_send_price
 #print axioms ConstructiveOpenaiBridge.q8_plaquette_holonomy_gauge_invariant
 #print axioms ConstructiveOpenaiBridge.q8_send_price_trace_invariant
-#print axioms LeanAsm.yangMills_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 42: GL(2) Elliptic Curve Modularity E_{11a1} & f_{11} (Issue #60)
 #print axioms EllipticModularityBridge.f11Coeffs_eq_table
@@ -578,8 +564,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms EllipticModularityBridge.gl2_euler_homog_pos_of_ramanujan
 #print axioms EllipticModularityBridge.hasse_weil_ramanujan_11a1_certs
 #print axioms EllipticModularityBridge.hecke_multiplicativity_11a1_certs
-#print axioms LeanAsm.finiteFieldWeil_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 43: Parametric Beyond-7/8 QRH Ladder & Kim-Sarnak Bridge (Issue #68)
 #print axioms QuasiRiemann.qrhShortExponent_strict_anti
@@ -589,8 +573,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms QuasiRiemann.qrhFromAutomorphic_eqv_half_add
 #print axioms QuasiRiemann.kim_sarnak_amplified_qrh_step
 #print axioms QuasiRiemann.parametric_qrh_kim_sarnak_certs
-#print axioms LeanAsm.quasiRiemann_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 44: Higher-Truncation N=256,512 Rational Contraction & Strip Bridge (Issue #69)
 #print axioms QuasiRiemann.RationalBoxContractionSpec.lip_mul_radius_lt
@@ -601,8 +583,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms QuasiRiemann.exponent_strict_mono_sigma
 #print axioms QuasiRiemann.ultradeep72_strip_to_zero_density_bridge
 #print axioms QuasiRiemann.ultradeep72_N512_strip_zd_certs
-#print axioms LeanAsm.quasiRiemann_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 45: GL(1) Artin Character-Twisted Short-Interval Bounds (Issue #70)
 #print axioms ArtinShortIntervalBridge.artin_gaussian_char_orthogonality
@@ -610,8 +590,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms ArtinShortIntervalBridge.artin_twisted_ap_short_interval_pos
 #print axioms ArtinShortIntervalBridge.artin_twisted_coset_short_interval_pos
 #print axioms ArtinShortIntervalBridge.fermat_tower_artin_short_interval_certs
-#print axioms LeanAsm.eulerRns_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 46: Constructive Dyadic-Shell & Discrete Abel Summation Bridge (Issue #71)
 #print axioms QuasiRiemann.dyadicShellPartition_flatten
@@ -626,8 +604,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms QuasiRiemann.sqrt_tail_gate_dyadic_step
 #print axioms QuasiRiemann.short_interval_dyadic_abel_envelope
 #print axioms QuasiRiemann.dyadic_abel_short_interval_certs
-#print axioms LeanAsm.quasiRiemann_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 47: Closed-Loop Dyadic-Abel Rungs k=5,6 & Variational Mollifier (Issue #78)
 #print axioms QuasiRiemann.dyadic_abel_unlocks_next_rung
@@ -640,13 +616,10 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms QuasiRiemann.variational_energy_lt_one_of_pos
 #print axioms QuasiRiemann.variational_mollifier_beats_linear
 #print axioms QuasiRiemann.mollifier_variational_bridge_certs
-#print axioms LeanAsm.quasiRiemann_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 48: UltraDeep108 N=1024,2048 & MiniVM Parametric 8-Pt Fermat NTT (Issue #79)
 #print axioms MiniVMNttBridge.fermatTowerNtt8Specs_valid
 #print axioms MiniVMNttBridge.fermatTowerNtt8_asm_roundtrip_certs
-#print axioms LeanAsm.miniVm_provenance_certified
 #print axioms QuasiRiemann.twoPiInterval108_valid
 #print axioms QuasiRiemann.ln_table_1_to_2048_valid
 #print axioms QuasiRiemann.phase_reduction_width_1e30_under_1e75
@@ -656,8 +629,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms QuasiRiemann.ultraDeep72_N1024_rational_rect_cert
 #print axioms QuasiRiemann.ultraDeep72_N2048_rational_rect_cert
 #print axioms QuasiRiemann.ultradeep72_N2048_strip_zd_certs
-#print axioms LeanAsm.quasiRiemann_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 49: Constructive p-Adic Ultrametric Valuation & Contraction (inbox/gemweb100-101)
 #print axioms QuasiRiemann.Valuation.IsPrime.dvd_mul
@@ -747,8 +718,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms QuasiRiemann.Valuation.hensel_poly_build_prime_tower_crt
 #print axioms QuasiRiemann.Valuation.hensel_mersenne_tower_sqrt2_lift
 #print axioms QuasiRiemann.Valuation.hensel_mersenne_tower_sqrt2_built
-#print axioms LeanAsm.quasiRiemann_provenance_certified
-#print axioms LeanAsm.leanasm_full_provenance_certified
 
 -- Part 50: Langlands Rankin-Selberg, Sym^2 & Hecke-Abel Bridge (Issue #80)
 #print axioms LanglandsRankinSelbergBridge.rs_at_11
