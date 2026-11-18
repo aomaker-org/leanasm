@@ -4,6 +4,7 @@
 
 import LeanAsm.CrtNtt
 import LeanAsm.EulerFactorNonVanishing
+import LeanAsm.Constants.PrimeTowers
 
 namespace CrtNtt
 
@@ -2378,6 +2379,9 @@ theorem karatsuba_192_digit_max_verified :
 def fermatTowerMod4 : Nat :=
   5 * 17 * 257 * 65537
 
+/-- Equivalence with the immutable constant. -/
+theorem fermatTowerMod4_eq_const : fermatTowerMod4 = LeanAsm.Constants.PrimeTowers.fermatTowerMod4 := by decide
+
 /-- Fermat-tower dynamic range & unsigned 31-bit embedding bounds:
 `M_4 = 1,431,655,765 = EulerFactorNonVanishing.fermatTowerPrimes.prod`,
 `3 * M_4 = 2^32 - 1 = 4,294,967,295`, and `2^30 < M_4 < 2^31`.
@@ -2396,7 +2400,7 @@ theorem fermat_tower_crt_modulus_bounds :
 `(5 * 17)⁻¹ ≡ 127 (mod 257)`. -/
 def garner5_17_257 (r1 r2 r3 : Nat) : Nat :=
   let x12 := garner5_17 r1 r2
-  let v3 := ((r3 % 257 + 257 - (x12 % 257)) * 127) % 257
+  let v3 := ((r3 % 257 + 257 - (x12 % 257)) * LeanAsm.Constants.PrimeTowers.garnerInv123) % 257
   x12 + 85 * v3
 
 /-- Constructive 4-prime Garner mixed-radix CRT reconstruction over `{5, 17, 257, 65537}`:
@@ -2406,7 +2410,7 @@ def garner5_17_257 (r1 r2 r3 : Nat) : Nat :=
 Avoids `O(M_4^2)` intermediate big-modulus multiplications. -/
 def garnerReconstruct4 (r1 r2 r3 r4 : Nat) : Nat :=
   let x123 := garner5_17_257 r1 r2 r3
-  let v4 := ((r4 % 65537 + 65537 - (x123 % 65537)) * 32767) % 65537
+  let v4 := ((r4 % 65537 + 65537 - (x123 % 65537)) * LeanAsm.Constants.PrimeTowers.garnerInv1234) % 65537
   x123 + 21845 * v4
 
 /-- Certified mixed-radix Garner inverses over `(5, 17, 257, 65537)`. -/
@@ -2432,12 +2436,14 @@ private theorem garner5_17_257_roundtrip (z : Nat) (hz : z < 21845) :
     rw [← Nat.mod_mod_of_dvd z hd5, ← Nat.mod_mod_of_dvd z hd17]
     exact garner5_17_roundtrip y hy
   rw [hpart]
+  dsimp only [LeanAsm.Constants.PrimeTowers.garnerInv123, LeanAsm.Constants.PrimeTowers.garnerInv1234, LeanAsm.Constants.PrimeTowers.fermatTowerMod4] at *
   omega
 
 /-- Output range bound: `garnerReconstruct4 r1 r2 r3 r4 < fermatTowerMod4` for all inputs. -/
 theorem garnerReconstruct4_lt (r1 r2 r3 r4 : Nat) :
     garnerReconstruct4 r1 r2 r3 r4 < fermatTowerMod4 := by
   dsimp [garnerReconstruct4, garner5_17_257, garner5_17, fermatTowerMod4]
+  dsimp only [LeanAsm.Constants.PrimeTowers.garnerInv123, LeanAsm.Constants.PrimeTowers.garnerInv1234, LeanAsm.Constants.PrimeTowers.fermatTowerMod4] at *
   omega
 
 /-- Constructive 4-Prime Garner Mixed-Radix CRT Roundtrip Soundness:
@@ -2457,6 +2463,7 @@ theorem garnerReconstruct4_sound (x : Nat) (hx : x < fermatTowerMod4) :
         ← Nat.mod_mod_of_dvd x hd257]
     exact garner5_17_257_roundtrip z hz
   rw [hpart]
+  dsimp only [LeanAsm.Constants.PrimeTowers.garnerInv123, LeanAsm.Constants.PrimeTowers.garnerInv1234, LeanAsm.Constants.PrimeTowers.fermatTowerMod4] at *
   omega
 
 /-- Generic `m`-term convolution inner-product sum `∑_{i < m} a i * b (idx i)`

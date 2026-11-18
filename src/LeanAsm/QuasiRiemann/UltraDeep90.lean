@@ -167,8 +167,8 @@ private theorem rawMul90_fn_eq : rawMul90Crt = rawMul90Fast := by
   simp only [PiChudnovsky.intMulBigViaCrtNtt_eq_mul]
 
 private def twoPiRaw90 : RawIv72 :=
-  (Int.ofNat (2 * PiChudnovsky.piLower105 / scale15Nat),
-   Int.ofNat ((2 * PiChudnovsky.piUpper105 + scale15Nat - 1) / scale15Nat))
+  (Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piLower105 / scale15Nat),
+   Int.ofNat ((2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale15Nat - 1) / scale15Nat))
 
 private def twoPiLoLit90 : Nat :=
   6283185307179586476925286766559005768394338798750211641949889184615632812572417997256069650
@@ -380,44 +380,44 @@ private def twoPiRaw90Lit : RawIv72 :=
   (Int.ofNat twoPiLoLit90, Int.ofNat twoPiHiLit90)
 
 private theorem twoPi_90_div_eq_lits :
-    2 * PiChudnovsky.piLower105 / scale15Nat = twoPiLoLit90 ∧
-    (2 * PiChudnovsky.piUpper105 + scale15Nat - 1) / scale15Nat = twoPiHiLit90 := by
-  obtain ⟨hlo, hhi, hdigits⟩ := PiChudnovsky.pi_100_digits_certified
-  have hdm_lo := Nat.div_add_mod PiChudnovsky.piLower105 (10 ^ 5)
-  have hmod_lo := Nat.mod_lt PiChudnovsky.piLower105 (by decide : 0 < 10 ^ 5)
+    2 * LeanAsm.Constants.PiAndSqrt.piLower105 / scale15Nat = twoPiLoLit90 ∧
+    (2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale15Nat - 1) / scale15Nat = twoPiHiLit90 := by
+  obtain ⟨hlo, hhi, hdigits⟩ := LeanAsm.Constants.PiAndSqrt.pi_100_digits_certified
+  have hdm_lo := Nat.div_add_mod LeanAsm.Constants.PiAndSqrt.piLower105 (10 ^ 5)
+  have hmod_lo := Nat.mod_lt LeanAsm.Constants.PiAndSqrt.piLower105 (by decide : 0 < 10 ^ 5)
   rw [hlo] at hdm_lo
-  have h_lo_1 : 10 ^ 5 * PiChudnovsky.piDigits100 ≤ PiChudnovsky.piLower105 :=
+  have h_lo_1 : 10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 ≤ LeanAsm.Constants.PiAndSqrt.piLower105 :=
     Nat.le.intro hdm_lo
-  have h_lo_2 : PiChudnovsky.piLower105 < 10 ^ 5 * PiChudnovsky.piDigits100 + 10 ^ 5 := by
+  have h_lo_2 : LeanAsm.Constants.PiAndSqrt.piLower105 < 10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 + 10 ^ 5 := by
     omega
-  have h1_lo : twoPiLoLit90 * scale15Nat ≤ 2 * (10 ^ 5 * PiChudnovsky.piDigits100) := by
+  have h1_lo : twoPiLoLit90 * scale15Nat ≤ 2 * (10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100) := by
     rw [hdigits]; decide
   have h2_lo :
-      2 * (10 ^ 5 * PiChudnovsky.piDigits100 + 10 ^ 5) ≤ (twoPiLoLit90 + 1) * scale15Nat := by
+      2 * (10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 + 10 ^ 5) ≤ (twoPiLoLit90 + 1) * scale15Nat := by
     rw [hdigits]; decide
-  have hdm_hi := Nat.div_add_mod PiChudnovsky.piUpper105 (10 ^ 5)
-  have hmod_hi := Nat.mod_lt PiChudnovsky.piUpper105 (by decide : 0 < 10 ^ 5)
+  have hdm_hi := Nat.div_add_mod LeanAsm.Constants.PiAndSqrt.piUpper105 (10 ^ 5)
+  have hmod_hi := Nat.mod_lt LeanAsm.Constants.PiAndSqrt.piUpper105 (by decide : 0 < 10 ^ 5)
   rw [hhi] at hdm_hi
-  have h_hi_1 : 10 ^ 5 * PiChudnovsky.piDigits100 ≤ PiChudnovsky.piUpper105 :=
+  have h_hi_1 : 10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 ≤ LeanAsm.Constants.PiAndSqrt.piUpper105 :=
     Nat.le.intro hdm_hi
-  have h_hi_2 : PiChudnovsky.piUpper105 < 10 ^ 5 * PiChudnovsky.piDigits100 + 10 ^ 5 := by
+  have h_hi_2 : LeanAsm.Constants.PiAndSqrt.piUpper105 < 10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 + 10 ^ 5 := by
     omega
   have h1_hi :
-      twoPiHiLit90 * scale15Nat ≤ 2 * (10 ^ 5 * PiChudnovsky.piDigits100) + scale15Nat - 1 := by
+      twoPiHiLit90 * scale15Nat ≤ 2 * (10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100) + scale15Nat - 1 := by
     rw [hdigits]; decide
   have h2_hi :
-      2 * (10 ^ 5 * PiChudnovsky.piDigits100 + 10 ^ 5) + scale15Nat - 1 ≤
+      2 * (10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 + 10 ^ 5) + scale15Nat - 1 ≤
         (twoPiHiLit90 + 1) * scale15Nat := by
     rw [hdigits]; decide
   have hhi_lo_le :
-      2 * (10 ^ 5 * PiChudnovsky.piDigits100) + scale15Nat - 1 ≤
-        2 * PiChudnovsky.piUpper105 + scale15Nat - 1 :=
+      2 * (10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100) + scale15Nat - 1 ≤
+        2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale15Nat - 1 :=
     Nat.sub_le_sub_right (Nat.add_le_add_right (Nat.mul_le_mul_left 2 h_hi_1) scale15Nat) 1
   have hhi_hi_lt :
-      2 * PiChudnovsky.piUpper105 + scale15Nat - 1 <
-        2 * (10 ^ 5 * PiChudnovsky.piDigits100 + 10 ^ 5) + scale15Nat - 1 :=
+      2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale15Nat - 1 <
+        2 * (10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 + 10 ^ 5) + scale15Nat - 1 :=
     Nat.sub_lt_sub_right
-      (Nat.le_trans scale15Nat_pos (Nat.le_add_left scale15Nat (2 * PiChudnovsky.piUpper105)))
+      (Nat.le_trans scale15Nat_pos (Nat.le_add_left scale15Nat (2 * LeanAsm.Constants.PiAndSqrt.piUpper105)))
       (Nat.add_lt_add_right (Nat.mul_lt_mul_of_pos_left h_hi_2 (by decide)) scale15Nat)
   exact ⟨
     nat_div_eq_of_bracket scale15Nat_pos
@@ -437,53 +437,53 @@ def twoPiInterval90 : ScaledInterval90 where
   hi := twoPiRaw90.2
   valid :=
     Int.ofNat_le.mpr
-      (nat_div_le_ceil_div (2 * PiChudnovsky.piLower105) (2 * PiChudnovsky.piUpper105)
-        scale15Nat scale15Nat_pos (Nat.mul_le_mul_left 2 PiChudnovsky.pi_105_bracket_valid.1))
+      (nat_div_le_ceil_div (2 * LeanAsm.Constants.PiAndSqrt.piLower105) (2 * LeanAsm.Constants.PiAndSqrt.piUpper105)
+        scale15Nat scale15Nat_pos (Nat.mul_le_mul_left 2 LeanAsm.Constants.PiAndSqrt.pi_105_bracket_valid.1))
 
 theorem twoPiInterval90_valid : twoPiInterval90.lo ≤ twoPiInterval90.hi :=
   twoPiInterval90.valid
 
 /-- Exact integer bracketing linking `twoPiInterval90` (`10^90`) directly to
-`PiChudnovsky.pi_105_bracket_valid` (`10^105`). -/
+`LeanAsm.Constants.PiAndSqrt.pi_105_bracket_valid` (`10^105`). -/
 theorem twoPiInterval90_from_chudnovsky_sound :
-    twoPiInterval90.lo * 10 ^ 15 ≤ 2 * (PiChudnovsky.piLower105 : Int) ∧
-    2 * (PiChudnovsky.piUpper105 : Int) ≤ twoPiInterval90.hi * 10 ^ 15 := by
-  have _ := PiChudnovsky.pi_105_bracket_valid
+    twoPiInterval90.lo * 10 ^ 15 ≤ 2 * (LeanAsm.Constants.PiAndSqrt.piLower105 : Int) ∧
+    2 * (LeanAsm.Constants.PiAndSqrt.piUpper105 : Int) ≤ twoPiInterval90.hi * 10 ^ 15 := by
+  have _ := LeanAsm.Constants.PiAndSqrt.pi_105_bracket_valid
   constructor
   · have hnat :
-        (2 * PiChudnovsky.piLower105 / scale15Nat) * scale15Nat ≤
-          2 * PiChudnovsky.piLower105 :=
-      Nat.div_mul_le_self (2 * PiChudnovsky.piLower105) scale15Nat
+        (2 * LeanAsm.Constants.PiAndSqrt.piLower105 / scale15Nat) * scale15Nat ≤
+          2 * LeanAsm.Constants.PiAndSqrt.piLower105 :=
+      Nat.div_mul_le_self (2 * LeanAsm.Constants.PiAndSqrt.piLower105) scale15Nat
     have hint :
-        Int.ofNat ((2 * PiChudnovsky.piLower105 / scale15Nat) * scale15Nat) ≤
-          Int.ofNat (2 * PiChudnovsky.piLower105) := Int.ofNat_le.mpr hnat
+        Int.ofNat ((2 * LeanAsm.Constants.PiAndSqrt.piLower105 / scale15Nat) * scale15Nat) ≤
+          Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piLower105) := Int.ofNat_le.mpr hnat
     have hmul1 :
         twoPiInterval90.lo * (10 ^ 15 : Int) =
-          Int.ofNat ((2 * PiChudnovsky.piLower105 / scale15Nat) * scale15Nat) := by
-      change Int.ofNat (2 * PiChudnovsky.piLower105 / scale15Nat) * Int.ofNat scale15Nat = _
+          Int.ofNat ((2 * LeanAsm.Constants.PiAndSqrt.piLower105 / scale15Nat) * scale15Nat) := by
+      change Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piLower105 / scale15Nat) * Int.ofNat scale15Nat = _
       exact (Int.natCast_mul _ _).symm
     have hmul2 :
-        2 * (PiChudnovsky.piLower105 : Int) = Int.ofNat (2 * PiChudnovsky.piLower105) :=
-      (Int.natCast_mul 2 PiChudnovsky.piLower105).symm
+        2 * (LeanAsm.Constants.PiAndSqrt.piLower105 : Int) = Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piLower105) :=
+      (Int.natCast_mul 2 LeanAsm.Constants.PiAndSqrt.piLower105).symm
     rw [hmul1, hmul2]
     exact hint
   · have hnat :
-        2 * PiChudnovsky.piUpper105 ≤
-          ((2 * PiChudnovsky.piUpper105 + scale15Nat - 1) / scale15Nat) * scale15Nat :=
-      nat_le_ceil_div_mul (2 * PiChudnovsky.piUpper105) scale15Nat scale15Nat_pos
+        2 * LeanAsm.Constants.PiAndSqrt.piUpper105 ≤
+          ((2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale15Nat - 1) / scale15Nat) * scale15Nat :=
+      nat_le_ceil_div_mul (2 * LeanAsm.Constants.PiAndSqrt.piUpper105) scale15Nat scale15Nat_pos
     have hint :
-        Int.ofNat (2 * PiChudnovsky.piUpper105) ≤
-          Int.ofNat (((2 * PiChudnovsky.piUpper105 + scale15Nat - 1) / scale15Nat) *
+        Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piUpper105) ≤
+          Int.ofNat (((2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale15Nat - 1) / scale15Nat) *
             scale15Nat) := Int.ofNat_le.mpr hnat
     have hmul1 :
-        2 * (PiChudnovsky.piUpper105 : Int) = Int.ofNat (2 * PiChudnovsky.piUpper105) :=
-      (Int.natCast_mul 2 PiChudnovsky.piUpper105).symm
+        2 * (LeanAsm.Constants.PiAndSqrt.piUpper105 : Int) = Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piUpper105) :=
+      (Int.natCast_mul 2 LeanAsm.Constants.PiAndSqrt.piUpper105).symm
     have hmul2 :
         twoPiInterval90.hi * (10 ^ 15 : Int) =
-          Int.ofNat (((2 * PiChudnovsky.piUpper105 + scale15Nat - 1) / scale15Nat) *
+          Int.ofNat (((2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale15Nat - 1) / scale15Nat) *
             scale15Nat) := by
       change
-        Int.ofNat ((2 * PiChudnovsky.piUpper105 + scale15Nat - 1) / scale15Nat) *
+        Int.ofNat ((2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale15Nat - 1) / scale15Nat) *
           Int.ofNat scale15Nat = _
       exact (Int.natCast_mul _ _).symm
     rw [hmul1, hmul2]
@@ -761,8 +761,8 @@ set_option exponentiation.threshold 2000 in
    `taylorCosInterval72` / `taylorSinInterval72` (`intMul192ViaCrtNtt`). ZERO `Classical.choice`/`sorryAx`. -/
 theorem crtNtt_phase_reduction_512_sound :
     (twoPiInterval90.hi - twoPiInterval90.lo = 1 ∧
-     twoPiInterval90.lo * 10 ^ 15 ≤ 2 * (PiChudnovsky.piLower105 : Int) ∧
-     2 * (PiChudnovsky.piUpper105 : Int) ≤ twoPiInterval90.hi * 10 ^ 15) ∧
+     twoPiInterval90.lo * 10 ^ 15 ≤ 2 * (LeanAsm.Constants.PiAndSqrt.piLower105 : Int) ∧
+     2 * (LeanAsm.Constants.PiAndSqrt.piUpper105 : Int) ≤ twoPiInterval90.hi * 10 ^ 15) ∧
     (∀ xIv : ScaledInterval90,
       0 ≤ xIv.lo →
       xIv.hi ≤ 7 * (10 ^ 18 + 10) * scale90Int →

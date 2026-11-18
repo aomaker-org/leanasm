@@ -3,6 +3,7 @@
 -- Max Column: 120 Columns
 
 import LeanAsm.PiChudnovsky.CrtMulBridge
+import LeanAsm.Constants.PiAndSqrt
 
 namespace PiChudnovsky
 
@@ -49,10 +50,10 @@ theorem isqrtNewton_eq_exact (n : Nat) : isqrtNewton n = isqrtExact n := by
   rw [natMulBigViaCrtNtt_eq_mul]
 
 /-- Scale `10^110` target used for `sqrt(10005 * 10^220)`. -/
-def sqrtTarget : Nat := 10005 * 10 ^ 220
+abbrev sqrtTarget : Nat := LeanAsm.Constants.PiAndSqrt.sqrtTarget
 
-/-- 113-digit floor of `√10005 · 10^110` computed via `isqrtNewton`. -/
-def sqrt10005Scaled110 : Nat := isqrtNewton sqrtTarget
+/-- 113-digit floor of `√10005 · 10^110` (alias of the immutable constant). -/
+abbrev sqrt10005Scaled110 : Nat := LeanAsm.Constants.PiAndSqrt.sqrt10005Scaled110
 
 set_option exponentiation.threshold 1024 in
 /-- Constructive certification of the exact 113-digit floor bracket for `√10005 · 10^110`
@@ -60,8 +61,13 @@ via `natMul192ViaCrtNtt` with zero non-standard axioms. -/
 theorem sqrt10005_scaled110_certified :
     natMul192ViaCrtNtt sqrt10005Scaled110 sqrt10005Scaled110 ≤ sqrtTarget ∧
     sqrtTarget < natMul192ViaCrtNtt (sqrt10005Scaled110 + 1) (sqrt10005Scaled110 + 1) := by
-  dsimp only [sqrt10005Scaled110]
-  rw [natMul192ViaCrtNtt_total_eq_mul, natMul192ViaCrtNtt_total_eq_mul, isqrtNewton_eq_exact]
+  rw [natMul192ViaCrtNtt_total_eq_mul, natMul192ViaCrtNtt_total_eq_mul]
+  exact LeanAsm.Constants.PiAndSqrt.sqrt10005_scaled110_certified
+
+set_option exponentiation.threshold 1024 in
+/-- Equivalence of the constant with the Newton-Raphson computation. -/
+theorem sqrt10005Scaled110_eq_isqrtNewton : sqrt10005Scaled110 = isqrtNewton sqrtTarget := by
+  rw [isqrtNewton_eq_exact]
   decide
 
 set_option exponentiation.threshold 1024 in
@@ -70,9 +76,8 @@ using `natMulBigViaCrtNtt` (`karatsubaCrtNttMul192` on `< 10^96` limbs). -/
 theorem sqrt10005_scaled110_crt_limbs_certified :
     natMulBigViaCrtNtt sqrt10005Scaled110 sqrt10005Scaled110 ≤ sqrtTarget ∧
     sqrtTarget < natMulBigViaCrtNtt (sqrt10005Scaled110 + 1) (sqrt10005Scaled110 + 1) := by
-  dsimp only [sqrt10005Scaled110]
-  rw [natMulBigViaCrtNtt_eq_mul, natMulBigViaCrtNtt_eq_mul, isqrtNewton_eq_exact]
-  decide
+  rw [natMulBigViaCrtNtt_eq_mul, natMulBigViaCrtNtt_eq_mul]
+  exact LeanAsm.Constants.PiAndSqrt.sqrt10005_scaled110_certified
 
 end PiChudnovsky
 

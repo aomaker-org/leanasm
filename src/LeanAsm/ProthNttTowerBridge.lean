@@ -4,13 +4,14 @@
 
 import LeanAsm.CrtNttUniversal
 import LeanAsm.EulerFactorNonVanishing
+import LeanAsm.Constants.PrimeTowers
 
 namespace ProthNttTowerBridge
 
 open CrtNtt
 
 /-- 31-bit Proth NTT prime `P_5 = 15 * 2^27 + 1`. -/
-def prothPrime5 : Nat := 2013265921
+abbrev prothPrime5 : Nat := LeanAsm.Constants.PrimeTowers.prothPrime5
 
 /-- The 5-prime tower. -/
 def prothTowerPrimes : List Nat := [5, 17, 257, 65537, 2013265921]
@@ -19,9 +20,15 @@ def prothTowerPrimes : List Nat := [5, 17, 257, 65537, 2013265921]
 def prothTowerMod5 : Nat := fermatTowerMod4 * prothPrime5
 
 /-- `M_4⁻¹ mod P_5`. -/
-def m4InvModP5 : Nat := 1327898798
+abbrev m4InvModP5 : Nat := LeanAsm.Constants.PrimeTowers.m4InvModP5
 
 theorem prothPrime5_eq : prothPrime5 = 15 * 2 ^ 27 + 1 := by decide
+
+/-- Delegates the `P_5` arithmetic sub-facts to the immutable constants module. -/
+theorem prothPrime5_certified_delegate :
+    prothPrime5 - 1 = 2 ^ 27 * 3 * 5 ∧ Nat.gcd prothPrime5 fermatTowerMod4 = 1 := by
+  have h := LeanAsm.Constants.PrimeTowers.proth_prime5_certified
+  exact ⟨h.2.1, h.2.2.1⟩
 
 theorem prothTower_eq_fermat_append :
     prothTowerPrimes = EulerFactorNonVanishing.fermatTowerPrimes ++ [prothPrime5] := by decide
@@ -59,10 +66,10 @@ def sqrIter (b m : Nat) : Nat → Nat
   | k + 1 => (sqrIter b m k) * (sqrIter b m k) % m
 
 /-- Primitive root `g = 31` of `F_{P_5}`. -/
-def prothGen : Nat := 31
+abbrev prothGen : Nat := LeanAsm.Constants.PrimeTowers.prothGen
 
 /-- Principal `2^27`-th root of unity `ω = 31^15 mod P_5`. -/
-def prothOmega27 : Nat := 440564289
+abbrev prothOmega27 : Nat := LeanAsm.Constants.PrimeTowers.prothOmega27
 
 /-- `P_5 - 1 = 2^27 * 3 * 5`. -/
 theorem prothPrime5_pred_factor : prothPrime5 - 1 = 2 ^ 27 * 3 * 5 := by decide
@@ -123,7 +130,7 @@ private theorem stage5_digit (x : Nat) (hx : x < prothTowerMod5) :
     rw [← hq', ← hr]; exact (Nat.div_add_mod x fermatTowerMod4).symm
   have hMn : fermatTowerMod4 = 1431655765 := hM
   have hPn : prothPrime5 = 2013265921 := hP
-  dsimp only [m4InvModP5]
+  dsimp only [m4InvModP5, LeanAsm.Constants.PrimeTowers.m4InvModP5]
   rw [hMn] at hx'
   rw [hPn] at hq ⊢
   omega
@@ -160,7 +167,8 @@ theorem garnerReconstruct5Asm_mod_P5 (r1 r2 r3 r4 r5 : Nat) :
     garnerReconstruct5Asm r1 r2 r3 r4 r5 % prothPrime5 = r5 % prothPrime5 := by
   have hv : ∀ a : Nat, ((r5 % prothPrime5 + prothPrime5 - (a % prothPrime5)) * m4InvModP5)
       % prothPrime5 < prothPrime5 := fun _ => Nat.mod_lt _ (by decide)
-  dsimp only [garnerReconstruct5Asm, m4InvModP5, fermatTowerMod4, prothPrime5] at *
+  dsimp only [garnerReconstruct5Asm, m4InvModP5, fermatTowerMod4, prothPrime5, LeanAsm.Constants.PrimeTowers.m4InvModP5,
+    LeanAsm.Constants.PrimeTowers.fermatTowerMod4, LeanAsm.Constants.PrimeTowers.prothPrime5] at *
   have := hv (garnerReconstruct4 r1 r2 r3 r4)
   generalize garnerReconstruct4 r1 r2 r3 r4 = a at *
   omega

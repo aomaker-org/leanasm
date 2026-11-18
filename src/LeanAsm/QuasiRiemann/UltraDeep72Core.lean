@@ -4,6 +4,7 @@
 -- Max Column: 100 Columns
 
 import LeanAsm.PiChudnovsky
+import LeanAsm.Constants.PiAndSqrt
 import LeanAsm.QuasiRiemann
 import LeanAsm.QuasiRiemann.Rat
 
@@ -201,8 +202,8 @@ private def scale33Nat : Nat := 10 ^ 33
 private theorem scale33Nat_pos : 0 < scale33Nat := by decide
 
 private def twoPiRaw72 : RawIv72 :=
-  (Int.ofNat (2 * PiChudnovsky.piLower105 / scale33Nat),
-   Int.ofNat ((2 * PiChudnovsky.piUpper105 + scale33Nat - 1) / scale33Nat))
+  (Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piLower105 / scale33Nat),
+   Int.ofNat ((2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale33Nat - 1) / scale33Nat))
 
 private def twoPiLoLit72 : Nat :=
   6283185307179586476925286766559005768394338798750211641949889184615632812
@@ -230,44 +231,44 @@ theorem nat_div_eq_of_bracket {n q d : Nat} (hd : 0 < d)
     exact Nat.le_antisymm (Nat.not_lt.mp hgt) (Nat.not_lt.mp hlt)
 
 private theorem twoPi_div_eq_lits :
-    2 * PiChudnovsky.piLower105 / scale33Nat = twoPiLoLit72 ∧
-    (2 * PiChudnovsky.piUpper105 + scale33Nat - 1) / scale33Nat = twoPiHiLit72 := by
-  obtain ⟨hlo, hhi, hdigits⟩ := PiChudnovsky.pi_100_digits_certified
-  have hdm_lo := Nat.div_add_mod PiChudnovsky.piLower105 (10 ^ 5)
-  have hmod_lo := Nat.mod_lt PiChudnovsky.piLower105 (by decide : 0 < 10 ^ 5)
+    2 * LeanAsm.Constants.PiAndSqrt.piLower105 / scale33Nat = twoPiLoLit72 ∧
+    (2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale33Nat - 1) / scale33Nat = twoPiHiLit72 := by
+  obtain ⟨hlo, hhi, hdigits⟩ := LeanAsm.Constants.PiAndSqrt.pi_100_digits_certified
+  have hdm_lo := Nat.div_add_mod LeanAsm.Constants.PiAndSqrt.piLower105 (10 ^ 5)
+  have hmod_lo := Nat.mod_lt LeanAsm.Constants.PiAndSqrt.piLower105 (by decide : 0 < 10 ^ 5)
   rw [hlo] at hdm_lo
-  have h_lo_1 : 10 ^ 5 * PiChudnovsky.piDigits100 ≤ PiChudnovsky.piLower105 :=
+  have h_lo_1 : 10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 ≤ LeanAsm.Constants.PiAndSqrt.piLower105 :=
     Nat.le.intro hdm_lo
-  have h_lo_2 : PiChudnovsky.piLower105 < 10 ^ 5 * PiChudnovsky.piDigits100 + 10 ^ 5 := by
+  have h_lo_2 : LeanAsm.Constants.PiAndSqrt.piLower105 < 10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 + 10 ^ 5 := by
     omega
-  have h1_lo : twoPiLoLit72 * scale33Nat ≤ 2 * (10 ^ 5 * PiChudnovsky.piDigits100) := by
+  have h1_lo : twoPiLoLit72 * scale33Nat ≤ 2 * (10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100) := by
     rw [hdigits]; decide
   have h2_lo :
-      2 * (10 ^ 5 * PiChudnovsky.piDigits100 + 10 ^ 5) ≤ (twoPiLoLit72 + 1) * scale33Nat := by
+      2 * (10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 + 10 ^ 5) ≤ (twoPiLoLit72 + 1) * scale33Nat := by
     rw [hdigits]; decide
-  have hdm_hi := Nat.div_add_mod PiChudnovsky.piUpper105 (10 ^ 5)
-  have hmod_hi := Nat.mod_lt PiChudnovsky.piUpper105 (by decide : 0 < 10 ^ 5)
+  have hdm_hi := Nat.div_add_mod LeanAsm.Constants.PiAndSqrt.piUpper105 (10 ^ 5)
+  have hmod_hi := Nat.mod_lt LeanAsm.Constants.PiAndSqrt.piUpper105 (by decide : 0 < 10 ^ 5)
   rw [hhi] at hdm_hi
-  have h_hi_1 : 10 ^ 5 * PiChudnovsky.piDigits100 ≤ PiChudnovsky.piUpper105 :=
+  have h_hi_1 : 10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 ≤ LeanAsm.Constants.PiAndSqrt.piUpper105 :=
     Nat.le.intro hdm_hi
-  have h_hi_2 : PiChudnovsky.piUpper105 < 10 ^ 5 * PiChudnovsky.piDigits100 + 10 ^ 5 := by
+  have h_hi_2 : LeanAsm.Constants.PiAndSqrt.piUpper105 < 10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 + 10 ^ 5 := by
     omega
   have h1_hi :
-      twoPiHiLit72 * scale33Nat ≤ 2 * (10 ^ 5 * PiChudnovsky.piDigits100) + scale33Nat - 1 := by
+      twoPiHiLit72 * scale33Nat ≤ 2 * (10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100) + scale33Nat - 1 := by
     rw [hdigits]; decide
   have h2_hi :
-      2 * (10 ^ 5 * PiChudnovsky.piDigits100 + 10 ^ 5) + scale33Nat - 1 ≤
+      2 * (10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 + 10 ^ 5) + scale33Nat - 1 ≤
         (twoPiHiLit72 + 1) * scale33Nat := by
     rw [hdigits]; decide
   have hhi_lo_le :
-      2 * (10 ^ 5 * PiChudnovsky.piDigits100) + scale33Nat - 1 ≤
-        2 * PiChudnovsky.piUpper105 + scale33Nat - 1 :=
+      2 * (10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100) + scale33Nat - 1 ≤
+        2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale33Nat - 1 :=
     Nat.sub_le_sub_right (Nat.add_le_add_right (Nat.mul_le_mul_left 2 h_hi_1) scale33Nat) 1
   have hhi_hi_lt :
-      2 * PiChudnovsky.piUpper105 + scale33Nat - 1 <
-        2 * (10 ^ 5 * PiChudnovsky.piDigits100 + 10 ^ 5) + scale33Nat - 1 :=
+      2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale33Nat - 1 <
+        2 * (10 ^ 5 * LeanAsm.Constants.PiAndSqrt.piDigits100 + 10 ^ 5) + scale33Nat - 1 :=
     Nat.sub_lt_sub_right
-      (Nat.le_trans scale33Nat_pos (Nat.le_add_left scale33Nat (2 * PiChudnovsky.piUpper105)))
+      (Nat.le_trans scale33Nat_pos (Nat.le_add_left scale33Nat (2 * LeanAsm.Constants.PiAndSqrt.piUpper105)))
       (Nat.add_lt_add_right (Nat.mul_lt_mul_of_pos_left h_hi_2 (by decide)) scale33Nat)
   exact ⟨
     nat_div_eq_of_bracket scale33Nat_pos
@@ -298,61 +299,61 @@ def twoPiInterval72 : ScaledInterval72 where
   hi := twoPiRaw72.2
   valid :=
     Int.ofNat_le.mpr
-      (nat_div_le_ceil_div (2 * PiChudnovsky.piLower105) (2 * PiChudnovsky.piUpper105)
-        scale33Nat scale33Nat_pos (Nat.mul_le_mul_left 2 PiChudnovsky.pi_105_bracket_valid.1))
+      (nat_div_le_ceil_div (2 * LeanAsm.Constants.PiAndSqrt.piLower105) (2 * LeanAsm.Constants.PiAndSqrt.piUpper105)
+        scale33Nat scale33Nat_pos (Nat.mul_le_mul_left 2 LeanAsm.Constants.PiAndSqrt.pi_105_bracket_valid.1))
 
 /-- Exact equality `twoPiInterval72.hi = twoPiRaw72Lit.2` derived from
-`PiChudnovsky.pi_100_digits_certified` for fast downstream `decide +kernel` checks. -/
+`LeanAsm.Constants.PiAndSqrt.pi_100_digits_certified` for fast downstream `decide +kernel` checks. -/
 theorem twoPiInterval72_hi_eq : twoPiInterval72.hi = twoPiRaw72Lit.2 := by
   change twoPiRaw72.2 = twoPiRaw72Lit.2
   rw [twoPiRaw72_eq]
 
 /-- Constructive order validity `twoPiInterval72.lo ≤ twoPiInterval72.hi`
-derived directly from `PiChudnovsky.pi_105_bracket_valid`. -/
+derived directly from `LeanAsm.Constants.PiAndSqrt.pi_105_bracket_valid`. -/
 theorem twoPiInterval72_valid : twoPiInterval72.lo ≤ twoPiInterval72.hi :=
   twoPiInterval72.valid
 
 /-- Exact integer bracketing linking `twoPiInterval72` at scale `10^72` directly to
-`PiChudnovsky.pi_105_bracket_valid` at scale `10^105`. -/
+`LeanAsm.Constants.PiAndSqrt.pi_105_bracket_valid` at scale `10^105`. -/
 theorem twoPiInterval72_from_chudnovsky_sound :
-    twoPiInterval72.lo * 10 ^ 33 ≤ 2 * (PiChudnovsky.piLower105 : Int) ∧
-    2 * (PiChudnovsky.piUpper105 : Int) ≤ twoPiInterval72.hi * 10 ^ 33 := by
-  have _ := PiChudnovsky.pi_105_bracket_valid
+    twoPiInterval72.lo * 10 ^ 33 ≤ 2 * (LeanAsm.Constants.PiAndSqrt.piLower105 : Int) ∧
+    2 * (LeanAsm.Constants.PiAndSqrt.piUpper105 : Int) ≤ twoPiInterval72.hi * 10 ^ 33 := by
+  have _ := LeanAsm.Constants.PiAndSqrt.pi_105_bracket_valid
   constructor
   · have hnat :
-        (2 * PiChudnovsky.piLower105 / scale33Nat) * scale33Nat ≤
-          2 * PiChudnovsky.piLower105 :=
-      Nat.div_mul_le_self (2 * PiChudnovsky.piLower105) scale33Nat
+        (2 * LeanAsm.Constants.PiAndSqrt.piLower105 / scale33Nat) * scale33Nat ≤
+          2 * LeanAsm.Constants.PiAndSqrt.piLower105 :=
+      Nat.div_mul_le_self (2 * LeanAsm.Constants.PiAndSqrt.piLower105) scale33Nat
     have hint :
-        Int.ofNat ((2 * PiChudnovsky.piLower105 / scale33Nat) * scale33Nat) ≤
-          Int.ofNat (2 * PiChudnovsky.piLower105) := Int.ofNat_le.mpr hnat
+        Int.ofNat ((2 * LeanAsm.Constants.PiAndSqrt.piLower105 / scale33Nat) * scale33Nat) ≤
+          Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piLower105) := Int.ofNat_le.mpr hnat
     have hmul1 :
         twoPiInterval72.lo * (10 ^ 33 : Int) =
-          Int.ofNat ((2 * PiChudnovsky.piLower105 / scale33Nat) * scale33Nat) := by
-      change Int.ofNat (2 * PiChudnovsky.piLower105 / scale33Nat) * Int.ofNat scale33Nat = _
+          Int.ofNat ((2 * LeanAsm.Constants.PiAndSqrt.piLower105 / scale33Nat) * scale33Nat) := by
+      change Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piLower105 / scale33Nat) * Int.ofNat scale33Nat = _
       exact (Int.natCast_mul _ _).symm
     have hmul2 :
-        2 * (PiChudnovsky.piLower105 : Int) = Int.ofNat (2 * PiChudnovsky.piLower105) :=
-      (Int.natCast_mul 2 PiChudnovsky.piLower105).symm
+        2 * (LeanAsm.Constants.PiAndSqrt.piLower105 : Int) = Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piLower105) :=
+      (Int.natCast_mul 2 LeanAsm.Constants.PiAndSqrt.piLower105).symm
     rw [hmul1, hmul2]
     exact hint
   · have hnat :
-        2 * PiChudnovsky.piUpper105 ≤
-          ((2 * PiChudnovsky.piUpper105 + scale33Nat - 1) / scale33Nat) * scale33Nat :=
-      nat_le_ceil_div_mul (2 * PiChudnovsky.piUpper105) scale33Nat scale33Nat_pos
+        2 * LeanAsm.Constants.PiAndSqrt.piUpper105 ≤
+          ((2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale33Nat - 1) / scale33Nat) * scale33Nat :=
+      nat_le_ceil_div_mul (2 * LeanAsm.Constants.PiAndSqrt.piUpper105) scale33Nat scale33Nat_pos
     have hint :
-        Int.ofNat (2 * PiChudnovsky.piUpper105) ≤
-          Int.ofNat (((2 * PiChudnovsky.piUpper105 + scale33Nat - 1) / scale33Nat) *
+        Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piUpper105) ≤
+          Int.ofNat (((2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale33Nat - 1) / scale33Nat) *
             scale33Nat) := Int.ofNat_le.mpr hnat
     have hmul1 :
-        2 * (PiChudnovsky.piUpper105 : Int) = Int.ofNat (2 * PiChudnovsky.piUpper105) :=
-      (Int.natCast_mul 2 PiChudnovsky.piUpper105).symm
+        2 * (LeanAsm.Constants.PiAndSqrt.piUpper105 : Int) = Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piUpper105) :=
+      (Int.natCast_mul 2 LeanAsm.Constants.PiAndSqrt.piUpper105).symm
     have hmul2 :
         twoPiInterval72.hi * (10 ^ 33 : Int) =
-          Int.ofNat (((2 * PiChudnovsky.piUpper105 + scale33Nat - 1) / scale33Nat) *
+          Int.ofNat (((2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale33Nat - 1) / scale33Nat) *
             scale33Nat) := by
       change
-        Int.ofNat ((2 * PiChudnovsky.piUpper105 + scale33Nat - 1) / scale33Nat) *
+        Int.ofNat ((2 * LeanAsm.Constants.PiAndSqrt.piUpper105 + scale33Nat - 1) / scale33Nat) *
           Int.ofNat scale33Nat = _
       exact (Int.natCast_mul _ _).symm
     rw [hmul1, hmul2]
@@ -1279,8 +1280,8 @@ Links `PiChudnovsky`'s `10^105` bracket directly to `twoPiInterval72` wrapping a
    maintains reduced width `≤ 6 * 10^15` at scale `10^72` (`< 10^-56` radians). -/
 theorem high_height_phase_reduction_1e12 :
     (twoPiInterval72.hi - twoPiInterval72.lo = 1 ∧
-     twoPiInterval72.lo * 10 ^ 33 ≤ 2 * (PiChudnovsky.piLower105 : Int) ∧
-     2 * (PiChudnovsky.piUpper105 : Int) ≤ twoPiInterval72.hi * 10 ^ 33) ∧
+     twoPiInterval72.lo * 10 ^ 33 ≤ 2 * (LeanAsm.Constants.PiAndSqrt.piLower105 : Int) ∧
+     2 * (LeanAsm.Constants.PiAndSqrt.piUpper105 : Int) ≤ twoPiInterval72.hi * 10 ^ 33) ∧
     (∀ xIv : ScaledInterval72,
       0 ≤ xIv.lo →
       xIv.hi ≤ 5 * (10 ^ 12 + 10) * scale72Int →

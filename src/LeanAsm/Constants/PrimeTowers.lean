@@ -19,8 +19,8 @@ def M_4 : Nat := fermatTowerMod4
 /-- Proth prime `P_5 = 15 · 2^27 + 1 = 2,013,265,921`. -/
 def prothPrime5 : Nat := 2013265921
 
-/-- Canonical generator for Proth prime `P_5`: `prothGen = 40`. -/
-def prothGen : Nat := 40
+/-- Canonical generator for Proth prime `P_5`: `prothGen = 31`. -/
+def prothGen : Nat := 31
 
 /-- Principal order-`2^27` twiddle root modulo `P_5`: `prothOmega27 = 440,564,289`. -/
 def prothOmega27 : Nat := 440564289

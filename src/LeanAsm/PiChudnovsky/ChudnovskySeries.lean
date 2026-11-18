@@ -3,6 +3,7 @@
 -- Max Column: 120 Columns
 
 import LeanAsm.PiChudnovsky.CrtMulBridge
+import LeanAsm.Constants.PiAndSqrt
 
 namespace PiChudnovsky
 
@@ -440,7 +441,7 @@ theorem chudPartialSum_trapped (m : Nat) (hm : 8 ≤ m) :
     exact ⟨crat_le_trans (chud_even_step j) hup, chud_odd_step j⟩
 
 /-- `640320^3 / 24 = 10939058860032000`. -/
-def c3Over24 : Nat := (640320 ^ 3) / 24
+abbrev c3Over24 : Nat := LeanAsm.Constants.PiAndSqrt.c3Over24
 
 private def chudBinarySplitFuel (a b fuel : Nat) : Nat × Nat × Int :=
   match fuel with
@@ -516,20 +517,20 @@ theorem chudBinarySplit_eq_exact (a b : Nat) :
 
 /-- Binary-split 8-term rational sum `S_8` (`k = 0..7`) numerator and denominator. -/
 def chud8Split : Nat × Nat × Int := chudnovskyBinarySplit 0 8
-def chud8Num : Nat := chud8Split.2.2.natAbs
-def chud8Den : Nat := chud8Split.2.1
+abbrev chud8Num : Nat := LeanAsm.Constants.PiAndSqrt.chud8Num
+abbrev chud8Den : Nat := LeanAsm.Constants.PiAndSqrt.chud8Den
 
 /-- Binary-split 9-term rational sum `S_9` (`k = 0..8`) numerator and denominator. -/
 def chud9Split : Nat × Nat × Int := chudnovskyBinarySplit 0 9
-def chud9Num : Nat := chud9Split.2.2.natAbs
-def chud9Den : Nat := chud9Split.2.1
+abbrev chud9Num : Nat := LeanAsm.Constants.PiAndSqrt.chud9Num
+abbrev chud9Den : Nat := LeanAsm.Constants.PiAndSqrt.chud9Den
 
 theorem chud8_eq_partialSum8 :
     (chud8Num : Int) * ((chudPartialSum 8).den : Int) =
       (chudPartialSum 8).num * (chud8Den : Int) ∧
     (0 : Int) < (chud8Num : Int) ∧
     (chud8Split.2.2 : Int) = (chud8Num : Int) := by
-  dsimp only [chud8Num, chud8Den, chud8Split]
+  dsimp only [chud8Split]
   rw [chudBinarySplit_eq_exact]
   decide
 
@@ -538,7 +539,21 @@ theorem chud9_eq_partialSum9 :
       (chudPartialSum 9).num * (chud9Den : Int) ∧
     (0 : Int) < (chud9Num : Int) ∧
     (chud9Split.2.2 : Int) = (chud9Num : Int) := by
-  dsimp only [chud9Num, chud9Den, chud9Split]
+  dsimp only [chud9Split]
+  rw [chudBinarySplit_eq_exact]
+  decide
+
+set_option exponentiation.threshold 1024 in
+/-- The constants equal the numerator and denominator of `chudnovskyBinarySplit 0 8`. -/
+theorem chud8_split_eq :
+    chud8Num = (chudnovskyBinarySplit 0 8).2.2.natAbs ∧ chud8Den = (chudnovskyBinarySplit 0 8).2.1 := by
+  rw [chudBinarySplit_eq_exact]
+  decide
+
+set_option exponentiation.threshold 1024 in
+/-- The constants equal the numerator and denominator of `chudnovskyBinarySplit 0 9`. -/
+theorem chud9_split_eq :
+    chud9Num = (chudnovskyBinarySplit 0 9).2.2.natAbs ∧ chud9Den = (chudnovskyBinarySplit 0 9).2.1 := by
   rw [chudBinarySplit_eq_exact]
   decide
 

@@ -168,7 +168,7 @@ theorem rawMul108_fn_eq : rawMul108Crt = rawMul108Fast := by
   simp only [PiChudnovsky.intMulBigViaCrtNtt_eq_mul]
 
 def twoPiRaw108 : RawIv72 :=
-  (Int.ofNat (2 * PiChudnovsky.piLower108), Int.ofNat (2 * PiChudnovsky.piUpper108))
+  (Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piLower108), Int.ofNat (2 * LeanAsm.Constants.PiAndSqrt.piUpper108))
 
 private def twoPiLoLit108 : Nat :=
   6283185307179586476925286766559005768394338798750211641949889184615632812572417997256069650684234135964296172
@@ -179,12 +179,14 @@ private def twoPiHiLit108 : Nat :=
 def twoPiRaw108Lit : RawIv72 :=
   ((twoPiLoLit108 : Int), (twoPiHiLit108 : Int))
 
-private theorem twoPiLo_eq_raw : 2 * PiChudnovsky.piLower108 = twoPiLoLit108 := by
+private theorem twoPiLo_eq_raw : 2 * LeanAsm.Constants.PiAndSqrt.piLower108 = twoPiLoLit108 := by
   dsimp only [twoPiLoLit108]
+  show 2 * PiChudnovsky.piLower108 = _
   rw [PiChudnovsky.piLower108_exact]
 
-private theorem twoPiHi_eq_raw : 2 * PiChudnovsky.piUpper108 = twoPiHiLit108 := by
+private theorem twoPiHi_eq_raw : 2 * LeanAsm.Constants.PiAndSqrt.piUpper108 = twoPiHiLit108 := by
   dsimp only [twoPiHiLit108]
+  show 2 * PiChudnovsky.piUpper108 = _
   rw [PiChudnovsky.piUpper108_exact]
 
 theorem twoPiRaw108_eq : twoPiRaw108 = twoPiRaw108Lit := by
@@ -198,7 +200,7 @@ def twoPiInterval108 : ScaledInterval108 :=
 /-- Validity `twoPiInterval108.lo ≤ twoPiInterval108.hi`. -/
 theorem twoPiInterval108_valid : twoPiRaw108.1 ≤ twoPiRaw108.2 := by
   dsimp only [twoPiRaw108]
-  exact Int.ofNat_le.mpr (Nat.mul_le_mul_left 2 PiChudnovsky.pi_108_bracket_valid.1)
+  exact Int.ofNat_le.mpr (Nat.mul_le_mul_left 2 LeanAsm.Constants.PiAndSqrt.pi_108_bracket_valid.1)
 
 private theorem twoPiInterval108_lo_eq : twoPiInterval108.lo = twoPiRaw108.1 := by
   dsimp only [twoPiInterval108, rawToIv108]
@@ -208,10 +210,10 @@ private theorem twoPiInterval108_hi_eq : twoPiInterval108.hi = twoPiRaw108.2 := 
   dsimp only [twoPiInterval108, rawToIv108]
   rw [dite_eq_left twoPiInterval108_valid]
 
-/-- Chudnovsky soundness of `twoPiInterval108` from `PiChudnovsky.pi_108_bracket_valid`. -/
+/-- Chudnovsky soundness of `twoPiInterval108` from `LeanAsm.Constants.PiAndSqrt.pi_108_bracket_valid`. -/
 theorem twoPiInterval108_from_chudnovsky_sound :
-    twoPiInterval108.lo = (2 * PiChudnovsky.piLower108 : Int) ∧
-    twoPiInterval108.hi = (2 * PiChudnovsky.piUpper108 : Int) ∧
+    twoPiInterval108.lo = (2 * LeanAsm.Constants.PiAndSqrt.piLower108 : Int) ∧
+    twoPiInterval108.hi = (2 * LeanAsm.Constants.PiAndSqrt.piUpper108 : Int) ∧
     twoPiInterval108.lo ≤ twoPiInterval108.hi := by
   have hord := twoPiInterval108_valid
   have h_eq : rawToIv108 twoPiRaw108 = ⟨twoPiRaw108.1, twoPiRaw108.2, hord⟩ := by
@@ -1617,8 +1619,8 @@ and reduced phase containment for any `(t, n)` with `t ~ 10^24` or `t ~ 10^30` a
 Zero `Classical.choice`, zero `sorryAx`. -/
 theorem phase_reduction_width_1e30_under_1e75 :
     (twoPiInterval108.hi - twoPiInterval108.lo = 2 ∧
-     twoPiInterval108.lo = (2 * PiChudnovsky.piLower108 : Int) ∧
-     twoPiInterval108.hi = (2 * PiChudnovsky.piUpper108 : Int)) ∧
+     twoPiInterval108.lo = (2 * LeanAsm.Constants.PiAndSqrt.piLower108 : Int) ∧
+     twoPiInterval108.hi = (2 * LeanAsm.Constants.PiAndSqrt.piUpper108 : Int)) ∧
     (∀ (xIv : ScaledInterval108),
       0 ≤ xIv.lo →
       xIv.hi ≤ 8 * (10 ^ 30 + 10) * scale108Int →

@@ -4,6 +4,8 @@
 -- and the universal 4-point cyclic convolution theorem with ZERO axioms.
 -- Max Column: 120 Columns
 
+import LeanAsm.Constants.PrimeTowers
+
 namespace NttArithmetic
 
 /-- Fermat prime modulus p = 2^(2^2) + 1 = 17. -/
@@ -876,6 +878,12 @@ theorem cyclic_conv4_ntt_universal_F17 (a b : Vec4) :
   · rw [hi1]; exact h_comb.2.1
   · rw [hi2]; exact h_comb.2.2.1
   · rw [hi3]; exact h_comb.2.2.2
+
+/-- The local NTT constants agree with the immutable `PrimeTowers` constants. -/
+theorem ntt_constants_eq_primeTowers :
+    omega8 = LeanAsm.Constants.PrimeTowers.omega8 ∧ invTwo = LeanAsm.Constants.PrimeTowers.invTwo ∧ omega4 = LeanAsm.Constants.PrimeTowers.omega4 ∧
+    invOmega4 = LeanAsm.Constants.PrimeTowers.invOmega4 ∧ invFour = LeanAsm.Constants.PrimeTowers.invFour := by
+  decide
 
 end NttArithmetic
 
