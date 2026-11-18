@@ -3,8 +3,8 @@
 -- and N = 128 ultra-deep 2D zero-free rectangle sweeper down to σ = 0.501.
 -- Max Column: 100 Columns
 
-import LeanAsm.PiChudnovsky
 import LeanAsm.Constants.PiAndSqrt
+import LeanAsm.PiChudnovsky.CrtMulBridge
 import LeanAsm.QuasiRiemann
 import LeanAsm.QuasiRiemann.Rat
 

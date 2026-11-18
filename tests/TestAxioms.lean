@@ -838,4 +838,11 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms LeanAsm.Constants.PrimeTowers.wrap_bounds_sharp_certified
 #print axioms LeanAsm.Constants.PrimeTowers.proth_prime5_certified
 
+#print axioms NttArithmetic.ntt_constants_eq_primeTowers
+#print axioms CrtNtt.fermatTowerMod4_eq_const
+#print axioms PiChudnovsky.sqrt10005Scaled110_eq_isqrtNewton
+#print axioms PiChudnovsky.piLower105_eq_piLowerWith
+#print axioms PiChudnovsky.piUpper105_eq_piUpperWith
+#print axioms ProthNttTowerBridge.prothPrime5_certified_delegate
+
 -- end of file: leanasm/tests/TestAxioms.lean

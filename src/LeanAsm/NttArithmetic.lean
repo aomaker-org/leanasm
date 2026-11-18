@@ -881,7 +881,9 @@ theorem cyclic_conv4_ntt_universal_F17 (a b : Vec4) :
 
 /-- The local NTT constants agree with the immutable `PrimeTowers` constants. -/
 theorem ntt_constants_eq_primeTowers :
-    omega8 = LeanAsm.Constants.PrimeTowers.omega8 ∧ invTwo = LeanAsm.Constants.PrimeTowers.invTwo ∧ omega4 = LeanAsm.Constants.PrimeTowers.omega4 ∧
+    omega8 = LeanAsm.Constants.PrimeTowers.omega8 ∧
+    invTwo = LeanAsm.Constants.PrimeTowers.invTwo ∧
+    omega4 = LeanAsm.Constants.PrimeTowers.omega4 ∧
     invOmega4 = LeanAsm.Constants.PrimeTowers.invOmega4 ∧ invFour = LeanAsm.Constants.PrimeTowers.invFour := by
   decide
 

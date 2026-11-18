@@ -139,6 +139,22 @@ theorem pi_108_bracket_valid :
     piLower108 ≤ piUpper108 ∧ piUpper108 - piLower108 = 1 := by
   decide
 
+set_option exponentiation.threshold 2000 in
+/-- Exact decimal value of `piLower108` (`108`-digit floor of `π`). -/
+theorem piLower108_exact :
+    piLower108 =
+      314159265358979323846264338327950288419716939937510582097494 * 10 ^ 49 +
+      4592307816406286208998628034825342117067982148086 := by
+  decide
+
+set_option exponentiation.threshold 2000 in
+/-- Exact decimal value of `piUpper108` (`108`-digit ceiling of `π`). -/
+theorem piUpper108_exact :
+    piUpper108 =
+      314159265358979323846264338327950288419716939937510582097494 * 10 ^ 49 +
+      4592307816406286208998628034825342117067982148087 := by
+  decide
+
 set_option exponentiation.threshold 1024 in
 /-- Exact decimal projection from 105-digit bounds to 100 digits of `π`. -/
 theorem pi_100_digits_certified :

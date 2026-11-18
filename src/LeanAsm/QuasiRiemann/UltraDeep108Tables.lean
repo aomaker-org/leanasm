@@ -1,5 +1,7 @@
 -- Path: leanasm/src/LeanAsm/QuasiRiemann/UltraDeep108Tables.lean
 import LeanAsm.QuasiRiemann.UltraDeep90
+import LeanAsm.Constants.PiAndSqrt
+import LeanAsm.PiChudnovsky.CrtMulBridge
 
 -- =============================================================================
 -- Part 20: 108-Digit CRT-NTT Precision Engine (N ≤ 2048, σ = 0.5000625,
@@ -181,13 +183,13 @@ def twoPiRaw108Lit : RawIv72 :=
 
 private theorem twoPiLo_eq_raw : 2 * LeanAsm.Constants.PiAndSqrt.piLower108 = twoPiLoLit108 := by
   dsimp only [twoPiLoLit108]
-  show 2 * PiChudnovsky.piLower108 = _
-  rw [PiChudnovsky.piLower108_exact]
+  show 2 * LeanAsm.Constants.PiAndSqrt.piLower108 = _
+  rw [LeanAsm.Constants.PiAndSqrt.piLower108_exact]
 
 private theorem twoPiHi_eq_raw : 2 * LeanAsm.Constants.PiAndSqrt.piUpper108 = twoPiHiLit108 := by
   dsimp only [twoPiHiLit108]
-  show 2 * PiChudnovsky.piUpper108 = _
-  rw [PiChudnovsky.piUpper108_exact]
+  show 2 * LeanAsm.Constants.PiAndSqrt.piUpper108 = _
+  rw [LeanAsm.Constants.PiAndSqrt.piUpper108_exact]
 
 theorem twoPiRaw108_eq : twoPiRaw108 = twoPiRaw108Lit := by
   dsimp only [twoPiRaw108, twoPiRaw108Lit]

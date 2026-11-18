@@ -2436,14 +2436,18 @@ private theorem garner5_17_257_roundtrip (z : Nat) (hz : z < 21845) :
     rw [← Nat.mod_mod_of_dvd z hd5, ← Nat.mod_mod_of_dvd z hd17]
     exact garner5_17_roundtrip y hy
   rw [hpart]
-  dsimp only [LeanAsm.Constants.PrimeTowers.garnerInv123, LeanAsm.Constants.PrimeTowers.garnerInv1234, LeanAsm.Constants.PrimeTowers.fermatTowerMod4] at *
+  dsimp only [LeanAsm.Constants.PrimeTowers.garnerInv123,
+    LeanAsm.Constants.PrimeTowers.garnerInv1234,
+    LeanAsm.Constants.PrimeTowers.fermatTowerMod4] at *
   omega
 
 /-- Output range bound: `garnerReconstruct4 r1 r2 r3 r4 < fermatTowerMod4` for all inputs. -/
 theorem garnerReconstruct4_lt (r1 r2 r3 r4 : Nat) :
     garnerReconstruct4 r1 r2 r3 r4 < fermatTowerMod4 := by
   dsimp [garnerReconstruct4, garner5_17_257, garner5_17, fermatTowerMod4]
-  dsimp only [LeanAsm.Constants.PrimeTowers.garnerInv123, LeanAsm.Constants.PrimeTowers.garnerInv1234, LeanAsm.Constants.PrimeTowers.fermatTowerMod4] at *
+  dsimp only [LeanAsm.Constants.PrimeTowers.garnerInv123,
+    LeanAsm.Constants.PrimeTowers.garnerInv1234,
+    LeanAsm.Constants.PrimeTowers.fermatTowerMod4] at *
   omega
 
 /-- Constructive 4-Prime Garner Mixed-Radix CRT Roundtrip Soundness:
@@ -2463,7 +2467,9 @@ theorem garnerReconstruct4_sound (x : Nat) (hx : x < fermatTowerMod4) :
         ← Nat.mod_mod_of_dvd x hd257]
     exact garner5_17_257_roundtrip z hz
   rw [hpart]
-  dsimp only [LeanAsm.Constants.PrimeTowers.garnerInv123, LeanAsm.Constants.PrimeTowers.garnerInv1234, LeanAsm.Constants.PrimeTowers.fermatTowerMod4] at *
+  dsimp only [LeanAsm.Constants.PrimeTowers.garnerInv123,
+    LeanAsm.Constants.PrimeTowers.garnerInv1234,
+    LeanAsm.Constants.PrimeTowers.fermatTowerMod4] at *
   omega
 
 /-- Generic `m`-term convolution inner-product sum `∑_{i < m} a i * b (idx i)`
