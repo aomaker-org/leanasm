@@ -19,6 +19,10 @@ import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 import LeanAsm.QuasiRiemann.Valuation.Ultrametric
 import LeanAsm.QuasiRiemann.Valuation.Contraction
 import LeanAsm.QuasiRiemann.Valuation.Hensel
+import LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic
+import LeanAsm.QuasiRiemann.Valuation.EisensteinWeights
+import LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics
+import LeanAsm.QuasiRiemann.Valuation.RNS
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.Genus2Jacobian
@@ -1793,7 +1797,8 @@ theorem leanasm_full_provenance_certified :
     EulerRnsProvenance ∧
     FiniteFieldWeilProvenance ∧
     CrtNttProvenance ∧
-    ChudnovskyPiProvenance :=
+    ChudnovskyPiProvenance ∧
+    ProthNttTowerProvenance :=
   ⟨miniVm_provenance_certified,
    collatz_provenance_certified,
    yangMills_provenance_certified,
@@ -1801,7 +1806,8 @@ theorem leanasm_full_provenance_certified :
    eulerRns_provenance_certified,
    finiteFieldWeil_provenance_certified,
    crtNtt_provenance_certified,
-   chudnovskyPi_provenance_certified⟩
+   chudnovskyPi_provenance_certified,
+   prothNttTower_provenance_certified⟩
 
 end LeanAsm
 

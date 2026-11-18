@@ -44,7 +44,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 
 #print axioms QuasiRiemann.rh_exponent_strictly_better
 #print axioms QuasiRiemann.rh_implies_qrh_seven_eighths
-#print axioms QuasiRiemann.rh_exponent_strictly_better
 
 #print axioms FiniteFieldRH.total_points_is_five
 #print axioms FiniteFieldRH.frobenius_trace_is_three
@@ -843,9 +842,31 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.wreath_product_bound_sound
 #print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.lemma43_divisibility_bound_sound
 
+#print axioms LeanAsm.QuasiRiemann.RNS.rns_contraction_sound
 #print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.reconstruct
 #print axioms LeanAsm.QuasiRiemann.RNS.RnsQRat.toQRat
 #print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.add
 #print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.zero
+
+-- =============================================================================
+-- Part 53: Immutable Constants Autonomous Certificates (Issue #54)
+-- =============================================================================
+
+#print axioms LeanAsm.Constants.PiAndSqrt.c3Over24_eq
+#print axioms LeanAsm.Constants.PiAndSqrt.sqrt10005_scaled110_certified
+#print axioms LeanAsm.Constants.PiAndSqrt.sqrt10005Scaled110_eq_isqrtExact
+#print axioms LeanAsm.Constants.PiAndSqrt.piLower105_certified
+#print axioms LeanAsm.Constants.PiAndSqrt.piUpper105_certified
+#print axioms LeanAsm.Constants.PiAndSqrt.piLower108_certified
+#print axioms LeanAsm.Constants.PiAndSqrt.piUpper108_certified
+#print axioms LeanAsm.Constants.PiAndSqrt.pi_105_bracket_valid
+#print axioms LeanAsm.Constants.PiAndSqrt.pi_108_bracket_valid
+#print axioms LeanAsm.Constants.PiAndSqrt.pi_100_digits_certified
+
+#print axioms LeanAsm.Constants.PrimeTowers.fermat_tower_mod4_certified
+#print axioms LeanAsm.Constants.PrimeTowers.garner_inverses_certified
+#print axioms LeanAsm.Constants.PrimeTowers.twiddle_roots_sound
+#print axioms LeanAsm.Constants.PrimeTowers.wrap_bounds_sharp_certified
+#print axioms LeanAsm.Constants.PrimeTowers.proth_prime5_certified
 
 -- end of file: leanasm/tests/TestAxioms.lean

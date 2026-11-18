@@ -3,11 +3,13 @@
 -- Bridges RnsArithmetic and QuasiRiemann with ZERO axioms.
 -- Max Column: 100 Columns
 
+import LeanAsm.Constants.PrimeTowers
 import LeanAsm.RnsArithmetic
 
 namespace EulerFactorNonVanishing
 
 open RnsArithmetic
+open LeanAsm.Constants.PrimeTowers
 
 /--
 Exact margin numerator for local Euler factor at rational real part σ = num / den:
@@ -170,13 +172,14 @@ def fermatPrefixProd : Nat → Nat
   | n + 1 => fermatPrefixProd n * fermatNumber n
 
 /-- Constructive Fermat-prime CRT-NTT tower `{5, 17, 257, 65537}` (`F_1..F_4`),
-matching `{5, 17}` in `CrtNtt` and `{17, 257, 65537}` in `CrtNttUniversal`. -/
+aliased to `LeanAsm.Constants.PrimeTowers.fermatTowerPrimes`. -/
 def fermatTowerPrimes : List Nat :=
-  [5, 17, 257, 65537]
+  LeanAsm.Constants.PrimeTowers.fermatTowerPrimes
 
-/-- Full 32-bit Fermat-prime factorization `[3, 5, 17, 257, 65537]` (`F_0..F_4`). -/
+/-- Full 32-bit Fermat-prime factorization `[3, 5, 17, 257, 65537]` (`F_0..F_4`),
+aliased to `LeanAsm.Constants.PrimeTowers.fermatAllPrimes`. -/
 def fermatAllPrimes : List Nat :=
-  [3, 5, 17, 257, 65537]
+  LeanAsm.Constants.PrimeTowers.fermatAllPrimes
 
 private theorem pred_mul_succ_eq_sq_sub_one (a : Nat) (ha : 1 ≤ a) :
     (a - 1) * (a + 1) = a * a - 1 := by

@@ -3,6 +3,8 @@
 -- QuasiRiemann, Rns, and FiniteFieldRH.
 
 import LeanAsm.MiniVM
+import LeanAsm.Constants.PiAndSqrt
+import LeanAsm.Constants.PrimeTowers
 import LeanAsm.MiniVMNttBridge
 import LeanAsm.Conjectures
 import LeanAsm.YangMillsToy
