@@ -1,0 +1,1085 @@
+[
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "### Summary\n\nFormalizes unicritical polynomial preperiodic dynamics {d,\\alpha}(x) = x^d + \\alpha$ and preperiodic partition sets (S, f) = f^n(S) \\setminus f^{n+1}(S)$ following Andersen & Garton (arXiv:2405.00605v1), verified over constructive zero-Mathlib `QRat`.\n\n### Key Formalizations\n- **Constructive Polynomial Dynamics**: Horner evaluator, addition, unicritical families {d,\\alpha}(x) = x^d + \\alpha$, and iterated evaluation over `QRat`.\n- **Preperiodic & Generalized Partitions**: Constructive representations and upper/lower bounds for (S, f)$ and generalized partition sets {m,n}(S, f)$.\n- **Proposition 2.2**: Concrete verification of valuation stabilization and dynamical properties.\n- **Theorem 5.1**: Asymptotic density bounds for preperiodic partitions as  \\to \\infty$.\n- **Theorem 1.3 / Corollary 5.1**: Average proportion bounds over quadratic polynomial families.\n- **Proposition 5.3**: Average generalized partition bounds.\n- **Key Lemma 4.2 & Lemma 4.3**: Wreath product multiplicity bounds and uniform divisibility bounds.\n- **Axiom Audit**: Added `tests/TestPreperiodic.lean` and updated `tests/TestAxioms.lean` to audit strict axiom compliance (`[propext, Quot.sound]`, zero `sorryAx`, zero `Classical.choice`).",
+    "closedAt": "2026-11-17T19:10:44Z",
+    "createdAt": "2026-11-17T07:37:41Z",
+    "headRefName": "feature/preperiodic-dynamics",
+    "labels": [],
+    "number": 92,
+    "state": "MERGED",
+    "title": "feat(valuation): unicritical polynomial preperiodic dynamics & valuation partitions",
+    "updatedAt": "2026-11-17T19:13:20Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/92"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n- Consolidates sequential build runner into `tools/incremental_build.py`.\n- Enforces default 4096MB heap capping (`-M 4096` / `LEAN_OPTS=\"-M4096\"`) on elaboration tasks to prevent RAM thrashing on large modules like `Genus2Jacobian` and `PiChudnovsky`.\n- Integrates rolling telemetry and +10% regression warning detection against `.lake/build-history.json`.\n- Adds standard `make build-seq` target to the `Makefile`.\n- Removes obsolete scratch scripts (`build_sequential*.py`).\n- Documents preferred sequential build directives in `AI.md` ([Directive 01]).\n\n## Verification\n- Clean run of `make build-seq` caching and elaborating all 52 modules.\n- `make sync` zero-axiom test suite passes.",
+    "closedAt": "2026-11-17T07:32:29Z",
+    "createdAt": "2026-11-17T07:32:04Z",
+    "headRefName": "feature/consolidate-sequential-build",
+    "labels": [],
+    "number": 91,
+    "state": "MERGED",
+    "title": "feat(build): consolidate sequential build with telemetry and heap capping",
+    "updatedAt": "2026-11-17T07:32:44Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/91"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n\nThis pull request implements Residue Number System (RNS) arithmetic and Chinese Remainder Theorem (CRT) constructive reconstruction for high-precision valuation and rational box contraction loops in Lean 4.\n\n### Key Changes\n- **RNS & CRT Foundations (`src/LeanAsm/QuasiRiemann/Valuation/RNS.lean`)**:\n  - Implemented `RnsInt` and `RnsQRat` with length-invariance proofs.\n  - Implemented constructive `RnsInt.add` and `RnsInt.reconstruct` folding over coprime moduli products.\n  - Implemented `RnsQRat.toQRat` converting reconstructed numerator and denominator pairs to `QRat`.\n  - Added high-order contraction loops ($N = 1024, 2048$) with certified soundness guarantees.\n- **Verification & Axiom Provenance**:\n  - Added `tests/TestRNS.lean` validating RNS and CRT reconstruction logic.\n  - Updated `tests/TestAxioms.lean`.\n  - Verified 0 `sorryAx`, 0 `Classical.choice`, adhering strictly to standard Lean foundational axioms (`[propext, Quot.sound]`).\n\n### Commits\n- `d60dea5`: feat(rns): implement RnsInt, RnsQRat, and constructive CRT reconstruction\n- `5537e87`: feat(rns): integrate high-order rational box contraction loops (N=1024, 2048) and certified soundness",
+    "closedAt": "2026-11-17T07:25:06Z",
+    "createdAt": "2026-11-17T05:38:43Z",
+    "headRefName": "feature/rns-crt-valuation",
+    "labels": [],
+    "number": 90,
+    "state": "MERGED",
+    "title": "feat(rns): implement constructive RNS/CRT valuation and high-order contraction loops",
+    "updatedAt": "2026-11-17T19:13:20Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/90"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Adds the 5-prime Proth NTT tower bridge and Garner CRT reconstruction, with provenance summary, axiom test, and roadmap updates.\n\nCloses #81",
+    "closedAt": "2026-11-16T20:46:54Z",
+    "createdAt": "2026-11-16T20:44:47Z",
+    "headRefName": "feature/proth-ntt-tower-81",
+    "labels": [],
+    "number": 89,
+    "state": "MERGED",
+    "title": "feat(ntt): add 5-prime Proth NTT tower and Garner CRT reconstruction (#81)",
+    "updatedAt": "2026-11-16T20:46:57Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/89"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\nZero-Mathlib, constructive Langlands bridge for `E_{11a1}` / `f_{11}`.\n\n- `LanglandsRankinSelbergBridge.lean`\n  - `rs_pos_goodPrimes`: f_11 x chi_4 cleared Euler factor > 0, p <= 97.\n  - `sym2_pos_goodPrimes`: Sym^2 cleared factor > 0 (incl. a_p = 0).\n  - `gl2ProdToGSp4Spinor_reciprocal`, `spin_eq_product`: GL2 x GL2 ->\n    GSp4 spinor polynomial, tied to `gsp4SpinEulerPoly`.\n  - `hecke_chi4_short_interval_bound`: Abel summation,\n    |sum c_n phi(n)| <= 2 B phi(M).\n- `ProvenanceSummary.lean`: `LanglandsRankinSelbergProvenance` plus\n  the Hensel/Mersenne sqrt2 provenance wiring.\n- `tests/TestAxioms.lean`: Part 50 audit; duplicate Part 48 block removed.\n- `LeanAsm.lean`, `Main.lean` wired.\n\n## Verification\n`lake build`, `make sync`, and the axiom audit: 0 warnings, 0 `sorryAx`,\n0 `Classical.choice`.\n\nCloses #80\n",
+    "closedAt": "2026-11-16T20:34:24Z",
+    "createdAt": "2026-11-16T20:21:21Z",
+    "headRefName": "feature/langlands-rankin-selberg-80",
+    "labels": [],
+    "number": 88,
+    "state": "MERGED",
+    "title": "feat(langlands): add Rankin-Selberg, Sym^2(f_11), and GSp(4) spinor bridge (#80)",
+    "updatedAt": "2026-11-16T20:34:27Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/88"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n\nAdds the three-module `QuasiRiemann.Valuation` stack (`Ultrametric`, `Contraction`, `Hensel`) to provide constructive $p$-adic ultrametric denominator-height control and Prime Tower CRT modular lifting over cleared-denominator `QRat`, strictly within Lean 4.35.0's `[propext, Quot.sound]` axiom cone (**zero Mathlib**, **zero `Classical.choice`**, **zero `sorryAx`**).\n\n### Modules & Integration\n\n1. **`src/LeanAsm/QuasiRiemann/Valuation/Ultrametric.lean`**\n   - Constructive, decidable trial-division primality (`IsPrime`) and Euclid's lemma (`IsPrime.dvd_mul`).\n   - Fuel-bounded structural $p$-adic valuation (`padicValNat`, `padicValInt`, `pAdicVal : Nat \u2192 QRat \u2192 ExtVal`).\n   - Negation invariance (`pAdicVal_neg`), multiplicativity (`pAdicVal_mul`), and strong ultrametric triangle inequality (`ultrametric_ineq`).\n   - Cleared-denominator prime-power height bounds across sums, products, `List QRat` folds, and Horner polynomial evaluation (`denVal_hornerEval_deg_le`, `denVal_hornerEvalTight_deg_le`).\n\n2. **`src/LeanAsm/QuasiRiemann/Valuation/Contraction.lean`**\n   - Cleared-denominator cross-multiplication valuation invariance (`pAdicVal_eq_of_cross_mul`) and telescoping identity (`pAdicVal_sub_add_sub`).\n   - `IsPAdicStepContraction` framework with linear $n$-step valuation growth (`iterate_val_growth`) and zero-slack multi-step Cauchy bounds (`iterate_val_range`, `iterate_val_range_of_init`).\n\n3. **`src/LeanAsm/QuasiRiemann/Valuation/Hensel.lean` (Parts 1\u201310)**\n   - **Parts 1\u20133:** Stationary Newton-Schulz contraction (`stationary_isStepContraction`) and quadratic Newton-Schulz inverse lifting (`nsStep_residual_val_double`, `hensel_newton_schulz_quadratic_residual`, `hensel_newton_schulz_cauchy_range`) with `by decide` Mersenne certificates (`p = 7, 31, 127`).\n   - **Parts 4\u20137:** Two-prime and arbitrary `List Nat` Prime Tower CRT divisibility and lifting (`prime_tower_pow_dvd_of_all`, `hensel_prime_tower_crt`), `CrossEq` equivalence of `hornerEval` and `hornerEvalTight`, and constructive CRT idempotent/seed synthesis (`crtCofactor`, `crtIdempotent`, `buildCrtSeed`, `hensel_build_prime_tower_crt`).\n   - **Parts 8\u201310:** Ultrametric Horner perturbation bounds (`hornerEval_sub_val_ge_of_integral`, `hornerEval_zero_const_sub_val_ge`), divided-difference slope factorization (`hornerEval_sub_cross_eq_slope`, `polySlope_diag_cross_eq_deriv`), arbitrary-degree simple-root lifting (`hensel_poly_simple_root_pow_dvd`), and Prime Tower CRT root lifting (`hensel_poly_prime_tower_crt`, `hensel_poly_build_prime_tower_crt`, `hensel_mersenne_tower_sqrt2_built` for $\\sqrt{2} \\bmod 27559^{n+1}$).\n\n4. **Top-Level Wiring & Axiom Audit (`LeanAsm.lean`, `ProvenanceSummary.lean`, `Main.lean`, `Makefile`, `tests/TestAxioms.lean`)**\n   - Exports `QuasiRiemann.Valuation` in the library and provenance summary, archives processed inbox artifacts under `inbox/archive/`, and adds Part 48 `#print axioms` checks confirming `[propext, Quot.sound]` across the entire stack.\n\n### Verification\n\n- `lake build` \u2014 94 jobs succeed with zero errors and zero warnings (`Hensel.lean` builds in ~6.2s).\n- `lake env lean tests/TestAxioms.lean` \u2014 zero `Classical.choice`, zero `Lean.ofReduceBool`, zero `sorryAx`.\n",
+    "closedAt": "2026-11-16T05:12:10Z",
+    "createdAt": "2026-11-16T05:10:08Z",
+    "headRefName": "feat/ultrametric-valuation",
+    "labels": [],
+    "number": 87,
+    "state": "MERGED",
+    "title": "feat(valuation): constructive p-adic ultrametric, telescoping contraction, and Prime Tower Hensel lifting over QRat",
+    "updatedAt": "2026-11-16T05:12:24Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/87"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Adds local Windows/WSL2 Ollama configuration, Antigravity SDK runners, and the profiled Qwen + DeepSeek codebase auditor:\n\n- `config_env`: CLI tags/flags (`deepseek`, `qwen`, `gemini`, `argon`, `argon-low`, `sonnet`, `opus`), `LEANASM_USE_OLLAMA` toggle, and non-mutating `agy_session()` helper ( / ).\n- `local/`: `agent.py`, `prover_orchestrator.py`, `auditor.py` (`--direct`, `--two-phase`, `--qwen-only`, `--prover-only`, smart source slicing, `--cooldown-secs`, `--budget-secs`, `--resume`, full JSONL/memory/VRAM/CPU-spill profiling), and `local/audit/usingQwenPlusDeepseek.sh`.\n- `docs/`: `ollama_local.md`, `local_llm_brainstorming.md`, and `local_audit_todo.md` consolidating deterministic 43/43 + initial 17/43 local AI review findings.",
+    "closedAt": "2026-11-16T00:58:20Z",
+    "createdAt": "2026-11-16T00:58:02Z",
+    "headRefName": "feature/ollama-local-config",
+    "labels": [],
+    "number": 85,
+    "state": "MERGED",
+    "title": "feat(local): add Ollama Qwen + DeepSeek codebase auditor and config_env toggles",
+    "updatedAt": "2026-11-16T00:58:22Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/85"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Implements GitHub Issue #79 (`v1.3.0` roadmap workstream).\n\n## Summary\n- **Modularized `UltraDeep72` & 108-digit Chudnovsky phase reduction**:\n  - Split `UltraDeep72.lean` into `UltraDeep72Core.lean`, `UltraDeep90.lean`, and the `UltraDeep108` stack (`UltraDeep108Tables.lean`, `UltraDeep108Eval.lean`, `UltraDeep108N1024.lean`, `UltraDeep108N2048.lean`, `UltraDeep108.lean`), registered in `UltraDeep72.lean` and `LeanAsm.lean`.\n  - Certified `phase_reduction_width_1e30_under_1e75` (`< 10^-75` rad up to `t ~ 10^30`, `N <= 2048`, zero `Classical.choice`, zero `sorryAx`).\n  - Certified 128-step chunked 2D zero-free tilings & rational contractions `crtNtt_highTrunc108_N1024_rect` / `ultraDeep72_N1024_rational_rect_cert` (`N = 1024`, `\u03c3 = 0.500125`, `t ~ 10^24`, gradient `319421067`) and `crtNtt_highTrunc108_N2048_rect` / `ultraDeep72_N2048_rational_rect_cert` (`N = 2048`, `\u03c3 = 0.5000625`, `t ~ 10^30`, gradient `512891320`).\n- **Zero-density bridge & `MiniVM` 8-pt Fermat NTT**:\n  - Added `ZeroDensityBridge.lean` Part 8 (`certifiedStrip0500125_N1024`, `certifiedStrip05000625_N2048`, `ultradeep72_N2048_strip_zd_certs`).\n  - Wired `MiniVMNttBridge.fermatTowerNtt8_asm_roundtrip_certs` (`fermatTowerNtt8Specs_valid`) into `MiniVmProvenance` and `UltraDeep108` certificates into `HighTruncRationalContractionProp` / `QuasiRiemannProvenance` in `ProvenanceSummary.lean`.\n- **Tests, CLI, & Docs**:\n  - Added Part 48 to `tests/TestAxioms.lean`, updated `Main.lean` Parts 1 & 5, and updated `README.md` (`43` modules, `Parts 1-48`).\n- **Verification**:\n  - `make build-incremental`: `Build completed successfully (88 jobs).`\n  - `lake env lean tests/TestAxioms.lean`: Parts 1-48 strictly `[propext]` or `[propext, Quot.sound]` (`0 Classical.choice`, `0 sorryAx`, `0 warnings`).\n  - `./.lake/build/bin/leanasm` & `make sync`: clean pass; `subrepos/YM` clean.\n\nCloses #79",
+    "closedAt": "2026-11-15T17:40:06Z",
+    "createdAt": "2026-11-15T17:39:55Z",
+    "headRefName": "feat/ultradeep-n2048-minivm-ntt8",
+    "labels": [],
+    "number": 84,
+    "state": "MERGED",
+    "title": "feat(qrh,minivm): UltraDeep108 N=1024/2048 tiling and MiniVM 8-pt Fermat NTT",
+    "updatedAt": "2026-11-15T17:40:10Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/84"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Implements GitHub Issue #78 (`v1.3.0` roadmap workstream).\n\n## Summary\n- **New module [`MollifierVariationalBridge.lean`](src/LeanAsm/QuasiRiemann/MollifierVariationalBridge.lean)** (exported in `src/LeanAsm.lean`, zero Mathlib, zero `Classical.choice`, zero `sorryAx`, zero warnings):\n  - **Closed-loop dyadic-Abel rungs `k = 5, 6`**: `dyadic_abel_unlocks_next_rung` couples `abel_monotone_weight_envelope_qrat`, `inv_sqrt_tail_gate_dyadic_step`, ladder advance, and `short_interval_spec_guarantees_theta_pos`. Certifies concrete `HasGuaranteedPrime` for `k = 5` (`33/64` on `[10^192, 10^192 + 10^108]`) and `k = 6` (`65/128 = 1/2 + 1/128` on `[10^384, 10^384 + 10^206]`), extending `65/128 < 33/64 < 17/32 < 7/8`.\n  - **Two-piece `QRat` variational mollifier (`TwoPieceMollifierSpec`, `variational_mollifier_beats_linear`)**:\n    - Explicitly separates `mollifierDirichletEnergy c1 c2 = c1^2 + 2*c1*c2 + (4/3)*c2^2` (= `(c1+c2)^2 + (1/3)*c2^2 >= 1`, equal to `49/48` at `(3/4, 1/4)`; `linear_minimizes_dirichlet_energy`) from the cleared-denominator variational off-diagonal energy `mollifierVariationalEnergy c1 c2 = c1^2 + c1*c2 + c2^2 = (c1+c2)^2 - c1*c2` (and `mollifierRatioL2Energy = 37/48 < 1`), proving `variational_energy_lt_one_of_pos` (`13/16 < 1` at `(3/4, 1/4)`) and strictly tightening the `thetaKimSarnakSym4 = 7/64` (`selbergLambda1 = 975/4096`) QRH threshold to `603/1024 < 39/64`.\n- **Provenance & CLI**: Wired `MollifierVariationalProp` into `QuasiRiemannProvenance` / `quasiRiemann_provenance_certified` in `ProvenanceSummary.lean`, updated `Main.lean` Part 5 output and `README.md` (`36` modules / `Parts 1-47`, `<= 80` cols).\n- **Verification**:\n  - `make build-incremental`: 74 Lake jobs, 0 errors, 0 warnings across 36 modules.\n  - `lake env lean tests/TestAxioms.lean`: Parts 1-47 (525 axiom checks) strictly `[propext]` or `[propext, Quot.sound]` (0 `Classical.choice`, 0 `sorryAx`).\n  - `make sync`: clean pass, `subrepos/YM` clean.\n\nCloses #78",
+    "closedAt": "2026-11-15T03:04:39Z",
+    "createdAt": "2026-11-15T03:02:36Z",
+    "headRefName": "feat/mollifier-variational-bridge",
+    "labels": [],
+    "number": 83,
+    "state": "MERGED",
+    "title": "feat(qrh): closed-loop dyadic-Abel rungs k=5,6 and variational mollifier bridge",
+    "updatedAt": "2026-11-15T03:04:42Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/83"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Adds the `v1.3.0` architecture roadmap (`#78`\u2013`#81`) and merges `docs/V1_2_0_CODE_DIGEST.md` into `main`, updating `README.md` links.\n\n### Summary\n- Add [`docs/ROADMAP_V1_3_0.md`](docs/ROADMAP_V1_3_0.md) (`<= 80` cols, Directive 04 header/footer) covering Issues `#78`\u2013`#81` (Parts 47\u201350):\n  - `#78`: `MollifierVariationalBridge.lean` (closed-loop rungs `k = 5, 6` and quadratic variational mollifier optimization)\n  - `#79`: `UltraDeep72.lean` build-performance split + 108-digit `twoPiInterval108` + `N = 1024, 2048` down to `\u03c3 = 0.5000625` + `MiniVM` 8-pt NTT `ntt8AsmFermat_sound`\n  - `#80`: `LanglandsRankinSelbergBridge.lean` (unified `GL(1) x GL(2) -> GSp(4)` Rankin-Selberg & Hecke short-interval bridge)\n  - `#81`: `ProthNttTowerBridge.lean` (5-prime Proth NTT tower `P_5 = 15*2^27 + 1` & Dedekind strip bounds)\n- Include [`docs/V1_2_0_CODE_DIGEST.md`](docs/V1_2_0_CODE_DIGEST.md) summarizing `v1.2.0` additions in oversized modules.\n- Link `docs/ROADMAP_V1_3_0.md` and `docs/V1_2_0_CODE_DIGEST.md` in `README.md`.\n\n(Issues `#78`\u2013`#81` remain open until their implementation PRs land.)",
+    "closedAt": "2026-11-15T02:49:47Z",
+    "createdAt": "2026-11-15T02:48:53Z",
+    "headRefName": "docs/roadmap-v1-3-0",
+    "labels": [],
+    "number": 82,
+    "state": "MERGED",
+    "title": "docs: add v1.3.0 architecture roadmap (#78-#81) and v1.2.0 code digest",
+    "updatedAt": "2026-11-15T02:49:50Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/82"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Ingests and refactors the v1.2.0 architecture review into `docs/ARCH_REVIEW_V1_2_0.md` and brings `README.md` module/audit counts up to date with `v1.2.0` (`6db78d7`).\n\n### Summary\n- Add [`docs/ARCH_REVIEW_V1_2_0.md`](docs/ARCH_REVIEW_V1_2_0.md) formatted to Directive 04 (`<= 80` cols, path header/footer) with factual corrections verified against `main` (`6db78d7`):\n  - Correct 4-prime Fermat modulus `M_4 = (2^32 - 1)/3 = 1,431,655,765` (`3 * M_4 = 2^32 - 1`).\n  - Distinguish 100-digit Chudnovsky `pi` bounds from 192-digit Karatsuba CRT-NTT multiplication and 90-digit `UltraDeep72` phase reductions.\n  - Document pure Lean 4 core constructive primitives (zero Mathlib, `List.nodup_range`, `Nat.decLt`/`Int.decLt`) and `ProvenanceSummary`'s eight `def ... : Prop` conjunctions + explicit 8-way `LeanAsm.leanasm_full_provenance_certified`.\n- Update `README.md` (`35` modules, `33` submodules / `22` domain modules, `Parts 1-46`, `Abel` under `QuasiRiemann/`, and links to `docs/ROADMAP_V1_2_0.md` & `docs/ARCH_REVIEW_V1_2_0.md`).\n\n### Verification\n- `make sync`: 72/72 Lake jobs, 0 warnings, 0 errors.",
+    "closedAt": "2026-11-15T02:36:59Z",
+    "createdAt": "2026-11-15T02:35:56Z",
+    "headRefName": "docs/ingest-arch-review-1.2.0",
+    "labels": [],
+    "number": 77,
+    "state": "MERGED",
+    "title": "docs: ingest, verify, and refactor v1.2.0 architecture review",
+    "updatedAt": "2026-11-15T02:37:01Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/77"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #71\n\n## Summary\n- Added `src/LeanAsm/QuasiRiemann/DyadicAbelBridge.lean` and exported it from `src/LeanAsm.lean`, extending `ConstructiveOpenaiBridge.slab_sum_foliation` and `QuasiRiemann.ShortIntervalPrimes` / `ParametricQrhLadder` with constructive `[M, M * 2^k)` dyadic-shell partitioning, discrete Abel summation-by-parts, and cleared-denominator quadratic `1 / \u221aN` tail gates.\n- Proved `dyadic_shell_sum_partition`, `dyadic_shell_sum_foliation`, `discrete_abel_summation_by_parts`, `abel_summation_by_parts_list`, `abel_monotone_weight_envelope`, `abel_monotone_weight_envelope_qrat`, `sqrt_tail_gate_of_sq_le`, `inv_sqrt_tail_gate_dyadic_step`, `sqrt_tail_gate_dyadic_step`, `short_interval_dyadic_abel_envelope`, and `dyadic_abel_short_interval_certs` across the beyond-`7/8` ladder (`17/32 < 9/16 < 5/8 < 2/3 < 3/4 < 7/8`).\n- Wired `DyadicAbelProvenanceProp` into `QuasiRiemannProvenance` / `quasiRiemann_provenance_certified` (and transitively `leanasm_full_provenance_certified`) in `src/LeanAsm/ProvenanceSummary.lean`.\n- Added **Part 46** `#print axioms` checks in `tests/TestAxioms.lean`, updated Part 5 CLI output in `Main.lean`, and updated `README.md` (`<= 80` cols) to document the 35-module inventory and Parts 1\u201346.\n\n## Verification\n- `make build-incremental`: passed (35/35 modules, 72 jobs, `0` warnings).\n- `lake env lean tests/TestAxioms.lean`: passed across Parts 1\u201346 with `0` `Classical.choice`, `0` `sorryAx`, and `0` warnings.\n- `make sync`: passed cleanly with `subrepos/YM` clean.",
+    "closedAt": "2026-11-15T02:19:01Z",
+    "createdAt": "2026-11-15T02:18:16Z",
+    "headRefName": "feat/dyadic-abel-bridge",
+    "labels": [],
+    "number": 76,
+    "state": "MERGED",
+    "title": "feat(qrh): add constructive dyadic-shell and discrete Abel summation bridge (Closes #71)",
+    "updatedAt": "2026-11-15T02:19:04Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/76"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #70\n\n## Summary\n- Added `src/LeanAsm/ArtinShortIntervalBridge.lean` and exported it from `src/LeanAsm.lean`, lifting `ShortIntervalPrimes.ApShortIntervalSpec` and `ParametricQrhLadder.qrhShortExponent` bounds to order-4 `GL(1)` Artin character-twisted short-interval prime sums across the Fermat-prime tower `{5, 17, 257, 65537}` and beyond-`7/8` parametric exponents (`17/32 < 39/64 < 5/8 < 2/3 < 3/4 < 7/8`).\n- Proved `artin_gaussian_char_orthogonality`, `artin_ntt4_residue_class_recovery`, `artin_twisted_ap_short_interval_pos`, `artin_twisted_coset_short_interval_pos`, and `fermat_tower_artin_short_interval_certs` connecting `MiniVM` 4-point NTT/INTT execution to residue-class recovery and prime positivity.\n- Wired `ArtinShortIntervalProvenanceProp` into `EulerRnsProvenance` / `eulerRns_provenance_certified` (and transitively `leanasm_full_provenance_certified`) in `src/LeanAsm/ProvenanceSummary.lean`.\n- Added **Part 45** `#print axioms` checks in `tests/TestAxioms.lean`, updated Part 6 output in `Main.lean`, and documented the 34-module inventory and Part 45 in `README.md` (`<= 80` cols).\n\n## Verification\n- `make build-incremental`: passed (34/34 modules, 70 jobs, `0` warnings).\n- `lake env lean tests/TestAxioms.lean`: passed across Parts 1\u201345 with `0` `Classical.choice`, `0` `sorryAx`, and `0` warnings.\n- `make sync` & `.lake/build/bin/leanasm`: passed cleanly with `subrepos/YM` clean.",
+    "closedAt": "2026-11-15T02:06:03Z",
+    "createdAt": "2026-11-15T02:04:26Z",
+    "headRefName": "feat/artin-short-interval-bridge",
+    "labels": [],
+    "number": 75,
+    "state": "MERGED",
+    "title": "feat(artin): add GL(1) Artin character-twisted short-interval bridge (Closes #70)",
+    "updatedAt": "2026-11-15T02:06:06Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/75"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Implements #69 cleanly with zero `Classical.choice`, zero `sorryAx`, and zero compiler warnings.\n\n### Summary\n- **`src/LeanAsm/QuasiRiemann/UltraDeep72.lean` (Part 19):**\n  - Added `RationalBoxContractionSpec`, `RationalBoxContractionSpec.lip_mul_radius_lt`, constructive `rational_box_contraction_step`, and `rational_telescoping_chain_cert` generalizing `1/2` halving to arbitrary cleared-denominator rational contraction ratios `0 < qNum < qDen` with shrunk-ball `M / (r - \u03b4)` derivative margins.\n  - Certified `ultraDeep72_N256_rational_rect_cert` (`N = 256`, `\u03c3 = 0.5005`, `t ~ 10^12`, `q = 1/3`, `dirichletGradBoundScaled6_512 500500 256 = 117284435`) and `ultraDeep72_N512_rational_rect_cert` (`N = 512`, `\u03c3 = 0.50025 = 1/2 + 1/4000`, `t ~ 10^18`, `q = 2/5`, `dirichletGradBoundScaled6_512 500250 512 = 195620879`).\n- **`src/LeanAsm/QuasiRiemann/ZeroDensityBridge.lean` (Part 7):**\n  - Imported `LeanAsm.QuasiRiemann.UltraDeep72`, added `CertifiedStripWidthSpec` (`certifiedStrip05005_N256`, `certifiedStrip050025_N512`), `exponent_strict_mono_sigma`, `ultradeep72_strip_to_zero_density_bridge`, and `ultradeep72_N512_strip_zd_certs`, proving exact critical-strip exponent tightenings (`3/5200` on `zdGuthMaynard` and `3/5000` on `zdHuxley`) from `\u03c3 = 1/2 + 1/4000`.\n- **Provenance, Audit, CLI & Docs:**\n  - Wired `HighTruncRationalContractionProp` into `QuasiRiemannProvenance` / `quasiRiemann_provenance_certified` (and transitively `LeanAsm.leanasm_full_provenance_certified`) in `src/LeanAsm/ProvenanceSummary.lean`.\n  - Added **Part 44** `#print axioms` checks in `tests/TestAxioms.lean`.\n  - Updated `Main.lean` Part 5 CLI output and `README.md` (`Parts 1-44`).\n\n### Verification\n- `make build-incremental` (`33` modules, `0` errors, `0` warnings)\n- `lake env lean tests/TestAxioms.lean` (`0` `Classical.choice`, `0` `sorryAx`, `0` warnings across Parts 1-44)\n- `make sync` (`lake build` + `lake exe leanasm` passed; `subrepos/YM` clean)\n\nCloses #69\n",
+    "closedAt": "2026-11-15T01:47:47Z",
+    "createdAt": "2026-11-15T01:43:06Z",
+    "headRefName": "feat/ultradeep72-rational-contraction",
+    "labels": [],
+    "number": 74,
+    "state": "MERGED",
+    "title": "feat(qrh): N=256,512 rational contraction and ZeroDensityBridge strip export",
+    "updatedAt": "2026-11-15T01:47:50Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/74"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #68\n\n## Summary\n- Added `src/LeanAsm/QuasiRiemann/ParametricQrhLadder.lean` and exported it from `src/LeanAsm.lean`:\n  - `qrhShortExponent (k : Nat) = (2^k + 1) / 2^(k + 1)` and dual `qrhDualFraction (k : Nat) = (2^(k + 1) - 1) / 2^(k + 1)`.\n  - `qrhShortExponent_strict_anti`: inductive descent `1/2 < qrhShortExponent (k + 1) < qrhShortExponent k` and `k \u2265 2 \u2192 qrhShortExponent k < 7/8` (`5/8 > 9/16 > 17/32 > 33/64 > 1/2`).\n  - `qrhShortExponent_density_benchmarks`: comparison against Huxley (`7/12`), Guth\u2013Maynard (`17/30`), and `zdGuthMaynard` saving (`11/26`).\n  - `qrhDualFraction_strict_mono`: inductive ascent `7/8 < 15/16 < 31/32 < ... < 1` and exact dualities (`qrhShortExponent k + qrhDualFraction k = 3/2`, `qrhDualFraction k - 1/2 = 1 - qrhShortExponent k`, `qrhThresholdFromMollifier (qrhDualFraction k) = qrhShortExponent (k + 1)`).\n  - `ParametricQrhBridgeSpec`, `mollifierFromAutomorphic`, `qrhFromAutomorphic_eqv_half_add`, `shortIntervalQrh1732Spec_has_prime` (`\u03b8 = 17/32` at `[10^96, +10^57]`), `kim_sarnak_amplified_qrh_step`, and `parametric_qrh_kim_sarnak_certs` coupling `GSp4FunctorialityBridge.thetaKimSarnakSym4 = 7/64` and `selbergLambda1 = 975/4096`.\n- Wired `ParametricQrhLadderProp` into `QuasiRiemannProvenance` and `quasiRiemann_provenance_certified` (and transitively `LeanAsm.leanasm_full_provenance_certified`) in `src/LeanAsm/ProvenanceSummary.lean`.\n- Added Part 43 `#print axioms` checks in `tests/TestAxioms.lean`, updated Part 5 CLI summary in `Main.lean`, and updated `README.md` (`33 modules`, `31 submodules`, Parts 1\u201343).\n\n## Verification\n- `make build-incremental`: passed (`33` modules, `0` errors, `0` warnings).\n- `lake env lean tests/TestAxioms.lean`: passed (all Part 43 theorems and `quasiRiemann_provenance_certified` / `leanasm_full_provenance_certified` depend only on `[propext, Quot.sound]`, `0 Classical.choice`, `0 sorryAx`).\n- `make sync`: passed (`0` errors, `0` warnings); `git -C subrepos/YM status -s` clean.\n",
+    "closedAt": "2026-11-15T00:59:16Z",
+    "createdAt": "2026-11-15T00:57:17Z",
+    "headRefName": "feat/parametric-qrh-ladder",
+    "labels": [],
+    "number": 73,
+    "state": "MERGED",
+    "title": "feat(qrh): parametric beyond-7/8 QRH ladder and Kim-Sarnak coupling",
+    "updatedAt": "2026-11-15T00:59:20Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/73"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n- Add `docs/ROADMAP_V1_2_0.md` (strictly `<= 80` cols) capturing the architectural scan on `main` (`d96e3d9`), cross-pillar disconnections across the 32 verified modules, candidate lemmas from `docs/openai-20261028/LEAN_TOC.json` (`Extension/UV`, `UVExtension`, `Contacts`, `EveryPhase`, `RemainderComparison`, `RG08`), and the four `v1.2.0` issue specs (`#68`\u2013`#71`).\n\n## Verification\n- Line-length check on `docs/ROADMAP_V1_2_0.md`: `124` lines, max `80/80` cols (`0` violations).\n- `git -C subrepos/YM status -s`: clean.\n",
+    "closedAt": "2026-11-15T00:48:09Z",
+    "createdAt": "2026-11-15T00:47:30Z",
+    "headRefName": "docs/roadmap-v1-2-0",
+    "labels": [],
+    "number": 72,
+    "state": "MERGED",
+    "title": "docs(qrh): add v1.2.0 architecture roadmap (#68-#71)",
+    "updatedAt": "2026-11-15T00:48:12Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/72"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #60\n\n### Summary\n- Add `LeanAsm.EllipticModularityBridge` (`src/LeanAsm/EllipticModularityBridge.lean`) certifying:\n  - Exact integer truncated `q`-expansion coefficients `heckeCoeff11 n` up to degree `100` for the weight-2 cusp form $f_{11}(\\tau) = \\eta(\\tau)^2 \\eta(11\\tau)^2 \\in S_2(\\Gamma_0(11))$ via chunked convolution (`etaStage1`\u2013`etaStage10`, `f11Coeffs_eq_table`, `heckeCoeff11_bad_11`).\n  - Point counts `#E_{11a1}(F_p)` (`ec11a1_point_counts_97`), balanced binary sum-tree equivalence (`sumTree_eq_range_foldl`), and `5`-torsion divisibility (`ec11a1_five_torsion_97`) for $E_{11a1} : y^2 + y = x^3 - x^2 - 10x - 20$ across all `24` good primes $p \\le 97$.\n  - Constructive Eichler\u2013Shimura Hecke\u2013Frobenius trace equality `eichler_shimura_trace_eq_11a1` ($c_p(f_{11}) = a_p(E_{11a1})$ for all $24$ good primes $p \\le 97$, plus $c_{11} = 1$).\n  - Strict Hasse\u2013Weil / Ramanujan temperedness (`a_p^2 < 4p`) and cleared-denominator `GL(2)` Euler-factor positivity (`0 < v^2 - a_p u v + p u^2` for $v > 0$) via `hasse_weil_ramanujan_11a1_certs`.\n  - Hecke multiplicativity (`c_1 = 1`, `c_{mn} = c_m c_n` for coprime `m, n >= 1` with `mn <= 100`, and `c_{p^2} = c_p^2 - p` for $p \\in \\{2, 3, 5, 7\\}$) via `hecke_multiplicativity_11a1_certs`.\n- Export `LeanAsm.EllipticModularityBridge` in `src/LeanAsm.lean` and integrate into `FiniteFieldWeilProvenance` / `LeanAsm.leanasm_full_provenance_certified` (`src/LeanAsm/ProvenanceSummary.lean`).\n- Add Part 42 axiom audit to `tests/TestAxioms.lean`, Part 7 modularity telemetry to `Main.lean`, and update `README.md` (`32` modules / `30` submodules / `21` domain modules, Parts 1\u201342).\n\n### Verification\n- `make build-incremental`: `66` jobs built cleanly (`0` errors, `0` warnings).\n- `lake env lean tests/TestAxioms.lean`: all axiom audits (Parts 1\u201342) verified with `0 Classical.choice`, `0 sorryAx`, `0` warnings; `LeanAsm.leanasm_full_provenance_certified` uses only `[propext, Quot.sound]`.\n- `make sync`: `lake build`, `leanasm` executable, and environment checks passed with `0` warnings.\n- `git -C subrepos/YM status -s`: clean.\n",
+    "closedAt": "2026-11-15T00:33:21Z",
+    "createdAt": "2026-11-15T00:31:37Z",
+    "headRefName": "feat/elliptic-modularity-bridge",
+    "labels": [],
+    "number": 67,
+    "state": "MERGED",
+    "title": "feat(weil): add E_11a1 / f_11 elliptic modularity bridge",
+    "updatedAt": "2026-11-15T00:33:23Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/67"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #65\n\n## Summary\n- Audits all 21 `leanasm_pure_constructive` `.lean` files under `subrepos/YM/submissions/openai-20261028` in [`docs/openai-20261028/CONSTRUCTIVE_AUDIT.md`](docs/openai-20261028/CONSTRUCTIVE_AUDIT.md) (4 substantive lattice/gauge modules = 57 declarations, 1 metaprogramming module = 4 declarations, 6 vintage macro scripts = 0 declarations, 10 audit/stub/control files = 6 declarations).\n- Adds pure-constructive [`src/LeanAsm/ConstructiveOpenaiBridge.lean`](src/LeanAsm/ConstructiveOpenaiBridge.lean) porting 4D lattice routes, closed square walks, `boxSites`/`slabSites` foliation (`slab_sum_foliation`), gauge connection holonomy covariance (`holonomy_gauge_covariant`), `SignedSym4` face-holonomy trace invariance (`classFn_send_price`), and concrete non-abelian `Q_8 subset SU(2)` instantiations (`q8_plaquette_holonomy_gauge_invariant`, `q8_send_price_trace_invariant`) with **zero** `Classical.choice` and **zero** `sorryAx`.\n- Exports `LeanAsm.ConstructiveOpenaiBridge` in `src/LeanAsm.lean`, extends `YangMillsProvenance` / `yangMills_provenance_certified` (bundled into `LeanAsm.leanasm_full_provenance_certified`) in `src/LeanAsm/ProvenanceSummary.lean`, adds Part 41 axiom checks in `tests/TestAxioms.lean`, updates Part 4 CLI output in `Main.lean`, and updates `README.md`.\n\n## Verification\n- `make build-incremental` (`31` modules, `0` errors, `0` warnings)\n- `lake env lean tests/TestAxioms.lean` (`459` axiom check lines, `0 Classical.choice`, `0 sorryAx`, `0 warnings`)\n- `make sync` (`64` build jobs + `leanasm` executable verified)\n- `git -C subrepos/YM status -s` clean\n",
+    "closedAt": "2026-11-15T00:11:35Z",
+    "createdAt": "2026-11-15T00:08:35Z",
+    "headRefName": "feat/port-openai-constructive",
+    "labels": [],
+    "number": 66,
+    "state": "MERGED",
+    "title": "feat(port): audit 21 pure constructive openai-20261028 files and port bridge",
+    "updatedAt": "2026-11-15T00:11:38Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/66"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #59\n\n## Summary\n- Added `src/LeanAsm/ArtinFermatBridge.lean` (`ArtinFermatCharacterSpec`, `artinFermatTowerSpecs` for `(F_k, \\omega_4) \\in \\{(5,2), (17,4), (257,16), (65537,256)\\}` with `\\phi(F_k) = 2^{2^k} \\in \\{4, 16, 256, 65536\\}`), proving:\n  - `artin_split_euler_factor_collapse`: links `EulerFactorNonVanishing.FermatTowerStripCert` and `fermat_tower_dedekind_euler_strip_certs` to cleared-denominator `(d - r)^\\phi(F_k)` split Euler products and positive strip evaluations.\n  - `artin_order4_cyclotomic_factorization`: certifies `\\prod_{j=0}^{3} (1 - \\omega_4^j T) \\equiv 1 - T^4 \\pmod{F_k}` across `{5, 17, 257, 65537}`.\n  - `artin_char_transform_eq_ntt4`: proves the 4-element GL(1) Artin Fourier transform equals `NttArithmetic.ntt4` for all `(F_k, \\omega_4)` and every valid `ArtinFermatCharacterSpec` / `FermatNtt4Spec`.\n  - `artin_char_orthogonality_minivm`: composes `MiniVMNttBridge.ntt4AsmFermat_sound` and `intt4_ntt4_asm_fermat_roundtrip` to certify GL(1) Artin character orthogonality (`\\delta_{i,m}`) inside `MiniVM` assembly execution.\n- Exported `LeanAsm.ArtinFermatBridge` in `src/LeanAsm.lean` and bundled the four headline theorems into `EulerRnsProvenance` / `eulerRns_provenance_certified` (and transitively `LeanAsm.leanasm_full_provenance_certified`) in `src/LeanAsm/ProvenanceSummary.lean`.\n- Added Part 39 `#print axioms` checks in `tests/TestAxioms.lean`, updated Part 6 CLI output in `Main.lean`, and updated `README.md` (`30` modules, `28` submodules, `Parts 1-39`).\n\n## Verification\n- `make build-incremental` (`30/30` modules, `0` warnings, `0` errors)\n- `lake env lean tests/TestAxioms.lean` (`Parts 1-39` passed, `[propext, Quot.sound]`, `0` `Classical.choice`, `0` `sorryAx`)\n- `make sync` (full `lake build` + CLI execution across Parts 1-11 + unified provenance, exit `0`)",
+    "closedAt": "2026-11-14T23:50:56Z",
+    "createdAt": "2026-11-14T23:48:41Z",
+    "headRefName": "feat/artin-fermat-bridge",
+    "labels": [],
+    "number": 64,
+    "state": "MERGED",
+    "title": "feat(artin): add GL(1) Artin-Fermat Euler & MiniVM NTT bridge",
+    "updatedAt": "2026-11-14T23:50:59Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/64"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Zero-dependency scanner for subrepos/YM/submissions/openai-20261028 (MANIFEST, LEAN_TOC, QRH_7_8_CANDIDATES) plus cleared-denominator Cauchy-Lipschitz interior box lower-bound and telescoping contraction certificates in UltraDeep72 and ProvenanceSummary.",
+    "closedAt": "2026-11-14T23:33:23Z",
+    "createdAt": "2026-11-14T23:23:08Z",
+    "headRefName": "chore/scan-openai-20261028",
+    "labels": [],
+    "number": 63,
+    "state": "MERGED",
+    "title": "feat(qrh): add openai-20261028 scanner and Cauchy-Lipschitz box bounds",
+    "updatedAt": "2026-11-14T23:33:26Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/63"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #61\n\n## Summary\n- Added `src/LeanAsm/GSp4FunctorialityBridge.lean` (exported from `src/LeanAsm.lean`) formalizing:\n  1. **Cleared-Denominator `GSp(4) -> SO(5)` Standard Euler-Factor Lift**: `gsp4StandardEulerPoly`, `gsp4StdQuarticCofactor`, `gsp4StandardEulerHomog`, `gsp4StdRecipEval`, and `gsp4_std_functional_equation` proving `(1 - T)` factorization, anti-palindromic symmetry `T^5 (q * L_std(1/T)) = -(q * L_std(T))`, and `q * L_std(1) = 0`.\n  2. **Genus-2 Curve `C / F_5` Cyclotomic Lift & Ramanujan Temperedness**: `genus2_f5_so5_cyclotomic_lift` and `genus2_f5_so5_ramanujan_tempered`, specializing to `(q, a\u2081, a\u2082) = (5, -5, 15)` from `FiniteFieldRH` and `Genus2Jacobian` (`#J(C)(F_5) = 71`), proving `5 * L_std(T) = 5 (1 - T) \u03a6_10(T)`, exact `1 - T^10` divisibility, and unit-circle `T^10 = 1` eigenvalue temperedness.\n  3. **Langlands Symmetric-Power (`Sym^k`) & Selberg / Kim\u2013Sarnak Ladder**: `kim_sarnak_ramanujan_ladder_strict` (`0 < 7/64 < 1/9 < 1/5 < 1/4 < 1/2`) and `selberg_laplacian_eigenvalue_ladder` (`3/16 < 21/100 < 77/324 < 975/4096 < 1/4` with exact `Sym^3 -> Sym^4` spectral gap `127/331776`) in constructive `QRat`.\n- Wired the new theorems into `src/LeanAsm/ProvenanceSummary.lean` (`LeanAsm.finiteFieldWeil_provenance_certified` & `LeanAsm.leanasm_full_provenance_certified`).\n- Added Part 37 `#print axioms` checks in `tests/TestAxioms.lean` (`0 Classical.choice`, `0 sorryAx`).\n- Updated `Main.lean` Part 7 CLI output and `README.md` (`\u2264 80` cols).\n\n## Verification\n- `make build-incremental`: 0 errors, 0 warnings (29/29 modules up to date)\n- `lake env lean tests/TestAxioms.lean`: all Part 37 theorems depend only on `[]`, `[propext]`, or `[propext, Quot.sound]` (`0 Classical.choice`, `0 sorryAx`)\n- `make sync`: clean build, executable run, and workspace sync passed",
+    "closedAt": "2026-11-14T22:44:35Z",
+    "createdAt": "2026-11-14T22:30:43Z",
+    "headRefName": "feat/gsp4-functoriality-bridge",
+    "labels": [],
+    "number": 62,
+    "state": "MERGED",
+    "title": "feat(langlands): GSp(4) to SO(5) functorial lift and Selberg / Kim-Sarnak ladder (#61)",
+    "updatedAt": "2026-11-14T22:44:37Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/62"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #57\n\n## Summary\n- **`src/LeanAsm/QuasiRiemann.lean`**: Added `HighTruncZeroFreeRectSpec`, `HasCertifiedNonVanishing`, constructive `nonvanishing_of_certified`, `InBox2D`, `LipTile2D`, `IsValidLipTile2D`, `intervalMinSq_le_sq_of_scaled_mem`, constructive `isValidLipTile2D_sound`, `IsPartition2x2Tiles`, and constructive `partition2x2_covers_all_points`.\n- **`src/LeanAsm/QuasiRiemann/UltraDeep72.lean`**:\n  - Added 90-digit CRT-NTT interval engine (`ln_table_1_to_512_valid`, `crtNtt_phase_reduction_512_sound`) certifying phase reduction `t ln n mod 2\u03c0` across `n \u2264 512` at heights `t ~ 10^12` and `t ~ 10^18` to `< 10^-60` radians via `PiChudnovsky.intMulBigViaCrtNtt` / `PiChudnovsky.pi_100_digits_certified`.\n  - Refactored `eulerMaclaurinB2TailCore` and proved `eulerMaclaurinB2TailRect2DForN_128_eq`, universal `eulerMaclaurinB2TailRect2DForN_monotone`, and `euler_maclaurin_tail_shrinks_with_N` down to `\u03c3 = 0.5005` (`1001/2000`) and `\u03c3 = 0.50025` (`2001/4000`).\n  - Certified compositional `2 \u00d7 2` 2D Lipschitz box tilings (`crtNtt_highTrunc_2d_zero_free_rect`) at `(\u03c3 = 0.5005, N = 256, t ~ 10^12)` and `(\u03c3 = 0.50025, N = 512, t ~ 10^18)`.\n- **`src/LeanAsm/ProvenanceSummary.lean`, `tests/TestAxioms.lean`, `Main.lean`, `README.md`**: Wired `HighTruncRectProvenanceProp` into `QuasiRiemannProvenance` / `quasiRiemann_provenance_certified`, added Part 36 `#print axioms` checks, added CLI summary output, and updated documentation (`\u2264 80` cols in `README.md`, `\u2264 120` chars in `.lean`).\n\n## Verification\n- `make build-incremental`: passed (`28/28` modules cached/built, `0` warnings).\n- `lake env lean tests/TestAxioms.lean`: passed (`0` `Classical.choice`, `0` `sorryAx`, `0` warnings; all Part 36 theorems depend only on `[propext]` / `[propext, Quot.sound]`).\n- `make sync`: passed (`58 jobs`, Lean executable test & provenance checks succeeded).",
+    "closedAt": "2026-11-14T22:17:58Z",
+    "createdAt": "2026-11-14T22:11:10Z",
+    "headRefName": "feat/ultradeep-crt-ntt-rectangles",
+    "labels": [],
+    "number": 58,
+    "state": "MERGED",
+    "title": "feat(qrh): higher-truncation 2D zero-free rectangles via CRT-NTT precision engine",
+    "updatedAt": "2026-11-14T22:18:01Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/58"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #55\n\n### Summary\n- **318-Digit Convergent Gap & Bracket (`src/LeanAsm/CollatzQrhBridge.lean`)**:\n  - Proved `convergent_1054_665_gap_pos` (`2 ^ 1054 < 3 ^ 665 \u2227 0 < 3 ^ 665 - 2 ^ 1054`, 313-digit separation).\n  - Proved `log2_3_convergent_bracket_665` (`1054 * 306 < 485 * 665`, certifying `1054 / 665 < log_2(3) < 485 / 306`).\n  - Proved `steiner_1cycle_excluded_1054_665` excluding both `(1054, 665)` directly (gap violation `2 ^ 1054 < 3 ^ 665`) and `(1055, 665)` via `\u00ac ((2 ^ 1055 - 3 ^ 665) \u2223 (3 ^ 665 - 2 ^ 665))`.\n- **Simons\u2013de Weger Cycle Barrier (`src/LeanAsm/CollatzQrhBridge.lean`)**:\n  - Proved `simons_de_weger_barrier_665`: under `936,360 <= c.nMin`, any non-trivial `CollatzOddCycle m` satisfies `666 <= m` odd steps, `1055 <= cycleShift c.a m` halvings, and `1721 <= cycleShift c.a m + m` total steps.\n- **Constructive Predecessor-Tree & Density Bounds (`src/LeanAsm/CollatzQrhBridge.lean`)**:\n  - Defined computable `collatzPredecessors` and `collatzPredTree`, proved backward-to-forward soundness `collatzPredTree_sound` into `Conjectures.iterate Conjectures.collatzStep`, and proved `collatz_mod6_branching`.\n  - Defined `PredecessorDensitySpec` and proved `collatz_pred_tree_growth_certs` certifying exact depth cardinalities (`14 -> 18 > 15`, `15 -> 24 > 16`, `20 -> 72 > 21`) and cleared-denominator power-law comparisons against `3/4 < 84/100 < 9/10 < 1`.\n- **Provenance, Axiom Audit, CLI & Docs**:\n  - Wired all new theorems into `CollatzProvenance` / `collatz_provenance_certified` in `src/LeanAsm/ProvenanceSummary.lean` and Part 35 of `tests/TestAxioms.lean`.\n  - Updated `Main.lean` Part 2 CLI output and `README.md` (`<= 80` cols).\n\n### Verification\n- `make build-incremental`: passed (0 warnings, all 28 modules up to date)\n- `lake env lean tests/TestAxioms.lean`: passed (402 axiom lines, 0 `Classical.choice`, 0 `sorryAx`, 0 warnings)\n- `make sync`: passed (58 jobs built, executable demo succeeded)",
+    "closedAt": "2026-11-14T20:42:25Z",
+    "createdAt": "2026-11-14T20:34:28Z",
+    "headRefName": "feat/collatz-convergents-density",
+    "labels": [],
+    "number": 56,
+    "state": "MERGED",
+    "title": "feat(collatz): higher log_2(3) convergent gaps (1054, 665) & predecessor-tree density",
+    "updatedAt": "2026-11-14T20:42:28Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/56"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #53\n\n### Summary\n- Extended `src/LeanAsm/MiniVMNttBridge.lean` with parametric 4-point NTT/INTT assembly compilers (`ntt4AsmFermat`, `intt4AsmFermat`) across Fermat-tower prime configurations `{5, 17, 257, 65537}` with symbolic soundness (`ntt4AsmFermat_sound`, `intt4AsmFermat_sound`) and roundtrip proofs (`intt4_ntt4_asm_fermat_roundtrip`, `fermatTowerNtt4_asm_roundtrip_certs`).\n- Compiled 4-channel Garner mixed-radix CRT reconstruction (`garnerReconstruct4Asm`) over moduli `(5, 17, 257, 65537)` and inverses `(7, 127, 32767)`, proving `garnerReconstruct4Asm_sound` matching `CrtNtt.garnerReconstruct4_sound` (`< M_4 = 1,431,655,765`).\n- Added end-to-end 4-point CRT-NTT cyclic convolution assembly bridge (`crtNtt4ChannelConvAsm_sound`, `crtNtt4ConvAsm_sound`) under the sharp bound `B <= 18,918`.\n- Wired all new theorems into `MiniVmProvenance` / `miniVm_provenance_certified` in `src/LeanAsm/ProvenanceSummary.lean`, added Part 34 `#print axioms` audits in `tests/TestAxioms.lean`, and updated `Main.lean` Part 1 CLI output and `README.md`.\n\n### Verification\n- `make build-incremental`: passed (0 warnings, all targets up to date)\n- `lake env lean tests/TestAxioms.lean`: passed (392 axiom lines, 0 `Classical.choice`, 0 `sorryAx`, 0 warnings)\n- `make sync`: passed (full build & executable demo succeeded)",
+    "closedAt": "2026-11-14T20:20:32Z",
+    "createdAt": "2026-11-14T20:18:22Z",
+    "headRefName": "feat/minivm-fermat-crt-ntt",
+    "labels": [],
+    "number": 54,
+    "state": "MERGED",
+    "title": "feat(minivm): parametric 4-prime Fermat-tower NTT/INTT & Garner CRT assembly",
+    "updatedAt": "2026-11-14T20:20:35Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/54"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n\nExtends `src/LeanAsm/QuasiRiemann/ShortIntervalPrimes.lean` with Fermat-tower arithmetic-progression short-interval prime guarantees (`{5, 17, 257, 65537}`) and sub-`3/4` QRH threshold rungs (`2/3`, `5/8`, `9/16`).\n\nCloses #51\n\n### Changes\n- **`src/LeanAsm/QuasiRiemann/ShortIntervalPrimes.lean`**:\n  - Imports `LeanAsm.EulerFactorNonVanishing` alongside `LeanAsm.QuasiRiemann.ZeroDensityBridge`.\n  - Defines `ApShortIntervalSpec` (extending `ShortIntervalChebyshevSpec` with `q`, `phiQ`) and decidable `ApShortIntervalSpec.HasGuaranteedApPrime` (`phiQ * (2 * errUpper + primePowerCorr) < 10 ^ hScaleExp`).\n  - Proves `ap_short_interval_psi_diff_bound` constructively showing `HasGuaranteedApPrime` implies `\u03d1(x + h; q, a) - \u03d1(x; q, a) > 0` for every reduced residue class `a mod q`.\n  - Proves `fermat_tower_ap_short_interval_certs` linking `EulerFactorNonVanishing.fermatTowerPrimes` (`[5, 17, 257, 65537]`, `\u03c6(F_k) \u2208 {4, 16, 256, 65536}`) and `EulerFactorNonVanishing.FermatTowerStripCert` to `HasGuaranteedApPrime` under both `\u03b8 = 7/8` (`10^336, +10^308`) and `\u03b8 = 3/4` (`10^168, +10^140`).\n  - Defines `qrhThresholdTwoThirds`, `qrhThresholdFiveEighths`, `qrhThresholdNineSixteenths` and proves `sub_three_quarters_qrh_ladder_certs` certifying `1/2 < 9/16 < 5/8 < 2/3 < 3/4 < 7/8 < 1` (and reversed `chebyshevGap` chain) plus minimal `HasGuaranteedPrime` scales `(24, 21)`, `(24, 20)`, and `(48, 32)`.\n- **`src/LeanAsm/ProvenanceSummary.lean`**:\n  - Wires `fermat_tower_ap_short_interval_certs`, `ap_short_interval_psi_diff_bound`, and `sub_three_quarters_qrh_ladder_certs` into `ShortIntervalPrimesProp` / `quasiRiemann_provenance_certified` (and transitively `LeanAsm.leanasm_full_provenance_certified`).\n- **`tests/TestAxioms.lean`**:\n  - Adds Part 33 `#print axioms` checks confirming `[propext, Quot.sound]` (`0 Classical.choice`, `0 sorryAx`).\n- **`Main.lean` & `README.md`**:\n  - Updates Part 5 CLI output and `README.md` (\u2264 80 columns) for Part 33 and the new `ShortIntervalPrimes` certificates.\n\n### Verification\n- `make build-incremental`: passed (28/28 modules, 0 errors, 0 warnings).\n- `lake env lean tests/TestAxioms.lean`: passed (0 `Classical.choice`, 0 `sorryAx`, 0 warnings).\n- `make sync`: passed cleanly.\n",
+    "closedAt": "2026-11-14T19:57:18Z",
+    "createdAt": "2026-11-14T19:55:30Z",
+    "headRefName": "feat/fermat-ap-short-intervals",
+    "labels": [],
+    "number": 52,
+    "state": "MERGED",
+    "title": "feat(qrh): Fermat-tower arithmetic-progression short-interval primes and sub-3/4 QRH ladder",
+    "updatedAt": "2026-11-14T19:57:20Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/52"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n\nImplements constructive short-interval prime guarantees, contrapositive maximal prime-gap bounds, and the rational short-interval exponent ladder extending our QRH Chebyshev remainder envelopes and zero-density bounds (`ZeroDensityBridge.lean`).\n\nCloses #49\n\n### Changes\n- **`src/LeanAsm/QuasiRiemann/ShortIntervalPrimes.lean`** (exported from `src/LeanAsm.lean`):\n  - Defines `ShortIntervalChebyshevSpec` (`thetaNum`, `thetaDen`, `xScaleExp`, `hScaleExp`, `errUpper`, `primePowerCorr`) and decidable `ShortIntervalChebyshevSpec.HasGuaranteedPrime` (`2 * s.errUpper + s.primePowerCorr < 10 ^ s.hScaleExp`).\n  - Defines `qrhRemainderBoundAtTwoTenPow` and proves `qrhRemainderBoundAtTenPow_le_twoTenPow`.\n  - Proves `short_interval_psi_diff_bound` and `short_interval_spec_guarantees_theta_pos` deriving differenced Chebyshev bounds `|\u03c8(x + h) - \u03c8(x) - h| \u2264 2 * E(2x, \u03b8)` and `\u03d1(x + h) - \u03d1(x) > 0` for `1 \u2264 h \u2264 x` without `Classical.choice` or `sorryAx`.\n  - Proves `qrh_maximal_prime_gap_bound` giving the contrapositive prime-gap bound `pNext - pCurr \u2264 10 ^ hScaleExp`.\n  - Proves `qrh_short_interval_positivity_certs` (with `set_option exponentiation.threshold 2000`) certifying `HasGuaranteedPrime` at `\u03b8 = 7/8` (`10^336, +10^308`), `\u03b8 = 3/4` (`10^168, +10^140`), and `\u03b8 = 1/2` (`10^168, +10^98`).\n  - Defines `shortIntervalDensityExponent`, proves compatibility with `QuasiRiemann.primeGapExponent`, and proves `short_interval_density_ladder_strict` certifying `1/2 < 17/30 < 7/12 < 2/3 < 3/4 < 7/8 < 1` alongside exact gaps `7/12 - 17/30 = 1/60` and `7/8 - 17/30 = 37/120`.\n- **`src/LeanAsm/ProvenanceSummary.lean`**:\n  - Adds `ShortIntervalPrimesProp` into `QuasiRiemannProvenance` / `quasiRiemann_provenance_certified` (and transitively `LeanAsm.leanasm_full_provenance_certified`).\n- **`tests/TestAxioms.lean`**:\n  - Adds Part 32 `#print axioms` checks verifying all new `ShortIntervalPrimes` theorems audit strictly to `[propext]` or `[propext, Quot.sound]` (ZERO `Classical.choice`, ZERO `sorryAx`).\n- **`Main.lean` & `README.md`**:\n  - Updates Part 5 CLI output with short-interval prime positivity scales and the `1/2 < 17/30 < 7/12 < 2/3 < 3/4 < 7/8 < 1` ladder.\n  - Updates `README.md` (\u2264 80 columns) for the 28-module inventory.\n\n### Verification\n- `make build-incremental`: passed (28/28 modules, 0 errors, 0 warnings).\n- `lake env lean tests/TestAxioms.lean`: passed (0 `Classical.choice`, 0 `sorryAx`, 0 warnings).\n- `make sync`: passed cleanly (`git status` clean after commit).\n",
+    "closedAt": "2026-11-14T19:49:13Z",
+    "createdAt": "2026-11-14T19:46:19Z",
+    "headRefName": "feat/short-interval-primes",
+    "labels": [],
+    "number": 50,
+    "state": "MERGED",
+    "title": "feat(qrh): constructive short-interval prime bounds and rational exponent ladder",
+    "updatedAt": "2026-11-14T19:49:15Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/50"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Implements aomaker-org/leanasm#45.\n\n## Summary\n- Added `src/LeanAsm/ProvenanceSummary.lean` (exported by `src/LeanAsm.lean`) uniting headline zero-axiom theorems across all 11 CLI parts into component provenance certificates (`miniVm_provenance_certified`, `collatz_provenance_certified`, `yangMills_provenance_certified`, `quasiRiemann_provenance_certified`, `eulerRns_provenance_certified`, `finiteFieldWeil_provenance_certified`, `crtNtt_provenance_certified`, `chudnovskyPi_provenance_certified`) and the master conjunction `LeanAsm.leanasm_full_provenance_certified`.\n- Added Part 31 axiom audit in `tests/TestAxioms.lean` verifying the full transitive closure depends strictly on `[propext, Quot.sound]` (0 `Classical.choice`, 0 `sorryAx`).\n- Updated `Main.lean` to reference and report `LeanAsm.leanasm_full_provenance_certified`.\n- Updated `README.md` (<= 80 columns) with the 27-module theorem inventory, CLI Parts 1-11 overview, and zero-axiom verification workflow.\n\n## Verification\n- `make build-incremental`: 27 modules / 56 build jobs completed cleanly.\n- `lake env lean tests/TestAxioms.lean`: all 372 output lines audited cleanly with 0 `Classical.choice` and 0 `sorryAx`.\n- `make sync`: built and executed all Parts 1-11 cleanly.\n\nCloses #45",
+    "closedAt": "2026-11-14T09:06:00Z",
+    "createdAt": "2026-11-14T09:02:43Z",
+    "headRefName": "feat/provenance-summary-audit",
+    "labels": [],
+    "number": 48,
+    "state": "MERGED",
+    "title": "feat(provenance): unified zero-axiom provenance theorem and README architecture audit",
+    "updatedAt": "2026-11-14T09:06:02Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/48"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\nAddresses Copilot's review comment from PR #39 (`discussion_r4572293439`) on `src/LeanAsm/EulerFactorNonVanishing.lean`:\n- Reused the introduced `fsHalf`, `fs34`, and `fsOne` `let` binders directly when applying `cyclotomic_euler_product_lower_bound` inside `fermat_tower_dedekind_euler_strip_certs`, eliminating the duplicated 4-element `CyclotomicSplitFactorSpec` list construction across all three strip branches.\n- Replaced `fermat_4_cyclotomic_valid` with the shared per-element helper `cyclotomic_factor_valid`.\n- Kept all theorem types and zero-axiom guarantees intact.\n\n## Verification\n- Checked line lengths (`<= 120` chars) and intact `Path:` / `end of file:` comments in `src/LeanAsm/EulerFactorNonVanishing.lean`.\n- `make build-incremental` passed across all 26 Lean modules (54 build jobs).\n- `lake env lean tests/TestAxioms.lean` passed (`EulerFactorNonVanishing.fermat_tower_dedekind_euler_strip_certs` depends strictly on `[propext, Quot.sound]`, zero `Classical.choice`, zero `sorryAx`).\n- `make sync` passed cleanly (54 build jobs and Parts 1\u201311 CLI output verified).",
+    "closedAt": "2026-11-14T08:50:14Z",
+    "createdAt": "2026-11-14T08:45:39Z",
+    "headRefName": "refactor/euler-dedekind-binders",
+    "labels": [],
+    "number": 47,
+    "state": "MERGED",
+    "title": "refactor(euler): reuse fsHalf/fs34/fsOne binders in fermat_tower_dedekind_euler_strip_certs",
+    "updatedAt": "2026-11-14T08:50:17Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/47"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n- Replaced brittle positional tuple projections (`.2.2.2...`) in `EulerFactorNonVanishing.fermat_tower_euler_product_strip_certs` with explicit `Prop`-valued structures in `src/LeanAsm/EulerFactorNonVanishing.lean`:\n  - `StripHalfCert` (`\u03c3 = 1/2`, bound `> 1/9`)\n  - `StripThreeQuartersCert` (`\u03c3 = 3/4`, bound `> 1/3`)\n  - `StripOneCert` (`\u03c3 = 1`, bounds `> 9/16 > 1/16` and `> 1/4` with `F_0 = 3`)\n  - `FermatTowerStripCert` bundling `.half`, `.threeQuarters`, and `.one`.\n- Preserved all existing bounds, cyclotomic splitting certificates (`fermat_tower_dedekind_euler_strip_certs`), and zero-axiom guarantees.\n\n## Verification\n- Checked line lengths (`<= 120` chars) and intact `Path:` / `end of file:` comments in `src/LeanAsm/EulerFactorNonVanishing.lean`.\n- `make build-incremental` passed across all 26 Lean modules (54 build jobs).\n- `lake env lean tests/TestAxioms.lean` passed (`EulerFactorNonVanishing.fermat_tower_euler_product_strip_certs` depends on ZERO axioms).\n- `make sync` passed cleanly (all 54 build jobs and Parts 1\u201311 CLI output verified).\n\nCloses #32",
+    "closedAt": "2026-11-14T08:37:43Z",
+    "createdAt": "2026-11-14T08:33:04Z",
+    "headRefName": "refactor/euler-strip-cert-struct",
+    "labels": [],
+    "number": 46,
+    "state": "MERGED",
+    "title": "refactor(euler): replace brittle tuple projections with named strip cert structures (#32)",
+    "updatedAt": "2026-11-14T08:37:46Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/46"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n- Extended `MiniVM` (`src/LeanAsm/MiniVM.lean`) with scratch registers `t0, t1` and sequential composition lemma `runProgram_append`.\n- Added `src/LeanAsm/MiniVMNttBridge.lean` (exported via `src/LeanAsm.lean`) implementing:\n  - `butterfly2AsmF17`, `ntt2AsmF17`, `intt2AsmF17` over `(r0, r1)` using `(r2, r3)`, explicit `+ 17` bias before `subReg`, and `invTwo = 9` mod `17`, with symbolic soundness and roundtrip proofs (`ntt2AsmF17_sound`, `intt2AsmF17_sound`, `intt2_ntt2_asm_F17_roundtrip`) across all `289` states.\n  - `dit4AsmF17`, `ntt4AsmF17`, `intt4AsmF17` over `(r0, r1, r2, r3)` using `(t0, t1)`, `omega4 = 13`, `invOmega4 = 4`, and `invFour = 13`, with symbolic soundness and roundtrip proofs (`ntt4AsmF17_sound`, `intt4AsmF17_sound`, `intt4_ntt4_asm_F17_roundtrip`) across all `83,521` states.\n- Added Part 30 `#print axioms` checks in `tests/TestAxioms.lean` confirming zero `Classical.choice` and zero `sorryAx`.\n- Updated Part 1 CLI output in `Main.lean` to showcase compiled `MiniVM` 2-point and 4-point NTT/INTT execution.\n\n## Verification\n- `make build-incremental` passed (all 26 Lean modules / 54 build jobs)\n- `lake env lean tests/TestAxioms.lean` passed (Part 30 depends only on `[propext, Quot.sound]`)\n- `make sync` passed cleanly (Parts 1\u201311 executable output verified)\n\nCloses #11",
+    "closedAt": "2026-11-14T08:22:24Z",
+    "createdAt": "2026-11-14T08:20:04Z",
+    "headRefName": "feat/minivm-f17-ntt",
+    "labels": [],
+    "number": 44,
+    "state": "MERGED",
+    "title": "feat(minivm): verified 2-point and 4-point F_17 NTT assembly programs (#11)",
+    "updatedAt": "2026-11-14T08:22:27Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/44"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #42\n\n## Summary\n- **Fermat-tower 4-prime CRT & Garner reconstruction in `src/LeanAsm/CrtNttUniversal.lean`:**\n  - Linked `LeanAsm.EulerFactorNonVanishing` and proved `fermat_tower_crt_modulus_bounds`: $M_4 = 5 \\cdot 17 \\cdot 257 \\cdot 65537 = 1{,}431{,}655{,}765 = \\text{fermatTowerPrimes.prod}$, $3 M_4 = 2^{32} - 1$, and $2^{30} < M_4 < 2^{31}$.\n  - Added `garner5_17_257`, `garnerReconstruct4`, `garner_4ch_inverses_sound`, `garnerReconstruct4_lt`, and `garnerReconstruct4_sound` proving sequential mixed-radix CRT roundtrip for all $x < M_4$ using $(c_{12}, c_{123}, c_{1234}) = (7, 127, 32{,}767)$.\n  - Added `convPairSum`, `ntt_convolution_no_wraparound`, and `fermat_tower_conv_bound_certs` proving $N \\cdot B^2$ convolution bounds and sharp wrap-around safety for $N = 4$ ($B \\le 18{,}918$), $N = 8$ ($B \\le 13{,}377$), and $N = 16$ ($B \\le 9{,}459$).\n- **Axiom Audit & CLI:**\n  - Added Part 29 `#print axioms` checks in `tests/TestAxioms.lean` confirming only `[]` or `[propext, Quot.sound]` (ZERO `Classical.choice`, ZERO `sorryAx`).\n  - Updated `Main.lean` Part 10 CLI output with the certified 4-prime Garner inverses and sharp wrap-around limits.\n\n## Verification\n- Max line length check (`> 120` chars): `[]` across all 3 modified files\n- `make build-incremental`: passed\n- `lake env lean tests/TestAxioms.lean`: passed (all 6 new Part 29 theorems depend only on `[]` or `[propext, Quot.sound]`)\n- `make sync`: passed (52 build jobs, Parts 1\u201311 CLI output verified)",
+    "closedAt": "2026-11-14T08:01:09Z",
+    "createdAt": "2026-11-14T07:56:49Z",
+    "headRefName": "feat/crt-garner-wraparound",
+    "labels": [],
+    "number": 43,
+    "state": "MERGED",
+    "title": "feat(crt): constructive Garner mixed-radix CRT and convolution wrap-around bounds over {5, 17, 257, 65537}",
+    "updatedAt": "2026-11-14T08:01:11Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/43"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #40\n\n## Summary\n- **Chebyshev remainder model in `src/LeanAsm/QuasiRiemann/ZeroDensityBridge.lean`:**\n  - Added `ChebyshevRemainderSpec`, `chebyshevLogEnv` (`28k`), `chebyshevLogSqEnv` (`(28k)^2`), `tenPowThetaExactExp`, `tenPowThetaCeilExp`, `tenPowGapExp`, `tenPowThetaCeilExp_eq_exact`, `tenPowThetaExactExp_lt_scale`, and `qrhRemainderBoundAtTenPow`.\n  - Proved `chebyshev_remainder_mono_theta` and `qrh_chebyshev_savings_certs` certifying monotonicity across $1/2 \\le \\theta_1 \\le \\theta_2 < 1$ and exact power-of-ten relative savings $10^3$ ($\\theta=3/4$ vs. $7/8$ at $x=10^{24}$), $10^4$ ($\\theta=3/4$ vs. $11/12$ at $x=10^{24}$), and $10^{11}$ ($\\theta=3/4$ vs. $47/48$ at $x=10^{48}$).\n  - Proved `tenPow_rel_err_lt_inv10` and `qrh_chebyshev_benchmark_certs` certifying concrete symbolic envelopes $10^e \\cdot (28k)^2$ across $x \\in \\{10^{12}, 10^{24}, 10^{36}, 10^{48}\\}$, strict sub-linear relative error ($< 1$ at $(10^{12}, 3/4)$ and $< 10^{-1}$ at $(10^{24}, 3/4), (10^{36}, 3/4), (10^{48}, \\{3/4, 7/8\\})$), and the minimal all-rung $< 10^{-1}$ crossover at $x = 10^{336}$ ($k = 28$) simultaneously across all four rungs $\\theta \\in \\{3/4, 7/8, 11/12, 47/48\\}$.\n- **Axiom Audit & CLI:**\n  - Added Part 28 `#print axioms` checks in `tests/TestAxioms.lean` confirming only `[propext, Quot.sound]` (ZERO `Classical.choice`, ZERO `sorryAx`).\n  - Updated `Main.lean` Part 5 CLI output to display the certified Chebyshev remainder savings across $x = 10^{24}$, $x = 10^{48}$, and the $x = 10^{336}$ all-rung crossover.\n\n## Verification\n- Max line length check: `[]` (`> 120` chars and `> 100` chars) across all 3 modified files\n- `make build-incremental`: passed (25 jobs)\n- `lake env lean tests/TestAxioms.lean`: passed (all 6 new Part 28 theorems depend only on `[propext, Quot.sound]`)\n- `make sync`: passed (52 build jobs, Parts 1\u201311 CLI output verified)",
+    "closedAt": "2026-11-14T07:46:48Z",
+    "createdAt": "2026-11-14T07:44:12Z",
+    "headRefName": "feat/qrh-chebyshev-envelopes",
+    "labels": [],
+    "number": 41,
+    "state": "MERGED",
+    "title": "feat(qrh): constructive Chebyshev remainder envelopes across benchmark scales",
+    "updatedAt": "2026-11-14T07:46:51Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/41"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #38\n\n## Summary\n- **Cyclotomic splitting in `src/LeanAsm/EulerFactorNonVanishing.lean`:**\n  - Added `fermatCyclotomicSplittingDeg`, `fermatTowerSplittingDegs` (`[2, 8, 128, 32768]`), and `fermat_prime_cyclotomic_splitting_deg`, constructively proving $F_k = 2^{2^k} + 1 \\equiv 1 \\pmod{2^{2^k}}$ for all $k \\ge 1$ with splitting multiplicities $(2, 8, 128, 32768)$ and total ideal sum $32{,}906$.\n- **Inductive Dedekind Euler factor & tower non-vanishing:**\n  - Added `cyclotomic_split_euler_factor_nonvanishing`, `CyclotomicSplitFactorSpec`, `cyclotomicProdMarginPow`, `cyclotomicProdNormPow`, `cyclotomicProdDenPow`, and `cyclotomic_euler_product_lower_bound` lifting local cleared-denominator Euler disk lower bounds to splitting multiplicity $g \\ge 1$ and finite ideal products.\n  - Added `fermat_sigma_one_uniform_quarter_bound` (uniform $(1 - 1/F_k)^{2g_k} > 1/4$ via elementary Bernoulli induction `bernoulli_sub_pow_nat`) and `fermat_tower_dedekind_euler_strip_certs` certifying non-vanishing across $(5, 17, 257, 65537)$ with multiplicities $(2, 8, 128, 32768)$ at $\\sigma \\in \\{1/2, 3/4, 1\\}$ in symbolic exponent form (plus $> 1/256$ uniform tower bound at $\\sigma = 1$).\n- **Axiom Audit & CLI:**\n  - Added Part 27 `#print axioms` checks in `tests/TestAxioms.lean` confirming only `[propext, Quot.sound]` (ZERO `Classical.choice`, ZERO `sorryAx`).\n  - Updated `Main.lean` Part 6 CLI output to display splitting multiplicities `(2, 8, 128, 32768)` (`sum = 32906`) and Dedekind strip non-vanishing across $\\sigma \\in \\{1/2, 3/4, 1\\}$.\n\n## Verification\n- Max line length check (`> 120` chars): `[]` across all 3 modified files\n- `make build-incremental`: passed (25 jobs)\n- `lake env lean tests/TestAxioms.lean`: passed (all 5 new Part 27 theorems depend only on `[propext, Quot.sound]`)\n- `make sync`: passed (52 build jobs, Parts 1\u201311 CLI output verified)",
+    "closedAt": "2026-11-14T07:36:17Z",
+    "createdAt": "2026-11-14T07:31:36Z",
+    "headRefName": "feat/cyclotomic-dedekind-euler",
+    "labels": [],
+    "number": 39,
+    "state": "MERGED",
+    "title": "feat(euler): constructive cyclotomic Fermat-tower Dedekind zeta Euler factor non-vanishing",
+    "updatedAt": "2026-11-14T07:37:26Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/39"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #36\n\n### Summary\n- Created `src/LeanAsm/QuasiRiemann/ZeroDensityBridge.lean` (`namespace QuasiRiemann`) with constructive, zero-`Classical.choice`, zero-`sorryAx` formalizations over `QRat` / cleared-denominator integers:\n  1. **Models & Cleared-Denominator Lemmas:** `ZeroDensitySpec`, `SubconvexitySpec`, `chebyshevGap`, `sublinearAt_iff_exponent_lt_one`, `exponent_mono_sigma`, `exponent_mono_slope`, `sublinearAt_mono_right`, `muAt_endpoints`, `muAt_antitone`, `chebyshevGap_pos_of_lt_one`, and `chebyshevGap_antitone`.\n  2. **Benchmark Certificates (`qrh_zero_density_benchmark_certs`):** certifies $A(3/4)(1 - 3/4)$ for Guth\u2013Maynard (`15/26`), Huxley (`3/5`), and Ingham (`2/3`), strict ordering `1/2 < 15/26 < 3/5 < 2/3 < 3/4` with `3/130` savings, and critical-line subconvexity exponents `\u03bc(1/2) \u2208 {0, 13/84, 1/6, 1/4}`.\n  3. **Zero-Density-to-QRH Descent & DVP Bridge:** `zero_density_implies_qrh_threshold`, `cDvp_div_octaveLnUpper36_le_inv168`, `qrh_theta_ladder_certs` (`3/4 < 7/8 < 11/12 < 47/48 < 1` with Chebyshev gaps `{1/4, 1/8, 1/12, 1/48}` and strict tightening relative to `AsymptoticZfr` DVP boundary for all `t \u2265 dvpThresholdT0`), and `zero_density_and_dvp_combined_region`.\n- Exported `LeanAsm.QuasiRiemann.ZeroDensityBridge` in `src/LeanAsm.lean`.\n- Added Part 26 `#print axioms` checks in `tests/TestAxioms.lean`.\n- Updated `Main.lean` Part 5 CLI output to display the certified zero-density exponents at `\u03c3 = 3/4` and QRH `\u03b8` ladder.\n\n### Verification\n- Line-length check (`> 120` chars): `[]` across all 4 added/modified `.lean` files.\n- `make build-incremental`: passed (25 modules, exit code `0`).\n- `lake env lean tests/TestAxioms.lean`: all Part 26 theorems depend only on `[propext]` or `[propext, Quot.sound]` (ZERO `Classical.choice`, ZERO `sorryAx`).\n- `make sync`: `Build completed successfully (52 jobs)` and executable Parts 1\u201311 ran cleanly (exit code `0`).",
+    "closedAt": "2026-11-14T07:18:48Z",
+    "createdAt": "2026-11-14T07:12:17Z",
+    "headRefName": "feat/qrh-zero-density-bridge",
+    "labels": [],
+    "number": 37,
+    "state": "MERGED",
+    "title": "feat(qrh): constructive rational zero-density-to-QRH descent bridge in ZeroDensityBridge",
+    "updatedAt": "2026-11-14T07:18:50Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/37"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #34\n\n### Summary\n- Extended `src/LeanAsm/WeilZetaBridge.lean` with constructive, zero-`Classical.choice`, zero-`sorryAx` proofs for the genus-2 curve $C : y^2 = x^5 - x + 1$ over $\\mathbb{F}_5$:\n  1. **Cleared-denominator $L$-polynomial reciprocity** (`genus2_L_poly_functional_eq`): homogenized integer, `QRat`, and Gaussian `Int \u00d7 Int` proofs of $25 T^4 L_C(1/(5T)) = L_C(T)$.\n  2. **Weil zeta functional equation** (`genus2_weil_zeta_functional_eq`): cleared-denominator proofs (Gaussian `Int \u00d7 Int` and integer/rational forms, with denominator non-vanishing) of $5 T^2 Z(C/\\mathbb{F}_5, 1/(5T)) = Z(C/\\mathbb{F}_5, T)$ for $T \\notin \\{0, 1, 1/5\\}$.\n  3. **Completed zeta reflection & critical-line reality** (`genus2_completed_zeta_reflection`): reflection symmetry $\\Xi_C(1 - s) = \\Xi_C(s)$ on $(u, v)$ satisfying $5 u v = d_u d_v$, vanishing of `completedZetaImagPart u d = 0` on the critical line $\\operatorname{Re}(s) = 1/2$ ($5 \\, \\mathrm{gNormSq}(u) = d^2$), and exact witness `completedZetaImagPart (1, 2) 5 = 0`.\n- Added `#print axioms` verification in `tests/TestAxioms.lean` (Part 25) confirming `[propext, Quot.sound]` only (zero `Classical.choice`, zero `sorryAx`).\n- Updated `Main.lean` Part 7 CLI output to report the Hasse\u2013Weil functional equations and `Im \u039e_C((1+2i)/5) = 0`.\n\n### Verification\n- `make build-incremental`: `+LeanAsm` (24 jobs) built cleanly.\n- `lake env lean tests/TestAxioms.lean`: all three new `WeilZetaBridge` theorems depend only on `[propext, Quot.sound]`.\n- `make sync`: `lake build` (50 jobs) + CLI executable passed cleanly.",
+    "closedAt": "2026-11-14T07:01:22Z",
+    "createdAt": "2026-11-14T05:53:13Z",
+    "headRefName": "feat/genus2-functional-eq",
+    "labels": [],
+    "number": 35,
+    "state": "MERGED",
+    "title": "feat(weil): constructive genus-2 Hasse-Weil functional equation and completed zeta symmetry",
+    "updatedAt": "2026-11-14T07:01:24Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/35"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Addresses both Copilot review comments from PR #31 in `src/LeanAsm/QuasiRiemann/UltraDeep72.lean`:\n- Remove the unused `have hmul` binding in `reduceModTwoPiRaw72With_ordered`.\n- Align the docstring of `isValidDirichletRect2DN128_sound` with what the theorem formally states (`InHighHeightRect2D`, `r.entries.length \u2264 128`, and positivity for enclosed `terms` under `TermWitnessesEnclosed` and `zetaPartialEvalScaled12`).\n\nVerified with `make build-incremental`, `lake env lean tests/TestAxioms.lean`, and `make sync` (50 jobs, zero `Classical.choice` / `sorryAx`).",
+    "closedAt": "2026-11-14T05:37:17Z",
+    "createdAt": "2026-11-14T05:33:49Z",
+    "headRefName": "fix/pr31-ultradeep72-cleanup",
+    "labels": [],
+    "number": 33,
+    "state": "MERGED",
+    "title": "fix(qrh): address PR #31 Copilot review comments in UltraDeep72",
+    "updatedAt": "2026-11-14T05:37:20Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/33"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #29\n\n### Summary\n- Extended `src/LeanAsm/QuasiRiemann/UltraDeep72.lean` (Part 16) with constructive 72-digit `twoPiInterval72` phase reduction at high heights `t \u2208 [10^12, 10^12 + 10]` (`1 \u2264 n \u2264 128`):\n  - `reducePhaseModTwoPi72` and `reduceModTwoPiCentered72_sound`\n  - `high_height_phase_reduction_1e12`: links `PiChudnovsky` `10^105` bracket (`twoPiInterval72.hi - twoPiInterval72.lo = 1` ULP at scale `10^72`, `< 10^-59` rad wrapping expansion `\u2264 10^13` ULP) and bounds the `lnInterval72 n` table-width product to `\u2264 6 * 10^15` ULP (`< 10^-56` rad)\n  - `InHighHeightRect2D`, `IsValidDirichletRect2DN128`, `dirichletGradBoundScaled6`, `isValidHighDirichletTreeN128`, `isValidHighDirichletTreeN128_sound`, `buildDirichletRect2DCertN128`, `sweepDirichletRectangles2DN128`, `isValidDirichletRect2DN128_sound`, `buildDirichletRect2DCertN128_implies_valid`, `sweepDirichletRectangles2DN128_all_valid`\n  - `high_height_dirichlet_rects_1e12_certified`: certifies 5 pairwise `t`-disjoint 2D zero-free rectangles for `\u03b6_128(s)` near `t = 10^12 + 6.1` spanning `\u03c3 \u2208 [0.501, 0.750]` with total Lebesgue area `6970000000 / 10^12 = 0.006970000000`\n- Added Part 24 `#print axioms` audit in `tests/TestAxioms.lean` confirming ZERO `Classical.choice` and ZERO `sorryAx` across all 323 lines of axiom checks.\n- Updated Part 5 CLI output in `Main.lean` to print the `t ~ 10^12` `PiChudnovsky` phase reduction precision and high-height `\u03b6_128` 2D zero-free rectangle sweep summary.\n\n### Verification\n- `make build-incremental`: 50 jobs built cleanly\n- `lake env lean tests/TestAxioms.lean`: 323 lines verified, ZERO `Classical.choice`, ZERO `sorryAx`\n- `make sync`: full build & executable CLI output verified\n- Line length check: all `.lean` files \u2264 120 chars with intact headers/footers",
+    "closedAt": "2026-11-14T05:18:51Z",
+    "createdAt": "2026-11-14T05:13:34Z",
+    "headRefName": "feat/qrh-high-height-1e12",
+    "labels": [],
+    "number": 31,
+    "state": "MERGED",
+    "title": "feat(qrh): high-height 2D zero-free rectangles at t ~ 10^12 via PiChudnovsky twoPiInterval72 phase reduction",
+    "updatedAt": "2026-11-14T05:33:59Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/31"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n\n- Extended `src/LeanAsm/EulerFactorNonVanishing.lean` with constructive Fermat-prime tower `{5, 17, 257, 65537}` Euler product non-vanishing bounds across the critical strip (`\u03c3 = 1/2`, `\u03c3 = 3/4`, `\u03c3 = 1`):\n  - `fermatNumber`, `fermatPrefixProd`, `fermatTowerPrimes`, `fermatAllPrimes`, `fermat_prefix_prod_eq` ($\\prod_{k=0}^{n-1} (2^{2^k}+1) = 2^{2^n}-1$), and `fermat_tower_product_eq_2pow32_sub_1` (`\u220f{5,17,257,65537} = 1431655765`, `3 * \u220f = 2^32 - 1 = 4294967295`, `[3,5,17,257,65537].prod = 2^32 - 1`, `\u220f(p-1) = 2^30 = 1073741824`).\n  - `EulerLocalFactorSpec`, `ValidEulerLocalFactorSpec`, `local_euler_disk_nonvanishing`, `euler_product_finite_norm_lower_bound`, and `fermat_tower_euler_product_nonvanishing` proving `0 < \u220f (d_p - rNum_p)^2 \u2264 \u220f ((d_p - zx_p)^2 + zy_p^2)` for arbitrary local factors inside `|z_p| \u2264 r_p < 1`.\n  - `fermat_tower_euler_product_strip_certs` plus universal local-factor disk corollaries `fermat_tower_sigma_half_lower_bound` (`> 1/9`), `fermat_tower_sigma_three_quarters_lower_bound` (`> 1/3`), and `fermat_tower_sigma_one_lower_bound` (`> 9/16 > 1/16`).\n- Added Part 23 `#print axioms` checks in `tests/TestAxioms.lean` confirming **ZERO `Classical.choice`** and **ZERO `sorryAx`** (`[]` and `[propext, Quot.sound]` only).\n- Updated Part 6 CLI output in `Main.lean` to display the `{5,17,257,65537}` product/totient identities and critical-strip Euler product lower bounds.\n\n## Verification\n\n- `make build-incremental`: passed (`50` jobs, `Build completed successfully`)\n- `lake env lean tests/TestAxioms.lean`: passed (zero `Classical.choice`, zero `sorryAx`)\n- `make sync`: passed (`50` jobs + CLI binary execution)\n\nCloses #28\n",
+    "closedAt": "2026-11-14T04:35:18Z",
+    "createdAt": "2026-11-14T04:32:49Z",
+    "headRefName": "feat/fermat-tower-euler-product",
+    "labels": [],
+    "number": 30,
+    "state": "MERGED",
+    "title": "feat(euler): constructive Fermat-prime tower {5,17,257,65537} Euler product non-vanishing",
+    "updatedAt": "2026-11-14T05:24:27Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/30"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n- Extended `src/LeanAsm/CollatzQrhBridge.lean` with constructive Steiner\u2013Simons\u2013de Weger cycle bounds through `(485, 306)`:\n  - `CollatzOddCycle`, `cycleShift`, `cycleRhs`, `collatz_odd_cycle_linear_eq`, `collatz_odd_cycle_gap_pos`, `collatz_cycle_min_element_lower_bound`, and `collatz_odd_cycle_min_element_lower_bound` (`n_min * (2^k - 3^m) \u2265 3^m - 2^m`).\n  - `steiner_1cycle_divides` and `steiner_1cycle_excluded_at_convergents` ruling out Steiner 1-cycles at `(8, 5)`, `(65, 41)`, `(306, 193)`, and `(485, 306)` via `powViaCrtNtt192`.\n  - `collatz_convergent_nmin_lower_bounds` certifying explicit ceiling thresholds `n_min \u2265 17`, `87`, `14`, and `978` at `(8, 5)`, `(65, 41)`, `(306, 193)`, and `(485, 306)`.\n  - `collatz_odd_cycle_product_bound`, `collatz_linear_form_uniform_306`, and `collatz_cycle_length_lower_bound_306` proving `nMin < 10 * m^2 \u2264 936,360` for `1 \u2264 m \u2264 306` and contrapositively `nMin \u2265 936,360 \u21d2 m \u2265 307`, `k \u2265 487`, and `K = k + m \u2265 793`.\n- Added Part 22 `#print axioms` checks in `tests/TestAxioms.lean` confirming ZERO `Classical.choice` and ZERO `sorryAx` (`[propext]` and `[propext, Quot.sound]` only).\n- Updated Part 2 CLI output in `Main.lean` to display the Steiner 1-cycle exclusions and Simons\u2013de Weger cycle-length barrier.\n\n## Verification\n- `make build-incremental`: passed (`50` jobs, `Build completed successfully`)\n- `lake env lean tests/TestAxioms.lean`: passed (`312` lines, zero `Classical.choice`, zero `sorryAx`)\n- `make sync`: passed (`50` jobs + CLI binary execution)\n\nCloses #26",
+    "closedAt": "2026-11-14T04:27:32Z",
+    "createdAt": "2026-11-14T04:17:41Z",
+    "headRefName": "feat/collatz-cycle-bounds",
+    "labels": [],
+    "number": 27,
+    "state": "MERGED",
+    "title": "feat(collatz): constructive Steiner-Simons-de Weger cycle bounds up to (485, 306)",
+    "updatedAt": "2026-11-14T05:22:14Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/27"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n- Added `src/LeanAsm/Genus2Jacobian.lean` implementing trimmed `PolyF5` arithmetic over `Fin 5` (`polyDivMod_sound`, `polyXgcd_bezout`), `MumfordDivisor`, `isReducedMumford`, Cantor composition and reduction (`cantorCompose`, `cantorReduceAux`, `cantorAdd`, `cantorNeg`, `cantorSmul`), `cantorAdd_preserves_reduced`, `cantorSmul_preserves_reduced`, `D0 = \u27e8[0, 1], [1]\u27e9` (`D0_is_reduced`), `jacobian_D0_order_71`, `jacobian_D0_primitive`, and `jacobian_group_axioms_on_orbit` via an exhaustive candidate classification (`candidateDivisors`) and sliced `decide +kernel` verification of the 71\u00d771 Cayley table (`orbitAt_cayley`).\n- Exported `LeanAsm.Genus2Jacobian` in `src/LeanAsm.lean`.\n- Updated Part 7 CLI output in `Main.lean` to display `Cantor-Mumford Group Law  : 71 * [P_0 - \u221e] = 0 on J(C)(F_5) (zero=true)`.\n- Added Part 21 `#print axioms` checks in `tests/TestAxioms.lean` verifying ZERO `Classical.choice` and ZERO `sorryAx` (only `[propext]` and `[propext, Quot.sound]`).\n\n## Verification\n- `make build-incremental`: passed (50 jobs)\n- `lake env lean tests/TestAxioms.lean`: passed (zero `Classical.choice`, zero `sorryAx`)\n- `make sync`: passed\n\nCloses #24",
+    "closedAt": "2026-11-14T04:05:22Z",
+    "createdAt": "2026-11-14T04:00:01Z",
+    "headRefName": "feat/genus2-jacobian",
+    "labels": [],
+    "number": 25,
+    "state": "MERGED",
+    "title": "feat(finite-field-rh): formalize Cantor-Mumford Jacobian group law and prove order 71",
+    "updatedAt": "2026-11-14T04:05:25Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/25"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #22\n\n## Summary\n- Reworded the docstrings on `FiniteFieldRH.genus2_L_at_1_eq_71_div_25` and `FiniteFieldRH.genus2_L_at_1_qrat` in `src/LeanAsm/FiniteFieldRH.lean` so the formal claim states strictly what the Lean theorem types prove (`genus2LNumAtInv5 = 1775`, `1775 * 25 = 71 * 625`, `1775 > 0`, and `QuasiRiemann.QRat.eqv` to `71 / 25`).\n- Moved the nonvanishing / analytic-rank-0 interpretation into an explicitly marked parenthetical `(mathematical remark: ...)`.\n\n## Verification\n- `make build-incremental`: passed (`46 jobs`, all targets up to date)\n- `lake env lean tests/TestAxioms.lean`: passed (`286` axiom lines, `0` `sorryAx` / `Classical.choice`)\n- `make sync`: passed (`46 jobs`, Lean executable ran cleanly)",
+    "closedAt": "2026-11-14T02:41:39Z",
+    "createdAt": "2026-11-14T02:40:36Z",
+    "headRefName": "docs/finite-field-rh-docstrings",
+    "labels": [],
+    "number": 23,
+    "state": "MERGED",
+    "title": "docs(finite-field-rh): align genus2_L_at_1 docstrings with formal theorem statements",
+    "updatedAt": "2026-11-14T02:43:26Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/23"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #17\n\n## Summary\n- Extracted Part 15 (72-digit CRT-NTT engine, `lnInterval72`, `twoPiInterval72`, and N=128 ultra-deep 2D strip certification) from `src/LeanAsm/QuasiRiemann.lean` into `src/LeanAsm/QuasiRiemann/UltraDeep72.lean` inside `namespace QuasiRiemann`.\n- Exposed shared interval/tree helpers (`ediv_mul_le_self`, `floorDiv_le_ceilDiv_gen`, `int_mul_sign_cases`, `corner_bounds`, `foldNatStep`, `EntriesTree`, `EntriesTree.toList`, `isValidRectTreeN64`, `isValidRectTreeN64_sound`) from `QuasiRiemann.lean` for reuse in `UltraDeep72.lean`, and imported `LeanAsm.QuasiRiemann.Rat` and `LeanAsm.PiChudnovsky`.\n- Removed dead Machin helpers (`rawArctan72`, `arctanTaylor72`) and derived `twoPiRaw72` / `twoPiInterval72` directly from `PiChudnovsky.piLower105` and `PiChudnovsky.piUpper105` scaled down by `scale33Nat = 10 ^ 33`, proving `twoPiInterval72_valid` and `twoPiInterval72_from_chudnovsky_sound` with ZERO `Classical.choice` and ZERO `sorryAx`.\n- Exported `LeanAsm.QuasiRiemann.UltraDeep72` in `src/LeanAsm.lean`, updated `src/LeanAsm/CollatzQrhBridge.lean` imports/proofs, and added `#print axioms` checks for `twoPiInterval72_valid` and `twoPiInterval72_from_chudnovsky_sound` in `tests/TestAxioms.lean`.\n\n## Verification\n- `make build-incremental`: passed (`48 jobs`)\n- `lake env lean tests/TestAxioms.lean`: passed (`288` axiom lines, `0` `Classical.choice` / `sorryAx`)\n- `make sync`: passed (`48 jobs`, Lean executable ran cleanly)",
+    "closedAt": "2026-11-14T02:47:36Z",
+    "createdAt": "2026-11-14T02:30:29Z",
+    "headRefName": "refactor/qrh-ultradeep72",
+    "labels": [],
+    "number": 21,
+    "state": "MERGED",
+    "title": "refactor(qrh): extract UltraDeep72 and derive twoPiInterval72 from PiChudnovsky",
+    "updatedAt": "2026-11-14T05:27:30Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/21"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #19\n\n## Summary\n- **Zero-pad 36-digit `ln16` printout (`Main.lean`)**: Added `private def padZeros (width n : Nat) : String` helper and updated `pad128` and `padLn16` so fractional printouts preserve leading zeros (`ln_hi(16) = 3.465735902799726547086160607290883110`).\n- **Clarify `QRat.reduce` vs `Repr QRat` docstrings (`src/LeanAsm/QuasiRiemann/Rat.lean`)**: Documented that `Repr QRat` prints `num/den` without automatic GCD reduction, and clarified `QRat.reduce` as the explicit manual reduction helper.\n- **Decouple `AsymptoticZfr` from `QuasiRiemann.lean` (`src/LeanAsm/QuasiRiemann/AsymptoticZfrBridge.lean`)**: Moved `ln2Upper36Scaled_eq_lnInterval36_hi` and `octaveLnUpper36_bounds_lnInterval36` into a dedicated `LeanAsm.QuasiRiemann.AsymptoticZfrBridge` module re-exported via `src/LeanAsm.lean`, removing the reverse import from `QuasiRiemann.lean` while preserving exact `QuasiRiemann.*` theorem names. Resolved `scale36Int` ownership cleanly in `QuasiRiemann.lean`.\n- **Clarify constant derivative in `genus2DerivF5` (`src/LeanAsm/FiniteFieldRH.lean`)**: Added `genus2DerivF5_eq_neg_one : \u2200 x : Fin 5, genus2DerivF5 x = -1` and updated docstrings on `genus2DerivF5` and `genus2_curve_smooth_F5`.\n- **Align `FiniteFieldRH` L-value & Jacobian docstrings (`src/LeanAsm/FiniteFieldRH.lean`)**: Imported `LeanAsm.QuasiRiemann.Rat`, proved `genus2_L_at_1_qrat` (`QRat.eqv` between `(genus2LNumAtInv5, 625)` and `(71, 25)`), and tightened docstrings to accurately describe the proved invariants.\n- **Axiom audits (`tests/TestAxioms.lean`)**: Added Part 20 `#print axioms` checks for `FiniteFieldRH.genus2DerivF5_eq_neg_one` and `FiniteFieldRH.genus2_L_at_1_qrat`.\n\n## Verification\n- `make build-incremental`: succeeded cleanly\n- `lake env lean tests/TestAxioms.lean`: 286 axiom checks passed with zero `Classical.choice` and zero `sorryAx`\n- `make sync`: succeeded cleanly",
+    "closedAt": "2026-11-14T01:43:18Z",
+    "createdAt": "2026-11-14T01:39:50Z",
+    "headRefName": "chore/copilot-review-followups",
+    "labels": [],
+    "number": 20,
+    "state": "MERGED",
+    "title": "chore: address actionable Copilot review comments from PRs #12, #14, and #18",
+    "updatedAt": "2026-11-14T01:45:42Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/20"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\nFormalizes constructive dyadic-octave logarithm bounds, an explicit de la Vall\u00e9e Poussin asymptotic zero-free region ($c_{\\text{dvp}} = 1/56$ for $t \\ge 16$), and constructive Dirichlet-polynomial $L^2$ diagonal dominance / Montgomery\u2013Vaughan sandwich bounds with zero `Classical.choice` and zero `sorryAx`.\n\nCloses #16\n\n## Changes\n- **[`src/LeanAsm/QuasiRiemann/Rat.lean`](src/LeanAsm/QuasiRiemann/Rat.lean)**: Extracted constructive `QRat` type and core exact rational arithmetic so both `QuasiRiemann.lean` and `AsymptoticZfr.lean` share a single `.olean`-cached definition.\n- **[`src/LeanAsm/QuasiRiemann/AsymptoticZfr.lean`](src/LeanAsm/QuasiRiemann/AsymptoticZfr.lean)**:\n  - Part 1: Constructive dyadic-octave log envelope (`octaveLnUpper36`, `octaveLnUpper36QRat`, `octave_bracket_pow2`, `octaveLnUpper36_pos`, `octaveLnUpper36_mono`, `ln2Upper36_envelope_certs`).\n  - Part 2: Explicit 3-4-1 trigonometric positivity (`trig_341_identity`, `trig_341_positivity`, `trig_341_positivity_qrat`, `trig_341_dirichlet_weighted_sum_nonneg`) and constructive de la Vall\u00e9e Poussin asymptotic zero-free region (`cDvp = 1/56`, `dvpThresholdT0 = 16`, `dvp_asymptotic_zero_free_region`).\n  - Part 3: Constructive Dirichlet-polynomial $L^2$ diagonal dominance & Montgomery\u2013Vaughan sandwich (`dirichletDiagEnergy`, `dirichlet_log_ratio_lower`, `dirichlet_offdiag_sum_bound`, `dirichlet_offdiag_envelope_le_half_diag`, `dirichlet_l2_diagonal_dominance_sandwich`, `dirichlet_l2_zeta_and_mobius_certs`).\n- **[`src/LeanAsm/QuasiRiemann.lean`](src/LeanAsm/QuasiRiemann.lean)** & **[`src/LeanAsm.lean`](src/LeanAsm.lean)**: Re-export `Rat` and `AsymptoticZfr` cleanly and link `ln2Upper36Scaled_eq_lnInterval36_hi` + `octaveLnUpper36_bounds_lnInterval36` directly to `(lnInterval36 2).hi`.\n- **[`tests/TestAxioms.lean`](tests/TestAxioms.lean)**: Part 19 `#print axioms` checks across all 16 new/bridge theorems (strictly `[propext, Quot.sound]` or zero axioms; zero `Classical.choice` and zero `sorryAx`).\n- **[`Main.lean`](Main.lean)**: Added Part 5 CLI output for `c_dvp = 1/56` ($t \\ge 16$) and the Zeta/Mobius Dirichlet $L^2$ sandwich bounds.\n\n## Verification\n- `make build-incremental`: all 44 jobs succeeded, all 21 modules cached/up-to-date.\n- `lake env lean tests/TestAxioms.lean`: all checks passed with zero `Classical.choice` and zero `sorryAx`.\n- `make sync`: clean build & executable test passed.",
+    "closedAt": "2026-11-14T01:26:30Z",
+    "createdAt": "2026-11-14T01:23:39Z",
+    "headRefName": "feat/qrh-asymptotic-zfr",
+    "labels": [],
+    "number": 18,
+    "state": "MERGED",
+    "title": "feat(qrh): constructive DVP zero-free region & Dirichlet L^2 diagonal dominance",
+    "updatedAt": "2026-11-14T01:45:21Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/18"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Implements gemweb054 bridging src/LeanAsm/FiniteFieldRH.lean and src/LeanAsm/EulerFactorNonVanishing.lean in src/LeanAsm/WeilZetaBridge.lean with zero Classical.choice and zero sorryAx:\n- Constructive local Euler-factor denominator bounds weil_denom_factor1_nonvanishing, weil_denom_factor2_nonvanishing, and weil_denom_product_lower_bound.\n- Global Frobenius off-half lower bound genus2_L_poly_lower_bound_off_half, quadratic factorization genus2_L_poly_quad_factor_id, and explicit strip certs genus2_L_poly_explicit_strip_certs (sigma = 1/4, 3/4, 1).\n- Unified punctured-strip regularity & non-vanishing theorem weil_zeta_punctured_strip_regular_and_nonzero.\n- Wired into src/LeanAsm.lean, Part 18 of tests/TestAxioms.lean (zero Classical.choice / sorryAx), and Part 7 of Main.lean.",
+    "closedAt": "2026-11-14T00:11:06Z",
+    "createdAt": "2026-11-14T00:10:07Z",
+    "headRefName": "feat/weil-zeta-euler-bridge",
+    "labels": [],
+    "number": 15,
+    "state": "MERGED",
+    "title": "feat(WeilZetaBridge): unify genus-2 Weil zeta & Euler-factor strip bounds",
+    "updatedAt": "2026-11-14T08:53:03Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/15"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Implements gemweb053 for C : y^2 = x^5 - x + 1 over F_5 in src/LeanAsm/FiniteFieldRH.lean with zero Classical.choice and zero sorryAx:\n- Reciprocal Weil L-polynomial genus2LPoly, cleared numerator genus2LNumAtInv5 = 1775, and Jacobian order cardJacobianGenus2F5 = 71.\n- Constructive proofs of genus2_L_poly_eq_recip_frob, genus2_zeta_rational_identity (mod T^3), genus2_L_at_1_eq_71_div_25 (analytic rank 0), genus2_bsd_finite_field_identity, genus2_jacobian_order_eq_71, genus2_jacobian_order_71_prime, and genus2_basepoint_generates_jacobian.\n- Axiom checks in tests/TestAxioms.lean (Part 17, zero Classical.choice/sorryAx) and Part 7 CLI output in Main.lean.",
+    "closedAt": "2026-11-14T00:03:42Z",
+    "createdAt": "2026-11-14T00:02:56Z",
+    "headRefName": "feat/genus2-weil-l-jacobian",
+    "labels": [],
+    "number": 14,
+    "state": "MERGED",
+    "title": "feat(FiniteFieldRH): genus-2 Weil L(C, 1) = 71/25 & Jacobian order 71",
+    "updatedAt": "2026-11-14T08:54:44Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/14"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n- Extend `src/LeanAsm/CollatzQrhBridge.lean` with 192-digit CRT-NTT exponentiation (`powViaCrtNtt192`, proved equal to `base ^ exp` via `PiChudnovsky.natMul192ViaCrtNtt_total_eq_mul`) and certify exact power gaps through the 146-digit principal convergent `(485, 306)` (`2^485 > 3^306`, exact 144-digit difference `expectedGap485`).\n- Add 72-digit linear form enclosures `linearFormLn2Ln3Interval72` and `linearFormLn2Ln3AbsLower72` backed by `QuasiRiemann.lnInterval72`, with universal soundness (`linearFormLn2Ln3Interval72_sound`, `linearFormLn2Ln3AbsLower72_sound`) and effective irrationality measure certification across all six convergents through `(485, 306)` (`baker_effective_measure_485_306_verified`).\n- Prove the `(485, 306)` cycle denominator bound (`collatz_485_306_cycle_denominator_certified`) and sharp 72-digit spectral beat-period upper bounds (`collatzBeatPeriodUpper72`, `collatzBeatPeriodUpper72_sound`, `collatz_qrh_phase_beat_72_verified`, `beat \u2264 6147`).\n- Add `#print axioms` checks in `tests/TestAxioms.lean` and display the `(485, 306)` gap and 72-digit Baker bound in `Main.lean` Part 2.\n\n## Verification\n- `make build-incremental` (`+LeanAsm.CollatzQrhBridge` built in `1.06s`)\n- `lake env lean tests/TestAxioms.lean` (zero `Classical.choice`, zero `sorryAx`)\n- `make sync` (passes cleanly)",
+    "closedAt": "2026-11-13T23:45:27Z",
+    "createdAt": "2026-11-13T23:44:35Z",
+    "headRefName": "feat/collatz-192-crt-ntt-485-306",
+    "labels": [],
+    "number": 13,
+    "state": "MERGED",
+    "title": "feat(collatz): 192-digit CRT-NTT (485, 306) gap & 72-digit Baker bounds (gemweb052)",
+    "updatedAt": "2026-11-13T23:49:11Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/13"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n- Extend `src/LeanAsm/FiniteFieldRH.lean` with exact point counting and Frobenius Riemann Hypothesis verification on the smooth genus-2 hyperelliptic curve $C : y^2 = x^5 - x + 1$ over $\\mathbb{F}_5$:\n  - Construct $\\mathbb{F}_{25} \\cong \\mathbb{F}_5[\\alpha]/(\\alpha^2 - 2)$ as `F25`, verify smoothness (`genus2_curve_smooth_F5`: `f'(x) = -1 \u2260 0`), and prove `#C(F_5) = 11` (`genus2_N1_eq_11`) and `#C(F_25) = 31` (`genus2_N2_eq_31`) by constructive enumeration.\n  - Derive Frobenius coefficients `a_1 = 5`, `a_2 = 15` (`genus2_weil_traces_verified`, verifying Newton\u2013Girard identities and genus-2 Hasse\u2013Weil bound `25 \u2264 80`) and `genus2FrobPoly(X) = X^4 + 5X^3 + 15X^2 + 25X + 25`.\n  - Prove the palindromic functional equation (`genus2_frob_poly_functional_eq`) and the `Q(\u221a5)` splitting identity `4 * P_frob(X) = (2 X^2 + 5 X + 10)^2 - 5 X^2` (`genus2_frob_poly_quad_factor_id`).\n  - Prove constructively with zero `Classical.choice` or `sorryAx` that both reciprocal eigenvalue sums `u_{1,2} = (5 \u00b1 \u221a5)/2` satisfy `u_i^2 < 20` (`genus2_real_trace_bounds`) and strictly negative discriminants `\u0394_i = u_i^2 - 20 < 0` (`genus2_frob_negative_discriminants`), proving `|\u03b1_i|^2 = 5` (`Re(s) = 1/2`).\n- Add `#print axioms` checks in `tests/TestAxioms.lean` and display genus-2 RH results in `Main.lean` Part 7.\n\n## Verification\n- `make build-incremental` (`+LeanAsm.FiniteFieldRH` built in `1.46s`)\n- `lake env lean tests/TestAxioms.lean` (`Forbidden axioms: []`, zero `Classical.choice`, zero `sorryAx`)\n- `make sync` (passes cleanly)",
+    "closedAt": "2026-11-13T23:38:59Z",
+    "createdAt": "2026-11-13T23:37:57Z",
+    "headRefName": "feat/finite-field-rh-genus2",
+    "labels": [],
+    "number": 12,
+    "state": "MERGED",
+    "title": "feat(finite-field-rh): smooth genus-2 curve C/F_5 Riemann Hypothesis (gemweb051)",
+    "updatedAt": "2026-11-14T01:45:30Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/12"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "Closes #9\n\nFixes Copilot formatting nit from PR #7 (`discussion_r4569368613`) by padding the `make help` column so `make build-incremental` has a space before `-` and every `-` separator aligns cleanly.\n\n## Verification\n- Verified `make help` alignment locally",
+    "closedAt": "2026-11-13T23:27:16Z",
+    "createdAt": "2026-11-13T23:26:24Z",
+    "headRefName": "fix/makefile-help-align",
+    "labels": [],
+    "number": 10,
+    "state": "MERGED",
+    "title": "chore(Makefile): align help text hyphen spacing",
+    "updatedAt": "2026-11-13T23:27:18Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/10"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n- Implement `ScaledInterval72` (scale `10^72`) in `src/LeanAsm/QuasiRiemann.lean` backed by `natMul192ViaCrtNtt` / `intMul192ViaCrtNtt` (`LeanAsm.PiChudnovsky.CrtMulBridge.natMul192ViaCrtNtt`, proved constructively via `karatsubaCrtNttMul192_universal_sound` with zero `Classical.choice` or `sorryAx`).\n- Add `mulInterval72`, `mulInterval72_sound`, `artanhTaylor72`, `arctanTaylor72`, `twoPiInterval72`, `reduceModTwoPiCentered72`, `taylorExpNegInterval72`, `taylorCosInterval72`, and `taylorSinInterval72`.\n- Extend pure-rational prime logarithm synthesis (`lnInterval72`, `ValidLnBound72`, `ln_table_1_to_128_valid`) to all integers `1 \u2264 n \u2264 128`.\n- Implement the `N = 128` 2D continuous zero-free rectangle sweeper down to `\u03c3 = 0.501` (`n128PowNegUpperFromSigma72`, `n128_pow_neg_sigma72_sound`, `eulerMaclaurinB2TailRect2D_N128`, `buildRect2DCertN128`, `sweepRectangles2DN128`, `buildRect2DCertN128_implies_valid`, `sweepRectangles2DN128_all_valid`, `ultra_deep_rects_down_to_0501_certified` \u2014 certifying 7/7 rectangles with `\u0394\u03c3\u00b7\u0394t = 0.000140000000`).\n- Add `#print axioms` audit entries in `tests/TestAxioms.lean` and update `Main.lean` Part 2 and Part 5 CLI output.\n\n## Verification\n- `make build-incremental` (`+LeanAsm.QuasiRiemann` built in 146.66s)\n- `lake env lean tests/TestAxioms.lean` (zero `Classical.choice`, zero `sorryAx`)\n- `make sync` (passes cleanly)",
+    "closedAt": "2026-11-13T22:40:27Z",
+    "createdAt": "2026-11-13T22:37:31Z",
+    "headRefName": "feat/qrh-n128-scaled72",
+    "labels": [],
+    "number": 8,
+    "state": "MERGED",
+    "title": "feat(qrh): 72-digit CRT-NTT interval engine & N=128 2D sweeper to \u03c3=0.501 (gemweb048)",
+    "updatedAt": "2026-11-13T22:42:47Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/8"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n- Implement constructive 100-digit Chudnovsky $\\pi$ engine (`LeanAsm.PiChudnovsky`) backed by `karatsubaCrtNttMul192` from `CrtNttUniversal.lean`, decomposed into `.olean`-checkpointed submodules (`CrtMulBridge`, `Sqrt10005`, `ChudnovskySeries`, and `PiChudnovsky`).\n- Certify all 100 decimal digits of $\\pi$ (`pi_100_digits_certified`, `pi_105_bracket_valid`, universal truncation soundness `pi_105_traps_all_chudnovsky_truncations`, `chudnovsky_alternating_decreasing`, `sqrt10005_scaled110_certified`) with zero `Classical.choice` and zero `sorryAx`.\n- Add Part 13 axiom checks to `tests/TestAxioms.lean` and Part 11 summary output to `Main.lean`.\n- Add interruptible ~15-minute `.olean`-checkpointed build driver `tools/incremental_build.py` and `Makefile` targets (`build-chunk`, `build-incremental`, `build-status`).\n\n## Verification\n- `make build-incremental` (`[+] All targets up to date.`)\n- `lake env lean tests/TestAxioms.lean` (zero `Classical.choice`, zero `sorryAx`)\n- `make sync` (exit 0)",
+    "closedAt": "2026-11-13T22:21:21Z",
+    "createdAt": "2026-11-13T22:20:08Z",
+    "headRefName": "feat/pi-chudnovsky-100",
+    "labels": [],
+    "number": 7,
+    "state": "MERGED",
+    "title": "feat(pi): constructive 100-digit Chudnovsky pi via CRT-NTT and interruptible incremental builds",
+    "updatedAt": "2026-11-13T22:40:52Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/7"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n- Remove unused `foldRawPair` helper with identical `if/else` branches in `src/LeanAsm/QuasiRiemann.lean` (PR #3 Copilot nit).\n- Clarify `qrat_div_mul_cancel` docstring to use `QRat.eqv (QRat.div a b hb * b) a` instead of `(a / b) * b` syntax (PR #4 Copilot nit).\n- Fix unclosed inline-code bold spans (`sorryAx**`) and enforce 80-column wrapping across `inbox/gemweb044.md`, `inbox/gemweb045.md`, and `inbox/gemweb046.md` (PR #4 Copilot nits).\n- Add `inbox/gemweb047.md` and `inbox/gemweb048.md` stubs linking to the corresponding prompt line ranges in `inbox/gemweb046.md`.\n\n## Verification\n- `lake build` completed successfully (30 jobs).\n- `lake env lean tests/TestAxioms.lean` passed with zero `Classical.choice` and zero `sorryAx`.\n- `make sync` completed and verified workspace state.",
+    "closedAt": "2026-11-13T19:48:02Z",
+    "createdAt": "2026-11-13T19:42:53Z",
+    "headRefName": "fix/copilot-nits-and-stubs",
+    "labels": [],
+    "number": 6,
+    "state": "MERGED",
+    "title": "chore: clean up Copilot review nits and add gemweb047/gemweb048 stubs",
+    "updatedAt": "2026-11-13T19:48:06Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/6"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n\nIngests `inbox/gemweb046.md`, extending `src/LeanAsm/CollatzQrhBridge.lean` with CRT-NTT-backed multi-digit exponentiation and 36-digit certified Diophantine lower bounds on `|k \u00b7 ln 2 - m \u00b7 ln 3|` across high-denominator convergents of `log\u2082(3)` through `(306, 193)`:\n\n1. **CRT-NTT Exponentiation & Exact Power Separations (`src/LeanAsm/CollatzQrhBridge.lean`)**\n   - Implemented `powViaCrtNtt96` using `QuasiRiemann.natMul96ViaCrtNtt` (`karatsubaCrtNttMul96_universal_sound`) and proved `powViaCrtNtt96_eq_pow`.\n   - Certified exact multi-digit gaps `|2^k - 3^m|` across `(8, 5)`, `(19, 12)`, `(65, 41)`, `(84, 53)`, and 93-digit `(306, 193)` (`collatz_convergent_powers_separation_certified`).\n\n2. **36-Digit Certified Linear Forms & Baker-Type Irrationality Measure**\n   - Built `linearFormLn2Ln3Interval36` and `linearFormLn2Ln3AbsLower36` from certified `lnInterval36 2` and `lnInterval36 3`, proving `linearFormLn2Ln3Interval36_sound` and `linearFormLn2Ln3AbsLower36_sound`.\n   - Proved `baker_effective_measure_verified`: `linearFormLn2Ln3AbsLower36 k m > 0` and `|k \u00b7 ln 2 - m \u00b7 ln 3| \u00b7 m\u00b2 > 1/10` (`> 10^35` at `10^36` scale) across all five convergents through `m = 193`.\n\n3. **Collatz Cycle Gap & QRH Spectral Beat Period Bridge**\n   - Proved `collatz_cycle_requires_positive_gap` connecting positive integer cycles `n0 * 2^k = n0 * 3^m + rhs` to `powViaCrtNtt96 2 k - powViaCrtNtt96 3 m`.\n   - Added safe checked beat-period upper bound `collatzBeatPeriodUpper36 : Nat \u2192 Nat \u2192 Option Nat` (no zero-fallback division), proved `collatzBeatPeriodUpper36_sound` and `collatz_qrh_phase_beat_lower_bound` (showing `\u0394t \u2264 89` for `(306, 193)`).\n\n4. **CLI Output, Axiom Audits & Inbox Formatting**\n   - Updated `Main.lean` Part 2 output to display CRT-NTT `|2^306 - 3^193|` and the `(306, 193)` linear-form lower bound and spectral beat bound.\n   - Added Part 12 `#print axioms` checks in `tests/TestAxioms.lean` and formatted `inbox/gemweb046.md` with Directive 04 header/footer.\n\n## Verification\n\n- `lake build` & `make sync`: `Build completed successfully (30 jobs).` with zero errors and zero warnings.\n- `lake env lean tests/TestAxioms.lean`: Exited `0`; all 8 Part 12 theorems use at most `[propext, Quot.sound]` (zero `Classical.choice`, zero `sorryAx`).\n- `lake exe leanasm`: Exited `0`, verifying `|2^306 - 3^193|` (91 digits) and `|306 ln2 - 193 ln3|\u00b710^36 \u2265 70865538398094242390698440154536530`.",
+    "closedAt": "2026-11-13T19:36:50Z",
+    "createdAt": "2026-11-13T19:35:32Z",
+    "headRefName": "feat/collatz-convergent-crt-ntt-gaps",
+    "labels": [],
+    "number": 5,
+    "state": "MERGED",
+    "title": "feat(collatz-qrh): high-convergent log\u2082(3) gaps & CRT-NTT |2^k - 3^m| bounds",
+    "updatedAt": "2026-11-13T19:41:56Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/5"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n\nResolves both Copilot review findings raised on [PR #2](https://github.com/aomaker-org/leanasm/pull/2):\n\n1. **Safe / Checked `QRat` Division API (`src/LeanAsm/QuasiRiemann.lean`)** \u2014 addresses [comment r4567249815](https://github.com/aomaker-org/leanasm/pull/2#discussion_r4567249815):\n   - Replaced total `QRat.div` (which silently returned `0` on division by zero) and removed the global `instance : Div QRat` so unguarded `a / b` expressions cannot mask `/ 0` bugs.\n   - Exposed proof-carrying `QRat.div (a b : QRat) (hb : b.num \u2260 0) : QRat` and safe partial `QRat.div? (a b : QRat) : Option QRat`.\n   - Made total fallback explicit via `QRat.divOrZero (a b : QRat) : QRat` (used only in unguarded compatibility wrappers like `vdcProcessA` and `primeGapExponent`, while adding `primeGapExponentChecked` / `primeGapExponent?` and switching `criticalLineMu` and `qrhThresholdFromMollifier` directly to checked `QRat.div` with `by decide`).\n   - Proved `qrat_div_mul_cancel` (`(QRat.div a b hb * b) \u2243 a`), `qrat_div?_zero`, `qrat_div?_eq_some`, and `qrat_divOrZero_eq_div`, with `#print axioms` verification in `tests/TestAxioms.lean`.\n\n2. **Directive 04 Markdown Formatting (`inbox/gemweb044.md`, `inbox/gemweb045.md`)** \u2014 addresses [comment r4567249893](https://github.com/aomaker-org/leanasm/pull/2#discussion_r4567249893):\n   - Added `# Path:` headers and `<!-- end of file: ... -->` footers and wrapped all lines to `\u2264 80` columns.\n\n## Verification\n\n- `lake build` (and `make sync`): `Build completed successfully (30 jobs).` with zero errors and zero warnings.\n- `lake env lean tests/TestAxioms.lean`: Exited `0`; `qrat_div_mul_cancel` depends only on `[propext, Quot.sound]` and `qrat_div?_zero`, `qrat_div?_eq_some`, `qrat_divOrZero_eq_div` depend only on `[propext]` (zero `Classical.choice`, zero `sorryAx`).\n- Line length audit: zero lines `> 120` chars in `src/LeanAsm/QuasiRiemann.lean` and `tests/TestAxioms.lean`; zero lines `> 80` chars in `inbox/gemweb044.md` and `inbox/gemweb045.md`.",
+    "closedAt": "2026-11-13T19:30:49Z",
+    "createdAt": "2026-11-13T19:28:53Z",
+    "headRefName": "fix/qrat-safe-div-pr2",
+    "labels": [],
+    "number": 4,
+    "state": "MERGED",
+    "title": "fix(qrh): safe QRat division API (div / div? / divOrZero) & markdown formatting",
+    "updatedAt": "2026-11-13T19:33:23Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/4"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n\nImplements and formally verifies `inbox/gemweb045.md`: a constructive, zero-`Classical.choice` / zero-`sorryAx` **36-digit fixed-point engine (`10^36`) backed by verified 96-digit CRT-NTT Karatsuba multiplication**, together with **36-digit transcendental evaluators** and an **ultra-deep `N = 64` 2D zero-free rectangle sweeper** reaching down to `\u03c3 = 0.505` in Lean 4 (`4.35.0`):\n\n1. **CRT-NTT 96-Digit Arithmetic Bridge & `ScaledInterval36` (`src/LeanAsm/QuasiRiemann.lean`)**\n   - Bridged `CrtNtt.karatsubaCrtNttMul96` (`3`-call Karatsuba over 3-channel Fermat NTTs) into arbitrary `Nat`/`Int` products via `natMul96ViaCrtNtt`, `natMul96ViaCrtNtt_eq_mul`, `intMul96ViaCrtNtt`, and `intMul96ViaCrtNtt_eq_mul`.\n   - Defined `ScaledInterval36` (`[lo / 10^36, hi / 10^36]`), `mulInterval36`, `toScaled6From36`, and proved constructive interval soundness `mulInterval36_sound` directly from `CrtNtt.karatsubaCrtNttMul96_universal_sound` and `mul_mem_corners_left` / `mul_mem_corners_right` without `Classical.choice`.\n\n2. **Constructive 36-Digit Transcendental Interval Evaluators (`10^36` scale)**\n   - Implemented 36-digit Taylor / Machin-like evaluators: `artanhTaylor36`, `arctanTaylor36`, `twoPiInterval36`, `reduceModTwoPiCentered36`, and `lnInterval36` across `1 \u2264 n \u2264 64`.\n   - Proved `ln_table_1_to_64_valid` certifying `ValidLnBound36` for all integers `1 \u2264 n \u2264 64`.\n   - Implemented outward 36-digit exponential and trigonometric evaluators: `taylorExpNegInterval36`, `taylorCosInterval36`, and `taylorSinInterval36` (using argument scaling `256` + `8` squarings for `exp(-y)` and `2` + double-angle identity for `cos/sin`).\n\n3. **`N = 64` Ultra-Deep 2D Zero-Free Rectangle Sweeper (`\u03c3` down to `0.505`)**\n   - Defined `n64PowNegUpperFromSigma36`, proved monotonicity/soundness `n64_pow_neg_sigma36_sound`, and defined the second-order Euler\u2013Maclaurin remainder `eulerMaclaurinB2TailRect2D_N64`.\n   - Implemented `EntriesTree` (depth-6 balanced tree reduction matching `evalDirichletPolyInterval`) together with `buildRect2DCertN64`, `sweepRectangles2DN64`, and the 7-rectangle grid `ultraDeepStripRectGrid2D_N64` spanning `[0.505, 0.507] \u00d7 ...` through `[0.520, 0.522]`.\n   - Proved `buildRect2DCertN64_implies_valid`, `sweepRectangles2DN64_all_valid`, and `ultra_deep_rects_down_to_0505_certified` (7/7 certified 2D rectangles down to `\u03c3 = 0.505`, total certified area `\u0394\u03c3\u00b7\u0394t = 0.140000000`).\n\n4. **CLI Demo, Axiom Audits & Inbox Archival**\n   - Updated `Main.lean` Part 2 (`lnInterval36 64` synthesis) and Part 5 (`ScaledInterval36` `(10^36)^2` CRT-NTT check and `N=64 Ultra-Deep 2D` summary).\n   - Added Part 11 `#print axioms` checks in `tests/TestAxioms.lean` covering all 7 required theorems (`natMul96ViaCrtNtt_eq_mul`, `mulInterval36_sound`, `ln_table_1_to_64_valid`, `n64_pow_neg_sigma36_sound`, `buildRect2DCertN64_implies_valid`, `sweepRectangles2DN64_all_valid`, `ultra_deep_rects_down_to_0505_certified`).\n   - Preserved `inbox/gemweb045.md`.\n\n## Verification\n\n- `lake build` (and `make sync`): `Build completed successfully (30 jobs).` with zero errors and zero warnings.\n- `lake env lean tests/TestAxioms.lean`: Exited `0`; `n64_pow_neg_sigma36_sound` depends on no axioms (`[]`) and the remaining Part 11 theorems depend only on `[propext, Quot.sound]` (zero `Classical.choice`, zero `sorryAx`).\n- `make run` / `lake exe leanasm` (via `make sync`): Exited `0`, verifying `(10^36)^2`, `(ln 64)\u00b710^36`, and 7/7 `N = 64` 2D rectangles with total area `0.140000000`.\n- Line length & header/footer audit: zero lines `> 120` chars across `src/LeanAsm/QuasiRiemann.lean`, `tests/TestAxioms.lean`, and `Main.lean`.",
+    "closedAt": "2026-11-13T19:16:53Z",
+    "createdAt": "2026-11-13T19:14:53Z",
+    "headRefName": "feat/scaled-interval36-n64-sweeper",
+    "labels": [],
+    "number": 3,
+    "state": "MERGED",
+    "title": "feat(qrh): ScaledInterval36 (10^36) via CRT-NTT & N=64 2D Sweeper down to \u03c3 = 0.505",
+    "updatedAt": "2026-11-13T19:22:09Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/3"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n\nImplements and formally verifies a constructive, zero-`Classical.choice` / zero-`sorryAx` rational engine for van der Corput `{A, B}*` exponent-pair orbits, Guth\u2013Maynard (`30/13`) vs. classical Huxley (`12/5`) / Ingham (`3`) zero-density comparisons, and constructive mollifier length descent (`11/12 \u2192 7/8 \u2192 5/6 \u2192 3/4 \u2192 1/2`) in Lean 4 (4.35.0):\n\n1. **Constructive Rational Arithmetic (`QRat`) & `{A, B}*` Exponent-Pair Engine (`src/LeanAsm/QuasiRiemann.lean`)**\n   - Added dependency-free `QRat` (`num : Int`, `den : Nat`, `0 < den`) with decidable `eqv`, `<`, `\u2264`, and arithmetic (`+`, `-`, `*`, `/`, `reduce`).\n   - Implemented `RatExpPair`, `vdcProcessA`, `vdcProcessB`, and `criticalLineMu`.\n   - Proved `vdcProcessA_preserves_valid`, `vdcProcessB_preserves_valid`, `vdcProcessB_involutive`, and `vdc_classic_orbit_chain` tracking `(0,1) \u2192 B(0,1)=(1/2,1/2) \u2192 AB=(1/6,2/3) \u2192 A\u00b2B=(1/14,11/14) \u2192 BA\u00b2B=(2/7,4/7) \u2192 ABA\u00b2B=(1/9,13/18)` with `criticalLineMu` bounds (`1/6 < 5/28 < 1/4` and `p5.k < p2.k < p1.k`).\n\n2. **Guth\u2013Maynard (`30/13`) vs. Huxley (`12/5`) & Ingham (`3`) Zero-Density Comparisons**\n   - Added `zeroDensityIngham` (`3`), `zeroDensityHuxley` (`12/5`), `zeroDensityGuthMaynard` (`30/13`), `zeroDensityHypothesis` (`2`), `zeroDensityExponentAt`, and `primeGapExponent`.\n   - Proved `guth_maynard_strictly_improves_huxley` and `guth_maynard_prime_gap_threshold` (`17/30 < 7/12 < 2/3` and `3/130` savings at `\u03c3 = 3/4`).\n\n3. **Constructive Mollifier Descent & Cross-Domain Collatz Synchronization**\n   - Defined `qrhThresholdFromMollifier` (`1 - \u03d1/2`) and proved `mollifier_descent_monotone`, `mollifier_beyond_quarter_beats_seven_eighths`, `mollifier_one_third_yields_five_sixths`, `mollifier_one_half_yields_three_quarters`, and `qrh_full_descent_chain_certified`.\n   - Synchronized the Collatz\u2013QRH ladder in `src/LeanAsm/CollatzQrhBridge.lean` via `collatz_qrh_mollifier_descent_synchronized`.\n\n4. **CLI Demo, Axiom Audits & Inbox Archival**\n   - Updated `Main.lean` Part 5 CLI output to display the `{A,B}*` `QRat` orbit (`ABA\u00b2B=((1/9), (13/18))`), Guth\u2013Maynard `30/13` vs. Huxley `12/5` comparison (`\u03b8_p (17/30) < (7/12)`), and mollifier descent chain (`11/12 \u2192 7/8 \u2192 5/6 \u2192 3/4 \u2192 1/2`).\n   - Added Part 5b `#print axioms` checks in `tests/TestAxioms.lean` covering all 12 new theorems (`vdcProcessA_preserves_valid` through `collatz_qrh_mollifier_descent_synchronized`).\n   - Preserved `inbox/gemweb044.md`.\n\n## Verification\n\n- `lake build` (and `make sync`): `Build completed successfully (30 jobs).` with zero warnings and zero errors.\n- `lake env lean tests/TestAxioms.lean`: Exited `0`; all Part 5b theorems depend only on `[propext, Quot.sound]` (zero `Classical.choice`, zero `sorryAx`).\n- `lake exe leanasm` (via `make sync`): Exited `0`.\n- Line length audit: zero lines `> 120` chars across `Main.lean`, `src/LeanAsm/CollatzQrhBridge.lean`, `src/LeanAsm/QuasiRiemann.lean`, and `tests/TestAxioms.lean`.\n",
+    "closedAt": "2026-11-13T18:38:34Z",
+    "createdAt": "2026-11-13T18:38:21Z",
+    "headRefName": "feat/qrh-vdc-mollifier-descent",
+    "labels": [],
+    "number": 2,
+    "state": "MERGED",
+    "title": "feat(qrh): Constructive QRat {A,B}* Exponent-Pair Engine, Guth-Maynard (30/13) & Mollifier Descent",
+    "updatedAt": "2026-11-17T02:20:10Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/2"
+  },
+  {
+    "author": {
+      "id": "MDQ6VXNlcjE1OTQwMjQ3",
+      "is_bot": false,
+      "login": "fekerr",
+      "name": "Fred Kerr"
+    },
+    "baseRefName": "main",
+    "body": "## Summary\n\nImplements and formally verifies a constructive, zero-`Classical.choice` / zero-`sorryAx` hierarchy of universal Number Theoretic Transform (NTT), Chinese Remainder Theorem (CRT-NTT) big-integer multiplication, and two-tier Karatsuba-over-CRT-NTT multipliers in Lean 4 (4.35.0):\n\n1. **Universal 4-Point NTT Algebraic Soundness (`F_5` & `F_17`)**\n   - Formalized universal inversion and cyclic convolution theorems (`NttArithmetic.intt4_ntt4_universal_F5`, `ntt4_intt4_universal_F5`, `cyclic_conv4_ntt_universal_F5`, and `F17` counterparts) in `src/LeanAsm/NttArithmetic.lean`.\n\n2. **Universal 8-Point NTT Soundness (`F_17` & `F_257`)**\n   - Formalized universal inversion and cyclic convolution over `F_17` and `F_257` (`CrtNtt.intt8_ntt8_universal_F17`, `ntt8_intt8_universal_F17`, `cyclic_conv8_ntt_universal_F17`, and `F257` counterparts) in `src/LeanAsm/CrtNtt.lean`.\n\n3. **Universal 16-Point NTT & End-to-End 48-Digit CRT-NTT Big-Integer Multiplier**\n   - Added `src/LeanAsm/CrtNttUniversal.lean` (exported from `src/LeanAsm.lean`) proving universal 16-point NTT inversion and cyclic convolution over Fermat primes `F_17`, `F_257`, and `F_65537`.\n   - Proved universal exactness of the 3-channel Garner CRT-NTT 48-digit big-integer multiplier: `CrtNtt.crtNttBigMulVec8_universal_sound` and `CrtNtt.crtNttBigMul_universal_sound` (`< 10^24` operands, `< 10^48` products).\n\n4. **96-Digit 2\u00d72 Karatsuba-over-CRT-NTT Multiplier (`karatsubaCrtNttMul96`)**\n   - Built a 3-call Karatsuba tier over `crtNttBigMulVec8` using carry-safe 8-limb decomposition (`splitVec16_eval`, `addVec8WithCarry_sound`) and `karatsuba_algebraic_identity`.\n   - Proved `karatsubaCrtNttMul96_normalized`, `karatsubaCrtNttMul96_universal_sound` (`\u2200 A, B < 10^48`), and `karatsuba_96_digit_max_verified` (`(10^48 - 1)^2`).\n\n5. **192-Digit Two-Tier 2\u00d72 Karatsuba-over-CRT-NTT Multiplier (`karatsubaCrtNttMul192`)**\n   - Layered a second 2\u00d72 Karatsuba tier (`Vec32` \u2192 `Vec64`) over `karatsubaCrtNttMul96` (9 underlying CRT-NTT calls vs. 16 schoolbook) with 32-limb ripple carry/borrow (`addVec32WithCarry_sound`, `subVec32WithBorrow_sound`).\n   - Proved `karatsubaCrtNttMul192_normalized`, `karatsubaCrtNttMul192_universal_sound` (`\u2200 A, B < 10^96`), and `karatsuba_192_digit_max_verified` (`(10^96 - 1)^2`).\n\n6. **CLI Demo, Axiom Audits & Inbox Archives**\n   - Updated `Main.lean` Part 9 & Part 10 CLI output to exercise and report the 48-digit, 96-digit, and 192-digit boundary products and universal theorems.\n   - Added `#print axioms` checks in `tests/TestAxioms.lean` confirming all new theorems depend at most on `[propext, Quot.sound]` (zero `Classical.choice`, zero `sorryAx`).\n   - Preserved spec prompts in `inbox/gemweb041.md`\u2013`gemweb043.md`, `inbox/NttArithmetic.lean`, and `inbox/workspace_ro.txt`.\n\n## Verification\n\n- `lake build` (via `make sync`): `Build completed successfully (30 jobs).`\n- `lake env lean tests/TestAxioms.lean`: Exited `0`; all added universal NTT, CRT-NTT, and Karatsuba theorems verified with `[propext, Quot.sound]` only (no `Classical.choice`, no `sorryAx`).\n- `lake exe leanasm` (via `make sync`): Exited `0`; verified concrete 48-digit, 96-digit (`(10^48 - 1)^2`), and 192-digit (`(10^96 - 1)^2`) outputs.\n- Line length audit: zero lines > 120 characters across `src/LeanAsm/CrtNttUniversal.lean`, `tests/TestAxioms.lean`, `Main.lean`, and `src/LeanAsm.lean`.",
+    "closedAt": "2026-11-13T18:09:23Z",
+    "createdAt": "2026-11-13T18:09:09Z",
+    "headRefName": "feat/ntt-universal-theorems",
+    "labels": [],
+    "number": 1,
+    "state": "MERGED",
+    "title": "feat(ntt): Universal 4/8/16-Point CRT-NTT & 96/192-Digit Karatsuba Multipliers",
+    "updatedAt": "2026-11-13T18:13:48Z",
+    "url": "https://github.com/aomaker-org/leanasm/pull/1"
+  }
+]
