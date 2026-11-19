@@ -764,6 +764,81 @@ theorem mollifier_longer_improves_qrh :
     mollifierThetaNum 1 1 * mollifierThetaDen 7 < mollifierThetaNum 4 7 * mollifierThetaDen 1 := by
   decide
 
+private theorem nat_lt_of_mul_lt_mul_right_local {a b c : Nat} (h : a * c < b * c) : a < b := by
+  cases Nat.decLt a b with
+  | isTrue hlt => exact hlt
+  | isFalse hge =>
+    have hle : b ≤ a := Nat.le_of_not_lt hge
+    have hmul : b * c ≤ a * c := Nat.mul_le_mul_right c hle
+    omega
+
+/--
+Theorem: Generalized mollifier-to-QRH step-improvement bound below 7/8:
+For any mollifier lengths 1/4 ≤ ϑ₁ < ϑ₂ ≤ 1, the induced thresholds satisfy
+1/2 ≤ θ(ϑ₂) < θ(ϑ₁) ≤ 7/8 in cleared-denominator Nat arithmetic.
+Proved constructively with ZERO axioms.
+-/
+theorem mollifier_step_improvement_below_seven_eighths
+    (vNum1 vDen1 vNum2 vDen2 : Nat)
+    (hDen1_pos : 0 < vDen1) (hDen2_pos : 0 < vDen2)
+    (h_ge_one_fourth : 1 * vDen1 ≤ 4 * vNum1)
+    (h_lt : vNum1 * vDen2 < vNum2 * vDen1)
+    (h_le_one : vNum2 ≤ vDen2) :
+    mollifierThetaDen vDen2 ≤ 2 * mollifierThetaNum vNum2 vDen2 ∧
+    mollifierThetaNum vNum2 vDen2 * mollifierThetaDen vDen1 <
+      mollifierThetaNum vNum1 vDen1 * mollifierThetaDen vDen2 ∧
+    8 * mollifierThetaNum vNum1 vDen1 ≤ 7 * mollifierThetaDen vDen1 := by
+  dsimp [mollifierThetaNum, mollifierThetaDen]
+  have h_int_lt : (vNum1 : Int) * (vDen2 : Int) < (vNum2 : Int) * (vDen1 : Int) := by
+    exact Int.ofNat_lt.mpr h_lt
+  have h_int_ge : (vDen1 : Int) ≤ 4 * (vNum1 : Int) := by omega
+  have h_int_le : (vNum2 : Int) ≤ (vDen2 : Int) := by omega
+  have h_d1_pos : 0 < (vDen1 : Int) := by omega
+  have h_d2_pos : 0 < (vDen2 : Int) := by omega
+  have h_n2_le_2d2 : (vNum2 : Int) ≤ 2 * (vDen2 : Int) := by omega
+  have h_n1_le_2d1 : (vNum1 : Nat) ≤ 2 * vDen1 := by
+    have h1 : vNum1 * vDen2 < vDen2 * vDen1 := by
+      calc vNum1 * vDen2 < vNum2 * vDen1 := h_lt
+        _ ≤ vDen2 * vDen1 := Nat.mul_le_mul_right vDen1 h_le_one
+    rw [Nat.mul_comm vDen2 vDen1] at h1
+    have h2 : vNum1 < vDen1 := nat_lt_of_mul_lt_mul_right_local h1
+    omega
+  have h_goal2_int :
+      (2 * (vDen2 : Int) - (vNum2 : Int)) * (2 * (vDen1 : Int)) <
+      (2 * (vDen1 : Int) - (vNum1 : Int)) * (2 * (vDen2 : Int)) := by
+    have h_exp1 : (2 * (vDen2 : Int) - (vNum2 : Int)) * (2 * (vDen1 : Int)) =
+        4 * (vDen1 : Int) * (vDen2 : Int) - 2 * ((vNum2 : Int) * (vDen1 : Int)) := by
+      calc (2 * (vDen2 : Int) - (vNum2 : Int)) * (2 * (vDen1 : Int))
+        _ = 2 * (vDen2 : Int) * (2 * (vDen1 : Int)) - (vNum2 : Int) * (2 * (vDen1 : Int)) := by
+          rw [Int.sub_mul]
+        _ = 4 * (vDen1 : Int) * (vDen2 : Int) - 2 * ((vNum2 : Int) * (vDen1 : Int)) := by
+          ac_rfl
+    have h_exp2 : (2 * (vDen1 : Int) - (vNum1 : Int)) * (2 * (vDen2 : Int)) =
+        4 * (vDen1 : Int) * (vDen2 : Int) - 2 * ((vNum1 : Int) * (vDen2 : Int)) := by
+      calc (2 * (vDen1 : Int) - (vNum1 : Int)) * (2 * (vDen2 : Int))
+        _ = 2 * (vDen1 : Int) * (2 * (vDen2 : Int)) - (vNum1 : Int) * (2 * (vDen2 : Int)) := by
+          rw [Int.sub_mul]
+        _ = 4 * (vDen1 : Int) * (vDen2 : Int) - 2 * ((vNum1 : Int) * (vDen2 : Int)) := by
+          ac_rfl
+    rw [h_exp1, h_exp2]
+    omega
+  refine ⟨by omega, ?_, by omega⟩
+  have h_cast1 : (((2 * vDen2 - vNum2) * (2 * vDen1) : Nat) : Int) =
+      (2 * (vDen2 : Int) - (vNum2 : Int)) * (2 * (vDen1 : Int)) := by
+    have hsub : ((2 * vDen2 - vNum2 : Nat) : Int) = 2 * (vDen2 : Int) - (vNum2 : Int) := by
+      exact Int.ofNat_sub (by omega)
+    rw [Int.natCast_mul, hsub, Int.natCast_mul]
+    rfl
+  have h_cast2 : (((2 * vDen1 - vNum1) * (2 * vDen2) : Nat) : Int) =
+      (2 * (vDen1 : Int) - (vNum1 : Int)) * (2 * (vDen2 : Int)) := by
+    have hsub : ((2 * vDen1 - vNum1 : Nat) : Int) = 2 * (vDen1 : Int) - (vNum1 : Int) := by
+      exact Int.ofNat_sub (by omega)
+    rw [Int.natCast_mul, hsub, Int.natCast_mul]
+    rfl
+  rw [← Int.ofNat_lt]
+  rw [h_cast1, h_cast2]
+  exact h_goal2_int
+
 /--
 Theorem: Concrete verified descent across landmark mollifier regimes:
   1/2 (RH) < 5/7 (extended) < 3/4 (Deshouillers-Iwaniec) < 5/6 (Conrey-Iwaniec) < 7/8 (Weil/QRH) < 1 (trivial).

@@ -111,6 +111,13 @@ def highTruncDyadicAbel2048Spec : HighTruncDyadicAbelSpec where
   nTrunc_eq_scaleN := rfl
   margin_pos := by decide
 
+/-- Certified `HighTruncDyadicAbelSpec` at the sharpened rung `(σ = 0.50003125, N = 2048, t ~ 10^30)`. -/
+def highTruncDyadicAbel32000Spec : HighTruncDyadicAbelSpec where
+  strip := certifiedStrip050003125_N2048
+  gate := invSqrtGate2048
+  nTrunc_eq_scaleN := rfl
+  margin_pos := by decide
+
 -- =============================================================================
 -- Part 3: Concrete End-to-End Weave Certificate Theorems
 -- =============================================================================
@@ -174,6 +181,38 @@ theorem hightrunc_dyadic_abel_weave_N2048_cert :
   have h2048 := crtNtt_highTrunc108_N2048_rect
   refine ⟨rfl, by decide, by decide, by decide, by decide, by decide,
     highTruncDyadicAbel2048Spec.strip.rect_certified, h2048.1, h2048.2.1⟩
+
+/-- Theorem (Sharp Sub-7/8 Dyadic-Abel Weave Certificate at Rung 1/32000):
+Demonstrates the combined strip-penetration + tail-gate theorem extending beyond 7/8:
+1. Exact non-vanishing margin `2683000 - (1 + 2) = 2682997 > 0`,
+2. Inverse square-root tail gate inequality `4 * 2048 * 1 ≤ 128^2 * 2^2`,
+3. Sharper sub-7/8 strip penetration `1/2 < 16001/32000 < 8001/16000 < 3/4 < 7/8`,
+4. Zero-density slope contraction under Guth-Maynard (`30/13`) and Huxley (`12/5`), and
+5. Compositional 2D Lipschitz box tiling non-vanishing on `[10^30, 10^30 + 400]`.
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem hightrunc_dyadic_abel_weave_rung32000_cert :
+    highTruncDyadicAbel32000Spec.margin = 2682997 ∧
+    (4 * highTruncDyadicAbel32000Spec.gate.scaleN) *
+        (highTruncDyadicAbel32000Spec.gate.tailBound *
+          highTruncDyadicAbel32000Spec.gate.tailBound) ≤
+      ((2 * highTruncDyadicAbel32000Spec.gate.denomM) *
+        (2 * highTruncDyadicAbel32000Spec.gate.denomM)) *
+        (highTruncDyadicAbel32000Spec.gate.tailNum *
+          highTruncDyadicAbel32000Spec.gate.tailNum) ∧
+    QRat.mk' 1 2 < highTruncDyadicAbel32000Spec.strip.sigmaLo ∧
+    highTruncDyadicAbel32000Spec.strip.sigmaLo < highTruncDyadicAbel2048Spec.strip.sigmaLo ∧
+    highTruncDyadicAbel32000Spec.strip.sigmaLo < QRat.mk' 3 4 ∧
+    highTruncDyadicAbel32000Spec.strip.sigmaLo < qrhThresholdSevenEighths ∧
+    zdGuthMaynard.exponent highTruncDyadicAbel32000Spec.strip.sigmaLo <
+      zdGuthMaynard.exponent (QRat.mk' 1 2) ∧
+    zdHuxley.exponent highTruncDyadicAbel32000Spec.strip.sigmaLo <
+      zdHuxley.exponent (QRat.mk' 1 2) ∧
+    highTruncDyadicAbel32000Spec.strip.rectSpec.HasCertifiedNonVanishing ∧
+    (highTruncTiles_1e30_N2048.length = 4 ∧
+      (∀ t ∈ highTruncTiles_1e30_N2048, IsValidLipTile2D t)) := by
+  have h2048 := crtNtt_highTrunc108_N2048_rect
+  refine ⟨rfl, by decide, by decide, by decide, by decide, by decide, by decide, by decide,
+    highTruncDyadicAbel32000Spec.strip.rect_certified, h2048.1, h2048.2.1⟩
 
 end QuasiRiemann
 

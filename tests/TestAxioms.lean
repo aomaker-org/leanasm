@@ -900,6 +900,9 @@ import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 #print axioms QuasiRiemann.hightrunc_dyadic_abel_weave_bridge
 #print axioms QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert
 #print axioms QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert
+#print axioms QuasiRiemann.hightrunc_dyadic_abel_weave_rung32000_cert
+#print axioms QuasiRiemann.mollifier_step_improvement_below_seven_eighths
+#print axioms QuasiRiemann.ultradeep72_N2048_strip_rung_32000_cert
 
 -- =============================================================================
 -- Part 57: Genus-2 Multi-Prime Weil + WeilZeta + GSp(4) Weave Bridge
