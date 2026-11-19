@@ -11,7 +11,7 @@ Cantor-Mumford certificates.
 All core proofs in `LeanAsm.leanasm_full_provenance_certified` audit strictly
 to `[propext, Quot.sound]` (or zero axioms), with **zero** `Classical.choice`
 and **zero** `sorryAx` across the full transitive dependency cone. For a full
-subsystem audit and mathematical provenance mapping across all 63 modules, see
+subsystem audit and mathematical provenance mapping across all 71 modules, see
 the [Architecture and Provenance Guide](docs/ARCHITECTURE_AND_PROVENANCE.md).
 
 ## Prerequisites & Toolchain
@@ -19,7 +19,7 @@ the [Architecture and Provenance Guide](docs/ARCHITECTURE_AND_PROVENANCE.md).
 The Lean toolchain is managed via [elan](https://github.com/leanprover/elan):
 
 - **Lean Version**: `leanprover/lean4:v4.35.0` (pinned in `lean-toolchain`)
-- **Build Manager**: Lake (Lean's package and build manager)
+- **Build Manager**: Lake (Lean package and build manager)
 - **Local Neural Prover Engines**: Windows-hosted Ollama (`deepseek-prover:7b`
   via `http://localhost:11434`, see [Local Ollama guide](docs/ollama_local.md))
   and `llama.cpp` (`llama-server`)
@@ -37,13 +37,17 @@ source config_env hum
 # Check toolchain and workspace status
 make status
 
-# Build all 63 modules incrementally with timing budgets
+# Build all 71 modules sequentially with heap capping
+# (core12 sequential build: LEAN_OPTS="-M4096")
+make build-seq
+
+# Build incrementally with timing budgets
 make build-incremental
 
 # Full build & execute Parts 1-11 + unified provenance CLI demo
 make sync
 
-# Audit transitive axiom closures across Parts 1-53 (0 choice, 0 sorryAx)
+# Audit transitive axiom closures across Parts 1-63 (0 choice, 0 sorryAx)
 lake env lean tests/TestAxioms.lean
 
 # Check submodule hydration status
@@ -55,10 +59,12 @@ make hydrate-status
 Running `lake exe leanasm` (or `make run`) executes and prints build-time
 kernel-verified computations across all 11 parts:
 
-1. **Part 1 (`MiniVM`, `MiniVMNttBridge`)**: Register machine execution,
-   4-channel Garner CRT assembly (`M_4 = 1,431,655,765`), `F_17` (`289` /
-   `83,521` states), parametric `{5, 17, 257, 65537}` 4-pt & `{17, 257,
-   65537}` 8-pt NTT/INTT assembly, and CRT-NTT cyclic convolution soundness.
+1. **Part 1 (`MiniVM`, `MiniVMNttBridge`, `MiniVMRnsHenselWeave`)**:
+   Register machine execution, 4-channel Garner CRT assembly (`M_4 =
+   1,431,655,765`), `F_17` (`289` / `83,521` states), parametric `{5, 17,
+   257, 65537}` 4-pt & `{17, 257, 65537}` 8-pt NTT/INTT assembly, CRT-NTT
+   cyclic convolution soundness, and MiniVM NTT + RnsInt CRT + QSD[4] Hensel
+   prime-tower weave bridge.
 2. **Part 2 (`Conjectures`, `CollatzQrhBridge`)**: 144-digit CRT-NTT gap
    `2^485 - 3^306 > 0`, 318-digit `(1054, 665)` convergent bracket, 72-digit
    Baker measure, Steiner 1-cycle exclusions, Simons-de Weger `m >= 666`
@@ -71,7 +77,9 @@ kernel-verified computations across all 11 parts:
    `SignedSym4` face-holonomy trace invariance.
 5. **Part 5 (`QuasiRiemann`, `UltraDeep72`, `AsymptoticZfr`,
    `ZeroDensityBridge`, `ShortIntervalPrimes`, `ParametricQrhLadder`,
-   `DyadicAbelBridge`, `MollifierVariationalBridge`)**: Mollifier descent, 2D
+   `DyadicAbelBridge`, `MollifierVariationalBridge`,
+   `HighTruncDyadicAbelWeave`, `QsdAlgebraBridge`,
+   `Qsd1LogDerivStripBridge`, `GaussianQsdBridge`)**: Mollifier descent, 2D
    rectangles down to `sigma = 0.501` (`N = 128`) and compositional 2x2
    Lipschitz tiles down to `sigma = 0.5005` (`N = 256`, `t ~ 10^12`),
    `sigma = 0.50025` (`N = 512`, `t ~ 10^18`, 90-digit CRT-NTT phase
@@ -88,8 +96,10 @@ kernel-verified computations across all 11 parts:
    (`0.50025`, `0.500125`, `0.5000625`), `[M, M * 2^k)` dyadic-shell
    foliation, discrete Abel summation-by-parts (`1/sqrt(N)` quadratic gates),
    closed-loop rungs `k = 5,6` (`33/64` at `[10^192, +10^108]`, `65/128` at
-   `[10^384, +10^206]`), and two-piece `QRat` variational mollifiers (`13/16 <
-   1`, `603/1024 < 39/64`).
+   `[10^384, +10^206]`), two-piece `QRat` variational mollifiers (`13/16 < 1`,
+   `603/1024 < 39/64`), QSD[1-4] nilpotent algebras, QSD[1] log-derivative
+   sub-7/8 strip contraction, integral Gaussian QSD norm multiplicativity, and
+   high-truncation dyadic-Abel weaves.
 6. **Part 6 (`RnsArithmetic`, `EulerFactorNonVanishing`, `ArtinFermatBridge`,
    `ArtinShortIntervalBridge`)**: 3-channel Garner CRT execution, Fermat-tower
    `{5, 17, 257, 65537}` strip bounds (`sigma in {1/2, 3/4, 1}`), cyclotomic
@@ -97,12 +107,16 @@ kernel-verified computations across all 11 parts:
    collapse, MiniVM 4-pt NTT character orthogonality, & character-twisted
    short-interval prime bounds (`17/32 < 39/64 < 5/8 < 2/3 < 3/4 < 7/8`).
 7. **Part 7 (`FiniteFieldRH`, `Genus2Jacobian`, `WeilZetaBridge`,
-   `GSp4FunctorialityBridge`, `EllipticModularityBridge`)**: Hasse-Weil RH
-   for `E/F_7`, genus-2 `C : y^2 = x^5 - x + 1` over `F_5`, `L(C, 1) = 71/25`,
-   Cantor-Mumford group axioms on `J(C)(F_5) ~= Z/71Z`, punctured-strip zeta
-   bounds, `Xi_C(1 - s) = Xi_C(s)`, `GSp(4) -> SO(5)` cyclotomic lift
-   `5(1 - T) Phi_10(T)`, Selberg / Kim-Sarnak `Sym^k` ladder, and
-   `E_{11a1}` / `f_{11}` Eichler-Shimura trace equality (`p <= 97`).
+   `GSp4FunctorialityBridge`, `EllipticModularityBridge`,
+   `Genus2MultiPrimeWeil`, `Genus2WeilGSp4Weave`,
+   `Genus2HenselPreperiodicWeave`)**: Hasse-Weil RH for `E/F_7`, genus-2 `C :
+   y^2 = x^5 - x + 1` over `F_5`, `L(C, 1) = 71/25`, Cantor-Mumford group
+   axioms on `J(C)(F_5) ~= Z/71Z`, punctured-strip zeta bounds, `Xi_C(1 - s) =
+   Xi_C(s)`, `GSp(4) -> SO(5)` cyclotomic lift `5(1 - T) Phi_10(T)`, Selberg /
+   Kim-Sarnak `Sym^k` ladder, `E_{11a1}` / `f_{11}` Eichler-Shimura trace
+   equality (`p <= 97`), multi-prime Frobenius / Weil RH certificates for
+   $p \in \{7, 11, 13, 17, 19, 23\}$, GSp(4) standard Euler weaves, and
+   Frobenius trace weaves with QSD[4] Hensel towers and preperiodic bounds.
 8. **Part 8 (`EulerFactorNonVanishing`)**: Local RNS channels `p in {7, 11,
    13}` non-vanishing at `sigma in {1/2, 7/8}`.
 9. **Part 9 (`NttArithmetic`)**: `F_17` primitive roots, butterfly, and
@@ -114,23 +128,24 @@ kernel-verified computations across all 11 parts:
     `pi`, universal `m >= 8` truncation trap, and unified master certificate
     `LeanAsm.leanasm_full_provenance_certified`.
 
-## 63-Module Theorem Inventory
+## 71-Module Theorem Inventory
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 `QuasiRiemann/`, `Val/` for `QuasiRiemann/Valuation/`, `PC/` for
 `PiChudnovsky/`, and `Main.lean` + `src/LeanAsm.lean` at the root).
-`tests/TestAxioms.lean` audits Parts 1-53 (705+ axiom checks).
+`tests/TestAxioms.lean` audits Parts 1-63 (800+ axiom checks).
 `NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `Val` = `Valuation`,
 `PC` = `PiChudnovsky`, `Const` = `Constants`, `G2` = `Genus2`.
 
 | Module | NS | Flagship Theorem / Role |
 | --- | --- | --- |
 | `Main.lean` | `(root)` | CLI entrypoint (`Parts 1-11` + prov) |
-| `LeanAsm.lean` | `(root)` | Library root exporting all 61 submodules |
+| `LeanAsm.lean` | `(root)` | Library root exporting all 60 submodules |
 | `MiniVM.lean` | `=` | `exec_garner_crt_sound`, `mul_mod_reg` |
 | `Constants/PiAndSqrt.lean` | `Const` | `sqrt10005_scaled110`, `pi_digits` |
 | `Constants/PrimeTowers.lean` | `Const` | `fermat_tower_mod4`, Fermat roots |
 | `MiniVMNttBridge.lean` | `=` | `crtNtt4ConvAsm_sound` |
+| `MiniVMRnsHenselWeave.lean` | `=` | `minivm_garner_hensel_weave_sound` |
 | `Conjectures.lean` | `=` | `collatz_one_reaches_one` |
 | `CollatzQrhBridge.lean` | `=` | `collatz_cycle_length_lower_bound_306` |
 | `YangMillsToy.lean` | `=` | `plaquette_action_gauge_invariant` |
@@ -158,13 +173,18 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `QR/ShortIntervalPrimes.lean` | `QR` | `qrh_short_interval_positivity_certs` |
 | `QR/ParametricQrhLadder.lean` | `QR` | `kim_sarnak_amplified_qrh_step` |
 | `QR/DyadicAbelBridge.lean` | `QR` | `short_interval_dyadic_abel_envelope` |
+| `QR/HighTruncDyadicAbelWeave.lean` | `QR` | `hightrunc_dyadic_abel_weave` |
 | `QR/MollifierVariationalBridge.lean` | `QR` | `variationalQrhThreshold` |
+| `QR/QsdAlgebraBridge.lean` | `QR` | `qsd4_nilpotent_zero_divisor_lift` |
+| `QR/Qsd1LogDerivStripBridge.lean` | `QR` | `qsd1_logderiv_sub78_strip` |
+| `QR/GaussianQsdBridge.lean` | `QR` | `gaussian_qsd_hensel_tower_bridge` |
 | `Val/Ultrametric.lean` | `Val` | `ultrametric_ineq` |
 | `Val/Contraction.lean` | `Val` | `iterate_val_range`, `iterate_growth` |
 | `Val/Hensel.lean` | `Val` | `hensel_poly_simple_root_lift` |
 | `Val/Eisenstein2Adic.lean` | `Val` | `legendre_v2_factorial`, `prop_4` |
 | `Val/EisensteinWeights.lean` | `Val` | `romikCoeff_symm`, `prop4_m4` |
 | `Val/PreperiodicDynamics.lean` | `Val` | `preperiodic_partition_sound` |
+| `Val/QsdHenselTower.lean` | `Val` | `qsd4_hensel_tangent_lift_step` |
 | `Val/RNS.lean` | `Val` | `rns_contraction_sound` |
 | `RnsArithmetic.lean` | `=` | `garner_mul_concrete_soundness` |
 | `EulerFactorNonVanishing.lean` | `=` | `local_euler_disk_nonvanishing` |
@@ -173,6 +193,9 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `Genus2/Cantor.lean` | `G2` | `jacobian_group_axioms_on_orbit` |
 | `Genus2Jacobian.lean` | `=` | `jacobian_group_axioms_on_orbit` facade |
 | `FiniteFieldRH.lean` | `=` | `hasse_weil_riemann_hypothesis` |
+| `Genus2MultiPrimeWeil.lean` | `=` | `genus2_multiprime_weil_certs` |
+| `Genus2WeilGSp4Weave.lean` | `=` | `genus2_multiprime_weil_gsp4` |
+| `QR/Genus2HenselPreperiodicWeave.lean` | `QR` | `genus2_hensel_preperiodic` |
 | `WeilZetaBridge.lean` | `=` | `genus2_completed_zeta_reflection` |
 | `GSp4FunctorialityBridge.lean` | `=` | `gsp4_std_functional_equation` |
 | `EllipticModularityBridge.lean` | `=` | `eichler_shimura_trace_eq_11a1` |
@@ -195,6 +218,9 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
 - `MiniVMNttBridge.fermatTowerNtt4_asm_roundtrip_certs`,
   `fermatTowerNtt8_asm_roundtrip_certs`, `garnerReconstruct4Asm_sound`, &
   `crtNtt4ConvAsm_sound`
+- `MiniVMRnsHenselWeave.minivm_garner_hensel_weave_sound`,
+  `minivm_rns_hensel_weave_cert_hold`, &
+  `minivm_ntt_rns_hensel_weave_bridge`
 - `CollatzQrhBridge.baker_effective_measure_485_306_verified`,
   `steiner_1cycle_excluded_at_convergents`, `log2_3_convergent_bracket_665`,
   `simons_de_weger_barrier_665`, `collatzPredTree_sound`, &
@@ -227,7 +253,10 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
   `dyadic_shell_sum_foliation`, `discrete_abel_summation_by_parts`,
   `abel_summation_by_parts_list`, `abel_monotone_weight_envelope`,
   `inv_sqrt_tail_gate_dyadic_step`, `short_interval_dyadic_abel_envelope`,
-  & `dyadic_abel_short_interval_certs`
+  `dyadic_abel_short_interval_certs`,
+  `hightrunc_dyadic_abel_weave_rung32000_cert`,
+  `qsd_algebra_provenance_certified`,
+  `qsd1_logderiv_rung32000_cert`, & `gaussian_qsd_hensel_tower_bridge`
 - `EulerFactorNonVanishing.fermat_tower_euler_product_strip_certs` &
   `fermat_tower_dedekind_euler_strip_certs`
 - `ArtinFermatBridge.artin_split_euler_factor_collapse`,
@@ -240,8 +269,11 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
 - `FiniteFieldRH.genus2_L_at_1_qrat`,
   `WeilZetaBridge.weil_zeta_punctured_strip_regular_and_nonzero`,
   `GSp4FunctorialityBridge.genus2_f5_so5_ramanujan_tempered`,
-  `kim_sarnak_ramanujan_ladder_strict`, &
-  `selberg_laplacian_eigenvalue_ladder`
+  `kim_sarnak_ramanujan_ladder_strict`,
+  `selberg_laplacian_eigenvalue_ladder`,
+  `Genus2MultiPrimeWeil.genus2_multiprime_weil_certs`,
+  `Genus2WeilGSp4Weave.genus2_multiprime_weil_gsp4_weave_bridge`, &
+  `QuasiRiemann.Genus2HenselPreperiodicWeave.genus2_hensel_preperiodic_cert`
 - `EllipticModularityBridge.eichler_shimura_trace_eq_11a1`,
   `hasse_weil_ramanujan_11a1_certs`, &
   `hecke_multiplicativity_11a1_certs`
@@ -250,10 +282,10 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
 
 ## Architecture Guides & External Verification
 
-- **v1.4.0 Architecture Roadmap**: Dynamics, RNS CRT, multi-prime Weil &
-  hygiene: [v1.4.0 Roadmap](docs/ROADMAP_V1_4_0.md).
+- **v1.4.0 Architecture Roadmap**: Release summary, weaves & forward targets:
+  [v1.4.0 Roadmap](docs/ROADMAP_V1_4_0.md).
 - **Architecture and Provenance Guide**: Subsystem audit and master provenance
-  justification across all 63 modules:
+  justification across all 71 modules:
   [Architecture & Provenance](docs/ARCHITECTURE_AND_PROVENANCE.md).
 - **v1.3.0 Architecture Roadmap**: Closed-loop QRH, `UltraDeep72` split,
   Rankin-Selberg, & 5-prime Proth NTT (`#78`–`#81`):
@@ -299,22 +331,22 @@ leanasm/
 ├── docs/                    # Architecture guides and specifications
 ├── inbox/                   # Ingested research notes
 ├── lake-manifest.json       # Lake dependency manifest
-├── lakefile.toml            # Lake package configuration
+├── lakefile.toml            # Lake package configuration (v1.4.0)
 ├── lean-toolchain           # Active Lean toolchain (v4.35.0)
 ├── Makefile                 # build, build-incremental, run, test, sync
 ├── mk/                      # Modular makefile extensions (hydrate.mk)
 ├── Main.lean                # CLI entrypoint (Parts 1-11 + provenance)
 ├── scripts/                 # clip_groups.py, files2clip, inspect_history
 ├── src/
-│   ├── LeanAsm.lean         # Library root aggregating 61 submodules
-│   └── LeanAsm/             # 61 modules + Constants + Genus2 + PC + QR + Val
+│   ├── LeanAsm.lean         # Library root aggregating 60 submodules
+│   └── LeanAsm/             # 69 modules + Constants + Genus2 + PC + QR + Val
 │       ├── Constants/       # PiAndSqrt, PrimeTowers, CurveTables
 │       ├── Genus2/          # PolyF5, Cantor
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
 │       ├── ProvenanceSummary.lean
 │       └── QuasiRiemann/    # Rat, UD72/90/108, Zfr, ZD, Short, PQL, Abel, MVB
 │           └── Valuation/   # Ultrametric, Hensel, Eisenstein, Dynamics, RNS
-├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-53)
+├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-63)
 └── tools/                   # Build and logging utilities
 ```
 
