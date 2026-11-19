@@ -10,7 +10,9 @@ Cantor-Mumford certificates.
 
 All core proofs in `LeanAsm.leanasm_full_provenance_certified` audit strictly
 to `[propext, Quot.sound]` (or zero axioms), with **zero** `Classical.choice`
-and **zero** `sorryAx` across the full transitive dependency cone.
+and **zero** `sorryAx` across the full transitive dependency cone. For a full
+subsystem audit and mathematical provenance mapping across all 63 modules, see
+the [Architecture and Provenance Guide](docs/ARCHITECTURE_AND_PROVENANCE.md).
 
 ## Prerequisites & Toolchain
 
@@ -41,7 +43,7 @@ make build-incremental
 # Full build & execute Parts 1-11 + unified provenance CLI demo
 make sync
 
-# Audit transitive axiom closures across Parts 1-52 (714 checks: 0 choice, 0 sorryAx)
+# Audit transitive axiom closures across Parts (0 choice, 0 sorryAx)
 lake env lean tests/TestAxioms.lean
 
 # Check submodule hydration status
@@ -152,8 +154,8 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `Val/Ultrametric.lean` | `Val` | `qrat_padic_valuation_nonarchimedean` |
 | `Val/Contraction.lean` | `Val` | `strict_contraction_fixed_point_unique` |
 | `Val/Hensel.lean` | `Val` | `hensel_step_unique_root_lifting` |
-| `Val/Eisenstein2Adic.lean` | `Val` | `legendre_v2_factorial`, `proposition_4` |
-| `Val/EisensteinWeights.lean` | `Val` | `romikCoeff_symm`, `prop4_computed_m4` |
+| `Val/Eisenstein2Adic.lean` | `Val` | `legendre_v2_factorial`, `prop_4` |
+| `Val/EisensteinWeights.lean` | `Val` | `romikCoeff_symm`, `prop4_m4` |
 | `Val/PreperiodicDynamics.lean` | `Val` | `preperiodic_partition_sound` |
 | `Val/RNS.lean` | `Val` | `RnsInt.reconstruct_sound` |
 | `RnsArithmetic.lean` | `=` | `garner_mul_concrete_soundness` |
@@ -292,7 +294,7 @@ leanasm/
 │       ├── ProvenanceSummary.lean
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
 │       └── QuasiRiemann/    # Rat, UD72/90/108, Zfr, ZD, Short, PQL, Abel, MVB
-│           └── Valuation/   # Ultrametric, Contraction, Hensel, Eisenstein, Dynamics, RNS
+│           └── Valuation/   # Ultrametric, Hensel, Eisenstein, Dynamics, RNS
 ├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-52)
 └── tools/                   # Build and logging utilities
 ```
