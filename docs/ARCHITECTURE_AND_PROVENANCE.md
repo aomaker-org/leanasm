@@ -90,9 +90,9 @@ Self-contained mathematical constants and certified precomputations:
 - `LeanAsm/Constants/PrimeTowers.lean`: Certified Fermat primes
   $F_0 = 3, F_1 = 5, F_2 = 17, F_3 = 257, F_4 = 65537$, primitive roots, and
   Proth prime tower data.
-- `LeanAsm/Constants/CurveTables.lean`: Points and multiplication tables for
-  genus-2 curves and elliptic curves over finite fields $\mathbb{F}_5$ and
-  $\mathbb{F}_7$.
+- `LeanAsm/Constants/CurveTables.lean`: Certified curve coefficients
+  `curveF5Coeffs` and raw orbit table `rawOrbitTable` (the 71-element Jacobian
+  orbit table for genus-2 $C/\mathbb{F}_5$, extracted in PR #95).
 
 ### Layer 3: Modular, NTT & Multi-Prime CRT Engines
 High-precision multi-prime arithmetic and convolution algorithms:
@@ -130,10 +130,12 @@ Verified hardware/interpreter formalization:
 Non-archimedean analysis and arithmetic dynamical systems:
 - `LeanAsm/QuasiRiemann/Valuation/Ultrametric.lean`: $p$-adic valuations $v_p$,
   ultrametric triangle inequalities, and non-archimedean absolute values.
-- `LeanAsm/QuasiRiemann/Valuation/Contraction.lean`: Strict contraction mappings
-  on complete ultrametric spaces and fixed-point uniqueness.
-- `LeanAsm/QuasiRiemann/Valuation/Hensel.lean`: Hensel's lemma formalization for
-  polynomial root lifting over $\mathbb{Z}_p$.
+- `LeanAsm/QuasiRiemann/Valuation/Contraction.lean`: Finite-depth step
+  contraction, valuation growth bounds (`iterate_val_growth`), and telescoping
+  Cauchy displacement ranges (`iterate_val_range`).
+- `LeanAsm/QuasiRiemann/Valuation/Hensel.lean`: Newton-Schulz quadratic residual
+  lifting (`hensel_newton_schulz_quadratic_residual`), polynomial simple root
+  lifting (`hensel_poly_simple_root_lift`), and Cauchy range bounds.
 - `LeanAsm/QuasiRiemann/Valuation/Eisenstein2Adic.lean`: 2-adic valuations of
   Eisenstein series coefficients and modular forms.
 - `LeanAsm/QuasiRiemann/Valuation/EisensteinWeights.lean`: Weight-filtration
@@ -188,10 +190,11 @@ Cross-domain applications connecting the kernel to broader mathematics:
 - `LeanAsm/YangMillsToy.lean`: $4\text{D}$ $\mathbb{Z}_2$ lattice gauge theory,
   Wilson plaquettes, and local gauge invariance.
 - `LeanAsm/YangMillsQ8.lean`: Non-abelian $Q_8 \subset \mathrm{SU}(2)$
-  quaternion lattice gauge action, plaquette trace cyclicity, and box/slab
-  foliation.
-- `LeanAsm/ConstructiveOpenaiBridge.lean`: $\mathrm{SignedSym4}$ face-holonomy
-  trace identities and discrete geometric gauge bridges.
+  quaternion gauge group multiplication table, trace cyclicity, and trace
+  conjugation invariance (`q8_trace_conjugation_invariant`).
+- `LeanAsm/ConstructiveOpenaiBridge.lean`: 4D integer lattice walks, box-layer
+  slab foliation (`slab_sum_foliation`), and $\mathrm{SignedSym4}$
+  face-holonomy trace invariance.
 - `LeanAsm/FiniteFieldRH.lean`: Hasse-Weil bound and Riemann Hypothesis for
   elliptic curves over $\mathbb{F}_7$.
 - `LeanAsm/Genus2/PolyF5.lean` & `Cantor.lean`: Explicit polynomial arithmetic
@@ -336,7 +339,8 @@ their architectural layer and hook in `LeanAsmFullProvenance`:
 58. `LeanAsm.EllipticModularityBridge` [Layer 7: Bridges]
     Hook: `FiniteFieldWeilProvenance` ($E_{11a1}$ Eichler-Shimura trace).
 59. `LeanAsm.LanglandsRankinSelbergBridge` [Layer 7: Bridges]
-    Hook: `LanglandsRankinSelbergProvenance` (Rankin-Selberg convolution).
+    Hook: `LanglandsRankinSelbergProvenance` (Rankin-Selberg convolution,
+    nested inside `FiniteFieldWeilProvenance`).
 60. `LeanAsm.ProthNttTowerBridge` [Layer 3: NTT/CRT]
     Hook: `ProthNttTowerProvenance` (Proth-Fermat NTT butterfly towers).
 61. `LeanAsm.ProvenanceSummary` [Orchestration]
