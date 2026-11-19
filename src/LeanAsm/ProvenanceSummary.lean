@@ -49,6 +49,7 @@ import LeanAsm.ProthNttTowerBridge
 import LeanAsm.Genus2MultiPrimeWeil
 import LeanAsm.Genus2WeilGSp4Weave
 import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
+import LeanAsm.QuasiRiemann.RankinSelbergGSp4Sub78Bridge
 import LeanAsm.MiniVMRnsHenselWeave
 
 namespace LeanAsm
@@ -1989,7 +1990,45 @@ def FiniteFieldWeilProvenance : Prop :=
    (∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList,
       Genus2MultiPrimeWeil.standardEulerPoly p 1 = 0)) ∧
   QuasiRiemann.Genus2HenselPreperiodicWeave.Genus2HenselPreperiodicWeaveBridge ∧
-  LanglandsRankinSelbergProvenance
+  LanglandsRankinSelbergProvenance ∧
+  (let spec := QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankinSelbergGSp4Rung32000Spec
+   ((∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList, Genus2WeilGSp4Weave.Genus2WeilGSp4PrimeWeaveCert p) ∧
+    (∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList, ∀ n d : Int,
+      Genus2WeilGSp4Weave.spinLPolyHomog p d ((p : Int) * n) =
+        (p : Int) ^ 2 * Genus2WeilGSp4Weave.spinLPolyHomog p n d) ∧
+    (∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList, ∀ T : Int,
+      Genus2MultiPrimeWeil.standardEulerPoly p T =
+        (1 - T) * GSp4FunctorialityBridge.gsp4StdQuarticCofactor (p : Int)
+          (Genus2MultiPrimeWeil.frobeniusTrace p) (Genus2MultiPrimeWeil.degree2Trace p) T) ∧
+    (∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList, ∀ n d : Int,
+      Genus2WeilGSp4Weave.standardEulerHomogP p d n =
+        -Genus2WeilGSp4Weave.standardEulerHomogP p n d) ∧
+    (∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList, Genus2MultiPrimeWeil.standardEulerPoly p 1 = 0)) ∧
+   ((∀ p ∈ EllipticModularityBridge.goodPrimes97, ∀ u v : Int, 0 < v →
+      0 < LanglandsRankinSelbergBridge.rsClearedEuler p (EllipticModularityBridge.heckeCoeff11 p) u v) ∧
+    (∀ p ∈ EllipticModularityBridge.goodPrimes97, ∀ u v : Int, 0 ≤ u → 0 < v - (p : Int) * u →
+      0 < LanglandsRankinSelbergBridge.sym2ClearedEuler p (EllipticModularityBridge.heckeCoeff11 p) u v) ∧
+    (∀ al1 al2 lam T : Int,
+      GSp4FunctorialityBridge.gsp4SpinEulerPoly lam (al1 + al2) (al1 * al2 + 2 * lam) T =
+        (1 - al1 * T + lam * T ^ 2) * (1 - al2 * T + lam * T ^ 2))) ∧
+   ((2 * spec.stripBridgeSpec.jetSpec.qSpec.lipNumerator * spec.stripBridgeSpec.jetSpec.qSpec.radius ≤
+     spec.stripBridgeSpec.jetSpec.qSpec.centerLower *
+       (spec.stripBridgeSpec.jetSpec.qSpec.radius - spec.stripBridgeSpec.jetSpec.qSpec.deltaShrink) ∧
+     spec.stripBridgeSpec.jetSpec.qSpec.lipNumerator * spec.stripBridgeSpec.jetSpec.qSpec.radius <
+     spec.stripBridgeSpec.jetSpec.qSpec.centerLower *
+       (spec.stripBridgeSpec.jetSpec.qSpec.radius - spec.stripBridgeSpec.jetSpec.qSpec.deltaShrink)) ∧
+    (QuasiRiemann.mollifierThetaDen spec.stripBridgeSpec.vDen2 ≤
+       2 * QuasiRiemann.mollifierThetaNum spec.stripBridgeSpec.vNum2 spec.stripBridgeSpec.vDen2 ∧
+     QuasiRiemann.mollifierThetaNum spec.stripBridgeSpec.vNum2 spec.stripBridgeSpec.vDen2 *
+         QuasiRiemann.mollifierThetaDen spec.stripBridgeSpec.vDen1 <
+       QuasiRiemann.mollifierThetaNum spec.stripBridgeSpec.vNum1 spec.stripBridgeSpec.vDen1 *
+         QuasiRiemann.mollifierThetaDen spec.stripBridgeSpec.vDen2 ∧
+     8 * QuasiRiemann.mollifierThetaNum spec.stripBridgeSpec.vNum1 spec.stripBridgeSpec.vDen1 ≤
+       7 * QuasiRiemann.mollifierThetaDen spec.stripBridgeSpec.vDen1) ∧
+    (0 < spec.stripBridgeSpec.weaveSpec.margin ∧
+     spec.stripBridgeSpec.weaveSpec.strip.rectSpec.HasCertifiedNonVanishing) ∧
+    (QuasiRiemann.QRat.mk' 1 2 < spec.stripBridgeSpec.weaveSpec.strip.sigmaLo ∧
+     spec.stripBridgeSpec.weaveSpec.strip.sigmaLo < QuasiRiemann.qrhThresholdSevenEighths)))
 
 /-- Zero-axiom certificate for Hasse-Weil RH, genus-2 Jacobian, completed zeta,
 `GSp(4) -> SO(5)` functoriality + Selberg / Kim-Sarnak ladder,
@@ -2017,7 +2056,9 @@ theorem finiteFieldWeil_provenance_certified : FiniteFieldWeilProvenance :=
    Genus2MultiPrimeWeil.genus2_multiprime_weil_certs,
    Genus2WeilGSp4Weave.genus2_multiprime_weil_gsp4_weave_bridge,
    QuasiRiemann.Genus2HenselPreperiodicWeave.genus2_hensel_preperiodic_weave_bridge,
-   langlandsRankinSelberg_provenance_certified⟩
+   langlandsRankinSelberg_provenance_certified,
+   QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankin_selberg_gsp4_sub78_bridge
+     QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankinSelbergGSp4Rung32000Spec⟩
 
 -- =============================================================================
 -- Parts 9-10: Universal NTT, 192-Digit Karatsuba CRT-NTT, & 4-Prime Garner
