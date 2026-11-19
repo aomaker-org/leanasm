@@ -33,6 +33,7 @@ import LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic
 import LeanAsm.QuasiRiemann.Valuation.EisensteinWeights
 import LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics
 import LeanAsm.QuasiRiemann.Valuation.RNS
+import LeanAsm.QuasiRiemann.QsdAlgebraBridge
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.Constants.CurveTables

@@ -24,6 +24,7 @@ import LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic
 import LeanAsm.QuasiRiemann.Valuation.EisensteinWeights
 import LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics
 import LeanAsm.QuasiRiemann.Valuation.RNS
+import LeanAsm.QuasiRiemann.QsdAlgebraBridge
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.Genus2Jacobian
@@ -1489,8 +1490,10 @@ theorem prothNttTower_provenance_certified : ProthNttTowerProvenance :=
    ProthNttTowerBridge.proth_tower_euler_strip_certs⟩
 
 /-- Part 52 provenance specification bundling 2-adic Eisenstein valuation,
-Romik symmetry, RNS rational contraction, and unicritical preperiodic polynomial dynamics bounds. -/
+Romik symmetry, RNS rational contraction, unicritical preperiodic polynomial dynamics bounds,
+and constructive QSD[1-4] algebra bridges. -/
 def ValuationDynamicsProvenance : Prop :=
+  QuasiRiemann.QsdAlgebraProvenanceProp ∧
   (∀ m : Nat, QuasiRiemann.Valuation.Eisenstein2Adic.v2 (QuasiRiemann.Valuation.Eisenstein2Adic.fact m) +
     QuasiRiemann.Valuation.Eisenstein2Adic.hammingWeight m = m) ∧
   (∀ m : Nat, QuasiRiemann.Valuation.Eisenstein2Adic.isUnitMod2 m (2 ^ m) = true ∧
@@ -1601,7 +1604,8 @@ def ValuationDynamicsProvenance : Prop :=
 
 /-- Zero-axiom certificate for Part 52 2-adic valuation and preperiodic dynamics bounds. -/
 theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
-  ⟨QuasiRiemann.Valuation.Eisenstein2Adic.legendre_v2_factorial,
+  ⟨QuasiRiemann.qsd_algebra_provenance_certified,
+   QuasiRiemann.Valuation.Eisenstein2Adic.legendre_v2_factorial,
    QuasiRiemann.Valuation.Eisenstein2Adic.proposition_4_unique,
    QuasiRiemann.Valuation.EisensteinWeights.romikCoeff_symm,
    QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m4.1,
