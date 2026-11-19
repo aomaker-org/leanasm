@@ -957,4 +957,12 @@ import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 #print axioms LeanAsm.MiniVMRnsHenselWeave.minivm_rns_hensel_weave_cert_hold
 #print axioms LeanAsm.MiniVMRnsHenselWeave.minivm_ntt_rns_hensel_weave_bridge
 
+-- =============================================================================
+-- Part 61: QSD[1] logDeriv Bounds & Sub-7/8 Strip Certificates Bridge
+-- =============================================================================
+
+#print axioms QuasiRiemann.qsd1_logderiv_sub78_strip_bridge
+#print axioms QuasiRiemann.qsd1LogDerivRung32000Spec
+#print axioms QuasiRiemann.qsd1_logderiv_rung32000_cert
+
 -- end of file: leanasm/tests/TestAxioms.lean

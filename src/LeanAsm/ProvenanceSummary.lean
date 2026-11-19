@@ -26,6 +26,7 @@ import LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics
 import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 import LeanAsm.QuasiRiemann.Valuation.RNS
 import LeanAsm.QuasiRiemann.QsdAlgebraBridge
+import LeanAsm.QuasiRiemann.Qsd1LogDerivStripBridge
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.Genus2Jacobian
@@ -753,7 +754,52 @@ def HighTruncRationalContractionProp : Prop :=
       (QuasiRiemann.zdHuxley.exponent (QuasiRiemann.QRat.mk' 1 2) -
         QuasiRiemann.zdHuxley.exponent QuasiRiemann.certifiedStrip050003125_N2048.sigmaLo)
       (QuasiRiemann.QRat.mk' 3 40000) ∧
-    QuasiRiemann.certifiedStrip050003125_N2048.rectSpec.HasCertifiedNonVanishing)
+    QuasiRiemann.certifiedStrip050003125_N2048.rectSpec.HasCertifiedNonVanishing) ∧
+  ((2 * QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.lipNumerator *
+      QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.radius ≤
+    QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.centerLower *
+      (QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.radius -
+        QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.deltaShrink) ∧
+   QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.lipNumerator *
+      QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.radius <
+    QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.centerLower *
+      (QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.radius -
+        QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.deltaShrink)) ∧
+  (QuasiRiemann.mollifierThetaDen QuasiRiemann.qsd1LogDerivRung32000Spec.vDen2 ≤
+      2 * QuasiRiemann.mollifierThetaNum QuasiRiemann.qsd1LogDerivRung32000Spec.vNum2
+        QuasiRiemann.qsd1LogDerivRung32000Spec.vDen2 ∧
+   QuasiRiemann.mollifierThetaNum QuasiRiemann.qsd1LogDerivRung32000Spec.vNum2
+       QuasiRiemann.qsd1LogDerivRung32000Spec.vDen2 *
+       QuasiRiemann.mollifierThetaDen QuasiRiemann.qsd1LogDerivRung32000Spec.vDen1 <
+     QuasiRiemann.mollifierThetaNum QuasiRiemann.qsd1LogDerivRung32000Spec.vNum1
+       QuasiRiemann.qsd1LogDerivRung32000Spec.vDen1 *
+       QuasiRiemann.mollifierThetaDen QuasiRiemann.qsd1LogDerivRung32000Spec.vDen2 ∧
+   8 * QuasiRiemann.mollifierThetaNum QuasiRiemann.qsd1LogDerivRung32000Spec.vNum1
+       QuasiRiemann.qsd1LogDerivRung32000Spec.vDen1 ≤
+     7 * QuasiRiemann.mollifierThetaDen QuasiRiemann.qsd1LogDerivRung32000Spec.vDen1) ∧
+  (QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.margin = 2682997 ∧
+   (4 * QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.gate.scaleN) *
+       (QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.gate.tailBound *
+         QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.gate.tailBound) ≤
+     ((2 * QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.gate.denomM) *
+       (2 * QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.gate.denomM)) *
+       (QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.gate.tailNum *
+         QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.gate.tailNum) ∧
+   QuasiRiemann.QRat.mk' 1 2 < QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.strip.sigmaLo ∧
+   QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.strip.sigmaLo <
+     QuasiRiemann.highTruncDyadicAbel2048Spec.strip.sigmaLo ∧
+   QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.strip.sigmaLo < QuasiRiemann.QRat.mk' 3 4 ∧
+   QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.strip.sigmaLo <
+     QuasiRiemann.qrhThresholdSevenEighths ∧
+   QuasiRiemann.zdGuthMaynard.exponent
+       QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.strip.sigmaLo <
+     QuasiRiemann.zdGuthMaynard.exponent (QuasiRiemann.QRat.mk' 1 2) ∧
+   QuasiRiemann.zdHuxley.exponent
+       QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.strip.sigmaLo <
+     QuasiRiemann.zdHuxley.exponent (QuasiRiemann.QRat.mk' 1 2) ∧
+   QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.strip.rectSpec.HasCertifiedNonVanishing ∧
+   (QuasiRiemann.highTruncTiles_1e30_N2048.length = 4 ∧
+     (∀ t ∈ QuasiRiemann.highTruncTiles_1e30_N2048, QuasiRiemann.IsValidLipTile2D t))))
 
 /-- Constructive `[M, M * 2^k)` dyadic-shell foliation, discrete Abel
 summation-by-parts, monotone-weight error contraction, cleared-denominator `1/√N`
@@ -1164,7 +1210,8 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
     ⟨QuasiRiemann.ultradeep72_N2048_strip_zd_certs.1,
      QuasiRiemann.ultradeep72_N2048_strip_zd_certs.2.2.2.2.2.2.1,
      QuasiRiemann.ultradeep72_N2048_strip_zd_certs.2.2.2.2.2.2.2.1⟩,
-    QuasiRiemann.ultradeep72_N2048_strip_rung_32000_cert⟩,
+    QuasiRiemann.ultradeep72_N2048_strip_rung_32000_cert,
+    QuasiRiemann.qsd1_logderiv_rung32000_cert⟩,
    ⟨QuasiRiemann.dyadic_shell_sum_partition,
     fun r o _i _l hi M k f g => QuasiRiemann.dyadic_shell_sum_foliation r o hi M k f g,
     QuasiRiemann.discrete_abel_summation_by_parts,
