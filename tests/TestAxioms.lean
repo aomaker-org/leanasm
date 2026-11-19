@@ -873,4 +873,18 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_concrete_iter1
 #print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_concrete_iter0_ne_iter1
 
+-- =============================================================================
+-- Part 55: Multi-Prime Genus-2 Frobenius and Weil RH Certificates (p in 7..23)
+-- =============================================================================
+
+#print axioms LeanAsm.Genus2MultiPrimeWeil.cert_p7
+#print axioms LeanAsm.Genus2MultiPrimeWeil.cert_p11
+#print axioms LeanAsm.Genus2MultiPrimeWeil.cert_p13
+#print axioms LeanAsm.Genus2MultiPrimeWeil.cert_p17
+#print axioms LeanAsm.Genus2MultiPrimeWeil.cert_p19
+#print axioms LeanAsm.Genus2MultiPrimeWeil.cert_p23
+#print axioms LeanAsm.Genus2MultiPrimeWeil.genus2_multiprime_weil_certs
+#print axioms LeanAsm.Genus2MultiPrimeWeil.multiprime_gsp4_so5_factorization
+#print axioms LeanAsm.finiteFieldWeil_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean
