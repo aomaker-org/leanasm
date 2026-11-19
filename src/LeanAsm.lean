@@ -48,6 +48,8 @@ import LeanAsm.Genus2Jacobian
 import LeanAsm.EulerFactorNonVanishing
 import LeanAsm.WeilZetaBridge
 import LeanAsm.NttArithmetic
+import LeanAsm.CrtNtt.Core
+import LeanAsm.CrtNtt.CrtBridge
 import LeanAsm.CrtNtt
 import LeanAsm.CrtNttUniversal
 import LeanAsm.CollatzQrhBridge
