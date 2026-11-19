@@ -1,6 +1,12 @@
-Here is the complete draft code addition for **Theorem 5.1** (asymptotic density bounds for preperiodic sets) tailored for `src/LeanAsm/QuasiRiemann/Valuation/PreperiodicDynamics.lean`, along with its corresponding test certificate and axiom audit for `tests/TestPreperiodic.lean`.
+# Path: leanasm/inbox/archive/gemweb110.md
 
-### 1. Code Additions for `src/LeanAsm/QuasiRiemann/Valuation/PreperiodicDynamics.lean`
+Here is the complete draft code addition for **Theorem 5.1** (asymptotic density
+bounds for preperiodic sets) tailored for
+`src/LeanAsm/QuasiRiemann/Valuation/PreperiodicDynamics.lean`, along with its
+corresponding test certificate and axiom audit for `tests/TestPreperiodic.lean`.
+
+### 1. Code Additions for
+`src/LeanAsm/QuasiRiemann/Valuation/PreperiodicDynamics.lean`
 
 ```lean
 /-- Constructive asymptotic density bound helper for Andersen & Garton (arXiv:2405.00605v1) Theorem 5.1:
@@ -27,7 +33,8 @@ theorem theorem51_asymptotic_bound_sound :
 
 ### 2. Axiom Audit Addition for `tests/TestPreperiodic.lean`
 
-Add this line to your test harness to ensure strict constructive compliance (`[propext, Quot.sound]`, zero `sorry`, zero `Classical.choice`):
+Add this line to your test harness to ensure strict constructive compliance
+(`[propext, Quot.sound]`, zero `sorry`, zero `Classical.choice`):
 
 ```lean
 #print axioms theorem51_asymptotic_bound_sound
@@ -35,3 +42,5 @@ Add this line to your test harness to ensure strict constructive compliance (`[p
 ```
 
 ---
+
+<!-- end of file: leanasm/inbox/archive/gemweb110.md -->

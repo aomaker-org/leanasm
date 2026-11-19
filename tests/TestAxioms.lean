@@ -1003,4 +1003,18 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms LeanAsm.QuasiRiemann.JacobianRankinSelbergWeave.jacobianRankinSelbergRung32000Spec
 #print axioms LeanAsm.QuasiRiemann.JacobianRankinSelbergWeave.jacobian_split_rankin_selberg_cert
 
+-- =============================================================================
+-- Part 66: Lucky Sieve Mechanics and Rational Beurling Certificates (gemweb120)
+-- =============================================================================
+
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.dropEveryKth_sublist
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.luckySieveSteps_sublist
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyPrefixUpTo_sublist_oddSeed
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyPrefixUpTo_50_eq
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyPrefixUpTo_50_length
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyGeneratorsUpTo_50_eq
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyBeurlingCert_50
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.lucky_survival_product_50_pos
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.lucky_harmonic_50_pos
+
 -- end of file: leanasm/tests/TestAxioms.lean

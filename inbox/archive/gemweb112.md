@@ -1,14 +1,23 @@
-To integrate **Proposition 5.3** (average generalized partition bounds) from Andersen & Garton (arXiv:2405.00605v1) into our zero-Mathlib `leanasm` architecture (`PreperiodicDynamics.lean`), we can combine the structural guarantees of Theorem 3.2 ($W_{m,n}$ upper bounds) with the family averaging statistics from Section 5.
+# Path: leanasm/inbox/archive/gemweb112.md
 
-Here is the formalization and implementation plan for `PreperiodicDynamics.lean`:
+To integrate **Proposition 5.3** (average generalized partition bounds) from
+Andersen & Garton (arXiv:2405.00605v1) into our zero-Mathlib `leanasm`
+architecture (`PreperiodicDynamics.lean`), we can combine the structural
+guarantees of Theorem 3.2 ($W_{m,n}$ upper bounds) with the family averaging
+statistics from Section 5.
+
+Here is the formalization and implementation plan for
+`PreperiodicDynamics.lean`:
 
 ---
 
 ### Formalization Plan for Proposition 5.3
 
-#### 1. Constructive Average Generalized Upper Bound Helper (`proposition53AverageBound`)
+#### 1. Constructive Average Generalized Upper Bound Helper
+(`proposition53AverageBound`)
 
-Define a constructive rational helper function that computes the average generalized partition upper bound over quadratic polynomial families:
+Define a constructive rational helper function that computes the average
+generalized partition upper bound over quadratic polynomial families:
 
 ```lean
 /-- Constructive average generalized partition bound helper for Andersen & Garton (arXiv:2405.00605v1) Proposition 5.3:
@@ -28,7 +37,8 @@ def proposition53AverageBound (d m n : Nat) : QRat :=
 
 #### 2. Concrete Verification Certificate (`proposition53_average_bound_sound`)
 
-Add a certified test case ensuring that the average generalized partition bound is well-defined and constructively positive for $d = 2, m = 2, n = 134$:
+Add a certified test case ensuring that the average generalized partition bound
+is well-defined and constructively positive for $d = 2, m = 2, n = 134$:
 
 ```lean
 /-- Concrete verification certificate for Proposition 5.3 average generalized partition bounds 
@@ -43,6 +53,9 @@ theorem proposition53_average_bound_sound :
 
 #### 3. Axiom Audit Integration (`tests/TestPreperiodic.lean`)
 
-Add the `#print axioms` audit entry to lock in strict constructive compliance (`[propext, Quot.sound]`, zero `sorry`, zero `Classical.choice`).
+Add the `#print axioms` audit entry to lock in strict constructive compliance
+(`[propext, Quot.sound]`, zero `sorry`, zero `Classical.choice`).
 
 ---
+
+<!-- end of file: leanasm/inbox/archive/gemweb112.md -->
