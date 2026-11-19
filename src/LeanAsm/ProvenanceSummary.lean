@@ -1491,7 +1491,7 @@ theorem prothNttTower_provenance_certified : ProthNttTowerProvenance :=
 
 /-- Part 52 provenance specification bundling 2-adic Eisenstein valuation,
 Romik symmetry, RNS rational contraction, unicritical preperiodic polynomial dynamics bounds,
-and constructive QSD[1-4] algebra bridges. -/
+and constructive QSD[1-4] algebra bridges (including QSD[1] dual-jet logarithmic-derivative box contractions). -/
 def ValuationDynamicsProvenance : Prop :=
   QuasiRiemann.QsdAlgebraProvenanceProp ∧
   (∀ m : Nat, QuasiRiemann.Valuation.Eisenstein2Adic.v2 (QuasiRiemann.Valuation.Eisenstein2Adic.fact m) +

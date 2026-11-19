@@ -923,6 +923,11 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 
 #print axioms QuasiRiemann.slice_dual_leibniz
 #print axioms QuasiRiemann.split_idempotent_properties
+#print axioms QuasiRiemann.qsd1_slice_dual_inv_laws
+#print axioms QuasiRiemann.qsd1_log_deriv_mul_additive
+#print axioms QuasiRiemann.qsd1_log_deriv_to_rational_box_contraction
+#print axioms QuasiRiemann.qsd1_log_deriv_N1024_cert
+#print axioms QuasiRiemann.qsd1_log_deriv_N2048_cert
 #print axioms QuasiRiemann.qsd2_truncation_associativity_defect
 #print axioms QuasiRiemann.qsd3_anticommute_order_obstruction
 #print axioms QuasiRiemann.qsd4_rns_channel_crt_decomposition
