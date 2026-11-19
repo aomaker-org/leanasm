@@ -948,4 +948,13 @@ import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 #print axioms QuasiRiemann.Valuation.qsd4_hensel_tower_cert_p2
 #print axioms LeanAsm.valuation_dynamics_provenance_certified
 
+-- =============================================================================
+-- Part 60: MiniVM NTT Bridge + RnsInt CRT + QSD[4] Hensel Prime-Tower Weave
+-- =============================================================================
+
+#print axioms LeanAsm.MiniVMRnsHenselWeave.rns_tower_mersenne_channel_consistency
+#print axioms LeanAsm.MiniVMRnsHenselWeave.minivm_garner_hensel_weave_sound
+#print axioms LeanAsm.MiniVMRnsHenselWeave.minivm_rns_hensel_weave_cert_hold
+#print axioms LeanAsm.MiniVMRnsHenselWeave.minivm_ntt_rns_hensel_weave_bridge
+
 -- end of file: leanasm/tests/TestAxioms.lean
