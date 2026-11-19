@@ -100,6 +100,48 @@ theorem test_rnsQRat_contraction_preserves_pos_2048 :
     (rnsContractionLoop 2048 sampleRnsRat #[sampleRnsRat]).toQRat.num ≥ 0 :=
   rnsQRat_contraction_preserves_pos 2048 sampleRnsRat #[sampleRnsRat]
 
+
+theorem test_rnsQRat_add_bounded_step :
+    (RnsQRat.add sampleRnsRat sampleRnsRat).toQRat.num ≥ 0 :=
+  rnsQRat_add_bounded_step sampleRnsRat sampleRnsRat
+
+theorem test_rnsQRat_mul_bounded_step :
+    (RnsQRat.mul sampleRnsRat sampleRnsRat).toQRat.num ≥ 0 :=
+  rnsQRat_mul_bounded_step sampleRnsRat sampleRnsRat
+
+theorem test_rns_valuation_orbit_step_sound :
+    let poly := LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly (QRat.ofInt 1) 2
+    let x0 := QRat.mk' 1 2 (by decide)
+    ((rnsContractionStep sampleRnsRat #[sampleRnsRat]).toQRat.num ≥ 0) ∧
+    (mersenneA.reconstruct = 5512 ∧
+      (QuasiRiemann.Valuation.buildCrtSeed QuasiRiemann.Valuation.mersenneTower
+        (fun q => QuasiRiemann.Valuation.crtIdempotent QuasiRiemann.Valuation.mersenneTower q 1 0
+          (QuasiRiemann.Valuation.mersenneCofactorInv q))
+        QuasiRiemann.Valuation.mersenneFiveInv).num % 27559 = 5512 ∧
+      QuasiRiemann.Valuation.PrimeTowerHenselCert QuasiRiemann.Valuation.mersenneTower 1
+        (QuasiRiemann.Valuation.qOfInt 5)
+        (QuasiRiemann.Valuation.buildCrtSeed QuasiRiemann.Valuation.mersenneTower
+          (fun q => QuasiRiemann.Valuation.crtIdempotent QuasiRiemann.Valuation.mersenneTower q 1 0
+            (QuasiRiemann.Valuation.mersenneCofactorInv q))
+          QuasiRiemann.Valuation.mersenneFiveInv)) ∧
+    (∀ n : Nat, QuasiRiemann.Valuation.pAdicVal 2
+      (LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval poly n x0) =
+      some (Int.ofNat (2 ^ n) * (-1))) ∧
+    (∀ m n : Nat, m ≠ n →
+      LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval poly m x0 ≠
+      LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval poly n x0) := by
+  have hp : QuasiRiemann.Valuation.IsPrime 2 := by decide
+  have hd : 2 ≤ 2 := by decide
+  have hv0 : (-1 : Int) < 0 := by decide
+  have hx0 : QuasiRiemann.Valuation.pAdicVal 2 (QRat.mk' 1 2 (by decide)) = some (-1) := by
+    decide
+  have ha : QuasiRiemann.Valuation.valLe (some (Int.ofNat 2 * (-1) + 1))
+      (QuasiRiemann.Valuation.pAdicVal 2 (QRat.ofInt 1)) := by
+    decide
+  exact rns_valuation_orbit_step_sound 2 hp hd (QRat.ofInt 1) (QRat.mk' 1 2 (by decide))
+    hv0 hx0 ha sampleRnsRat #[sampleRnsRat]
+
+
 #print axioms sampleRnsA_reconstruct_eval
 #print axioms sampleRnsB_reconstruct_eval
 #print axioms sampleRnsRat_toQRat_eval
@@ -130,5 +172,14 @@ theorem test_rnsQRat_contraction_preserves_pos_2048 :
 #print axioms test_rnsInt_mersenne_mul_sound
 #print axioms test_rnsQRat_contraction_preserves_pos_1024
 #print axioms test_rnsQRat_contraction_preserves_pos_2048
+
+#print axioms rnsQRat_add_bounded_step
+#print axioms rnsQRat_mul_bounded_step
+#print axioms rnsContractionStep_bounded_step
+#print axioms rnsQRat_contraction_loop_bounded_step
+#print axioms rns_valuation_orbit_step_sound
+#print axioms test_rnsQRat_add_bounded_step
+#print axioms test_rnsQRat_mul_bounded_step
+#print axioms test_rns_valuation_orbit_step_sound
 
 -- end of file: leanasm/tests/TestRNS.lean
