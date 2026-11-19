@@ -41,6 +41,7 @@ import LeanAsm.ConstructiveOpenaiBridge
 import LeanAsm.EllipticModularityBridge
 import LeanAsm.LanglandsRankinSelbergBridge
 import LeanAsm.ProthNttTowerBridge
+import LeanAsm.Genus2MultiPrimeWeil
 
 namespace LeanAsm
 
@@ -1770,11 +1771,12 @@ def FiniteFieldWeilProvenance : Prop :=
    (∀ p ∈ EllipticModularityBridge.goodSqPrimes100,
       EllipticModularityBridge.heckeCoeff11 (p * p) =
         EllipticModularityBridge.heckeCoeff11 p ^ 2 - (p : Int))) ∧
+  (∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList, Genus2MultiPrimeWeil.Genus2WeilCert p) ∧
   LanglandsRankinSelbergProvenance
 
 /-- Zero-axiom certificate for Hasse-Weil RH, genus-2 Jacobian, completed zeta,
-`GSp(4) -> SO(5)` functoriality + Selberg / Kim-Sarnak ladder, and
-`E_{11a1}` / `f_{11}` GL(2) Eichler-Shimura modularity. -/
+`GSp(4) -> SO(5)` functoriality + Selberg / Kim-Sarnak ladder,
+`E_{11a1}` / `f_{11}` GL(2) Eichler-Shimura modularity, and multi-prime genus-2 Weil RH. -/
 theorem finiteFieldWeil_provenance_certified : FiniteFieldWeilProvenance :=
   ⟨FiniteFieldRH.hasse_weil_riemann_hypothesis,
    FiniteFieldRH.genus2_frob_negative_discriminants,
@@ -1794,6 +1796,7 @@ theorem finiteFieldWeil_provenance_certified : FiniteFieldWeilProvenance :=
    EllipticModularityBridge.eichler_shimura_trace_eq_11a1,
    EllipticModularityBridge.hasse_weil_ramanujan_11a1_certs,
    EllipticModularityBridge.hecke_multiplicativity_11a1_certs,
+   Genus2MultiPrimeWeil.genus2_multiprime_weil_certs,
    langlandsRankinSelberg_provenance_certified⟩
 
 -- =============================================================================

@@ -362,6 +362,8 @@ def main : IO Unit := do
   let so5At2 := GSp4FunctorialityBridge.gsp4StandardEulerPoly 5 (-5) 15 2
   IO.println ("  GSp(4) -> SO(5) Lift (C/F_5): 5 L_std(T) = 5(1 - T) Φ_10(T), " ++
     s!"5 L_std(2) = {so5At2} (T^10 = 1 unit-circle roots)")
+  IO.println ("  Multi-Prime Genus-2 Weil RH : C : y^2 = x^5 - x + 1 across p ∈ {7,11,13,17,19,23} " ++
+    "a_p^2 ≤ 16p, b_p^2 ≤ 36p^2 (ZERO axioms)")
   IO.println ("  Selberg / Kim-Sarnak Ladder : θ: 0 < 7/64 < 1/9 < 1/5 < 1/4 < 1/2 | " ++
     "λ_1: 3/16 < 21/100 < 77/324 < 975/4096 < 1/4 (ΔSym4-3 = 127/331776)")
   let c13 := EllipticModularityBridge.heckeCoeff11 13
