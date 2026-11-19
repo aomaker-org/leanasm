@@ -17,14 +17,24 @@ boundaries, and repository hygiene for all assistants operating within the
 - **Mandatory Toolchain Hygiene**: Use `lake` and `lean` via `elan` for all
   Lean package builds, verification, and executions. If Python scripts are
   used, execute via `uv` or standard virtual environments.
+- **Constructive Axiom & Zero-Mathlib Invariant**: Keep the package strictly
+  free of Mathlib dependencies; all proven theorems MUST reduce solely to
+  `[propext, Quot.sound]` (zero `Classical.choice`, zero `sorryAx`), verified
+  via `make axioms` (`lake env lean tests/TestAxioms.lean`).
 - **Preferred Build Strategy**: To prevent RAM thrashing and OOM terminations
-  on heavy modules (e.g., `Genus2Jacobian`, `PiChudnovsky`), assistants MUST
-  prefer sequential, heap-capped elaboration via `make build-seq` or
-  `python3 tools/incremental_build.py` (enforcing `-M 4096` / `LEAN_OPTS="-M4096"`
-  and checking rolling build telemetry regression against
-  `.lake/build-history.json`). Full unbounded concurrent builds (`lake build`)
-  risk exhausting system memory. Ongoing architecture work targets finer-grained
-  modularization so individual units remain fast and lightweight.
+  on heavy modules (e.g., `UltraDeep108N2048Part1/2`, `UltraDeep108N1024`,
+  `CrtNtt`), assistants MUST prefer sequential, heap-capped elaboration via
+  `make build-seq` or `python3 tools/incremental_build.py` (enforcing
+  `-M 4096` / `LEAN_OPTS="-M4096"` and checking rolling build telemetry
+  regression against `.lake/build-history.json` or via
+  `python3 scripts/inspect_build_history.py`). Full unbounded concurrent builds
+  (`lake build`) risk exhausting system memory. Ongoing architecture work
+  targets finer-grained modularization so individual units remain fast and
+  lightweight.
+- **Background Task & Timer Hygiene**: NEVER call `Schedule` or polling loops
+  to watch long-running `make` or `lake` background tasks; run builds
+  synchronously or end your turn and let the CLI harness auto-wake on task
+  completion.
 - **Safe Shell Usage**: Always use standard Linux bash.
 
 ### [Directive 02] LOGGING & DIAGNOSTIC OBSERVABILITY
@@ -36,7 +46,7 @@ boundaries, and repository hygiene for all assistants operating within the
 ### [Directive 04] FILE FORMATTING, LINE WRAPPING, & HEADER/FOOTER RULES
 - **Line Wrapping**:
   - Text and Markdown (`.md`): Maximum **80 columns**.
-  - Code files (`.lean`, `.py`, `.sh`): Target **80 columns**; max **120 chars**.
+  - Code files (`.lean`, `.py`, `.sh`): Target **80 cols**; max **120 chars**.
 - **File Headers & Footers**:
   - Every file MUST contain a clear header identifying the file path.
   - Every file MUST contain a footer comment specifying the relative file path.
@@ -45,7 +55,7 @@ boundaries, and repository hygiene for all assistants operating within the
 
 ### [Directive 07] GIT BRANCHING & WORKFLOW STANDARDS
 - **Branch-Per-Feature Mandate**: Work in dedicated feature branches
-  (`feature/*`, `fix/*`).
+  (`feature/*`, `refactor/*`, `fix/*`, `chore/*`).
 - **History Immutability**: Git history must NEVER be overwritten, squashed,
   or destroyed (`git reset --hard` and `git clean -fd` are prohibited).
 - **Additive Artifact Operations**: Generated traces and execution logs
