@@ -4,7 +4,7 @@
 
 import LeanAsm.Conjectures
 import LeanAsm.QuasiRiemann.QR.QrhCore
-import LeanAsm.QuasiRiemann.UltraDeep72
+import LeanAsm.QuasiRiemann.UltraDeep72Core
 import LeanAsm.PiChudnovsky.CrtMulBridge
 
 namespace CollatzQrhBridge

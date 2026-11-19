@@ -3,7 +3,6 @@
 -- Max Column: 120 Columns
 
 import LeanAsm.ArtinFermatBridge
-import LeanAsm.MiniVMNttBridge
 import LeanAsm.EulerFactorNonVanishing
 import LeanAsm.QuasiRiemann.ShortIntervalPrimes
 import LeanAsm.QuasiRiemann.ParametricQrhLadder
