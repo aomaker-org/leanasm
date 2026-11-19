@@ -26,6 +26,7 @@ import LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics
 import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 import LeanAsm.QuasiRiemann.Valuation.RNS
 import LeanAsm.QuasiRiemann.QsdAlgebraBridge
+import LeanAsm.QuasiRiemann.GaussianQsdBridge
 import LeanAsm.QuasiRiemann.Qsd1LogDerivStripBridge
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
@@ -1711,7 +1712,37 @@ def ValuationDynamicsProvenance : Prop :=
    LeanAsm.MiniVMRnsHenselWeave.rnsTowerMersenneQRat.toQRat.num = 14332 ∧
    LeanAsm.MiniVMRnsHenselWeave.rnsTowerMersenneQRat.toQRat.den = 1 ∧
    LeanAsm.MiniVMRnsHenselWeave.rnsTowerMersenneQRat.toQRat.num * 1 =
-     14332 * (LeanAsm.MiniVMRnsHenselWeave.rnsTowerMersenneQRat.toQRat.den : Int))
+     14332 * (LeanAsm.MiniVMRnsHenselWeave.rnsTowerMersenneQRat.toQRat.den : Int)) ∧
+  ((∀ (x y : QuasiRiemann.GaussianQsdInt),
+      QuasiRiemann.GaussianQsdInt.norm (QuasiRiemann.GaussianQsdInt.mulGaussian x y) =
+        QuasiRiemann.GaussianQsdInt.norm x * QuasiRiemann.GaussianQsdInt.norm y) ∧
+   (let z1 := QuasiRiemann.GaussianQsdInt.ofGaussian 2 1
+    let z2 := QuasiRiemann.GaussianQsdInt.ofGaussian 1 3
+    QuasiRiemann.GaussianQsdInt.norm z1 = 5 ∧
+    QuasiRiemann.GaussianQsdInt.norm z2 = 10 ∧
+    QuasiRiemann.GaussianQsdInt.norm (QuasiRiemann.GaussianQsdInt.mulGaussian z1 z2) = 50) ∧
+   ((QuasiRiemann.gaussian_b_basis.mulTrunc QuasiRiemann.gaussian_b_basis).mulTrunc
+        QuasiRiemann.gaussian_b_basis ≠
+      QuasiRiemann.gaussian_b_basis.mulTrunc
+        (QuasiRiemann.gaussian_b_basis.mulTrunc QuasiRiemann.gaussian_b_basis) ∧
+    ((QuasiRiemann.gaussian_b_basis.mulTrunc QuasiRiemann.gaussian_b_basis).mulTrunc
+        QuasiRiemann.gaussian_b_basis).f = 1) ∧
+   (∀ (p k x t : Nat) (_hp : 2 ≤ p) (_hk : 1 ≤ k),
+     let pk := p ^ k
+     let x_lift := x + t * pk
+     (x_lift % pk = x % pk) ∧
+     ((t * pk) * (t * pk)) % (pk * pk) = 0) ∧
+   (∀ (p : Nat) (hp : 2 ≤ p) (k : Nat) (_hk : 1 ≤ k),
+     let m := p ^ k
+     let m2 := m * m
+     have hm_pos : 0 < m := QuasiRiemann.Valuation.pow_pos_of_ge_two hp k
+     have hm2_pos : 0 < m2 := Nat.mul_pos hm_pos hm_pos
+     let tan_elem := QuasiRiemann.QsdModRing.ofNat m2 hm2_pos m
+     (QuasiRiemann.QsdModRing.mul hm2_pos tan_elem tan_elem).val = 0 ∧
+     (p ^ (2 * k)) ∣ (tan_elem.val * tan_elem.val)) ∧
+   ((LeanAsm.QuasiRiemann.RNS.mersenneA.reconstruct % 7 = 3) ∧
+    (LeanAsm.QuasiRiemann.RNS.mersenneA.reconstruct % 31 = 25) ∧
+    (LeanAsm.QuasiRiemann.RNS.mersenneA.reconstruct % 127 = 51)))
 
 /-- Zero-axiom certificate for Part 52 2-adic valuation and preperiodic dynamics bounds. -/
 theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
@@ -1741,7 +1772,8 @@ theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
    fun p hp k hk =>
      QuasiRiemann.Valuation.qsd4_prime_tower_nilpotent_remainder_bound p hp k hk,
    ⟨⟨rfl, rfl, rfl⟩, QuasiRiemann.Valuation.qsd4_hensel_tower_cert_p2⟩,
-   LeanAsm.MiniVMRnsHenselWeave.minivm_ntt_rns_hensel_weave_bridge⟩
+   LeanAsm.MiniVMRnsHenselWeave.minivm_ntt_rns_hensel_weave_bridge,
+   QuasiRiemann.gaussian_qsd_hensel_tower_bridge⟩
 
 /-- Part 7 provenance specification bundling Hasse-Weil RH for `E / F_7`,
 genus-2 `C / F_5` negative discriminants, `L(C, 1) = 71/25`, Cantor-Mumford group axioms
