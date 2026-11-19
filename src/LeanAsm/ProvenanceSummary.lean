@@ -46,6 +46,7 @@ import LeanAsm.LanglandsRankinSelbergBridge
 import LeanAsm.ProthNttTowerBridge
 import LeanAsm.Genus2MultiPrimeWeil
 import LeanAsm.Genus2WeilGSp4Weave
+import LeanAsm.MiniVMRnsHenselWeave
 
 namespace LeanAsm
 
@@ -1656,7 +1657,14 @@ def ValuationDynamicsProvenance : Prop :=
    ((1 * 1) % 2 = 1 % 2 ∧
     (1 * 1) % (2 ^ 2) = 1 % (2 ^ 2) ∧
     (1 * 1) % (2 ^ 3) = 1 % (2 ^ 3) ∧
-    QuasiRiemann.Valuation.pAdicVal 2 (QuasiRiemann.QRat.ofInt (1 * 1 - 1)) = none))
+    QuasiRiemann.Valuation.pAdicVal 2 (QuasiRiemann.QRat.ofInt (1 * 1 - 1)) = none)) ∧
+  (LeanAsm.MiniVMRnsHenselWeave.MiniVMRnsHenselWeaveCert ∧
+   LeanAsm.MiniVMRnsHenselWeave.rnsTowerMersenneQRat.num.reconstruct = 14332 ∧
+   LeanAsm.MiniVMRnsHenselWeave.rnsTowerMersenneQRat.den.reconstruct = 1 ∧
+   LeanAsm.MiniVMRnsHenselWeave.rnsTowerMersenneQRat.toQRat.num = 14332 ∧
+   LeanAsm.MiniVMRnsHenselWeave.rnsTowerMersenneQRat.toQRat.den = 1 ∧
+   LeanAsm.MiniVMRnsHenselWeave.rnsTowerMersenneQRat.toQRat.num * 1 =
+     14332 * (LeanAsm.MiniVMRnsHenselWeave.rnsTowerMersenneQRat.toQRat.den : Int))
 
 /-- Zero-axiom certificate for Part 52 2-adic valuation and preperiodic dynamics bounds. -/
 theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
@@ -1685,7 +1693,8 @@ theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
      QuasiRiemann.Valuation.qsd4_hensel_tangent_lift_step p k x t hp hk,
    fun p hp k hk =>
      QuasiRiemann.Valuation.qsd4_prime_tower_nilpotent_remainder_bound p hp k hk,
-   ⟨⟨rfl, rfl, rfl⟩, QuasiRiemann.Valuation.qsd4_hensel_tower_cert_p2⟩⟩
+   ⟨⟨rfl, rfl, rfl⟩, QuasiRiemann.Valuation.qsd4_hensel_tower_cert_p2⟩,
+   LeanAsm.MiniVMRnsHenselWeave.minivm_ntt_rns_hensel_weave_bridge⟩
 
 /-- Part 7 provenance specification bundling Hasse-Weil RH for `E / F_7`,
 genus-2 `C / F_5` negative discriminants, `L(C, 1) = 71/25`, Cantor-Mumford group axioms
