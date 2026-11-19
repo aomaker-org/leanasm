@@ -1486,6 +1486,26 @@ def ValuationDynamicsProvenance : Prop :=
     have result := QuasiRiemann.RNS.rnsContractionLoop 1024 initial #[initial]
     have final_qrat := result.toQRat
     final_qrat.num ≥ 0) ∧
+  ((LeanAsm.QuasiRiemann.RNS.mersenneA.add LeanAsm.QuasiRiemann.RNS.mersenneB).reconstruct =
+    (LeanAsm.QuasiRiemann.RNS.mersenneA.reconstruct +
+      LeanAsm.QuasiRiemann.RNS.mersenneB.reconstruct) % 27559) ∧
+  ((LeanAsm.QuasiRiemann.RNS.mersenneA.mul LeanAsm.QuasiRiemann.RNS.mersenneB).reconstruct =
+    (LeanAsm.QuasiRiemann.RNS.mersenneA.reconstruct *
+      LeanAsm.QuasiRiemann.RNS.mersenneB.reconstruct) % 27559) ∧
+  (∀ (n : Nat) (val : LeanAsm.QuasiRiemann.RNS.RnsQRat 3)
+    (coeffs : Array (LeanAsm.QuasiRiemann.RNS.RnsQRat 3)),
+    (LeanAsm.QuasiRiemann.RNS.rnsContractionLoop n val coeffs).toQRat.num ≥ 0) ∧
+  (LeanAsm.QuasiRiemann.RNS.mersenneA.reconstruct = 5512 ∧
+    (QuasiRiemann.Valuation.buildCrtSeed QuasiRiemann.Valuation.mersenneTower
+      (fun p => QuasiRiemann.Valuation.crtIdempotent QuasiRiemann.Valuation.mersenneTower p 1 0
+        (QuasiRiemann.Valuation.mersenneCofactorInv p))
+      QuasiRiemann.Valuation.mersenneFiveInv).num % 27559 = 5512 ∧
+    QuasiRiemann.Valuation.PrimeTowerHenselCert QuasiRiemann.Valuation.mersenneTower 1
+      (QuasiRiemann.Valuation.qOfInt 5)
+      (QuasiRiemann.Valuation.buildCrtSeed QuasiRiemann.Valuation.mersenneTower
+        (fun p => QuasiRiemann.Valuation.crtIdempotent QuasiRiemann.Valuation.mersenneTower p 1 0
+          (QuasiRiemann.Valuation.mersenneCofactorInv p))
+        QuasiRiemann.Valuation.mersenneFiveInv)) ∧
   ((QuasiRiemann.Valuation.PreperiodicDynamics.w0_formula 5 2 (by decide) (by decide)).reduce =
     QuasiRiemann.QRat.mk' 2 5 (by decide)) ∧
   (QuasiRiemann.Valuation.PreperiodicDynamics.qratV2
@@ -1539,6 +1559,10 @@ theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
    QuasiRiemann.Valuation.EisensteinWeights.romikCoeff_symm,
    QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m4.1,
    QuasiRiemann.RNS.rns_contraction_sound,
+   LeanAsm.QuasiRiemann.RNS.rnsInt_reconstruct_add_sound,
+   LeanAsm.QuasiRiemann.RNS.rnsInt_reconstruct_mul_sound,
+   fun n val coeffs => LeanAsm.QuasiRiemann.RNS.rnsQRat_contraction_preserves_pos n val coeffs,
+   LeanAsm.QuasiRiemann.RNS.rnsInt_reconstruct_mersenne_crt_seed_cert,
    QuasiRiemann.Valuation.PreperiodicDynamics.andersen_garton_prop22_q5_d2_reduced,
    QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_iterate_valuation_growth.2.2,
    QuasiRiemann.Valuation.PreperiodicDynamics.theorem51_asymptotic_bound_sound,

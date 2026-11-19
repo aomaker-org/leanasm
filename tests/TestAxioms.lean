@@ -815,7 +815,20 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.reconstruct
 #print axioms LeanAsm.QuasiRiemann.RNS.RnsQRat.toQRat
 #print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.add
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.mul
 #print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.zero
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.one
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsQRat.add
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsQRat.mul
+#print axioms LeanAsm.QuasiRiemann.RNS.rnsContractionStep
+#print axioms LeanAsm.QuasiRiemann.RNS.rnsContractionLoop
+#print axioms LeanAsm.QuasiRiemann.RNS.rnsInt_reconstruct_mod_eq
+#print axioms LeanAsm.QuasiRiemann.RNS.rnsInt_reconstruct_add_sound
+#print axioms LeanAsm.QuasiRiemann.RNS.rnsInt_reconstruct_mul_sound
+#print axioms LeanAsm.QuasiRiemann.RNS.rnsQRat_add_eval_sound
+#print axioms LeanAsm.QuasiRiemann.RNS.rnsQRat_mul_eval_sound
+#print axioms LeanAsm.QuasiRiemann.RNS.rnsQRat_contraction_preserves_pos
+#print axioms LeanAsm.QuasiRiemann.RNS.rnsInt_reconstruct_mersenne_crt_seed_cert
 
 -- =============================================================================
 -- Part 53: Immutable Constants Autonomous Certificates (Issue #54)
