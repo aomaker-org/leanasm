@@ -892,4 +892,12 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms LeanAsm.Genus2MultiPrimeWeil.multiprime_gsp4_so5_factorization
 #print axioms LeanAsm.finiteFieldWeil_provenance_certified
 
+-- =============================================================================
+-- Part 56: High-Truncation Strip + Dyadic-Abel Weave
+-- =============================================================================
+
+#print axioms QuasiRiemann.hightrunc_dyadic_abel_weave_bridge
+#print axioms QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert
+#print axioms QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert
+
 -- end of file: leanasm/tests/TestAxioms.lean
