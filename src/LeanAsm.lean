@@ -10,6 +10,8 @@ import LeanAsm.Conjectures
 import LeanAsm.YangMillsToy
 import LeanAsm.YangMillsQ8
 import LeanAsm.QuasiRiemann
+import LeanAsm.QuasiRiemann.UltraDeep72Core.Bounds
+import LeanAsm.QuasiRiemann.UltraDeep72Core.Certificates
 import LeanAsm.QuasiRiemann.UltraDeep72Core
 import LeanAsm.QuasiRiemann.UltraDeep90
 import LeanAsm.QuasiRiemann.UltraDeep108Tables
