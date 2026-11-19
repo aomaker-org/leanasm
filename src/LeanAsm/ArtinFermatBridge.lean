@@ -3,7 +3,6 @@
 -- Max Column: 120 Columns
 
 import LeanAsm.EulerFactorNonVanishing
-import LeanAsm.NttArithmetic
 import LeanAsm.MiniVMNttBridge
 
 namespace ArtinFermatBridge

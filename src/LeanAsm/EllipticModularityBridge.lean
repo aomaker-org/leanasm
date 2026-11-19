@@ -4,13 +4,8 @@
 -- cleared-denominator local Euler-factor positivity, and Hecke multiplicativity.
 -- Max Column: 120 Columns
 
-import LeanAsm.FiniteFieldRH
-import LeanAsm.WeilZetaBridge
-
 namespace EllipticModularityBridge
 
-open FiniteFieldRH
-open WeilZetaBridge
 
 -- =============================================================================
 -- Part 1: Exact Truncated Power Series for f_{11}(τ) = η(τ)^2 η(11τ)^2
