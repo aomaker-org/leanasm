@@ -16,6 +16,8 @@ import LeanAsm.QuasiRiemann.UltraDeep72Core
 import LeanAsm.QuasiRiemann.UltraDeep90
 import LeanAsm.QuasiRiemann.UltraDeep108Tables
 import LeanAsm.QuasiRiemann.UltraDeep108Eval
+import LeanAsm.QuasiRiemann.UltraDeep108N1024.Bounds
+import LeanAsm.QuasiRiemann.UltraDeep108N1024.Certificates
 import LeanAsm.QuasiRiemann.UltraDeep108N1024
 import LeanAsm.QuasiRiemann.UltraDeep108N2048
 import LeanAsm.QuasiRiemann.UltraDeep108
