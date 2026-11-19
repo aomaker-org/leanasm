@@ -71,6 +71,35 @@ theorem sampleContractionLoop_2048_pos :
     (rnsContractionLoop 2048 sampleRnsRat #[sampleRnsRat]).toQRat.num ≥ 0 :=
   sampleContractionLoop_sound_pos 2048
 
+-- =============================================================================
+-- Mersenne Prime Tower CRT Soundness Executable Checks
+-- =============================================================================
+
+theorem test_rnsInt_mersenne_mod_eq :
+    (mersenneA.reconstruct % 7 = 3) ∧
+    (mersenneA.reconstruct % 31 = 25) ∧
+    (mersenneA.reconstruct % 127 = 51) :=
+  rnsInt_reconstruct_mod_eq 3 25 51 mersenneA rfl rfl
+    (by decide) (by decide) (by decide) (by decide) (by decide)
+
+theorem test_rnsInt_mersenne_add_sound :
+    (RnsInt.add mersenneA mersenneB).reconstruct =
+      (mersenneA.reconstruct + mersenneB.reconstruct) % 27559 :=
+  rnsInt_reconstruct_add_sound
+
+theorem test_rnsInt_mersenne_mul_sound :
+    (RnsInt.mul mersenneA mersenneB).reconstruct =
+      (mersenneA.reconstruct * mersenneB.reconstruct) % 27559 :=
+  rnsInt_reconstruct_mul_sound
+
+theorem test_rnsQRat_contraction_preserves_pos_1024 :
+    (rnsContractionLoop 1024 sampleRnsRat #[sampleRnsRat]).toQRat.num ≥ 0 :=
+  rnsQRat_contraction_preserves_pos 1024 sampleRnsRat #[sampleRnsRat]
+
+theorem test_rnsQRat_contraction_preserves_pos_2048 :
+    (rnsContractionLoop 2048 sampleRnsRat #[sampleRnsRat]).toQRat.num ≥ 0 :=
+  rnsQRat_contraction_preserves_pos 2048 sampleRnsRat #[sampleRnsRat]
+
 #print axioms sampleRnsA_reconstruct_eval
 #print axioms sampleRnsB_reconstruct_eval
 #print axioms sampleRnsRat_toQRat_eval
@@ -89,5 +118,17 @@ theorem sampleContractionLoop_2048_pos :
 #print axioms RnsQRat.mul
 #print axioms rnsContractionStep
 #print axioms rnsContractionLoop
+#print axioms rnsInt_reconstruct_mod_eq
+#print axioms rnsInt_reconstruct_add_sound
+#print axioms rnsInt_reconstruct_mul_sound
+#print axioms rnsQRat_add_eval_sound
+#print axioms rnsQRat_mul_eval_sound
+#print axioms rnsQRat_contraction_preserves_pos
+#print axioms rnsInt_reconstruct_mersenne_crt_seed_cert
+#print axioms test_rnsInt_mersenne_mod_eq
+#print axioms test_rnsInt_mersenne_add_sound
+#print axioms test_rnsInt_mersenne_mul_sound
+#print axioms test_rnsQRat_contraction_preserves_pos_1024
+#print axioms test_rnsQRat_contraction_preserves_pos_2048
 
 -- end of file: leanasm/tests/TestRNS.lean
