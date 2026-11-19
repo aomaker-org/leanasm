@@ -59,6 +59,7 @@ import LeanAsm.LanglandsRankinSelbergBridge
 import LeanAsm.ProthNttTowerBridge
 import LeanAsm.Genus2MultiPrimeWeil
 import LeanAsm.Genus2WeilGSp4Weave
+import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 import LeanAsm.MiniVMRnsHenselWeave
 import LeanAsm.ProvenanceSummary
 

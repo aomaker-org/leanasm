@@ -48,6 +48,7 @@ import LeanAsm.LanglandsRankinSelbergBridge
 import LeanAsm.ProthNttTowerBridge
 import LeanAsm.Genus2MultiPrimeWeil
 import LeanAsm.Genus2WeilGSp4Weave
+import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 import LeanAsm.MiniVMRnsHenselWeave
 
 namespace LeanAsm
@@ -1987,6 +1988,7 @@ def FiniteFieldWeilProvenance : Prop :=
         -Genus2WeilGSp4Weave.standardEulerHomogP p n d) ∧
    (∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList,
       Genus2MultiPrimeWeil.standardEulerPoly p 1 = 0)) ∧
+  QuasiRiemann.Genus2HenselPreperiodicWeave.Genus2HenselPreperiodicWeaveBridge ∧
   LanglandsRankinSelbergProvenance
 
 /-- Zero-axiom certificate for Hasse-Weil RH, genus-2 Jacobian, completed zeta,
@@ -2014,6 +2016,7 @@ theorem finiteFieldWeil_provenance_certified : FiniteFieldWeilProvenance :=
    EllipticModularityBridge.hecke_multiplicativity_11a1_certs,
    Genus2MultiPrimeWeil.genus2_multiprime_weil_certs,
    Genus2WeilGSp4Weave.genus2_multiprime_weil_gsp4_weave_bridge,
+   QuasiRiemann.Genus2HenselPreperiodicWeave.genus2_hensel_preperiodic_weave_bridge,
    langlandsRankinSelberg_provenance_certified⟩
 
 -- =============================================================================
