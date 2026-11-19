@@ -36,6 +36,28 @@ def luckyPrefixUpTo (N : Nat) : List Nat :=
 def luckyGeneratorsUpTo (N : Nat) : List Nat :=
   (luckyPrefixUpTo N).filter (fun x => x > 1)
 
+/-- Monotonicity: dropEveryKth does not increase list length. -/
+theorem dropEveryKth_go_length (k : Nat) (idx : Nat) (xs : List Nat) :
+    (dropEveryKth.go k idx xs).length ≤ xs.length := by
+  induction xs generalizing idx with
+  | nil =>
+    dsimp [dropEveryKth.go]
+    exact Nat.le_refl 0
+  | cons y ys ih =>
+    dsimp [dropEveryKth.go]
+    split
+    · have h := ih (idx + 1)
+      omega
+    · have h := ih (idx + 1)
+      dsimp
+      omega
+
+/-- Monotonicity: dropEveryKth survivor count bound. -/
+theorem dropEveryKth_length (k : Nat) (xs : List Nat) :
+    (dropEveryKth k xs).length ≤ xs.length := by
+  dsimp [dropEveryKth]
+  exact dropEveryKth_go_length k 1 xs
+
 /-- Monotonicity helper for `dropEveryKth.go`. -/
 theorem dropEveryKth_go_sublist (k : Nat) (idx : Nat) (l : List Nat) (x : Nat) :
     x ∈ dropEveryKth.go k idx l → x ∈ l := by
@@ -97,6 +119,27 @@ theorem luckyPrefixUpTo_50_length :
 /-- Exact generator certificate up to `N = 50`. -/
 theorem luckyGeneratorsUpTo_50_eq :
     luckyGeneratorsUpTo 50 = [3, 7, 9, 13, 15, 21, 25, 31, 33, 37, 43, 49] := by
+  rfl
+
+/-- Exact prefix certificate up to `N = 200` verified constructively. -/
+theorem luckyPrefixUpTo_200_eq :
+    luckyPrefixUpTo 200 =
+      [1, 3, 7, 9, 13, 15, 21, 25, 31, 33, 37, 43, 49, 51, 63, 67, 69, 73, 75,
+       79, 87, 93, 99, 105, 111, 115, 127, 129, 133, 135, 141, 151, 159, 163,
+       169, 171, 189, 193, 195] := by
+  rfl
+
+/-- Exact prefix count certificate up to `N = 200`. -/
+theorem luckyPrefixUpTo_200_length :
+    (luckyPrefixUpTo 200).length = 39 := by
+  rfl
+
+/-- Exact generator certificate up to `N = 200`. -/
+theorem luckyGeneratorsUpTo_200_eq :
+    luckyGeneratorsUpTo 200 =
+      [3, 7, 9, 13, 15, 21, 25, 31, 33, 37, 43, 49, 51, 63, 67, 69, 73, 75,
+       79, 87, 93, 99, 105, 111, 115, 127, 129, 133, 135, 141, 151, 159, 163,
+       169, 171, 189, 193, 195] := by
   rfl
 
 end LeanAsm.QuasiRiemann.LuckySieve

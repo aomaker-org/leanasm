@@ -6,9 +6,10 @@ import LeanAsm.QuasiRiemann.LuckySieve.Core
 import LeanAsm.QuasiRiemann.Rat
 
 open QuasiRiemann
-open LeanAsm.QuasiRiemann.LuckySieve
 
 namespace LeanAsm.QuasiRiemann.LuckySieve
+
+open LeanAsm.QuasiRiemann.LuckySieve
 
 /-- Safe rational reciprocal for natural number `l`. -/
 def invRat (l : Nat) : QRat :=
@@ -69,6 +70,30 @@ theorem lucky_survival_product_50_pos :
 /-- Exact non-vanishing of finite Lucky harmonic sum at N = 50. -/
 theorem lucky_harmonic_50_pos :
     QRat.ofInt 0 < luckyHarmonicRat (luckyGeneratorsUpTo 50) := by
+  decide
+
+/-- Concrete constructive certificate at `N = 200` (`39` Lucky numbers `<= 200`).
+    Exact values:
+    luckyHarmonicRat ≈ 1.19998 (bounded by [119/100, 121/100])
+    survivalProductRat ≈ 0.27232 (bounded by 28/100). -/
+def luckyBeurlingCert_200 : LuckyBeurlingCertificate 200 where
+  countUpToN := 39
+  harmonicLower := QRat.mk' 119 100
+  harmonicUpper := QRat.mk' 121 100
+  survivalUpper := QRat.mk' 28 100
+  h_count := by rfl
+  h_harm_lo := by decide
+  h_harm_hi := by decide
+  h_surv_hi := by decide
+
+/-- Exact non-vanishing of finite Lucky Beurling survival product at N = 200. -/
+theorem lucky_survival_product_200_pos :
+    QRat.ofInt 0 < survivalProductRat (luckyGeneratorsUpTo 200) := by
+  decide
+
+/-- Exact non-vanishing of finite Lucky harmonic sum at N = 200. -/
+theorem lucky_harmonic_200_pos :
+    QRat.ofInt 0 < luckyHarmonicRat (luckyGeneratorsUpTo 200) := by
   decide
 
 end LeanAsm.QuasiRiemann.LuckySieve

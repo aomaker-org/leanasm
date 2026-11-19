@@ -1007,14 +1007,24 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 -- Part 66: Lucky Sieve Mechanics and Rational Beurling Certificates (gemweb120)
 -- =============================================================================
 
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.dropEveryKth_go_length
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.dropEveryKth_length
 #print axioms LeanAsm.QuasiRiemann.LuckySieve.dropEveryKth_sublist
 #print axioms LeanAsm.QuasiRiemann.LuckySieve.luckySieveSteps_sublist
 #print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyPrefixUpTo_sublist_oddSeed
 #print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyPrefixUpTo_50_eq
 #print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyPrefixUpTo_50_length
 #print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyGeneratorsUpTo_50_eq
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyPrefixUpTo_200_eq
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyPrefixUpTo_200_length
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyGeneratorsUpTo_200_eq
 #print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyBeurlingCert_50
 #print axioms LeanAsm.QuasiRiemann.LuckySieve.lucky_survival_product_50_pos
 #print axioms LeanAsm.QuasiRiemann.LuckySieve.lucky_harmonic_50_pos
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.luckyBeurlingCert_200
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.lucky_survival_product_200_pos
+#print axioms LeanAsm.QuasiRiemann.LuckySieve.lucky_harmonic_200_pos
+#print axioms LeanAsm.QuasiRiemann.lucky_beurling_qsd1_strip_weave
+#print axioms LeanAsm.QuasiRiemann.lucky_beurling_qsd1_strip_cert
 
 -- end of file: leanasm/tests/TestAxioms.lean
