@@ -965,4 +965,12 @@ import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 #print axioms QuasiRiemann.qsd1LogDerivRung32000Spec
 #print axioms QuasiRiemann.qsd1_logderiv_rung32000_cert
 
+-- =============================================================================
+-- Part 62: Integral Gaussian QSD[1-4] Slices, Norm Multiplicativity & Hensel Bridge
+-- =============================================================================
+
+#print axioms QuasiRiemann.gaussian_qsd_norm_multiplicative
+#print axioms QuasiRiemann.gaussian_qsd_truncation_defect
+#print axioms QuasiRiemann.gaussian_qsd_hensel_tower_bridge
+
 -- end of file: leanasm/tests/TestAxioms.lean
