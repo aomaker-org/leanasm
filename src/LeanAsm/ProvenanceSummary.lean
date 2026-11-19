@@ -1504,7 +1504,33 @@ def ValuationDynamicsProvenance : Prop :=
    bound.num > 0) ∧
   (have bound := QuasiRiemann.Valuation.PreperiodicDynamics.lemma43DivisibilityBound 2 3 1
     (QuasiRiemann.QRat.mk' 1 10 (by decide))
-   bound.num > 0)
+   bound.num > 0) ∧
+  (∀ (p : Nat) (hp : QuasiRiemann.Valuation.IsPrime p) (alpha x0 : QuasiRiemann.QRat) (d : Nat),
+    QuasiRiemann.Valuation.valLe (some 0) (QuasiRiemann.Valuation.pAdicVal p alpha) →
+    QuasiRiemann.Valuation.valLe (some 0) (QuasiRiemann.Valuation.pAdicVal p x0) →
+    ∀ n : Nat, QuasiRiemann.Valuation.valLe (some 0)
+      (QuasiRiemann.Valuation.pAdicVal p
+        (QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
+          (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) n x0))) ∧
+  (∀ (p : Nat) (hp : QuasiRiemann.Valuation.IsPrime p) {d : Nat} (hd : 2 ≤ d)
+    (alpha x0 : QuasiRiemann.QRat) {v0 : Int} (hv0 : v0 < 0),
+    QuasiRiemann.Valuation.pAdicVal p x0 = some v0 →
+    QuasiRiemann.Valuation.valLe (some (Int.ofNat d * v0 + 1))
+      (QuasiRiemann.Valuation.pAdicVal p alpha) →
+    ∀ n : Nat, QuasiRiemann.Valuation.pAdicVal p
+      (QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
+        (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) n x0) =
+      some (Int.ofNat (d ^ n) * v0)) ∧
+  (∀ (p : Nat) (hp : QuasiRiemann.Valuation.IsPrime p) {d : Nat} (hd : 2 ≤ d)
+    (alpha x0 : QuasiRiemann.QRat) {v0 : Int} (hv0 : v0 < 0),
+    QuasiRiemann.Valuation.pAdicVal p x0 = some v0 →
+    QuasiRiemann.Valuation.valLe (some (Int.ofNat d * v0 + 1))
+      (QuasiRiemann.Valuation.pAdicVal p alpha) →
+    ∀ m n : Nat, m ≠ n →
+      QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
+        (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) m x0 ≠
+      QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
+        (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) n x0)
 
 /-- Zero-axiom certificate for Part 52 2-adic valuation and preperiodic dynamics bounds. -/
 theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
@@ -1519,7 +1545,10 @@ theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
    QuasiRiemann.Valuation.PreperiodicDynamics.theorem13_average_bound_sound,
    QuasiRiemann.Valuation.PreperiodicDynamics.proposition53_average_bound_sound,
    QuasiRiemann.Valuation.PreperiodicDynamics.wreath_product_bound_sound,
-   QuasiRiemann.Valuation.PreperiodicDynamics.lemma43_divisibility_bound_sound⟩
+   QuasiRiemann.Valuation.PreperiodicDynamics.lemma43_divisibility_bound_sound,
+   QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_integral_orbit_invariant,
+   QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_val_exact,
+   QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_no_preperiodic⟩
 
 /-- Part 7 provenance specification bundling Hasse-Weil RH for `E / F_7`,
 genus-2 `C / F_5` negative discriminants, `L(C, 1) = 71/25`, Cantor-Mumford group axioms

@@ -31,5 +31,14 @@ ZERO `sorryAx` and ZERO `Classical.choice`.
 #print axioms proposition53_average_bound_sound
 #print axioms wreath_product_bound_sound
 #print axioms lemma43_divisibility_bound_sound
+#print axioms unicriticalPoly_eval_cross_eq
+#print axioms pAdicVal_qPow
+#print axioms pAdicVal_add_eq_of_lt
+#print axioms unicritical_integral_orbit_invariant
+#print axioms unicritical_escape_val_exact
+#print axioms unicritical_escape_no_preperiodic
+#print axioms unicritical_escape_concrete_iter0
+#print axioms unicritical_escape_concrete_iter1
+#print axioms unicritical_escape_concrete_iter0_ne_iter1
 
 -- end of file: leanasm/tests/TestPreperiodic.lean
