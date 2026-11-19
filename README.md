@@ -159,13 +159,13 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `QR/ParametricQrhLadder.lean` | `QR` | `kim_sarnak_amplified_qrh_step` |
 | `QR/DyadicAbelBridge.lean` | `QR` | `short_interval_dyadic_abel_envelope` |
 | `QR/MollifierVariationalBridge.lean` | `QR` | `variationalQrhThreshold` |
-| `Val/Ultrametric.lean` | `Val` | `qrat_padic_valuation_nonarchimedean` |
+| `Val/Ultrametric.lean` | `Val` | `ultrametric_ineq` |
 | `Val/Contraction.lean` | `Val` | `iterate_val_range`, `iterate_growth` |
 | `Val/Hensel.lean` | `Val` | `hensel_poly_simple_root_lift` |
 | `Val/Eisenstein2Adic.lean` | `Val` | `legendre_v2_factorial`, `prop_4` |
 | `Val/EisensteinWeights.lean` | `Val` | `romikCoeff_symm`, `prop4_m4` |
 | `Val/PreperiodicDynamics.lean` | `Val` | `preperiodic_partition_sound` |
-| `Val/RNS.lean` | `Val` | `RnsInt.reconstruct_sound` |
+| `Val/RNS.lean` | `Val` | `rns_contraction_sound` |
 | `RnsArithmetic.lean` | `=` | `garner_mul_concrete_soundness` |
 | `EulerFactorNonVanishing.lean` | `=` | `local_euler_disk_nonvanishing` |
 | `Genus2/PolyF5.lean` | `G2` | `polyDivMod_sound`, `polyXgcd_bezout` |
@@ -250,6 +250,11 @@ Additional headline theorems audited in `ProvenanceSummary.lean` and
 
 ## Architecture Guides & External Verification
 
+- **v1.4.0 Architecture Roadmap**: Dynamics, RNS CRT, multi-prime Weil &
+  hygiene: [v1.4.0 Roadmap](docs/ROADMAP_V1_4_0.md).
+- **Architecture and Provenance Guide**: Subsystem audit and master provenance
+  justification across all 63 modules:
+  [Architecture & Provenance](docs/ARCHITECTURE_AND_PROVENANCE.md).
 - **v1.3.0 Architecture Roadmap**: Closed-loop QRH, `UltraDeep72` split,
   Rankin-Selberg, & 5-prime Proth NTT (`#78`–`#81`):
   [v1.3.0 Roadmap](docs/ROADMAP_V1_3_0.md).
