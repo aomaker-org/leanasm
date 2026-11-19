@@ -987,4 +987,12 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave.genus2_hensel_preperiodic_weave_bridge
 #print axioms LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave.genus2_hensel_preperiodic_cert
 
+-- =============================================================================
+-- Part 64: Rankin-Selberg & GSp(4) to Sub-7/8 Strip Certificate Bridge
+-- =============================================================================
+
+#print axioms LeanAsm.QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankin_selberg_gsp4_sub78_bridge
+#print axioms LeanAsm.QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankinSelbergGSp4Rung32000Spec
+#print axioms LeanAsm.QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankin_selberg_gsp4_rung32000_cert
+
 -- end of file: leanasm/tests/TestAxioms.lean
