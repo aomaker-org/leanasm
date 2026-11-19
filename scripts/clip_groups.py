@@ -25,12 +25,14 @@ GROUP_META = [
     ("8_valuation", "p-adic valuation, Eisenstein, and preperiodic dynamics"),
     ("9_bridges", "Arithmetic & L-function bridges (Artin, Weil, Collatz)"),
     ("10_proofs", "Provenance summary, axiom audits, and test suites"),
-    ("11_docs", "Scanned submission docs & architecture notes"),
+    ("docs", "README, AI/AGENTS guides, and docs architecture notes"),
 ]
 
 INCLUDE_EXTS = {".lean", ".py", ".sh", ".toml", ".mk", ".md"}
 INCLUDE_NAMES = {"Makefile", "lean-toolchain", "config_env"}
 EXCLUDE_DIRS = {".git", ".lake", ".venv", "__pycache__", "subrepos"}
+DOCS_ROOT_FILES = {"README.md", "AI.md", "AGENTS.md"}
+DOCS_EXCLUDE_NAMES = {"github_issues.md", "github_prs.md"}
 
 
 def discover_repo_files() -> list[str]:
@@ -56,8 +58,9 @@ def discover_repo_files() -> list[str]:
             part.startswith(".") or part in EXCLUDE_DIRS for part in p.parts
         ):
             continue
-        if p.parts[0] == "docs" and "--include-docs" not in sys.argv:
-            continue
+        if p.parts[0] == "docs":
+            if p.suffix != ".md" or p.name in DOCS_EXCLUDE_NAMES:
+                continue
         if not p.is_file():
             continue
         if p.name in INCLUDE_NAMES or p.suffix in INCLUDE_EXTS:
@@ -67,11 +70,11 @@ def discover_repo_files() -> list[str]:
 
 def classify_file(path: str) -> str:
     """Assign a workspace file path to its semantic group key."""
+    if path in DOCS_ROOT_FILES or path.startswith("docs/"):
+        return "docs"
     if path.startswith("src/LeanAsm/Constants/"):
         return "0_constants"
     if path in {
-        "AI.md",
-        "README.md",
         "lakefile.toml",
         "lean-toolchain",
         "Makefile",
@@ -117,8 +120,6 @@ def classify_file(path: str) -> str:
         "tests/"
     ):
         return "10_proofs"
-    if path.startswith("docs/"):
-        return "11_docs"
     if path.startswith("src/LeanAsm/") and path.endswith(".lean"):
         return "9_bridges"
     return "1_core"
@@ -257,7 +258,9 @@ def print_list(state: dict, stale: bool) -> None:
     print("=" * 78)
 
 
-def send_batch(state: dict, stale: bool, idx: int) -> None:
+def send_batch(
+    state: dict, stale: bool, idx: int, dry_run: bool = False
+) -> None:
     batches = state.get("batches", [])
     if idx < 1 or idx > len(batches):
         print(f"[-] Error: Batch index {idx} out of range (1..{len(batches)}).")
@@ -279,6 +282,10 @@ def send_batch(state: dict, stale: bool, idx: int) -> None:
     for f in bfiles:
         print(f"    - {f} ({os.path.getsize(f)/1024:.1f} KB)")
 
+    if dry_run:
+        print(f"[+] Dry run complete for batch {idx} ({b['name']}).")
+        return
+
     cmd = ["files2clip"] + bfiles
     try:
         res = subprocess.run(cmd, check=True)
@@ -297,7 +304,9 @@ def send_batch(state: dict, stale: bool, idx: int) -> None:
 
 
 def main() -> None:
-    args = [a for a in sys.argv[1:] if a != "--include-docs"]
+    raw_args = [a for a in sys.argv[1:] if a != "--include-docs"]
+    dry_run = "--dry-run" in raw_args
+    args = [a for a in raw_args if a != "--dry-run"]
     target = args[0].strip().lower() if args else "list"
 
     if target in ("rebuild", "--rebuild", "-r"):
@@ -321,11 +330,11 @@ def main() -> None:
     if target in ("next", "n"):
         last_idx = int(state.get("last_index", 0))
         target_idx = last_idx + 1 if last_idx < len(batches) else 1
-        send_batch(state, stale, target_idx)
+        send_batch(state, stale, target_idx, dry_run=dry_run)
         sys.exit(0)
 
     if target.isdigit():
-        send_batch(state, stale, int(target))
+        send_batch(state, stale, int(target), dry_run=dry_run)
         sys.exit(0)
 
     matches = [
@@ -334,7 +343,7 @@ def main() -> None:
         if target in b["name"].lower()
     ]
     if len(matches) == 1:
-        send_batch(state, stale, matches[0])
+        send_batch(state, stale, matches[0], dry_run=dry_run)
     elif len(matches) > 1:
         print(f"[-] Ambiguous name '{target}'. Matches batches: {matches}")
         sys.exit(1)
