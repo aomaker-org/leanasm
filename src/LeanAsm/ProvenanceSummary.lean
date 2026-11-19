@@ -23,6 +23,7 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 import LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic
 import LeanAsm.QuasiRiemann.Valuation.EisensteinWeights
 import LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics
+import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 import LeanAsm.QuasiRiemann.Valuation.RNS
 import LeanAsm.QuasiRiemann.QsdAlgebraBridge
 import LeanAsm.RnsArithmetic
@@ -1600,7 +1601,34 @@ def ValuationDynamicsProvenance : Prop :=
       QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
         (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) m x0 ≠
       QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
-        (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) n x0))
+        (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) n x0)) ∧
+  (∀ (p k x t : Nat) (hp : 2 ≤ p) (_hk : 1 ≤ k),
+    let m := p ^ (k + 1)
+    let pk := p ^ k
+    let x_lift := x + t * pk
+    have hm_pos : 0 < m := QuasiRiemann.Valuation.pow_pos_of_ge_two hp (k + 1)
+    let dual_lift : QuasiRiemann.Valuation.QsdDualModRing m :=
+      ⟨QuasiRiemann.QsdModRing.ofNat m hm_pos x,
+       QuasiRiemann.QsdModRing.ofNat m hm_pos (t * pk)⟩
+    (x_lift % pk = x % pk) ∧
+    ((t * pk) * (t * pk)) % (pk * pk) = 0 ∧
+    dual_lift.val.val = x % m ∧
+    dual_lift.tan.val = (t * pk) % m) ∧
+  (∀ (p : Nat) (hp : 2 ≤ p) (k : Nat) (_hk : 1 ≤ k),
+    let m := p ^ k
+    let m2 := m * m
+    have hm_pos : 0 < m := QuasiRiemann.Valuation.pow_pos_of_ge_two hp k
+    have hm2_pos : 0 < m2 := Nat.mul_pos hm_pos hm_pos
+    let tan_elem := QuasiRiemann.QsdModRing.ofNat m2 hm2_pos m
+    (QuasiRiemann.QsdModRing.mul hm2_pos tan_elem tan_elem).val = 0 ∧
+    (p ^ (2 * k)) ∣ (tan_elem.val * tan_elem.val)) ∧
+  ((QuasiRiemann.Valuation.qsd4_hensel_tower_cert_p7.x1 = 3 ∧
+    QuasiRiemann.Valuation.qsd4_hensel_tower_cert_p7.x2 = 10 ∧
+    QuasiRiemann.Valuation.qsd4_hensel_tower_cert_p7.x3 = 108) ∧
+   ((1 * 1) % 2 = 1 % 2 ∧
+    (1 * 1) % (2 ^ 2) = 1 % (2 ^ 2) ∧
+    (1 * 1) % (2 ^ 3) = 1 % (2 ^ 3) ∧
+    QuasiRiemann.Valuation.pAdicVal 2 (QuasiRiemann.QRat.ofInt (1 * 1 - 1)) = none))
 
 /-- Zero-axiom certificate for Part 52 2-adic valuation and preperiodic dynamics bounds. -/
 theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
@@ -1624,7 +1652,12 @@ theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
    QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_integral_orbit_invariant,
    QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_val_exact,
    QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_no_preperiodic,
-   LeanAsm.QuasiRiemann.RNS.rns_valuation_orbit_step_sound⟩
+   LeanAsm.QuasiRiemann.RNS.rns_valuation_orbit_step_sound,
+   fun p k x t hp hk =>
+     QuasiRiemann.Valuation.qsd4_hensel_tangent_lift_step p k x t hp hk,
+   fun p hp k hk =>
+     QuasiRiemann.Valuation.qsd4_prime_tower_nilpotent_remainder_bound p hp k hk,
+   ⟨⟨rfl, rfl, rfl⟩, QuasiRiemann.Valuation.qsd4_hensel_tower_cert_p2⟩⟩
 
 /-- Part 7 provenance specification bundling Hasse-Weil RH for `E / F_7`,
 genus-2 `C / F_5` negative discriminants, `L(C, 1) = 71/25`, Cantor-Mumford group axioms
