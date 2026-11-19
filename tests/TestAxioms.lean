@@ -995,4 +995,12 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms LeanAsm.QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankinSelbergGSp4Rung32000Spec
 #print axioms LeanAsm.QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankin_selberg_gsp4_rung32000_cert
 
+-- =============================================================================
+-- Part 65: Split Genus2Jacobian and Rankin-Selberg / GSp(4) / Sub-7/8 Weave
+-- =============================================================================
+
+#print axioms LeanAsm.QuasiRiemann.JacobianRankinSelbergWeave.jacobian_split_rankin_selberg_weave
+#print axioms LeanAsm.QuasiRiemann.JacobianRankinSelbergWeave.jacobianRankinSelbergRung32000Spec
+#print axioms LeanAsm.QuasiRiemann.JacobianRankinSelbergWeave.jacobian_split_rankin_selberg_cert
+
 -- end of file: leanasm/tests/TestAxioms.lean

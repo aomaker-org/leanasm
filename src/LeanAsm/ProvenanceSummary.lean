@@ -50,6 +50,7 @@ import LeanAsm.Genus2MultiPrimeWeil
 import LeanAsm.Genus2WeilGSp4Weave
 import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 import LeanAsm.QuasiRiemann.RankinSelbergGSp4Sub78Bridge
+import LeanAsm.QuasiRiemann.JacobianRankinSelbergWeave
 import LeanAsm.MiniVMRnsHenselWeave
 
 namespace LeanAsm
@@ -2028,7 +2029,75 @@ def FiniteFieldWeilProvenance : Prop :=
     (0 < spec.stripBridgeSpec.weaveSpec.margin ∧
      spec.stripBridgeSpec.weaveSpec.strip.rectSpec.HasCertifiedNonVanishing) ∧
     (QuasiRiemann.QRat.mk' 1 2 < spec.stripBridgeSpec.weaveSpec.strip.sigmaLo ∧
-     spec.stripBridgeSpec.weaveSpec.strip.sigmaLo < QuasiRiemann.qrhThresholdSevenEighths)))
+     spec.stripBridgeSpec.weaveSpec.strip.sigmaLo < QuasiRiemann.qrhThresholdSevenEighths))) ∧
+  (let spec := QuasiRiemann.JacobianRankinSelbergWeave.jacobianRankinSelbergRung32000Spec
+   (Genus2Jacobian.cantorSmul 71 Genus2Jacobian.D0 = Genus2Jacobian.MumfordDivisor.zero ∧
+    (∀ k : Nat, 1 ≤ k → k ≤ 70 →
+       Genus2Jacobian.cantorSmul k Genus2Jacobian.D0 ≠ Genus2Jacobian.MumfordDivisor.zero) ∧
+    Genus2Jacobian.isReducedMumford Genus2Jacobian.D0.u Genus2Jacobian.D0.v = true ∧
+    ((∀ A B C, Genus2Jacobian.inD0Orbit A → Genus2Jacobian.inD0Orbit B →
+        Genus2Jacobian.inD0Orbit C →
+        Genus2Jacobian.cantorAdd (Genus2Jacobian.cantorAdd A B) C =
+          Genus2Jacobian.cantorAdd A (Genus2Jacobian.cantorAdd B C)) ∧
+     (∀ A B, Genus2Jacobian.inD0Orbit A → Genus2Jacobian.inD0Orbit B →
+        Genus2Jacobian.cantorAdd A B = Genus2Jacobian.cantorAdd B A) ∧
+     (∀ A, Genus2Jacobian.inD0Orbit A →
+        Genus2Jacobian.cantorAdd A Genus2Jacobian.MumfordDivisor.zero = A ∧
+        Genus2Jacobian.cantorAdd Genus2Jacobian.MumfordDivisor.zero A = A) ∧
+     (∀ A, Genus2Jacobian.inD0Orbit A →
+        Genus2Jacobian.inD0Orbit (Genus2Jacobian.cantorNeg A) ∧
+        Genus2Jacobian.cantorAdd A (Genus2Jacobian.cantorNeg A) =
+          Genus2Jacobian.MumfordDivisor.zero ∧
+        Genus2Jacobian.cantorAdd (Genus2Jacobian.cantorNeg A) A =
+          Genus2Jacobian.MumfordDivisor.zero))) ∧
+   (((∀ p ∈ spec.rsSpec.goodPrimes, Genus2WeilGSp4Weave.Genus2WeilGSp4PrimeWeaveCert p) ∧
+     (∀ p ∈ spec.rsSpec.goodPrimes, ∀ n d : Int,
+       Genus2WeilGSp4Weave.spinLPolyHomog p d ((p : Int) * n) =
+         (p : Int) ^ 2 * Genus2WeilGSp4Weave.spinLPolyHomog p n d) ∧
+     (∀ p ∈ spec.rsSpec.goodPrimes, ∀ T : Int,
+       Genus2MultiPrimeWeil.standardEulerPoly p T =
+         (1 - T) * GSp4FunctorialityBridge.gsp4StdQuarticCofactor (p : Int)
+           (Genus2MultiPrimeWeil.frobeniusTrace p) (Genus2MultiPrimeWeil.degree2Trace p) T) ∧
+     (∀ p ∈ spec.rsSpec.goodPrimes, ∀ n d : Int,
+       Genus2WeilGSp4Weave.standardEulerHomogP p d n =
+         -Genus2WeilGSp4Weave.standardEulerHomogP p n d) ∧
+     (∀ p ∈ spec.rsSpec.goodPrimes, Genus2MultiPrimeWeil.standardEulerPoly p 1 = 0)) ∧
+    ((∀ p ∈ EllipticModularityBridge.goodPrimes97, ∀ u v : Int, 0 < v →
+       0 < LanglandsRankinSelbergBridge.rsClearedEuler p
+         (EllipticModularityBridge.heckeCoeff11 p) u v) ∧
+     (∀ p ∈ EllipticModularityBridge.goodPrimes97, ∀ u v : Int, 0 ≤ u → 0 < v - (p : Int) * u →
+       0 < LanglandsRankinSelbergBridge.sym2ClearedEuler p
+         (EllipticModularityBridge.heckeCoeff11 p) u v) ∧
+     (∀ al1 al2 lam T : Int,
+       GSp4FunctorialityBridge.gsp4SpinEulerPoly lam (al1 + al2) (al1 * al2 + 2 * lam) T =
+         (1 - al1 * T + lam * T ^ 2) * (1 - al2 * T + lam * T ^ 2))) ∧
+    ((2 * spec.rsSpec.stripBridgeSpec.jetSpec.qSpec.lipNumerator *
+        spec.rsSpec.stripBridgeSpec.jetSpec.qSpec.radius ≤
+      spec.rsSpec.stripBridgeSpec.jetSpec.qSpec.centerLower *
+        (spec.rsSpec.stripBridgeSpec.jetSpec.qSpec.radius -
+          spec.rsSpec.stripBridgeSpec.jetSpec.qSpec.deltaShrink) ∧
+      spec.rsSpec.stripBridgeSpec.jetSpec.qSpec.lipNumerator *
+        spec.rsSpec.stripBridgeSpec.jetSpec.qSpec.radius <
+      spec.rsSpec.stripBridgeSpec.jetSpec.qSpec.centerLower *
+        (spec.rsSpec.stripBridgeSpec.jetSpec.qSpec.radius -
+          spec.rsSpec.stripBridgeSpec.jetSpec.qSpec.deltaShrink)) ∧
+     (QuasiRiemann.mollifierThetaDen spec.rsSpec.stripBridgeSpec.vDen2 ≤
+        2 * QuasiRiemann.mollifierThetaNum spec.rsSpec.stripBridgeSpec.vNum2
+          spec.rsSpec.stripBridgeSpec.vDen2 ∧
+      QuasiRiemann.mollifierThetaNum spec.rsSpec.stripBridgeSpec.vNum2
+          spec.rsSpec.stripBridgeSpec.vDen2 *
+        QuasiRiemann.mollifierThetaDen spec.rsSpec.stripBridgeSpec.vDen1 <
+      QuasiRiemann.mollifierThetaNum spec.rsSpec.stripBridgeSpec.vNum1
+          spec.rsSpec.stripBridgeSpec.vDen1 *
+        QuasiRiemann.mollifierThetaDen spec.rsSpec.stripBridgeSpec.vDen2 ∧
+      8 * QuasiRiemann.mollifierThetaNum spec.rsSpec.stripBridgeSpec.vNum1
+          spec.rsSpec.stripBridgeSpec.vDen1 ≤
+        7 * QuasiRiemann.mollifierThetaDen spec.rsSpec.stripBridgeSpec.vDen1) ∧
+     (0 < spec.rsSpec.stripBridgeSpec.weaveSpec.margin ∧
+      spec.rsSpec.stripBridgeSpec.weaveSpec.strip.rectSpec.HasCertifiedNonVanishing) ∧
+     (QuasiRiemann.QRat.mk' 1 2 < spec.rsSpec.stripBridgeSpec.weaveSpec.strip.sigmaLo ∧
+      spec.rsSpec.stripBridgeSpec.weaveSpec.strip.sigmaLo <
+        QuasiRiemann.qrhThresholdSevenEighths))))
 
 /-- Zero-axiom certificate for Hasse-Weil RH, genus-2 Jacobian, completed zeta,
 `GSp(4) -> SO(5)` functoriality + Selberg / Kim-Sarnak ladder,
@@ -2058,7 +2127,9 @@ theorem finiteFieldWeil_provenance_certified : FiniteFieldWeilProvenance :=
    QuasiRiemann.Genus2HenselPreperiodicWeave.genus2_hensel_preperiodic_weave_bridge,
    langlandsRankinSelberg_provenance_certified,
    QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankin_selberg_gsp4_sub78_bridge
-     QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankinSelbergGSp4Rung32000Spec⟩
+     QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankinSelbergGSp4Rung32000Spec,
+   QuasiRiemann.JacobianRankinSelbergWeave.jacobian_split_rankin_selberg_weave
+     QuasiRiemann.JacobianRankinSelbergWeave.jacobianRankinSelbergRung32000Spec⟩
 
 -- =============================================================================
 -- Parts 9-10: Universal NTT, 192-Digit Karatsuba CRT-NTT, & 4-Prime Garner
