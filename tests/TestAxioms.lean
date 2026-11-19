@@ -846,4 +846,18 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms ProthNttTowerBridge.prothPrime5_certified_delegate
 #print axioms LeanAsm.valuation_dynamics_provenance_certified
 
+-- =============================================================================
+-- Part 54: Unicritical Polynomial p-Adic Escape & Bounded Orbits
+-- =============================================================================
+
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly_eval_cross_eq
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.pAdicVal_qPow
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.pAdicVal_add_eq_of_lt
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_integral_orbit_invariant
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_val_exact
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_no_preperiodic
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_concrete_iter0
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_concrete_iter1
+#print axioms LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_concrete_iter0_ne_iter1
+
 -- end of file: leanasm/tests/TestAxioms.lean
