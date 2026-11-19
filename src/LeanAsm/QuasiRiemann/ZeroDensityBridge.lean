@@ -3,7 +3,7 @@
 -- QRH thresholds θ ∈ {3/4, 7/8, 11/12, 47/48}, Chebyshev gaps, and AsymptoticZfr.
 -- Max Column: 100 Columns
 
-import LeanAsm.QuasiRiemann
+import LeanAsm.QuasiRiemann.QR.QrhCore
 import LeanAsm.QuasiRiemann.AsymptoticZfr
 import LeanAsm.QuasiRiemann.UltraDeep72
 

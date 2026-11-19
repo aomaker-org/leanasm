@@ -175,11 +175,16 @@ def weightTableAux : Nat → List (Nat × List (Nat × QRat))
     let prev := weightTableAux m
     (m + 1, computeWeightRow (m + 1) prev) :: prev
 
+/-- Memoized table up to `m = 32` (`k = 64`). -/
+private def weightTable32 : List (Nat × List (Nat × QRat)) :=
+  weightTableAux 32
+
 /-- Computed rational coefficient `w(a, k)` in `G_k = ∑_{4a + 6b = k} w(a, k) G_4^a G_6^b`. -/
 def eisensteinWeight (a k : Nat) : QRat :=
   if k % 2 = 0 then
     let m := k / 2
-    match (weightTableAux m).find? (fun p => p.1 == m) with
+    let tbl := if _h : m ≤ 32 then weightTable32 else weightTableAux m
+    match tbl.find? (fun p => p.1 == m) with
     | none => QRat.ofInt 0
     | some (_, row) =>
       match row.find? (fun q => q.1 == a) with
@@ -374,7 +379,8 @@ theorem weight_64_10 :
 
 set_option maxRecDepth 8192 in
 theorem weight_64_7 :
-    eisensteinWeight 7 64 = QRat.mk' 25836415074618238879673986008000000 658837012857118909222788817562797240139 := by decide
+    eisensteinWeight 7 64 =
+      QRat.mk' 25836415074618238879673986008000000 658837012857118909222788817562797240139 := by decide
 
 set_option maxRecDepth 8192 in
 theorem weight_64_4 :

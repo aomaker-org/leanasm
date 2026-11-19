@@ -3,7 +3,7 @@
 -- Max Column: 100 Columns
 
 import LeanAsm.Conjectures
-import LeanAsm.QuasiRiemann
+import LeanAsm.QuasiRiemann.QR.QrhCore
 import LeanAsm.QuasiRiemann.UltraDeep72
 import LeanAsm.PiChudnovsky.CrtMulBridge
 

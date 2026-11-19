@@ -2,7 +2,7 @@
 -- Bridges QuasiRiemann 36-digit certified ln(2) bounds with AsymptoticZfr envelopes.
 -- Max Column: 100 Columns
 
-import LeanAsm.QuasiRiemann
+import LeanAsm.QuasiRiemann.QR.DirichletSweepN64
 import LeanAsm.QuasiRiemann.AsymptoticZfr
 
 namespace QuasiRiemann
