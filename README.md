@@ -10,7 +10,9 @@ Cantor-Mumford certificates.
 
 All core proofs in `LeanAsm.leanasm_full_provenance_certified` audit strictly
 to `[propext, Quot.sound]` (or zero axioms), with **zero** `Classical.choice`
-and **zero** `sorryAx` across the full transitive dependency cone.
+and **zero** `sorryAx` across the full transitive dependency cone. For a full
+subsystem audit and mathematical provenance mapping across all 63 modules, see
+the [Architecture and Provenance Guide](docs/ARCHITECTURE_AND_PROVENANCE.md).
 
 ## Prerequisites & Toolchain
 
@@ -35,13 +37,13 @@ source config_env hum
 # Check toolchain and workspace status
 make status
 
-# Build all 52 modules incrementally with timing budgets
+# Build all 63 modules incrementally with timing budgets
 make build-incremental
 
 # Full build & execute Parts 1-11 + unified provenance CLI demo
 make sync
 
-# Audit transitive axiom closures across Parts 1-52 (714 checks: 0 choice, 0 sorryAx)
+# Audit transitive axiom closures across Parts 1-53 (0 choice, 0 sorryAx)
 lake env lean tests/TestAxioms.lean
 
 # Check submodule hydration status
@@ -71,23 +73,23 @@ kernel-verified computations across all 11 parts:
    `ZeroDensityBridge`, `ShortIntervalPrimes`, `ParametricQrhLadder`,
    `DyadicAbelBridge`, `MollifierVariationalBridge`)**: Mollifier descent, 2D
    rectangles down to `sigma = 0.501` (`N = 128`) and compositional 2x2
-   0.501` (`N = 128`) and compositional 2x2 Lipschitz tiles down to `sigma =
-   0.5005` (`N = 256`, `t ~ 10^12`), `sigma = 0.50025` (`N = 512`, `t ~ 10^18`,
-   90-digit CRT-NTT phase reduction `< 10^-60` rad), and `UltraDeep108`
-   (`N = 1024` at `sigma = 0.500125`, `t ~ 10^24`; `N = 2048` at `sigma =
-   0.5000625`, `t ~ 10^30`, 108-digit Chudnovsky phase reduction `< 10^-75`
-   rad), DVP asymptotic ZFR, Dirichlet `L^2` diagonal dominance, rational
-   zero-density descent (`15/26 < 3/5 < 2/3`), QRH threshold ladder `theta in
-   {3/4, 7/8, 11/12, 47/48}`, Chebyshev envelopes (`10^12..10^336`),
-   short-interval primes (`10^336/10^308`), Fermat-tower AP primes (`q in {5,
-   17, 257, 65537}`), parametric binary ladder `theta(k) = (2^k + 1) /
-   2^(k + 1)` (`5/8 > 9/16 > 17/32 > 33/64 > 1/2`), Kim-Sarnak `7/64` coupling
-   (`17/32` at `[10^96, +10^57]`), rational box contraction (`1/3`, `2/5`),
-   `UltraDeep72/108 -> ZD` (`0.50025`, `0.500125`, `0.5000625`), `[M, M * 2^k)`
-   dyadic-shell foliation, discrete Abel summation-by-parts (`1/sqrt(N)`
-   quadratic gates), closed-loop rungs `k = 5,6` (`33/64` at `[10^192,
-   +10^108]`, `65/128` at `[10^384, +10^206]`), and two-piece `QRat`
-   variational mollifiers (`13/16 < 1`, `603/1024 < 39/64`).
+   Lipschitz tiles down to `sigma = 0.5005` (`N = 256`, `t ~ 10^12`),
+   `sigma = 0.50025` (`N = 512`, `t ~ 10^18`, 90-digit CRT-NTT phase
+   reduction `< 10^-60` rad), and `UltraDeep108` (`N = 1024` at `sigma =
+   0.500125`, `t ~ 10^24`; `N = 2048` at `sigma = 0.5000625`, `t ~ 10^30`,
+   108-digit Chudnovsky phase reduction `< 10^-75` rad), DVP asymptotic ZFR,
+   Dirichlet `L^2` diagonal dominance, rational zero-density descent
+   (`15/26 < 3/5 < 2/3`), QRH threshold ladder `theta in {3/4, 7/8, 11/12,
+   47/48}`, Chebyshev envelopes (`10^12..10^336`), short-interval primes
+   (`10^336/10^308`), Fermat-tower AP primes (`q in {5, 17, 257, 65537}`),
+   parametric binary ladder `theta(k) = (2^k + 1) / 2^(k + 1)` (`5/8 > 9/16 >
+   17/32 > 33/64 > 1/2`), Kim-Sarnak `7/64` coupling (`17/32` at `[10^96,
+   +10^57]`), rational box contraction (`1/3`, `2/5`), `UltraDeep72/108 -> ZD`
+   (`0.50025`, `0.500125`, `0.5000625`), `[M, M * 2^k)` dyadic-shell
+   foliation, discrete Abel summation-by-parts (`1/sqrt(N)` quadratic gates),
+   closed-loop rungs `k = 5,6` (`33/64` at `[10^192, +10^108]`, `65/128` at
+   `[10^384, +10^206]`), and two-piece `QRat` variational mollifiers (`13/16 <
+   1`, `603/1024 < 39/64`).
 6. **Part 6 (`RnsArithmetic`, `EulerFactorNonVanishing`, `ArtinFermatBridge`,
    `ArtinShortIntervalBridge`)**: 3-channel Garner CRT execution, Fermat-tower
    `{5, 17, 257, 65537}` strip bounds (`sigma in {1/2, 3/4, 1}`), cyclotomic
@@ -112,20 +114,22 @@ kernel-verified computations across all 11 parts:
     `pi`, universal `m >= 8` truncation trap, and unified master certificate
     `LeanAsm.leanasm_full_provenance_certified`.
 
-## 52-Module Theorem Inventory
+## 63-Module Theorem Inventory
 
 Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 `QuasiRiemann/`, `Val/` for `QuasiRiemann/Valuation/`, `PC/` for
 `PiChudnovsky/`, and `Main.lean` + `src/LeanAsm.lean` at the root).
-`tests/TestAxioms.lean` audits Parts 1-52 (714 axiom checks).
+`tests/TestAxioms.lean` audits Parts 1-53 (705+ axiom checks).
 `NS` legend: `=` = filename stem, `QR` = `QuasiRiemann`, `Val` = `Valuation`,
-`PC` = `PiChudnovsky`.
+`PC` = `PiChudnovsky`, `Const` = `Constants`, `G2` = `Genus2`.
 
 | Module | NS | Flagship Theorem / Role |
 | --- | --- | --- |
-| `Main.lean` | `(root)` | CLI entrypoint (`Parts 1-11` + provenance) |
-| `LeanAsm.lean` | `(root)` | Library root exporting all 46 submodules |
-| `MiniVM.lean` | `=` | `exec_garner_crt_sound`, `mul_mod_reg_correct` |
+| `Main.lean` | `(root)` | CLI entrypoint (`Parts 1-11` + prov) |
+| `LeanAsm.lean` | `(root)` | Library root exporting all 61 submodules |
+| `MiniVM.lean` | `=` | `exec_garner_crt_sound`, `mul_mod_reg` |
+| `Constants/PiAndSqrt.lean` | `Const` | `sqrt10005_scaled110`, `pi_digits` |
+| `Constants/PrimeTowers.lean` | `Const` | `fermat_tower_mod4`, Fermat roots |
 | `MiniVMNttBridge.lean` | `=` | `crtNtt4ConvAsm_sound` |
 | `Conjectures.lean` | `=` | `collatz_one_reaches_one` |
 | `CollatzQrhBridge.lean` | `=` | `collatz_cycle_length_lower_bound_306` |
@@ -133,13 +137,19 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `YangMillsQ8.lean` | `=` | `q8_trace_conjugation_invariant` |
 | `ConstructiveOpenaiBridge.lean` | `=` | `holonomy_gauge_covariant` |
 | `QR/Rat.lean` | `QR` | `QRat` constructive rational field core |
+| `QR/QR/QrhCore.lean` | `QR` | `seven_eighths_in_critical_strip` |
+| `QR/QR/DirichletSweepLowN.lean` | `QR` | `sample_certs_valid_in_unknown_box` |
+| `QR/QR/DirichletSweepN64.lean` | `QR` | `ultra_deep_rects_down_to_0505` |
 | `QuasiRiemann.lean` | `=` | `isValidLipTile2D_sound` |
 | `QR/UltraDeep72Core.lean` | `QR` | `crtNtt_highTrunc_2d_zero_free_rect` |
 | `QR/UltraDeep90.lean` | `QR` | `ultraDeep72_N512_rational_rect_cert` |
 | `QR/UltraDeep108Tables.lean` | `QR` | `ln_table_1_to_2048_valid` |
 | `QR/UltraDeep108Eval.lean` | `QR` | `foldNatStep_2047_chunks` |
 | `QR/UltraDeep108N1024.lean` | `QR` | `ultraDeep72_N1024_rational_rect_cert` |
-| `QR/UltraDeep108N2048.lean` | `QR` | `ultraDeep72_N2048_rational_rect_cert` |
+| `QR/UltraDeep108N2048Part1.lean` | `QR` | `evalStep30_eq`, anchor step fold |
+| `QR/UltraDeep108N2048Part2.lean` | `QR` | `t30_2_c1`..`c6` chunked fold eval |
+| `QR/UltraDeep108N2048Part3.lean` | `QR` | `ultraDeep72_N2048_rect_cert` |
+| `QR/UltraDeep108N2048.lean` | `QR` | Re-export facade for $N=2048$ tile |
 | `QR/UltraDeep108.lean` | `QR` | `crtNtt_highTrunc108_2d_zero_free_rect` |
 | `QR/UltraDeep72.lean` | `QR` | `72`/`90`/`108`-digit umbrella re-export |
 | `QR/AsymptoticZfr.lean` | `QR` | `dvp_asymptotic_zero_free_region` |
@@ -150,16 +160,19 @@ Paths below `src/LeanAsm/` are relative to `src/LeanAsm/` (with `QR/` for
 | `QR/DyadicAbelBridge.lean` | `QR` | `short_interval_dyadic_abel_envelope` |
 | `QR/MollifierVariationalBridge.lean` | `QR` | `variationalQrhThreshold` |
 | `Val/Ultrametric.lean` | `Val` | `qrat_padic_valuation_nonarchimedean` |
-| `Val/Contraction.lean` | `Val` | `strict_contraction_fixed_point_unique` |
-| `Val/Hensel.lean` | `Val` | `hensel_step_unique_root_lifting` |
-| `Val/Eisenstein2Adic.lean` | `Val` | `legendre_v2_factorial`, `proposition_4` |
-| `Val/EisensteinWeights.lean` | `Val` | `romikCoeff_symm`, `prop4_computed_m4` |
+| `Val/Contraction.lean` | `Val` | `iterate_val_range`, `iterate_growth` |
+| `Val/Hensel.lean` | `Val` | `hensel_poly_simple_root_lift` |
+| `Val/Eisenstein2Adic.lean` | `Val` | `legendre_v2_factorial`, `prop_4` |
+| `Val/EisensteinWeights.lean` | `Val` | `romikCoeff_symm`, `prop4_m4` |
 | `Val/PreperiodicDynamics.lean` | `Val` | `preperiodic_partition_sound` |
 | `Val/RNS.lean` | `Val` | `RnsInt.reconstruct_sound` |
 | `RnsArithmetic.lean` | `=` | `garner_mul_concrete_soundness` |
 | `EulerFactorNonVanishing.lean` | `=` | `local_euler_disk_nonvanishing` |
+| `Genus2/PolyF5.lean` | `G2` | `polyDivMod_sound`, `polyXgcd_bezout` |
+| `Constants/CurveTables.lean` | `Const` | `curveF5Coeffs`, `rawOrbitTable` |
+| `Genus2/Cantor.lean` | `G2` | `jacobian_group_axioms_on_orbit` |
+| `Genus2Jacobian.lean` | `=` | `jacobian_group_axioms_on_orbit` facade |
 | `FiniteFieldRH.lean` | `=` | `hasse_weil_riemann_hypothesis` |
-| `Genus2Jacobian.lean` | `=` | `jacobian_group_axioms_on_orbit` |
 | `WeilZetaBridge.lean` | `=` | `genus2_completed_zeta_reflection` |
 | `GSp4FunctorialityBridge.lean` | `=` | `gsp4_std_functional_equation` |
 | `EllipticModularityBridge.lean` | `=` | `eichler_shimura_trace_eq_11a1` |
@@ -286,14 +299,17 @@ leanasm/
 ├── Makefile                 # build, build-incremental, run, test, sync
 ├── mk/                      # Modular makefile extensions (hydrate.mk)
 ├── Main.lean                # CLI entrypoint (Parts 1-11 + provenance)
+├── scripts/                 # clip_groups.py, files2clip, inspect_history
 ├── src/
-│   ├── LeanAsm.lean         # Library root aggregating 46 submodules
-│   └── LeanAsm/             # 25 domain modules + PC/ + QR/ + QR/Valuation/
-│       ├── ProvenanceSummary.lean
+│   ├── LeanAsm.lean         # Library root aggregating 61 submodules
+│   └── LeanAsm/             # 61 modules + Constants + Genus2 + PC + QR + Val
+│       ├── Constants/       # PiAndSqrt, PrimeTowers, CurveTables
+│       ├── Genus2/          # PolyF5, Cantor
 │       ├── PiChudnovsky/    # CrtMulBridge, Sqrt10005, ChudnovskySeries
+│       ├── ProvenanceSummary.lean
 │       └── QuasiRiemann/    # Rat, UD72/90/108, Zfr, ZD, Short, PQL, Abel, MVB
-│           └── Valuation/   # Ultrametric, Contraction, Hensel, Eisenstein, Dynamics, RNS
-├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-52)
+│           └── Valuation/   # Ultrametric, Hensel, Eisenstein, Dynamics, RNS
+├── tests/                   # Axiom audit suite (TestAxioms.lean Parts 1-53)
 └── tools/                   # Build and logging utilities
 ```
 
