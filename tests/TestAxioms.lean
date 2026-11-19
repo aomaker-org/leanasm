@@ -917,4 +917,16 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms LeanAsm.Genus2WeilGSp4Weave.cert_weave_p23
 #print axioms LeanAsm.Genus2WeilGSp4Weave.genus2_multiprime_weil_gsp4_weave_bridge
 
+-- =============================================================================
+-- Part 58: Constructive QSD[1-4] Algebraic Structures & QuasiRiemann/Zeta Bridge
+-- =============================================================================
+
+#print axioms QuasiRiemann.slice_dual_leibniz
+#print axioms QuasiRiemann.split_idempotent_properties
+#print axioms QuasiRiemann.qsd2_truncation_associativity_defect
+#print axioms QuasiRiemann.qsd3_anticommute_order_obstruction
+#print axioms QuasiRiemann.qsd4_rns_channel_crt_decomposition
+#print axioms QuasiRiemann.qsd4_nilpotent_zero_divisor_lift
+#print axioms QuasiRiemann.qsd_algebra_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean
