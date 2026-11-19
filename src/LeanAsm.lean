@@ -35,6 +35,7 @@ import LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics
 import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 import LeanAsm.QuasiRiemann.Valuation.RNS
 import LeanAsm.QuasiRiemann.QsdAlgebraBridge
+import LeanAsm.QuasiRiemann.Qsd1LogDerivStripBridge
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
 import LeanAsm.Constants.CurveTables
