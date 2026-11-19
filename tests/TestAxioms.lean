@@ -6,6 +6,7 @@ import LeanAsm.QuasiRiemann.Valuation.Ultrametric
 import LeanAsm.QuasiRiemann.Valuation.Contraction
 import LeanAsm.QuasiRiemann.Valuation.Hensel
 import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
+import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 
 #print axioms MiniVM.get_set_same
 #print axioms MiniVM.get_set_other
@@ -972,5 +973,18 @@ import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 #print axioms QuasiRiemann.gaussian_qsd_norm_multiplicative
 #print axioms QuasiRiemann.gaussian_qsd_truncation_defect
 #print axioms QuasiRiemann.gaussian_qsd_hensel_tower_bridge
+
+-- =============================================================================
+-- Part 63: Genus-2 Multi-Prime Frobenius Traces, QSD[4] Hensel & Preperiodic Weave
+-- =============================================================================
+
+#print axioms LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave.cert_weave_p7
+#print axioms LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave.cert_weave_p11
+#print axioms LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave.cert_weave_p13
+#print axioms LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave.cert_weave_p17
+#print axioms LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave.cert_weave_p19
+#print axioms LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave.cert_weave_p23
+#print axioms LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave.genus2_hensel_preperiodic_weave_bridge
+#print axioms LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave.genus2_hensel_preperiodic_cert
 
 -- end of file: leanasm/tests/TestAxioms.lean
