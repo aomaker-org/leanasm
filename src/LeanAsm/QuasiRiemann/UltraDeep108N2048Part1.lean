@@ -5,21 +5,6 @@ import LeanAsm.QuasiRiemann.UltraDeep108Eval
 
 namespace QuasiRiemann
 
-/-- Partitioned `2 × 2` tile grid for `(σ = 0.500062, N = 2048, t ~ 10^30)` covering
-`[0.500062, 0.500462] × [10^30 + 1.0698, 10^30 + 1.0702]` (containing `σ = 0.5000625`). -/
-def highTruncTiles_1e30_N2048 : List LipTile2D :=
-  buildLipTile2x2_108Core twoPiRaw108 lnPrimeTable108Crt lnHighPrimes108TreeCrt rawMul108Crt
-    intMul192ViaCrtNtt rawMul18Crt 2048
-    500062 500262 500462
-    1000000000000000000000000000001069800 1000000000000000000000000000001070000
-    1000000000000000000000000000001070200 2
-
-
-theorem grad30_fast_valid :
-    dirichletGradBoundScaled6_2048Core lnPrimeTable108Lit lnHighPrimes108TreeLit Int.mul
-      rawMul18Fast 500062 2048 = 512891320 := by
-  decide +kernel
-
 def step30 (sMid6 tMid6 : Nat) :
     Nat → ScaledInterval × ScaledInterval → ScaledInterval × ScaledInterval :=
   zetaAnchorStep108Core twoPiRaw108Lit lnPrimeTable108Lit lnHighPrimes108TreeLit
