@@ -844,5 +844,6 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms PiChudnovsky.piLower105_eq_piLowerWith
 #print axioms PiChudnovsky.piUpper105_eq_piUpperWith
 #print axioms ProthNttTowerBridge.prothPrime5_certified_delegate
+#print axioms LeanAsm.valuation_dynamics_provenance_certified
 
 -- end of file: leanasm/tests/TestAxioms.lean

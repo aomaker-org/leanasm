@@ -3,7 +3,6 @@
 -- Max Column: 100 Columns
 
 import LeanAsm.QuasiRiemann.Rat
-import LeanAsm.QuasiRiemann.Valuation.Ultrametric
 import LeanAsm.QuasiRiemann.Valuation.Eisenstein2Adic
 
 open _root_.QuasiRiemann

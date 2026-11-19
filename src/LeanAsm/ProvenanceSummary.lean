@@ -1469,6 +1469,58 @@ theorem prothNttTower_provenance_certified : ProthNttTowerProvenance :=
    ProthNttTowerBridge.garnerReconstruct5Asm_sound,
    ProthNttTowerBridge.proth_tower_euler_strip_certs⟩
 
+/-- Part 52 provenance specification bundling 2-adic Eisenstein valuation,
+Romik symmetry, RNS rational contraction, and unicritical preperiodic polynomial dynamics bounds. -/
+def ValuationDynamicsProvenance : Prop :=
+  (∀ m : Nat, QuasiRiemann.Valuation.Eisenstein2Adic.v2 (QuasiRiemann.Valuation.Eisenstein2Adic.fact m) +
+    QuasiRiemann.Valuation.Eisenstein2Adic.hammingWeight m = m) ∧
+  (∀ m : Nat, QuasiRiemann.Valuation.Eisenstein2Adic.isUnitMod2 m (2 ^ m) = true ∧
+    ∀ a : Nat, a ≠ 2 ^ m → QuasiRiemann.Valuation.Eisenstein2Adic.isUnitMod2 m a = false) ∧
+  (∀ (n j : Nat) (hj1 : 1 ≤ j) (hjn : j ≤ n),
+    QuasiRiemann.Valuation.EisensteinWeights.romikCoeff n j =
+      QuasiRiemann.Valuation.EisensteinWeights.romikCoeff n (n - j + 1)) ∧
+  (QuasiRiemann.Valuation.EisensteinWeights.qratV2
+    (QuasiRiemann.Valuation.EisensteinWeights.eisensteinWeight 16 64) = 0) ∧
+  (∀ (k : Nat) (moduli : Array Nat) (h_mod : moduli.size = k),
+    have initial := QuasiRiemann.RNS.RnsQRat.zero k moduli h_mod
+    have result := QuasiRiemann.RNS.rnsContractionLoop 1024 initial #[initial]
+    have final_qrat := result.toQRat
+    final_qrat.num ≥ 0) ∧
+  ((QuasiRiemann.Valuation.PreperiodicDynamics.w0_formula 5 2 (by decide) (by decide)).reduce =
+    QuasiRiemann.QRat.mk' 2 5 (by decide)) ∧
+  (QuasiRiemann.Valuation.PreperiodicDynamics.qratV2
+    (QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
+      (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly (QuasiRiemann.QRat.ofInt 2) 2) 2
+      (QuasiRiemann.QRat.ofInt 0)) = 1) ∧
+  (have base := QuasiRiemann.QRat.mk' 2 5 (by decide)
+   have bound := QuasiRiemann.Valuation.PreperiodicDynamics.theorem51AsymptoticBound 2 2 base
+   bound ≥ base) ∧
+  (have bound := QuasiRiemann.Valuation.PreperiodicDynamics.theorem13AverageBound 134
+   bound.num > 0) ∧
+  (have bound := QuasiRiemann.Valuation.PreperiodicDynamics.proposition53AverageBound 2 2 134
+   bound.num > 0) ∧
+  (have bound := QuasiRiemann.Valuation.PreperiodicDynamics.wreathProductMultiplicityBound 2 2
+    (QuasiRiemann.QRat.mk' 1 100 (by decide))
+   bound.num > 0) ∧
+  (have bound := QuasiRiemann.Valuation.PreperiodicDynamics.lemma43DivisibilityBound 2 3 1
+    (QuasiRiemann.QRat.mk' 1 10 (by decide))
+   bound.num > 0)
+
+/-- Zero-axiom certificate for Part 52 2-adic valuation and preperiodic dynamics bounds. -/
+theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
+  ⟨QuasiRiemann.Valuation.Eisenstein2Adic.legendre_v2_factorial,
+   QuasiRiemann.Valuation.Eisenstein2Adic.proposition_4_unique,
+   QuasiRiemann.Valuation.EisensteinWeights.romikCoeff_symm,
+   QuasiRiemann.Valuation.EisensteinWeights.prop4_computed_m4.1,
+   QuasiRiemann.RNS.rns_contraction_sound,
+   QuasiRiemann.Valuation.PreperiodicDynamics.andersen_garton_prop22_q5_d2_reduced,
+   QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_iterate_valuation_growth.2.2,
+   QuasiRiemann.Valuation.PreperiodicDynamics.theorem51_asymptotic_bound_sound,
+   QuasiRiemann.Valuation.PreperiodicDynamics.theorem13_average_bound_sound,
+   QuasiRiemann.Valuation.PreperiodicDynamics.proposition53_average_bound_sound,
+   QuasiRiemann.Valuation.PreperiodicDynamics.wreath_product_bound_sound,
+   QuasiRiemann.Valuation.PreperiodicDynamics.lemma43_divisibility_bound_sound⟩
+
 /-- Part 7 provenance specification bundling Hasse-Weil RH for `E / F_7`,
 genus-2 `C / F_5` negative discriminants, `L(C, 1) = 71/25`, Cantor-Mumford group axioms
 for `J(C)(F_5) ≅ Z/71Z`, punctured-strip zeta non-vanishing, `Ξ_C` reflection,
@@ -1789,16 +1841,19 @@ theorem chudnovskyPi_provenance_certified : ChudnovskyPiProvenance :=
 of `leanasm` (`MiniVM`, `Collatz`, `Yang-Mills`, `QuasiRiemann`, `Euler-RNS`, `FiniteFieldRH` /
 `Genus2Jacobian` / `WeilZeta`, `CrtNtt`, and `PiChudnovsky`), proved with ZERO `Classical.choice`
 and ZERO `sorryAx`. -/
-theorem leanasm_full_provenance_certified :
-    MiniVmProvenance ∧
-    CollatzProvenance ∧
-    YangMillsProvenance ∧
-    QuasiRiemannProvenance ∧
-    EulerRnsProvenance ∧
-    FiniteFieldWeilProvenance ∧
-    CrtNttProvenance ∧
-    ChudnovskyPiProvenance ∧
-    ProthNttTowerProvenance :=
+def LeanAsmFullProvenance : Prop :=
+  MiniVmProvenance ∧
+  CollatzProvenance ∧
+  YangMillsProvenance ∧
+  QuasiRiemannProvenance ∧
+  EulerRnsProvenance ∧
+  FiniteFieldWeilProvenance ∧
+  CrtNttProvenance ∧
+  ChudnovskyPiProvenance ∧
+  ProthNttTowerProvenance ∧
+  ValuationDynamicsProvenance
+
+theorem leanasm_full_provenance_certified : LeanAsmFullProvenance :=
   ⟨miniVm_provenance_certified,
    collatz_provenance_certified,
    yangMills_provenance_certified,
@@ -1807,7 +1862,8 @@ theorem leanasm_full_provenance_certified :
    finiteFieldWeil_provenance_certified,
    crtNtt_provenance_certified,
    chudnovskyPi_provenance_certified,
-   prothNttTower_provenance_certified⟩
+   prothNttTower_provenance_certified,
+   valuation_dynamics_provenance_certified⟩
 
 end LeanAsm
 
