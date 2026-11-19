@@ -34,6 +34,9 @@ import LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics
 import LeanAsm.QuasiRiemann.Valuation.RNS
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
+import LeanAsm.Constants.CurveTables
+import LeanAsm.Genus2.PolyF5
+import LeanAsm.Genus2.Cantor
 import LeanAsm.Genus2Jacobian
 import LeanAsm.EulerFactorNonVanishing
 import LeanAsm.WeilZetaBridge
