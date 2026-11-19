@@ -1026,5 +1026,11 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms LeanAsm.QuasiRiemann.LuckySieve.lucky_harmonic_200_pos
 #print axioms LeanAsm.QuasiRiemann.lucky_beurling_qsd1_strip_weave
 #print axioms LeanAsm.QuasiRiemann.lucky_beurling_qsd1_strip_cert
+#print axioms LeanAsm.QuasiRiemann.luckySub78StripCert_50
+#print axioms LeanAsm.QuasiRiemann.luckySub78StripCert_200
+#print axioms LeanAsm.QuasiRiemann.lucky_beurling_product_50_pos
+#print axioms LeanAsm.QuasiRiemann.lucky_beurling_product_200_pos
+#print axioms LeanAsm.QuasiRiemann.lucky_sub78_strip_certificate_bridge
+#print axioms LeanAsm.QuasiRiemann.lucky_sub78_strip_cert_50_bridge
 
 -- end of file: leanasm/tests/TestAxioms.lean

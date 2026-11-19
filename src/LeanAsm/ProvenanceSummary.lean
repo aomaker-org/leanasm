@@ -52,6 +52,7 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 import LeanAsm.QuasiRiemann.RankinSelbergGSp4Sub78Bridge
 import LeanAsm.QuasiRiemann.JacobianRankinSelbergWeave
 import LeanAsm.QuasiRiemann.LuckyBeurlingStripWeave
+import LeanAsm.QuasiRiemann.LuckyQrh78Strip
 import LeanAsm.MiniVMRnsHenselWeave
 
 namespace LeanAsm
@@ -1187,6 +1188,46 @@ def QuasiRiemannProvenance : Prop :=
       QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.strip.rectSpec.HasCertifiedNonVanishing) ∧
      (QuasiRiemann.QRat.mk' 1 2 < QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.strip.sigmaLo ∧
       QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.strip.sigmaLo <
+        QuasiRiemann.qrhThresholdSevenEighths))) ∧
+  ((QuasiRiemann.QRat.ofInt 0 <
+      LeanAsm.QuasiRiemann.beurlingEulerPartialProductRat
+        (LeanAsm.QuasiRiemann.LuckySieve.luckyGeneratorsUpTo 50) 1 ∧
+    QuasiRiemann.QRat.mk' 241 100 ≤
+      LeanAsm.QuasiRiemann.beurlingEulerPartialProductRat
+        (LeanAsm.QuasiRiemann.LuckySieve.luckyGeneratorsUpTo 50) 1 ∧
+    LeanAsm.QuasiRiemann.beurlingEulerPartialProductRat
+        (LeanAsm.QuasiRiemann.LuckySieve.luckyGeneratorsUpTo 50) 1 ≤
+      QuasiRiemann.QRat.mk' 242 100 ∧
+    QuasiRiemann.qrhThresholdSevenEighths ≤ QuasiRiemann.qrhThresholdSevenEighths ∧
+    QuasiRiemann.rationalBoxSpec_N256.lipNumerator * QuasiRiemann.rationalBoxSpec_N256.radius <
+      QuasiRiemann.rationalBoxSpec_N256.centerLower *
+        (QuasiRiemann.rationalBoxSpec_N256.radius - QuasiRiemann.rationalBoxSpec_N256.deltaShrink)) ∧
+   ((2 * QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.lipNumerator *
+         QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.radius ≤
+       QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.centerLower *
+         (QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.radius -
+           QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.deltaShrink) ∧
+      QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.lipNumerator *
+         QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.radius <
+       QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.centerLower *
+         (QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.radius -
+           QuasiRiemann.qsd1LogDerivRung32000Spec.jetSpec.qSpec.deltaShrink)) ∧
+     (QuasiRiemann.mollifierThetaDen QuasiRiemann.qsd1LogDerivRung32000Spec.vDen2 ≤
+         2 * QuasiRiemann.mollifierThetaNum QuasiRiemann.qsd1LogDerivRung32000Spec.vNum2
+           QuasiRiemann.qsd1LogDerivRung32000Spec.vDen2 ∧
+      QuasiRiemann.mollifierThetaNum QuasiRiemann.qsd1LogDerivRung32000Spec.vNum2
+          QuasiRiemann.qsd1LogDerivRung32000Spec.vDen2 *
+          QuasiRiemann.mollifierThetaDen QuasiRiemann.qsd1LogDerivRung32000Spec.vDen1 <
+        QuasiRiemann.mollifierThetaNum QuasiRiemann.qsd1LogDerivRung32000Spec.vNum1
+          QuasiRiemann.qsd1LogDerivRung32000Spec.vDen1 *
+          QuasiRiemann.mollifierThetaDen QuasiRiemann.qsd1LogDerivRung32000Spec.vDen2 ∧
+      8 * QuasiRiemann.mollifierThetaNum QuasiRiemann.qsd1LogDerivRung32000Spec.vNum1
+          QuasiRiemann.qsd1LogDerivRung32000Spec.vDen1 ≤
+        7 * QuasiRiemann.mollifierThetaDen QuasiRiemann.qsd1LogDerivRung32000Spec.vDen1) ∧
+     (0 < QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.margin ∧
+      QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.strip.rectSpec.HasCertifiedNonVanishing) ∧
+     (QuasiRiemann.QRat.mk' 1 2 < QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.strip.sigmaLo ∧
+      QuasiRiemann.qsd1LogDerivRung32000Spec.weaveSpec.strip.sigmaLo <
         QuasiRiemann.qrhThresholdSevenEighths)))
 
 set_option exponentiation.threshold 2000 in
@@ -1316,7 +1357,8 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
     QuasiRiemann.Valuation.hensel_mersenne_tower_crt_built_inv_5,
     QuasiRiemann.Valuation.hensel_sqrt2_mod_pow_7,
     QuasiRiemann.Valuation.hensel_mersenne_tower_sqrt2_built⟩,
-   QuasiRiemann.lucky_beurling_qsd1_strip_cert⟩
+   QuasiRiemann.lucky_beurling_qsd1_strip_cert,
+   QuasiRiemann.lucky_sub78_strip_cert_50_bridge⟩
 
 -- =============================================================================
 -- Parts 6 & 8: RNS Garner & Fermat-Tower / Dedekind Euler Non-Vanishing
