@@ -999,6 +999,55 @@ theorem ultradeep72_N2048_strip_zd_certs :
     certifiedStrip0500125_N1024.rect_certified,
     certifiedStrip05000625_N2048.rect_certified⟩
 
+/-- High-height `HighTruncZeroFreeRectSpec` for `(σ = 0.50003125 = 1/2 + 1/32000, N = 2048, t ~ 10^30)`.
+Shares `deltaN`, `eTail`, `epsCrt`, and `[tLo, tHi]` with `highTruncSpec_1e30_N2048`. -/
+def highTruncSpec_1e30_N2048_rung32000 : HighTruncZeroFreeRectSpec where
+  nTrunc := 2048
+  sigmaNum := 16001
+  sigmaDen := 32000
+  tLoScaled := 1000000000000000000000000000001069800
+  tHiScaled := 1000000000000000000000000000001070200
+  deltaN := 2683000
+  eTail := 1
+  epsCrt := 2
+  nTrunc_valid := Or.inr (Or.inr (Or.inr (Or.inr rfl)))
+  sigma_above_half := by decide
+  t_ordered := by decide
+
+/-- Concrete `CertifiedStripWidthSpec` for the sharper dyadic rung
+`(σ = 0.50003125 = 1/2 + 1/32000, N = 2048, t ~ 10^30)`. -/
+def certifiedStrip050003125_N2048 : CertifiedStripWidthSpec where
+  rectSpec := highTruncSpec_1e30_N2048_rung32000
+  sigmaDen_pos := by decide
+  sigmaLo := QRat.mk' 16001 32000
+  halfWidth := QRat.mk' 1 32000
+  halfWidth_pos := by decide
+  sigma_eq_half_add := by decide
+  sigma_eq_rect := by decide
+  rect_certified := crtNtt_highTrunc108_N2048_rect.2.2.2
+
+/-- Sharp dyadic strip rung `1/2 + 1/32000` theorem:
+Certifies strictly narrower half-width `1/32000 < 1/16000 < 1/8000 < 1/4000 < 7/8`,
+strict penetration `1/2 < 16001/32000 < 8001/16000 < 7/8`, and exact Guth-Maynard
+and Huxley zero-density exponent gains `3/41600` and `3/40000` below `1/2`.
+Zero `Classical.choice`, zero `sorryAx`. -/
+theorem ultradeep72_N2048_strip_rung_32000_cert :
+    certifiedStrip050003125_N2048.halfWidth < certifiedStrip05000625_N2048.halfWidth ∧
+    certifiedStrip050003125_N2048.sigmaLo < certifiedStrip05000625_N2048.sigmaLo ∧
+    QRat.mk' 1 2 < certifiedStrip050003125_N2048.sigmaLo ∧
+    certifiedStrip050003125_N2048.sigmaLo < qrhThresholdSevenEighths ∧
+    QRat.eqv
+      (zdGuthMaynard.exponent (QRat.mk' 1 2) -
+        zdGuthMaynard.exponent certifiedStrip050003125_N2048.sigmaLo)
+      (QRat.mk' 3 41600) ∧
+    QRat.eqv
+      (zdHuxley.exponent (QRat.mk' 1 2) -
+        zdHuxley.exponent certifiedStrip050003125_N2048.sigmaLo)
+      (QRat.mk' 3 40000) ∧
+    certifiedStrip050003125_N2048.rectSpec.HasCertifiedNonVanishing := by
+  exact ⟨by decide, by decide, by decide, by decide, by decide, by decide,
+    certifiedStrip050003125_N2048.rect_certified⟩
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/ZeroDensityBridge.lean

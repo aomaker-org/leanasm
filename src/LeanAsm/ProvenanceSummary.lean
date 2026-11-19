@@ -737,7 +737,22 @@ def HighTruncRationalContractionProp : Prop :=
     QuasiRiemann.QRat.eqv
       (QuasiRiemann.zdHuxley.exponent (QuasiRiemann.QRat.mk' 1 2) -
         QuasiRiemann.zdHuxley.exponent QuasiRiemann.certifiedStrip05000625_N2048.sigmaLo)
-      (QuasiRiemann.QRat.mk' 3 20000))
+      (QuasiRiemann.QRat.mk' 3 20000)) ∧
+  (QuasiRiemann.certifiedStrip050003125_N2048.halfWidth <
+      QuasiRiemann.certifiedStrip05000625_N2048.halfWidth ∧
+    QuasiRiemann.certifiedStrip050003125_N2048.sigmaLo <
+      QuasiRiemann.certifiedStrip05000625_N2048.sigmaLo ∧
+    QuasiRiemann.QRat.mk' 1 2 < QuasiRiemann.certifiedStrip050003125_N2048.sigmaLo ∧
+    QuasiRiemann.certifiedStrip050003125_N2048.sigmaLo < QuasiRiemann.qrhThresholdSevenEighths ∧
+    QuasiRiemann.QRat.eqv
+      (QuasiRiemann.zdGuthMaynard.exponent (QuasiRiemann.QRat.mk' 1 2) -
+        QuasiRiemann.zdGuthMaynard.exponent QuasiRiemann.certifiedStrip050003125_N2048.sigmaLo)
+      (QuasiRiemann.QRat.mk' 3 41600) ∧
+    QuasiRiemann.QRat.eqv
+      (QuasiRiemann.zdHuxley.exponent (QuasiRiemann.QRat.mk' 1 2) -
+        QuasiRiemann.zdHuxley.exponent QuasiRiemann.certifiedStrip050003125_N2048.sigmaLo)
+      (QuasiRiemann.QRat.mk' 3 40000) ∧
+    QuasiRiemann.certifiedStrip050003125_N2048.rectSpec.HasCertifiedNonVanishing)
 
 /-- Constructive `[M, M * 2^k)` dyadic-shell foliation, discrete Abel
 summation-by-parts, monotone-weight error contraction, cleared-denominator `1/√N`
@@ -800,7 +815,14 @@ def DyadicAbelProvenanceProp : Prop :=
    QuasiRiemann.QRat.mk' 1 2 < QuasiRiemann.highTruncDyadicAbel1024Spec.strip.sigmaLo ∧
    QuasiRiemann.highTruncDyadicAbel1024Spec.strip.sigmaLo < QuasiRiemann.QRat.mk' 3 4 ∧
    QuasiRiemann.QRat.mk' 1 2 < QuasiRiemann.highTruncDyadicAbel2048Spec.strip.sigmaLo ∧
-   QuasiRiemann.highTruncDyadicAbel2048Spec.strip.sigmaLo < QuasiRiemann.QRat.mk' 3 4)
+   QuasiRiemann.highTruncDyadicAbel2048Spec.strip.sigmaLo < QuasiRiemann.QRat.mk' 3 4) ∧
+  (QuasiRiemann.highTruncDyadicAbel32000Spec.margin = 2682997 ∧
+   QuasiRiemann.highTruncDyadicAbel32000Spec.strip.rectSpec.HasCertifiedNonVanishing ∧
+   QuasiRiemann.QRat.mk' 1 2 < QuasiRiemann.highTruncDyadicAbel32000Spec.strip.sigmaLo ∧
+   QuasiRiemann.highTruncDyadicAbel32000Spec.strip.sigmaLo <
+     QuasiRiemann.highTruncDyadicAbel2048Spec.strip.sigmaLo ∧
+   QuasiRiemann.highTruncDyadicAbel32000Spec.strip.sigmaLo <
+     QuasiRiemann.qrhThresholdSevenEighths)
 
 /-- Reusable Part 5 specification for closed-loop dyadic-Abel rungs (`k = 5, 6`)
 and two-piece `QRat` variational mollifier optimization (`Issue #78`). -/
@@ -1140,7 +1162,8 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
      QuasiRiemann.ultraDeep72_N2048_rational_rect_cert.2.2.2.2.2.2.2.2.1⟩,
     ⟨QuasiRiemann.ultradeep72_N2048_strip_zd_certs.1,
      QuasiRiemann.ultradeep72_N2048_strip_zd_certs.2.2.2.2.2.2.1,
-     QuasiRiemann.ultradeep72_N2048_strip_zd_certs.2.2.2.2.2.2.2.1⟩⟩,
+     QuasiRiemann.ultradeep72_N2048_strip_zd_certs.2.2.2.2.2.2.2.1⟩,
+    QuasiRiemann.ultradeep72_N2048_strip_rung_32000_cert⟩,
    ⟨QuasiRiemann.dyadic_shell_sum_partition,
     fun r o _i _l hi M k f g => QuasiRiemann.dyadic_shell_sum_foliation r o hi M k f g,
     QuasiRiemann.discrete_abel_summation_by_parts,
@@ -1156,14 +1179,19 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
      QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.1,
      QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.2.1,
      QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.2.2.1⟩,
-    ⟨QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert.1,
-     QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert.1,
-     QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert.2.2.2.2.2.2.1,
-     QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert.2.2.2.2.2.2.1,
-     QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert.2.2.1,
-     QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert.2.2.2.1,
-     QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert.2.2.1,
-     QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert.2.2.2.1⟩⟩,
+    ⟨⟨QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert.1,
+      QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert.1,
+      QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert.2.2.2.2.2.2.1,
+      QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert.2.2.2.2.2.2.1,
+      QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert.2.2.1,
+      QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert.2.2.2.1,
+      QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert.2.2.1,
+      QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert.2.2.2.1⟩,
+     ⟨QuasiRiemann.hightrunc_dyadic_abel_weave_rung32000_cert.1,
+      QuasiRiemann.hightrunc_dyadic_abel_weave_rung32000_cert.2.2.2.2.2.2.2.2.1,
+      QuasiRiemann.hightrunc_dyadic_abel_weave_rung32000_cert.2.2.1,
+      QuasiRiemann.hightrunc_dyadic_abel_weave_rung32000_cert.2.2.2.1,
+      QuasiRiemann.hightrunc_dyadic_abel_weave_rung32000_cert.2.2.2.2.2.1⟩⟩⟩,
    ⟨fun kC kN specN sN hD a w M N E D hMN hD0 hw0 hwA hR gate hHX hE pX pXH tX tXH hBX hBXH hC hP =>
       let h := QuasiRiemann.dyadic_abel_unlocks_next_rung kC kN specN sN hD a w M N E D hMN hD0
         hw0 hwA hR gate hHX hE pX pXH tX tXH hBX hBXH hC hP
