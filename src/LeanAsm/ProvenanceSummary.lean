@@ -43,6 +43,7 @@ import LeanAsm.EllipticModularityBridge
 import LeanAsm.LanglandsRankinSelbergBridge
 import LeanAsm.ProthNttTowerBridge
 import LeanAsm.Genus2MultiPrimeWeil
+import LeanAsm.Genus2WeilGSp4Weave
 
 namespace LeanAsm
 
@@ -1818,11 +1819,27 @@ def FiniteFieldWeilProvenance : Prop :=
       EllipticModularityBridge.heckeCoeff11 (p * p) =
         EllipticModularityBridge.heckeCoeff11 p ^ 2 - (p : Int))) ∧
   (∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList, Genus2MultiPrimeWeil.Genus2WeilCert p) ∧
+  ((∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList,
+      Genus2WeilGSp4Weave.Genus2WeilGSp4PrimeWeaveCert p) ∧
+   (∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList, ∀ n d : Int,
+      Genus2WeilGSp4Weave.spinLPolyHomog p d ((p : Int) * n) =
+        (p : Int) ^ 2 * Genus2WeilGSp4Weave.spinLPolyHomog p n d) ∧
+   (∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList, ∀ T : Int,
+      Genus2MultiPrimeWeil.standardEulerPoly p T =
+        (1 - T) * GSp4FunctorialityBridge.gsp4StdQuarticCofactor
+          (p : Int) (Genus2MultiPrimeWeil.frobeniusTrace p)
+          (Genus2MultiPrimeWeil.degree2Trace p) T) ∧
+   (∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList, ∀ n d : Int,
+      Genus2WeilGSp4Weave.standardEulerHomogP p d n =
+        -Genus2WeilGSp4Weave.standardEulerHomogP p n d) ∧
+   (∀ p ∈ Genus2MultiPrimeWeil.goodPrimesList,
+      Genus2MultiPrimeWeil.standardEulerPoly p 1 = 0)) ∧
   LanglandsRankinSelbergProvenance
 
 /-- Zero-axiom certificate for Hasse-Weil RH, genus-2 Jacobian, completed zeta,
 `GSp(4) -> SO(5)` functoriality + Selberg / Kim-Sarnak ladder,
-`E_{11a1}` / `f_{11}` GL(2) Eichler-Shimura modularity, and multi-prime genus-2 Weil RH. -/
+`E_{11a1}` / `f_{11}` GL(2) Eichler-Shimura modularity, multi-prime genus-2 Weil RH,
+and Genus2MultiPrimeWeil + WeilZetaBridge + GSp4FunctorialityBridge weave. -/
 theorem finiteFieldWeil_provenance_certified : FiniteFieldWeilProvenance :=
   ⟨FiniteFieldRH.hasse_weil_riemann_hypothesis,
    FiniteFieldRH.genus2_frob_negative_discriminants,
@@ -1843,6 +1860,7 @@ theorem finiteFieldWeil_provenance_certified : FiniteFieldWeilProvenance :=
    EllipticModularityBridge.hasse_weil_ramanujan_11a1_certs,
    EllipticModularityBridge.hecke_multiplicativity_11a1_certs,
    Genus2MultiPrimeWeil.genus2_multiprime_weil_certs,
+   Genus2WeilGSp4Weave.genus2_multiprime_weil_gsp4_weave_bridge,
    langlandsRankinSelberg_provenance_certified⟩
 
 -- =============================================================================

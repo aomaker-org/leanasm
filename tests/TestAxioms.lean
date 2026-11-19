@@ -900,4 +900,21 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert
 #print axioms QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert
 
+-- =============================================================================
+-- Part 57: Genus-2 Multi-Prime Weil + WeilZeta + GSp(4) Weave Bridge
+-- =============================================================================
+
+#print axioms LeanAsm.Genus2WeilGSp4Weave.spinLPolyHomog_recip
+#print axioms LeanAsm.Genus2WeilGSp4Weave.spinLPolyHomog_one
+#print axioms LeanAsm.Genus2WeilGSp4Weave.standardEulerHomogP_anti_palindromic
+#print axioms LeanAsm.Genus2WeilGSp4Weave.standardEulerPoly_factorization
+#print axioms LeanAsm.Genus2WeilGSp4Weave.standardEulerPoly_eval_one
+#print axioms LeanAsm.Genus2WeilGSp4Weave.cert_weave_p7
+#print axioms LeanAsm.Genus2WeilGSp4Weave.cert_weave_p11
+#print axioms LeanAsm.Genus2WeilGSp4Weave.cert_weave_p13
+#print axioms LeanAsm.Genus2WeilGSp4Weave.cert_weave_p17
+#print axioms LeanAsm.Genus2WeilGSp4Weave.cert_weave_p19
+#print axioms LeanAsm.Genus2WeilGSp4Weave.cert_weave_p23
+#print axioms LeanAsm.Genus2WeilGSp4Weave.genus2_multiprime_weil_gsp4_weave_bridge
+
 -- end of file: leanasm/tests/TestAxioms.lean
