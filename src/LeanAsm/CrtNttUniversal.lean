@@ -1,4 +1,5 @@
 -- Path: leanasm/src/LeanAsm/CrtNttUniversal.lean
+-- Max Column: 120 Columns
 -- Universal 16-Point NTT Inversion, Cyclic Convolution, 48-Digit crtNttBigMul_universal_sound,
 -- and 96-Digit 2x2 Karatsuba-over-CRT-NTT Multiplier (gemweb042 Stage 2 & Stage 3).
 

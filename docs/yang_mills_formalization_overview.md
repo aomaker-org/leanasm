@@ -17,11 +17,20 @@ instructions.
 
 ## 1. Scope of the Proved Claim vs. Millennium Problem
 
-| Aspect | What Was Proved | What Was NOT Proved |
-| :--- | :--- | :--- |
-| **Continuum Limit** | Relativistic QFT satisfying Wightman / OS axioms constructed as a scaling limit of 4D Wilson lattice gauge theory for any simple compact Lie group $G$. | Does **NOT** establish uniqueness of the thermodynamic / infinite-volume limit. |
-| **Mass Gap** | Proves fixed-volume UV convergence and a positive lattice probe. | Does **NOT** prove a non-zero strictly positive continuum mass gap ($\Delta > 0$). |
-| **Perturbative Matching** | Leading short-distance trace logarithmic power law. | Not an all-orders perturbative matching with QCD. |
+- **Continuum Limit**:
+  - *What Was Proved*: Relativistic QFT satisfying Wightman / OS axioms
+    constructed as a scaling limit of 4D Wilson lattice gauge theory for any
+    simple compact Lie group $G$.
+  - *What Was NOT Proved*: Does **NOT** establish uniqueness of the
+    thermodynamic / infinite-volume limit.
+- **Mass Gap**:
+  - *What Was Proved*: Proves fixed-volume UV convergence and a positive
+    lattice probe.
+  - *What Was NOT Proved*: Does **NOT** prove a non-zero strictly positive
+    continuum mass gap ($\Delta > 0$).
+- **Perturbative Matching**:
+  - *What Was Proved*: Leading short-distance trace logarithmic power law.
+  - *What Was NOT Proved*: Not an all-orders perturbative matching with QCD.
 
 ---
 
@@ -43,7 +52,8 @@ theorem YangMills.jointExistence : YangMills.JointExistence := by
 ```lean
 theorem YangMills.jointExistence : YangMills.JointExistence := by
   intro g hg
-  obtain ⟨C, _, _, reg, orders⟩ := YangMills.constructed.{0,0} g hg 1 zero_lt_one
+  obtain ⟨C, _, _, reg, orders⟩ :=
+    YangMills.constructed.{0,0} g hg 1 zero_lt_one
   refine ⟨YangMills.wilsonFamily C, reg, fun p hp => ?_⟩
   ...
 ```
@@ -57,7 +67,8 @@ The review group (`yang-mills-group/YM`) verified the package against 8 formal
 criteria in `checks/CombinedAcceptance.lean`:
 - **A1**: Centered stress-trace scalar family satisfies Douglas–Mei–Yin
   Osterwalder–Schrader axioms (E0–E4) and linear growth.
-- **A2**: Registered invariant polynomial operator content and faithful dense domain.
+- **A2**: Registered invariant polynomial operator content and faithful dense
+  domain.
 - **A3 & A7**: Agreement with Wilson lattice action after coupling conversion.
 - **A4**: Trace two-point kernel UV power-law bounds.
 - **A5**: Common scale and lattice probe.
@@ -98,21 +109,25 @@ Following Lean FRO standards, the review runner enforces:
   `[propext, Classical.choice, Quot.sound]`.
 - Rejection of `sorryAx` or `Lean.ofReduceBool` (`native_decide`).
 
-<!-- end of file: leanasm/docs/yang_mills_formalization_overview.md -->
 
 ---
 
 ## 5. Discrete to Non-Abelian Hierarchy
 
 From `inbox/gemweb007.md` and `inbox/gemweb008.md`:
-- **$\mathbb{Z}_2$ Abelian Core**: The site transformations cancel directly ($g(x)$
-  and $g(x)^{-1}$ commute past intermediate link variables).
-- **Non-Abelian $Q_8 \subset SU(2)$**: In non-abelian gauge groups, the plaquette
-  does not remain identical under local gauge transformations, but conjugates:
+- **$\mathbb{Z}_2$ Abelian Core**: The site transformations cancel directly
+  ($g(x)$ and $g(x)^{-1}$ commute past intermediate link variables).
+- **Non-Abelian $Q_8 \subset SU(2)$**: In non-abelian gauge groups, the
+  plaquette does not remain identical under local gauge transformations,
+  but conjugates:
   $$U'_{\mu\nu}(x) = g(x) \cdot U_{\mu\nu}(x) \cdot g(x)^{-1}$$
   Action invariance $S_P[U'] = S_P[U]$ requires **trace cyclicity**:
-  $$\operatorname{Re}\operatorname{Tr}(g U g^{-1}) = \operatorname{Re}\operatorname{Tr}(U)$$
-  This establishes the algebraic foundation for $SU(2)$ / $SU(3)$ color gauge invariance.
+  $$
+  \operatorname{Re}\operatorname{Tr}(g U g^{-1})
+  = \operatorname{Re}\operatorname{Tr}(U)
+  $$
+  This establishes the algebraic foundation for $SU(2)$ / $SU(3)$ color gauge
+  invariance.
 - **Quasi-Riemann Hypothesis (QRH)**: OpenAI's October 6, 2026 formalizations
   (`QuasiRiemannHypothesis.lean`, `DirichletSevenEighths.lean`) formalize
   explicit zero-free regions ($\Re(s) > 7/8$).
