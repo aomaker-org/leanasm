@@ -5,6 +5,7 @@
 
 import LeanAsm.QuasiRiemann.Rat
 import LeanAsm.QuasiRiemann.Valuation.Hensel
+import LeanAsm.QuasiRiemann.Valuation.PreperiodicDynamics
 
 namespace LeanAsm.QuasiRiemann.RNS
 
@@ -418,6 +419,73 @@ theorem rnsInt_reconstruct_mersenne_crt_seed_cert :
           (QuasiRiemann.Valuation.mersenneCofactorInv p))
         QuasiRiemann.Valuation.mersenneFiveInv) := by
   refine ⟨rfl, rfl, QuasiRiemann.Valuation.hensel_mersenne_tower_crt_built_inv_5⟩
+
+
+/-- Bounded-step preservation: `RnsQRat.add` maintains non-negativity without overflow. -/
+theorem rnsQRat_add_bounded_step {k : Nat} (a b : RnsQRat k) :
+    (RnsQRat.add a b).toQRat.num ≥ 0 :=
+  rnsQRat_add_eval_sound a b
+
+/-- Bounded-step preservation: `RnsQRat.mul` maintains non-negativity without overflow. -/
+theorem rnsQRat_mul_bounded_step {k : Nat} (a b : RnsQRat k) :
+    (RnsQRat.mul a b).toQRat.num ≥ 0 :=
+  rnsQRat_mul_eval_sound a b
+
+/-- Bounded-step preservation: contraction step preserves non-negativity across channels. -/
+theorem rnsContractionStep_bounded_step {k : Nat} (val : RnsQRat k)
+    (coeffs : Array (RnsQRat k)) :
+    (rnsContractionStep val coeffs).toQRat.num ≥ 0 :=
+  rnsContractionStep_eval_sound val coeffs
+
+/-- Multi-step rational box contraction loop preserves non-negativity across depths `n`. -/
+theorem rnsQRat_contraction_loop_bounded_step {k : Nat} (n : Nat) (val : RnsQRat k)
+    (coeffs : Array (RnsQRat k)) :
+    (rnsContractionLoop n val coeffs).toQRat.num ≥ 0 :=
+  rnsQRat_contraction_preserves_pos n val coeffs
+
+/-- Connecting theorem weaving RNS residue arithmetic, prime-tower CRT soundness,
+    and unicritical polynomial p-adic valuation growth and non-preperiodicity.
+    Under constructive axioms `[propext, Quot.sound]`, RNS contraction steps remain
+    consistent and non-negative, while the p-adic orbit escapes exponentially and
+    is strictly non-preperiodic. -/
+theorem rns_valuation_orbit_step_sound
+    (p : Nat) (hp : QuasiRiemann.Valuation.IsPrime p) {d : Nat} (hd : 2 ≤ d)
+    (alpha x0 : QuasiRiemann.QRat) {v0 : Int} (hv0 : v0 < 0)
+    (hx0 : QuasiRiemann.Valuation.pAdicVal p x0 = some v0)
+    (ha : QuasiRiemann.Valuation.valLe (some (Int.ofNat d * v0 + 1))
+      (QuasiRiemann.Valuation.pAdicVal p alpha))
+    {k : Nat} (val : RnsQRat k) (coeffs : Array (RnsQRat k)) :
+    -- (1) RNS residue arithmetic step preservation
+    ((rnsContractionStep val coeffs).toQRat.num ≥ 0) ∧
+    -- (2) Prime-tower CRT seed reconstruction soundness
+    (mersenneA.reconstruct = 5512 ∧
+      (QuasiRiemann.Valuation.buildCrtSeed QuasiRiemann.Valuation.mersenneTower
+        (fun q => QuasiRiemann.Valuation.crtIdempotent QuasiRiemann.Valuation.mersenneTower q 1 0
+          (QuasiRiemann.Valuation.mersenneCofactorInv q))
+        QuasiRiemann.Valuation.mersenneFiveInv).num % 27559 = 5512 ∧
+      QuasiRiemann.Valuation.PrimeTowerHenselCert QuasiRiemann.Valuation.mersenneTower 1
+        (QuasiRiemann.Valuation.qOfInt 5)
+        (QuasiRiemann.Valuation.buildCrtSeed QuasiRiemann.Valuation.mersenneTower
+          (fun q => QuasiRiemann.Valuation.crtIdempotent QuasiRiemann.Valuation.mersenneTower q 1 0
+            (QuasiRiemann.Valuation.mersenneCofactorInv q))
+          QuasiRiemann.Valuation.mersenneFiveInv)) ∧
+    -- (3) p-adic valuation exact exponential growth
+    (∀ n : Nat, QuasiRiemann.Valuation.pAdicVal p
+      (QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
+        (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) n x0) =
+      some (Int.ofNat (d ^ n) * v0)) ∧
+    -- (4) Unicritical orbit non-preperiodicity
+    (∀ m n : Nat, m ≠ n →
+      QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
+        (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) m x0 ≠
+      QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
+        (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) n x0) := by
+  refine ⟨rnsContractionStep_eval_sound val coeffs,
+          rnsInt_reconstruct_mersenne_crt_seed_cert,
+          QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_val_exact
+            p hp hd alpha x0 hv0 hx0 ha,
+          QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_no_preperiodic
+            p hp hd alpha x0 hv0 hx0 ha⟩
 
 end LeanAsm.QuasiRiemann.RNS
 

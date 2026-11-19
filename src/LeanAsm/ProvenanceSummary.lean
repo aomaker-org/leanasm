@@ -1551,7 +1551,35 @@ def ValuationDynamicsProvenance : Prop :=
       QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
         (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) m x0 ≠
       QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
-        (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) n x0)
+        (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) n x0) ∧
+  (∀ (p : Nat) (hp : QuasiRiemann.Valuation.IsPrime p) {d : Nat} (hd : 2 ≤ d)
+    (alpha x0 : QuasiRiemann.QRat) {v0 : Int} (hv0 : v0 < 0)
+    (hx0 : QuasiRiemann.Valuation.pAdicVal p x0 = some v0)
+    (ha : QuasiRiemann.Valuation.valLe (some (Int.ofNat d * v0 + 1))
+      (QuasiRiemann.Valuation.pAdicVal p alpha))
+    {k : Nat} (val : LeanAsm.QuasiRiemann.RNS.RnsQRat k)
+    (coeffs : Array (LeanAsm.QuasiRiemann.RNS.RnsQRat k)),
+    ((LeanAsm.QuasiRiemann.RNS.rnsContractionStep val coeffs).toQRat.num ≥ 0) ∧
+    (LeanAsm.QuasiRiemann.RNS.mersenneA.reconstruct = 5512 ∧
+      (QuasiRiemann.Valuation.buildCrtSeed QuasiRiemann.Valuation.mersenneTower
+        (fun q => QuasiRiemann.Valuation.crtIdempotent QuasiRiemann.Valuation.mersenneTower q 1 0
+          (QuasiRiemann.Valuation.mersenneCofactorInv q))
+        QuasiRiemann.Valuation.mersenneFiveInv).num % 27559 = 5512 ∧
+      QuasiRiemann.Valuation.PrimeTowerHenselCert QuasiRiemann.Valuation.mersenneTower 1
+        (QuasiRiemann.Valuation.qOfInt 5)
+        (QuasiRiemann.Valuation.buildCrtSeed QuasiRiemann.Valuation.mersenneTower
+          (fun q => QuasiRiemann.Valuation.crtIdempotent QuasiRiemann.Valuation.mersenneTower q 1 0
+            (QuasiRiemann.Valuation.mersenneCofactorInv q))
+          QuasiRiemann.Valuation.mersenneFiveInv)) ∧
+    (∀ n : Nat, QuasiRiemann.Valuation.pAdicVal p
+      (QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
+        (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) n x0) =
+      some (Int.ofNat (d ^ n) * v0)) ∧
+    (∀ m n : Nat, m ≠ n →
+      QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
+        (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) m x0 ≠
+      QuasiRiemann.Valuation.PreperiodicDynamics.iterateEval
+        (QuasiRiemann.Valuation.PreperiodicDynamics.unicriticalPoly alpha d) n x0))
 
 /-- Zero-axiom certificate for Part 52 2-adic valuation and preperiodic dynamics bounds. -/
 theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
@@ -1573,7 +1601,8 @@ theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
    QuasiRiemann.Valuation.PreperiodicDynamics.lemma43_divisibility_bound_sound,
    QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_integral_orbit_invariant,
    QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_val_exact,
-   QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_no_preperiodic⟩
+   QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_no_preperiodic,
+   LeanAsm.QuasiRiemann.RNS.rns_valuation_orbit_step_sound⟩
 
 /-- Part 7 provenance specification bundling Hasse-Weil RH for `E / F_7`,
 genus-2 `C / F_5` negative discriminants, `L(C, 1) = 71/25`, Cantor-Mumford group axioms
