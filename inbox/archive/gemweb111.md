@@ -1,6 +1,12 @@
-Here is the draft code addition for **Theorem 1.3 / Corollary 5.1** (average proportions of strictly preperiodic points over quadratic polynomials) tailored for `src/LeanAsm/QuasiRiemann/Valuation/PreperiodicDynamics.lean`, along with its axiom audit integration for `tests/TestPreperiodic.lean`.
+# Path: leanasm/inbox/archive/gemweb111.md
 
-### 1. Code Additions for `src/LeanAsm/QuasiRiemann/Valuation/PreperiodicDynamics.lean`
+Here is the draft code addition for **Theorem 1.3 / Corollary 5.1** (average
+proportions of strictly preperiodic points over quadratic polynomials) tailored
+for `src/LeanAsm/QuasiRiemann/Valuation/PreperiodicDynamics.lean`, along with
+its axiom audit integration for `tests/TestPreperiodic.lean`.
+
+### 1. Code Additions for
+`src/LeanAsm/QuasiRiemann/Valuation/PreperiodicDynamics.lean`
 
 ```lean
 /-- Constructive average proportion bound helper for Andersen & Garton (arXiv:2405.00605v1) Theorem 1.3:
@@ -22,13 +28,15 @@ theorem theorem13_average_bound_sound :
 
 ```
 
-*(Note: You can substitute or define `theorem13134Bound` or evaluate directly at $n = 134$ as illustrated above).*
+*(Note: You can substitute or define `theorem13134Bound` or evaluate directly at
+$n = 134$ as illustrated above).*
 
 ---
 
 ### 2. Axiom Audit Addition for `tests/TestPreperiodic.lean`
 
-Add this line to your test harness to verify strict constructive compliance (`[propext, Quot.sound]`, zero `sorry`, zero `Classical.choice`):
+Add this line to your test harness to verify strict constructive compliance
+(`[propext, Quot.sound]`, zero `sorry`, zero `Classical.choice`):
 
 ```lean
 #print axioms theorem13_average_bound_sound
@@ -36,3 +44,5 @@ Add this line to your test harness to verify strict constructive compliance (`[p
 ```
 
 ---
+
+<!-- end of file: leanasm/inbox/archive/gemweb111.md -->
