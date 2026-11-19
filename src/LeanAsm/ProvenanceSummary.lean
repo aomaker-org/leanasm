@@ -15,6 +15,7 @@ import LeanAsm.QuasiRiemann.ZeroDensityBridge
 import LeanAsm.QuasiRiemann.ShortIntervalPrimes
 import LeanAsm.QuasiRiemann.ParametricQrhLadder
 import LeanAsm.QuasiRiemann.DyadicAbelBridge
+import LeanAsm.QuasiRiemann.HighTruncDyadicAbelWeave
 import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 import LeanAsm.QuasiRiemann.Valuation.Ultrametric
 import LeanAsm.QuasiRiemann.Valuation.Contraction
@@ -788,7 +789,15 @@ def DyadicAbelProvenanceProp : Prop :=
    QuasiRiemann.shortIntervalQrh916Spec.HasGuaranteedPrime ∧
    QuasiRiemann.shortIntervalQrh58Spec.HasGuaranteedPrime ∧
    QuasiRiemann.shortIntervalQrh23Spec.HasGuaranteedPrime ∧
-   QuasiRiemann.shortIntervalQrh34Spec.HasGuaranteedPrime)
+   QuasiRiemann.shortIntervalQrh34Spec.HasGuaranteedPrime) ∧
+  (QuasiRiemann.highTruncDyadicAbel1024Spec.margin = 2521997 ∧
+   QuasiRiemann.highTruncDyadicAbel2048Spec.margin = 2682997 ∧
+   QuasiRiemann.highTruncDyadicAbel1024Spec.strip.rectSpec.HasCertifiedNonVanishing ∧
+   QuasiRiemann.highTruncDyadicAbel2048Spec.strip.rectSpec.HasCertifiedNonVanishing ∧
+   QuasiRiemann.QRat.mk' 1 2 < QuasiRiemann.highTruncDyadicAbel1024Spec.strip.sigmaLo ∧
+   QuasiRiemann.highTruncDyadicAbel1024Spec.strip.sigmaLo < QuasiRiemann.QRat.mk' 3 4 ∧
+   QuasiRiemann.QRat.mk' 1 2 < QuasiRiemann.highTruncDyadicAbel2048Spec.strip.sigmaLo ∧
+   QuasiRiemann.highTruncDyadicAbel2048Spec.strip.sigmaLo < QuasiRiemann.QRat.mk' 3 4)
 
 /-- Reusable Part 5 specification for closed-loop dyadic-Abel rungs (`k = 5, 6`)
 and two-piece `QRat` variational mollifier optimization (`Issue #78`). -/
@@ -1143,7 +1152,15 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
      QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.1,
      QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.1,
      QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.2.1,
-     QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.2.2.1⟩⟩,
+     QuasiRiemann.dyadic_abel_short_interval_certs.2.2.2.2.2.2.2.1⟩,
+    ⟨QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert.1,
+     QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert.1,
+     QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert.2.2.2.2.2.2.1,
+     QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert.2.2.2.2.2.2.1,
+     QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert.2.2.1,
+     QuasiRiemann.hightrunc_dyadic_abel_weave_N1024_cert.2.2.2.1,
+     QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert.2.2.1,
+     QuasiRiemann.hightrunc_dyadic_abel_weave_N2048_cert.2.2.2.1⟩⟩,
    ⟨fun kC kN specN sN hD a w M N E D hMN hD0 hw0 hwA hR gate hHX hE pX pXH tX tXH hBX hBXH hC hP =>
       let h := QuasiRiemann.dyadic_abel_unlocks_next_rung kC kN specN sN hD a w M N E D hMN hD0
         hw0 hwA hR gate hHX hE pX pXH tX tXH hBX hBXH hC hP
