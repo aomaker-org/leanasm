@@ -5,6 +5,7 @@ import LeanAsm
 import LeanAsm.QuasiRiemann.Valuation.Ultrametric
 import LeanAsm.QuasiRiemann.Valuation.Contraction
 import LeanAsm.QuasiRiemann.Valuation.Hensel
+import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 
 #print axioms MiniVM.get_set_same
 #print axioms MiniVM.get_set_other
@@ -933,5 +934,15 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 #print axioms QuasiRiemann.qsd4_rns_channel_crt_decomposition
 #print axioms QuasiRiemann.qsd4_nilpotent_zero_divisor_lift
 #print axioms QuasiRiemann.qsd_algebra_provenance_certified
+
+-- =============================================================================
+-- Part 59: QSD[4] Hensel Prime-Tower Tangent Lifts (mod p^k and m^2 = 0)
+-- =============================================================================
+
+#print axioms QuasiRiemann.Valuation.qsd4_hensel_tangent_lift_step
+#print axioms QuasiRiemann.Valuation.qsd4_prime_tower_nilpotent_remainder_bound
+#print axioms QuasiRiemann.Valuation.qsd4_hensel_tower_cert_p7
+#print axioms QuasiRiemann.Valuation.qsd4_hensel_tower_cert_p2
+#print axioms LeanAsm.valuation_dynamics_provenance_certified
 
 -- end of file: leanasm/tests/TestAxioms.lean
