@@ -1113,4 +1113,16 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.qrat_char_bound_witness_ne_zero
 #print axioms QuasiRiemann.qrat_window_char_bound_nonvanishing
 
+-- =============================================================================
+-- Part 72: Euler-Defect Contraction & Real Box Exclusion Lemmas (Issue #167)
+-- =============================================================================
+
+#print axioms QuasiRiemann.euler_defect_int_ne_zero
+#print axioms QuasiRiemann.euler_defect_int_pos
+#print axioms QuasiRiemann.euler_defect_qrat_ne_zero
+#print axioms QuasiRiemann.realIntervalBox
+#print axioms QuasiRiemann.real_interval_box_pos
+#print axioms QuasiRiemann.real_interval_box_lower_ne_zero
+#print axioms QuasiRiemann.real_interval_box_contains_ne_zero
+
 -- end of file: leanasm/tests/TestAxioms.lean
