@@ -1033,4 +1033,27 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms LeanAsm.QuasiRiemann.lucky_sub78_strip_certificate_bridge
 #print axioms LeanAsm.QuasiRiemann.lucky_sub78_strip_cert_50_bridge
 
+-- =============================================================================
+-- Part 67: Generalized Sieve Sequences and Beurling Operators (gemweb125)
+-- =============================================================================
+
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.dropEveryKth_go_length
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.dropEveryKth_length
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.dropEveryKth_sublist
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.luckyPrefixUpTo_50_eq
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.luckyGeneratorsUpTo_50_eq
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ludicGeneratorsUpTo_50_eq
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ludicGeneratorsUpTo_50_length
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.josephusPrefixUpTo_50_eq
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.josephusGeneratorsUpTo_50_eq
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.josephusGeneratorsUpTo_50_length
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ludicGeneratorsUpTo_200_length
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.josephusGeneratorsUpTo_200_length
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ludicBeurlingCert_50
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ludic_survival_product_50_pos
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ludic_harmonic_50_pos
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.josephusBeurlingCert_50
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.josephus_survival_product_50_pos
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.josephus_harmonic_50_pos
+
 -- end of file: leanasm/tests/TestAxioms.lean
