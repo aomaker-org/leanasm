@@ -1,0 +1,9 @@
+# Path: leanasm/.gitmodules
+# Git submodules configuration for leanasm workspace
+# Max Column: 80 Columns
+
+[submodule "subrepos/alpo-rh"]
+	path = subrepos/alpo-rh
+	url = https://github.com/jsmorph/rh.git
+
+# end of file: leanasm/.gitmodules
