@@ -32,9 +32,10 @@ boundaries, and repository hygiene for all assistants operating within the
   targets finer-grained modularization so individual units remain fast and
   lightweight.
 - **Background Task & Timer Hygiene**: NEVER call `Schedule` or polling loops
-  to watch long-running `make` or `lake` background tasks; run builds
-  synchronously or end your turn and let the CLI harness auto-wake on task
-  completion.
+  to watch long-running `make` or `lake` background tasks, and do not
+  repeatedly call `ManageTask` on the same task ID (check/update a task ID at
+  most once per step and proceed directly); run builds synchronously or end
+  your turn and let the CLI harness auto-wake on task completion.
 - **Safe Shell Usage**: Always use standard Linux bash.
 
 ### [Directive 02] LOGGING & DIAGNOSTIC OBSERVABILITY
@@ -56,6 +57,10 @@ boundaries, and repository hygiene for all assistants operating within the
 ### [Directive 07] GIT BRANCHING & WORKFLOW STANDARDS
 - **Branch-Per-Feature Mandate**: Work in dedicated feature branches
   (`feature/*`, `refactor/*`, `fix/*`, `chore/*`).
+- **Issue-Before-PR Default**: Always check for or create a tracking GitHub
+  issue before opening a pull request. Every PR must reference its tracking
+  issue (e.g. `fixes #N` or `(#N)`), with narrow exceptions only for urgent
+  hotfixes or explicit user override.
 - **History Immutability**: Git history must NEVER be overwritten, squashed,
   or destroyed (`git reset --hard` and `git clean -fd` are prohibited).
 - **Additive Artifact Operations**: Generated traces and execution logs
