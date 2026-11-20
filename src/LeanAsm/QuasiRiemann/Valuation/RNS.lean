@@ -487,6 +487,29 @@ theorem rns_valuation_orbit_step_sound
           QuasiRiemann.Valuation.PreperiodicDynamics.unicritical_escape_no_preperiodic
             p hp hd alpha x0 hv0 hx0 ha⟩
 
+/-- Constructive RNS box/window exclusion nonvanishing:
+If an RNS integer evaluation or rational window coordinate is strictly lower-bounded
+by `boxLow > 0` on an exclusion box `[boxLow, boxHigh]`, its integer value cannot vanish. -/
+theorem rns_box_exclusion_ne_zero (val : Int) (boxLow boxHigh : Nat)
+    (h_pos : 0 < boxLow) (h_box : (boxLow : Int) ≤ val ∧ val ≤ (boxHigh : Int)) :
+    val ≠ 0 := by
+  intro hz
+  have h_low := h_box.1
+  rw [hz] at h_low
+  omega
+
+/-- Constructive RNS rational box/window exclusion nonvanishing:
+If a `QRat` evaluation `q` has positive denominator and its numerator is bounded in a strictly
+positive window `[boxLow, boxHigh]` with `0 < boxLow`, `q` is constructively non-zero. -/
+theorem rns_qrat_box_exclusion_ne_zero (q : QRat) (boxLow boxHigh : Nat)
+    (h_pos : 0 < boxLow) (h_box : (boxLow : Int) ≤ q.num ∧ q.num ≤ (boxHigh : Int)) :
+    ¬ QRat.eqv q (QRat.ofInt 0) := by
+  intro h
+  change q.num * 1 = 0 * ((q.den : Nat) : Int) at h
+  rw [Int.mul_one, Int.zero_mul] at h
+  have h_ne := rns_box_exclusion_ne_zero q.num boxLow boxHigh h_pos h_box
+  exact h_ne h
+
 end LeanAsm.QuasiRiemann.RNS
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/Valuation/RNS.lean

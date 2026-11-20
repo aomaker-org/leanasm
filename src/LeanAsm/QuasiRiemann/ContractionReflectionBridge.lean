@@ -44,6 +44,34 @@ theorem qrh_contraction_qrat_ne_zero (p k : Nat) (hp : 0 < p) (c : Int)
   have hne := qrh_contraction_nonvanishing_abs p k c hc
   exact hne h
 
+/-- Scale-dual contraction reflection bound:
+For scale tower `k ≤ K`, base `0 < p`, and contraction coefficient `|c| < p^k`,
+the scaled contraction reflection term `p^(K - k) * (p^k - c)` is strictly non-zero. -/
+theorem qrh_dual_contraction_reflection_bound (p K k : Nat) (c : Int)
+    (_hk : k ≤ K) (hp : 0 < p) (hc : c.natAbs < p ^ k) :
+    ((p ^ (K - k) : Nat) : Int) * (((p ^ k : Nat) : Int) - c) ≠ 0 := by
+  have _hpos : 0 < p ^ (K - k) := Nat.pow_pos hp
+  have hscale_nz : ((p ^ (K - k) : Nat) : Int) ≠ 0 := by omega
+  have hbase_nz : ((p ^ k : Nat) : Int) - c ≠ 0 :=
+    qrh_contraction_nonvanishing_abs p k c hc
+  exact Int.mul_ne_zero hscale_nz hbase_nz
+
+/-- Scale-dual contraction reflection nonvanishing as a `QRat`:
+`p^(K - k) * (1 - c * p^(-k)) ≠ 0`. -/
+theorem qrh_dual_contraction_reflection_qrat_ne_zero (p K k : Nat) (c : Int)
+    (hk : k ≤ K) (hp : 0 < p) (hc : c.natAbs < p ^ k) :
+    ¬ QRat.eqv
+      (QRat.mk' ((p ^ (K - k) : Nat) : Int) 1 (by decide) *
+        (QRat.ofInt 1 - QRat.mk' c (p ^ k) (Nat.pow_pos hp)))
+      (QRat.ofInt 0) := by
+  have _h_base := qrh_contraction_qrat_ne_zero p k hp c hc
+  intro h
+  change (((p ^ (K - k) : Nat) : Int) * (1 * ((p ^ k : Nat) : Int) - c * 1)) * 1 =
+      0 * _ at h
+  rw [Int.one_mul, Int.mul_one, Int.mul_one, Int.zero_mul] at h
+  have hmul_nz := qrh_dual_contraction_reflection_bound p K k c hk hp hc
+  exact hmul_nz h
+
 -- =============================================================================
 -- 2. Dual Ladder Reflection Exponent & Duality Identities
 -- =============================================================================
@@ -300,6 +328,18 @@ theorem QsdZeroExclusion (centerLower lipNumerator radius deltaShrink : Nat)
       Int.ofNat_lt.mpr h_contract
     omega
   omega
+
+/-- Re-export of constructive RNS box/window exclusion nonvanishing in `QuasiRiemann`. -/
+theorem rns_box_exclusion_ne_zero (val : Int) (boxLow boxHigh : Nat)
+    (h_pos : 0 < boxLow) (h_box : (boxLow : Int) ≤ val ∧ val ≤ (boxHigh : Int)) :
+    val ≠ 0 :=
+  LeanAsm.QuasiRiemann.RNS.rns_box_exclusion_ne_zero val boxLow boxHigh h_pos h_box
+
+/-- Re-export of constructive RNS rational box/window exclusion nonvanishing in `QuasiRiemann`. -/
+theorem rns_qrat_box_exclusion_ne_zero (q : QRat) (boxLow boxHigh : Nat)
+    (h_pos : 0 < boxLow) (h_box : (boxLow : Int) ≤ q.num ∧ q.num ≤ (boxHigh : Int)) :
+    ¬ QRat.eqv q (QRat.ofInt 0) :=
+  LeanAsm.QuasiRiemann.RNS.rns_qrat_box_exclusion_ne_zero q boxLow boxHigh h_pos h_box
 
 end QuasiRiemann
 
