@@ -1090,4 +1090,15 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.RnsStripNonVanishing
 #print axioms QuasiRiemann.QsdZeroExclusion
 
+-- =============================================================================
+-- Part 70: Dual Contraction Reflection & RNS Box Exclusion Lemmas (Issue #162)
+-- =============================================================================
+
+#print axioms QuasiRiemann.qrh_dual_contraction_reflection_bound
+#print axioms QuasiRiemann.qrh_dual_contraction_reflection_qrat_ne_zero
+#print axioms LeanAsm.QuasiRiemann.RNS.rns_box_exclusion_ne_zero
+#print axioms LeanAsm.QuasiRiemann.RNS.rns_qrat_box_exclusion_ne_zero
+#print axioms QuasiRiemann.rns_box_exclusion_ne_zero
+#print axioms QuasiRiemann.rns_qrat_box_exclusion_ne_zero
+
 -- end of file: leanasm/tests/TestAxioms.lean
