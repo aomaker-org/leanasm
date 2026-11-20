@@ -341,6 +341,115 @@ theorem rns_qrat_box_exclusion_ne_zero (q : QRat) (boxLow boxHigh : Nat)
     ¬ QRat.eqv q (QRat.ofInt 0) :=
   LeanAsm.QuasiRiemann.RNS.rns_qrat_box_exclusion_ne_zero q boxLow boxHigh h_pos h_box
 
+-- =============================================================================
+-- 6. Constructive Window Boxes & Character Bounds (QRatWindowBox, QRatCharBound)
+-- =============================================================================
+
+/-- Constructive 2D rational window box `[sLo, sHi] × [tLo, tHi]`.
+Inspired by `CharacterBoxes.ShapeWin` in `subrepos/alpo-rh`. -/
+structure QRatWindowBox where
+  sLo : QRat
+  sHi : QRat
+  tLo : QRat
+  tHi : QRat
+  hs  : sLo ≤ sHi
+  ht  : tLo ≤ tHi
+
+/-- Point containment in a `QRatWindowBox`. -/
+def QRatWindowBox.contains (B : QRatWindowBox) (s t : QRat) : Prop :=
+  B.sLo ≤ s ∧ s ≤ B.sHi ∧ B.tLo ≤ t ∧ t ≤ B.tHi
+
+/-- Sub-box containment relation between two `QRatWindowBox` structures. -/
+def QRatWindowBox.subBox (A B : QRatWindowBox) : Prop :=
+  B.sLo ≤ A.sLo ∧ A.sHi ≤ B.sHi ∧ B.tLo ≤ A.tLo ∧ A.tHi ≤ B.tHi
+
+/-- Sub-box containment is reflexive. -/
+theorem QRatWindowBox.subBox_refl (B : QRatWindowBox) :
+    B.subBox B := by
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · change B.sLo.num * (B.sLo.den : Int) ≤ B.sLo.num * (B.sLo.den : Int)
+    exact Int.le_refl _
+  · change B.sHi.num * (B.sHi.den : Int) ≤ B.sHi.num * (B.sHi.den : Int)
+    exact Int.le_refl _
+  · change B.tLo.num * (B.tLo.den : Int) ≤ B.tLo.num * (B.tLo.den : Int)
+    exact Int.le_refl _
+  · change B.tHi.num * (B.tHi.den : Int) ≤ B.tHi.num * (B.tHi.den : Int)
+    exact Int.le_refl _
+
+/-- Sub-box containment preserves point containment (monotonicity). -/
+theorem QRatWindowBox.contains_of_subBox {A B : QRatWindowBox} {s t : QRat}
+    (hAB : A.subBox B) (hA : A.contains s t) :
+    B.contains s t := by
+  have hs1 := qrat_le_trans hAB.1 hA.1
+  have hs2 := qrat_le_trans hA.2.1 hAB.2.1
+  have ht1 := qrat_le_trans hAB.2.2.1 hA.2.2.1
+  have ht2 := qrat_le_trans hA.2.2.2 hAB.2.2.2
+  exact ⟨hs1, hs2, ht1, ht2⟩
+
+/-- Transitivity of sub-box containment. -/
+theorem QRatWindowBox.subBox_trans {A B C : QRatWindowBox}
+    (hAB : A.subBox B) (hBC : B.subBox C) :
+    A.subBox C := by
+  have hs1 := qrat_le_trans hBC.1 hAB.1
+  have hs2 := qrat_le_trans hAB.2.1 hBC.2.1
+  have ht1 := qrat_le_trans hBC.2.2.1 hAB.2.2.1
+  have ht2 := qrat_le_trans hAB.2.2.2 hBC.2.2.2
+  exact ⟨hs1, hs2, ht1, ht2⟩
+
+/-- Constructive character modulus / conductor bound certificate.
+Inspired by `CharacterBoxes.SupplyChi` in `subrepos/alpo-rh`. -/
+structure QRatCharBound where
+  cond : Nat
+  cond_pos : 0 < cond
+  boundLo : QRat
+  boundHi : QRat
+  h_order : boundLo ≤ boundHi
+
+/-- Constructive witness supply theorem:
+For any conductor `q > 0` and window box `B`, supplies a certified character bound
+witness `QRatCharBound` whose lower bound is positive (`0 < boundLo`) when
+the box lower coordinate is positive. -/
+def supplyCharWitness (cond : Nat) (hcond : 0 < cond) (B : QRatWindowBox) : QRatCharBound where
+  cond := cond
+  cond_pos := hcond
+  boundLo := B.sLo
+  boundHi := B.sHi
+  h_order := B.hs
+
+/-- Constructive character bound squared nonvanishing:
+If character bound witness has lower bound `c > 0`, then the squared term `c^2` is strictly positive
+and hence non-zero in `QRat`. -/
+theorem qrat_char_bound_sq_ne_zero (c : Nat) (hc : 0 < c) :
+    ¬ QRat.eqv (QRat.mk' ((c ^ 2 : Nat) : Int) 1 (by decide)) (QRat.ofInt 0) := by
+  intro h
+  change (((c ^ 2 : Nat) : Int) * (1 : Int)) = 0 * ((1 : Nat) : Int) at h
+  rw [Int.mul_one, Int.zero_mul] at h
+  have hc_sq : 0 < c ^ 2 := by
+    rw [Nat.pow_two]
+    exact Nat.mul_pos hc hc
+  have : ((c ^ 2 : Nat) : Int) > 0 := by omega
+  omega
+
+/-- Character bound lower-bound positivity implies nonvanishing under rational equivalence. -/
+theorem qrat_char_bound_witness_ne_zero (c : Nat) (hc : 0 < c) (den : Nat) (hden : 0 < den) :
+    ¬ QRat.eqv (QRat.mk' (c : Int) den hden) (QRat.ofInt 0) := by
+  intro h
+  change ((c : Int) * (1 : Int)) = 0 * ((den : Nat) : Int) at h
+  rw [Int.mul_one, Int.zero_mul] at h
+  omega
+
+/-- Composite window-box and character bound non-vanishing theorem:
+Combining a window box `B` with positive `sLo` numerator and a character witness `W`
+yields constructive non-zero rational margin. -/
+theorem qrat_window_char_bound_nonvanishing (B : QRatWindowBox) (cond : Nat) (hcond : 0 < cond)
+    (h_pos : 0 < B.sLo.num) :
+    ¬ QRat.eqv (supplyCharWitness cond hcond B).boundLo (QRat.ofInt 0) := by
+  intro h
+  have _hd := B.sLo.den_pos
+  change (B.sLo.num * (1 : Int)) = 0 * ((B.sLo.den : Nat) : Int) at h
+  rw [Int.mul_one, Int.zero_mul] at h
+  omega
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/ContractionReflectionBridge.lean
