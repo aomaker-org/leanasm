@@ -1064,4 +1064,19 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms LeanAsm.QuasiRiemann.SieveSequence.josephus_survival_product_50_pos
 #print axioms LeanAsm.QuasiRiemann.SieveSequence.josephus_harmonic_50_pos
 
+-- =============================================================================
+-- Part 68: Contraction Nonvanishing & Reflection Duality Lemmas (Issue #156)
+-- =============================================================================
+
+#print axioms QuasiRiemann.qrh_contraction_nonvanishing_abs
+#print axioms QuasiRiemann.qrh_contraction_distance_lower_bound
+#print axioms QuasiRiemann.qrh_contraction_qrat_ne_zero
+#print axioms QuasiRiemann.qrhReflectedExponent_eqv_one_sub
+#print axioms QuasiRiemann.qrh_ladder_reflection_identity
+#print axioms QuasiRiemann.qrh_short_exponent_add_half_eq
+#print axioms QuasiRiemann.qrh_ladder_dual_sum_eq_three_halves
+#print axioms QuasiRiemann.qrh_short_exponent_distance_to_half
+#print axioms QuasiRiemann.qrh_reflected_exponent_distance_to_half
+#print axioms QuasiRiemann.qrh_symmetric_strip_reflection_bounds
+
 -- end of file: leanasm/tests/TestAxioms.lean
