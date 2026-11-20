@@ -1,5 +1,6 @@
 # Path: leanasm/mk/hydrate.mk
-# Purpose: Dynamic, on-demand ("lazy") Git submodule hydration & thermal management.
+# Purpose: Dynamic, on-demand ("lazy") Git submodule hydration & thermal
+# management.
 # Lineage: Adapted from clouds-labs/mk/hydrate.mk
 # Max Column: 80 Columns (comments/docs) / 120 Chars (code)
 
@@ -22,7 +23,8 @@ ifdef ALL
 	@echo "[+] All submodules successfully hydrated (hot/wet)."
 else ifdef SUB
 	@_FULL_PATH="$(SUB)"; \
-	if [ -d "$(REPO_ROOT)/subrepos/$${SUB}" ] || ([ -f "$(REPO_ROOT)/.gitmodules" ] && grep -q "subrepos/$${SUB}" "$(REPO_ROOT)/.gitmodules"); then \
+	if [ -d "$(REPO_ROOT)/subrepos/$${SUB}" ] || \
+	   ([ -f "$(REPO_ROOT)/.gitmodules" ] && grep -q "subrepos/$${SUB}" "$(REPO_ROOT)/.gitmodules"); then \
 		_FULL_PATH="subrepos/$${SUB}"; \
 	fi; \
 	echo "[*] Hydrating subrepo: $${_FULL_PATH}..."; \
@@ -46,7 +48,8 @@ ifdef ALL
 	@echo "[+] All submodules dehydrated (dry/cold). Disk space reclaimed."
 else ifdef SUB
 	@_FULL_PATH="$(SUB)"; \
-	if [ -d "$(REPO_ROOT)/subrepos/$${SUB}" ] || ([ -f "$(REPO_ROOT)/.gitmodules" ] && grep -q "subrepos/$${SUB}" "$(REPO_ROOT)/.gitmodules"); then \
+	if [ -d "$(REPO_ROOT)/subrepos/$${SUB}" ] || \
+	   ([ -f "$(REPO_ROOT)/.gitmodules" ] && grep -q "subrepos/$${SUB}" "$(REPO_ROOT)/.gitmodules"); then \
 		_FULL_PATH="subrepos/$${SUB}"; \
 	fi; \
 	echo "[*] Dehydrating subrepo & drying working tree: $${_FULL_PATH}..."; \
@@ -72,6 +75,19 @@ hydrate-status:
 	@git -C $(REPO_ROOT) submodule status 2>/dev/null || echo "No submodules registered."
 	@echo ""
 	@echo " [THERMAL STATE AUDIT BY SUBREPO]"
+	@if [ -f "$(REPO_ROOT)/.gitmodules" ]; then \
+		awk -F'[][]' '/\[submodule/{print $$2}' "$(REPO_ROOT)/.gitmodules" | \
+			sed 's/^submodule "//; s/"$$//' | while IFS= read -r sub; do \
+				if [ -n "$$sub" ] && [ ! -d "$(REPO_ROOT)/$$sub" ]; then \
+					if [ -d "$(REPO_ROOT)/.git/modules/$$sub" ]; then \
+						_CSZ=$$(du -sh "$(REPO_ROOT)/.git/modules/$$sub" 2>/dev/null | cut -f1); \
+						echo "  [WARM / DRY]       $$sub (Tree empty, object cache: $${_CSZ})"; \
+					else \
+						echo "  [COLD / DESERT]    $$sub (Dormant manifest pointer only)"; \
+					fi; \
+				fi; \
+			done; \
+	fi
 	@if [ -d "$(REPO_ROOT)/subrepos" ]; then \
 		for d in $(REPO_ROOT)/subrepos/*; do \
 			if [ -d "$$d" ]; then \
