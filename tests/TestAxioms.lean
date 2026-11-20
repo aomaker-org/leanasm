@@ -619,12 +619,16 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.variational_mollifier_beats_linear
 #print axioms QuasiRiemann.mollifier_variational_bridge_certs
 
--- Part 48: UltraDeep108 N=1024,2048 & MiniVM Parametric 8-Pt Fermat NTT (Issue #79)
+-- Part 48: UltraDeep108 N=1024,2048 & MiniVM Parametric 8-Pt Fermat NTT (Issue #79, Issue #148)
 #print axioms MiniVMNttBridge.fermatTowerNtt8Specs_valid
 #print axioms MiniVMNttBridge.fermatTowerNtt8_asm_roundtrip_certs
 #print axioms QuasiRiemann.twoPiInterval108_valid
 #print axioms QuasiRiemann.ln_table_1_to_2048_valid
 #print axioms QuasiRiemann.phase_reduction_width_1e30_under_1e75
+#print axioms QuasiRiemann.tile24_0_valid
+#print axioms QuasiRiemann.tile24_1_valid
+#print axioms QuasiRiemann.tile24_2_valid
+#print axioms QuasiRiemann.tile24_3_valid
 #print axioms QuasiRiemann.crtNtt_highTrunc108_N1024_rect
 #print axioms QuasiRiemann.crtNtt_highTrunc108_N2048_rect
 #print axioms QuasiRiemann.crtNtt_highTrunc108_2d_zero_free_rect
