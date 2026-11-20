@@ -450,6 +450,94 @@ theorem qrat_window_char_bound_nonvanishing (B : QRatWindowBox) (cond : Nat) (hc
   rw [Int.mul_one, Int.zero_mul] at h
   omega
 
+-- =============================================================================
+-- 7. Euler-Defect Contraction Nonvanishing & Real-Interval Box Exclusion (#167)
+-- =============================================================================
+
+/-- Euler-defect integer cleared contraction nonvanishing:
+For `|a| ≤ 1` and `1 < p ^ k`, the cleared defect term `p ^ k - a` is strictly positive
+and non-zero. Inspired by `CharacterBoxes.Imprimitive` in `subrepos/alpo-rh`. -/
+theorem euler_defect_int_ne_zero (p k : Nat) (a : Int)
+    (ha : a.natAbs ≤ 1) (hpk : 1 < p ^ k) :
+    ((p ^ k : Nat) : Int) - a ≠ 0 := by
+  have ha_le : a ≤ (a.natAbs : Int) := Int.le_natAbs
+  have ha_bound : (a.natAbs : Int) ≤ 1 := Int.ofNat_le.mpr ha
+  have hpk_cast : 1 < ((p ^ k : Nat) : Int) := Int.ofNat_lt.mpr hpk
+  omega
+
+/-- Euler-defect integer cleared contraction strictly positive:
+For `|a| ≤ 1` and `1 < p ^ k`, `0 < p ^ k - a`. -/
+theorem euler_defect_int_pos (p k : Nat) (a : Int)
+    (ha : a.natAbs ≤ 1) (hpk : 1 < p ^ k) :
+    0 < ((p ^ k : Nat) : Int) - a := by
+  have ha_le : a ≤ (a.natAbs : Int) := Int.le_natAbs
+  have ha_bound : (a.natAbs : Int) ≤ 1 := Int.ofNat_le.mpr ha
+  have hpk_cast : 1 < ((p ^ k : Nat) : Int) := Int.ofNat_lt.mpr hpk
+  omega
+
+/-- Euler-defect rational contraction factor nonvanishing as a `QRat`:
+For `|a| ≤ 1` and `1 < p ^ k`, the rational factor `1 - a / p ^ k` is non-zero. -/
+theorem euler_defect_qrat_ne_zero (p k : Nat) (hp : 0 < p) (a : Int)
+    (ha : a.natAbs ≤ 1) (hpk : 1 < p ^ k) :
+    ¬ QRat.eqv (QRat.ofInt 1 - QRat.mk' a (p ^ k) (Nat.pow_pos hp)) (QRat.ofInt 0) := by
+  intro h
+  change (1 * ((p ^ k : Nat) : Int) - a * 1) * 1 = 0 * ((1 * p ^ k : Nat) : Int) at h
+  rw [Int.one_mul, Int.mul_one, Int.mul_one, Int.zero_mul] at h
+  have hne := euler_defect_int_ne_zero p k a ha hpk
+  exact hne h
+
+/-- Real-interval exclusion box `[1 - δ, 1 + δ]` in `QRat`.
+Defines a symmetric real-interval box around 1 with radius `δ`.
+Inspired by `CharacterBoxes.RealBox` in `subrepos/alpo-rh`. -/
+def realIntervalBox (delta : QRat) : QRat × QRat :=
+  (QRat.ofInt 1 - delta, QRat.ofInt 1 + delta)
+
+/-- Real-interval box exclusion lower bound strictly positive:
+If `0 ≤ δ` and `δ < 1` in `QRat`, then `0 < 1 - δ`. -/
+theorem real_interval_box_pos (delta : QRat)
+    (h_lt : delta < QRat.ofInt 1) :
+    QRat.ofInt 0 < QRat.ofInt 1 - delta := by
+  change delta.num * 1 < 1 * (delta.den : Int) at h_lt
+  rw [Int.mul_one, Int.one_mul] at h_lt
+  change 0 * (1 * delta.den : Int) < (1 * (delta.den : Int) - delta.num * 1) * 1
+  rw [Int.zero_mul, Int.one_mul, Int.mul_one, Int.mul_one]
+  omega
+
+/-- Real-interval box exclusion nonvanishing on lower bound:
+If `δ < 1` in `QRat`, then `1 - δ` does not vanish. -/
+theorem real_interval_box_lower_ne_zero (delta : QRat)
+    (h_lt : delta < QRat.ofInt 1) :
+    ¬ QRat.eqv (QRat.ofInt 1 - delta) (QRat.ofInt 0) := by
+  intro h
+  change (1 * (delta.den : Int) - delta.num * 1) * 1 = 0 * ((1 * delta.den : Nat) : Int) at h
+  rw [Int.one_mul, Int.mul_one, Int.mul_one, Int.zero_mul] at h
+  change delta.num * 1 < 1 * (delta.den : Int) at h_lt
+  rw [Int.mul_one, Int.one_mul] at h_lt
+  omega
+
+/-- Real-interval box exclusion on the full interval:
+Any `x` in `[1 - δ, 1 + δ]` with `δ < 1` satisfies `0 < x` and therefore `x ≠ 0`. -/
+theorem real_interval_box_contains_ne_zero (delta x : QRat)
+    (h_lt : delta < QRat.ofInt 1)
+    (hx_ge : QRat.ofInt 1 - delta ≤ x) :
+    ¬ QRat.eqv x (QRat.ofInt 0) := by
+  intro h
+  change (1 * (delta.den : Int) - delta.num * 1) * (x.den : Int) ≤
+    x.num * (((1 * delta.den : Nat) : Int)) at hx_ge
+  rw [Int.one_mul, Int.mul_one] at hx_ge
+  rw [Nat.one_mul] at hx_ge
+  change x.num * 1 = 0 * ((x.den : Nat) : Int) at h
+  rw [Int.mul_one, Int.zero_mul] at h
+  rw [h, Int.zero_mul] at hx_ge
+  change delta.num * 1 < 1 * (delta.den : Int) at h_lt
+  rw [Int.mul_one, Int.one_mul] at h_lt
+  have hxd := x.den_pos
+  have hden_pos : 0 < (x.den : Int) := by omega
+  have hdiff_pos : 0 < (delta.den : Int) - delta.num := by omega
+  have hprod_pos : 0 < ((delta.den : Int) - delta.num) * (x.den : Int) :=
+    Int.mul_pos hdiff_pos hden_pos
+  omega
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/ContractionReflectionBridge.lean
