@@ -43,6 +43,11 @@ boundaries, and repository hygiene for all assistants operating within the
   or suppress command failures with `|| true` unless strictly required.
 - **Structured Logging**: Use `tools/run_with_logging.py` for audit trails and
   long-running tasks when running outside interactive terminals.
+- **Trial Helper-Script Logging**: When creating or executing any non-trivial
+  helper script, append a single-line log entry recording timestamp, script
+  path, and intent to `/tmp/agy_helper_scripts.log`; avoid refactoring or
+  generalizing scripts prematurely and do not modify tracked files unless
+  explicitly requested.
 
 ### [Directive 04] FILE FORMATTING, LINE WRAPPING, & HEADER/FOOTER RULES
 - **Line Wrapping**:
