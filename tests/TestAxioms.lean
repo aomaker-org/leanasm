@@ -629,6 +629,8 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.tile24_1_valid
 #print axioms QuasiRiemann.tile24_2_valid
 #print axioms QuasiRiemann.tile24_3_valid
+#print axioms QuasiRiemann.tile30_0_valid
+#print axioms QuasiRiemann.tile30_1_valid
 #print axioms QuasiRiemann.crtNtt_highTrunc108_N1024_rect
 #print axioms QuasiRiemann.crtNtt_highTrunc108_N2048_rect
 #print axioms QuasiRiemann.crtNtt_highTrunc108_2d_zero_free_rect

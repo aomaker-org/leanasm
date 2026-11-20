@@ -24,6 +24,9 @@ import LeanAsm.QuasiRiemann.UltraDeep108N1024.Tile3
 import LeanAsm.QuasiRiemann.UltraDeep108N1024.Bounds
 import LeanAsm.QuasiRiemann.UltraDeep108N1024.Certificates
 import LeanAsm.QuasiRiemann.UltraDeep108N1024
+import LeanAsm.QuasiRiemann.UltraDeep108N2048Part1.Bounds
+import LeanAsm.QuasiRiemann.UltraDeep108N2048Part1.Certificates
+import LeanAsm.QuasiRiemann.UltraDeep108N2048Part1
 import LeanAsm.QuasiRiemann.UltraDeep108N2048
 import LeanAsm.QuasiRiemann.UltraDeep108
 import LeanAsm.QuasiRiemann.UltraDeep72
