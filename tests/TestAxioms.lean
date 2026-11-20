@@ -1079,4 +1079,15 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.qrh_reflected_exponent_distance_to_half
 #print axioms QuasiRiemann.qrh_symmetric_strip_reflection_bounds
 
+-- =============================================================================
+-- Part 69: Strip Reflection, RNS, and QSD Lemmas (Issue #160)
+-- =============================================================================
+
+#print axioms QuasiRiemann.half_plane_reflection_qrat_involution
+#print axioms QuasiRiemann.half_plane_reflection_qrat_lt
+#print axioms QuasiRiemann.half_plane_reflection_qrat_eq_half
+#print axioms QuasiRiemann.HalfPlaneReflectionQRat
+#print axioms QuasiRiemann.RnsStripNonVanishing
+#print axioms QuasiRiemann.QsdZeroExclusion
+
 -- end of file: leanasm/tests/TestAxioms.lean
