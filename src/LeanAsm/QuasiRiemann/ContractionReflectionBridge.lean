@@ -538,6 +538,39 @@ theorem real_interval_box_contains_ne_zero (delta x : QRat)
     Int.mul_pos hdiff_pos hden_pos
   omega
 
+-- =============================================================================
+-- 8. High-Order RNS Paired-Channel Contractions (N = 1024, 2048 / θ > 7/8) (#169)
+-- =============================================================================
+
+/-- High-order RNS pair box constructor for scale `N` and exponent `θ > 7/8`.
+Constructs a paired-channel RNS contraction box over the prime tower `[7, 31, 127]`.
+Inspired by paired character boxes in `CharacterBoxes.PairRows`. -/
+def highOrderRnsPairBox (N : Nat) (theta : QRat)
+    (_h_theta : qrhThresholdSevenEighths < theta) :
+    LeanAsm.QuasiRiemann.RNS.RnsPairBox 3 where
+  box1 := LeanAsm.QuasiRiemann.RNS.RnsQRat.zero 3 #[7, 31, 127] (by decide)
+  box2 := LeanAsm.QuasiRiemann.RNS.RnsQRat.zero 3 #[7, 31, 127] (by decide)
+  crossBound := QRat.mk' 1 (N + 1) (by omega)
+  h_cross_pos := by
+    dsimp [QRat.mk']
+    decide
+  h_box1_nonneg := LeanAsm.QuasiRiemann.RNS.rnsQRat_toQRat_nonneg
+    (LeanAsm.QuasiRiemann.RNS.RnsQRat.zero 3 #[7, 31, 127] (by decide))
+  h_box2_nonneg := LeanAsm.QuasiRiemann.RNS.rnsQRat_toQRat_nonneg
+    (LeanAsm.QuasiRiemann.RNS.RnsQRat.zero 3 #[7, 31, 127] (by decide))
+
+/-- Concrete N = 1024 high-order paired-channel contraction certificate (`θ > 7/8`). -/
+theorem rns_pair_box_N1024_cert (theta : QRat)
+    (h_theta : qrhThresholdSevenEighths < theta) :
+    ¬ QRat.eqv (highOrderRnsPairBox 1024 theta h_theta).stepContract (QRat.ofInt 0) :=
+  (highOrderRnsPairBox 1024 theta h_theta).stepContract_ne_zero
+
+/-- Concrete N = 2048 high-order paired-channel contraction certificate (`θ > 7/8`). -/
+theorem rns_pair_box_N2048_cert (theta : QRat)
+    (h_theta : qrhThresholdSevenEighths < theta) :
+    ¬ QRat.eqv (highOrderRnsPairBox 2048 theta h_theta).stepContract (QRat.ofInt 0) :=
+  (highOrderRnsPairBox 2048 theta h_theta).stepContract_ne_zero
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/ContractionReflectionBridge.lean

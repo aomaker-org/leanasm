@@ -510,6 +510,104 @@ theorem rns_qrat_box_exclusion_ne_zero (q : QRat) (boxLow boxHigh : Nat)
   have h_ne := rns_box_exclusion_ne_zero q.num boxLow boxHigh h_pos h_box
   exact h_ne h
 
+/-- Bilinear discrete ladder contraction step combining two channel contraction terms
+with a cross-bound margin. Evaluates `QRat.add (QRat.mul step1 step2) crossBound`.
+Inspired by paired-channel bounds in `CharacterBoxes.PairRows`. -/
+def pairStepContract (step1 step2 crossBound : QRat) : QRat :=
+  QRat.add (QRat.mul step1 step2) crossBound
+
+/-- Constructive bound preservation: If `step1`, `step2`, and `crossBound` have non-negative
+numerators, then `pairStepContract step1 step2 crossBound` has non-negative numerator. -/
+theorem pairStepContract_nonneg (step1 step2 crossBound : QRat)
+    (h1 : 0 ≤ step1.num) (h2 : 0 ≤ step2.num) (hc : 0 ≤ crossBound.num) :
+    0 ≤ (pairStepContract step1 step2 crossBound).num := by
+  dsimp [pairStepContract, QRat.add, QRat.mul]
+  have hprod : 0 ≤ step1.num * step2.num := Int.mul_nonneg h1 h2
+  have hdc : 0 ≤ (crossBound.den : Int) := by omega
+  have hd1 : 0 ≤ (step1.den : Int) := by omega
+  have hd2 : 0 ≤ (step2.den : Int) := by omega
+  have h12 : 0 ≤ (step1.den : Int) * (step2.den : Int) := Int.mul_nonneg hd1 hd2
+  have hleft : 0 ≤ (step1.num * step2.num) * (crossBound.den : Int) :=
+    Int.mul_nonneg hprod hdc
+  have hright : 0 ≤ crossBound.num * ((step1.den : Int) * (step2.den : Int)) :=
+    Int.mul_nonneg hc h12
+  exact Int.add_nonneg hleft hright
+
+/-- Strict positivity preservation: If `step1` and `step2` are non-negative and `crossBound`
+has strictly positive numerator, then `pairStepContract` has strictly positive numerator. -/
+theorem pairStepContract_pos (step1 step2 crossBound : QRat)
+    (h1 : 0 ≤ step1.num) (h2 : 0 ≤ step2.num) (hc : 0 < crossBound.num) :
+    0 < (pairStepContract step1 step2 crossBound).num := by
+  dsimp [pairStepContract, QRat.add, QRat.mul]
+  have hprod : 0 ≤ step1.num * step2.num := Int.mul_nonneg h1 h2
+  have hd1_pos := step1.den_pos
+  have hd2_pos := step2.den_pos
+  have hdc : 0 ≤ (crossBound.den : Int) := by omega
+  have h12 : 0 < ((step1.den : Int) * (step2.den : Int)) := by
+    have hd1 : 0 < (step1.den : Int) := by omega
+    have hd2 : 0 < (step2.den : Int) := by omega
+    exact Int.mul_pos hd1 hd2
+  have hleft : 0 ≤ (step1.num * step2.num) * (crossBound.den : Int) :=
+    Int.mul_nonneg hprod hdc
+  have hright : 0 < crossBound.num * ((step1.den : Int) * (step2.den : Int)) :=
+    Int.mul_pos hc h12
+  have : 0 + 0 < (step1.num * step2.num) * (crossBound.den : Int) +
+      crossBound.num * ((step1.den : Int) * (step2.den : Int)) :=
+    Int.add_lt_add_of_le_of_lt hleft hright
+  exact this
+
+/-- Non-vanishing of `pairStepContract` under strictly positive cross-bound. -/
+theorem pairStepContract_ne_zero (step1 step2 crossBound : QRat)
+    (h1 : 0 ≤ step1.num) (h2 : 0 ≤ step2.num) (hc : 0 < crossBound.num) :
+    ¬ QRat.eqv (pairStepContract step1 step2 crossBound) (QRat.ofInt 0) := by
+  intro h
+  have hp := pairStepContract_pos step1 step2 crossBound h1 h2 hc
+  change (pairStepContract step1 step2 crossBound).num * 1 =
+    0 * (((pairStepContract step1 step2 crossBound).den : Nat) : Int) at h
+  rw [Int.mul_one, Int.zero_mul] at h
+  omega
+
+/-- Non-negativity of reconstructed RNS rational evaluations. -/
+theorem rnsQRat_toQRat_nonneg {k : Nat} (x : RnsQRat k) :
+    0 ≤ x.toQRat.num := by
+  dsimp [RnsQRat.toQRat]
+  split
+  · next hd =>
+    dsimp [QRat.mk']
+    dsimp [RnsInt.reconstruct]
+    split
+    · decide
+    · next hM =>
+      exact Int.natCast_nonneg _
+  · decide
+
+/-- Paired-channel Residue Number System (RNS) contraction box.
+Pairs two parallel RNS channels with channel non-negativity and positive cross-bound margin.
+Inspired by `PairGood` in `subrepos/alpo-rh/CharacterBoxes/PairRows.lean`. -/
+structure RnsPairBox (k : Nat) where
+  box1 : RnsQRat k
+  box2 : RnsQRat k
+  crossBound : QRat
+  h_cross_pos : 0 < crossBound.num
+  h_box1_nonneg : 0 ≤ box1.toQRat.num
+  h_box2_nonneg : 0 ≤ box2.toQRat.num
+
+/-- Bilinear contraction step on an `RnsPairBox`. -/
+def RnsPairBox.stepContract {k : Nat} (pb : RnsPairBox k) : QRat :=
+  pairStepContract pb.box1.toQRat pb.box2.toQRat pb.crossBound
+
+/-- Strict positivity of `RnsPairBox.stepContract`. -/
+theorem RnsPairBox.stepContract_pos {k : Nat} (pb : RnsPairBox k) :
+    0 < pb.stepContract.num :=
+  pairStepContract_pos pb.box1.toQRat pb.box2.toQRat pb.crossBound
+    pb.h_box1_nonneg pb.h_box2_nonneg pb.h_cross_pos
+
+/-- Non-vanishing of `RnsPairBox.stepContract`. -/
+theorem RnsPairBox.stepContract_ne_zero {k : Nat} (pb : RnsPairBox k) :
+    ¬ QRat.eqv pb.stepContract (QRat.ofInt 0) :=
+  pairStepContract_ne_zero pb.box1.toQRat pb.box2.toQRat pb.crossBound
+    pb.h_box1_nonneg pb.h_box2_nonneg pb.h_cross_pos
+
 end LeanAsm.QuasiRiemann.RNS
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/Valuation/RNS.lean
