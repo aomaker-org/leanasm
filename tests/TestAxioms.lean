@@ -1101,4 +1101,16 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.rns_box_exclusion_ne_zero
 #print axioms QuasiRiemann.rns_qrat_box_exclusion_ne_zero
 
+-- =============================================================================
+-- Part 71: QRat Window Box & Character Bound Lemmas (Issue #165)
+-- =============================================================================
+
+#print axioms QuasiRiemann.QRatWindowBox.subBox_refl
+#print axioms QuasiRiemann.QRatWindowBox.contains_of_subBox
+#print axioms QuasiRiemann.QRatWindowBox.subBox_trans
+#print axioms QuasiRiemann.supplyCharWitness
+#print axioms QuasiRiemann.qrat_char_bound_sq_ne_zero
+#print axioms QuasiRiemann.qrat_char_bound_witness_ne_zero
+#print axioms QuasiRiemann.qrat_window_char_bound_nonvanishing
+
 -- end of file: leanasm/tests/TestAxioms.lean
