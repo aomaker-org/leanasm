@@ -1125,4 +1125,20 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.real_interval_box_lower_ne_zero
 #print axioms QuasiRiemann.real_interval_box_contains_ne_zero
 
+-- =============================================================================
+-- Part 73: High-Order RNS Paired-Channel Contraction Lemmas (Issue #169)
+-- =============================================================================
+
+#print axioms LeanAsm.QuasiRiemann.RNS.pairStepContract
+#print axioms LeanAsm.QuasiRiemann.RNS.pairStepContract_nonneg
+#print axioms LeanAsm.QuasiRiemann.RNS.pairStepContract_pos
+#print axioms LeanAsm.QuasiRiemann.RNS.pairStepContract_ne_zero
+#print axioms LeanAsm.QuasiRiemann.RNS.rnsQRat_toQRat_nonneg
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsPairBox.stepContract
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsPairBox.stepContract_pos
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsPairBox.stepContract_ne_zero
+#print axioms QuasiRiemann.highOrderRnsPairBox
+#print axioms QuasiRiemann.rns_pair_box_N1024_cert
+#print axioms QuasiRiemann.rns_pair_box_N2048_cert
+
 -- end of file: leanasm/tests/TestAxioms.lean
