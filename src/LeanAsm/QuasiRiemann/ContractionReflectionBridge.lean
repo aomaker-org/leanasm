@@ -7,6 +7,7 @@
 import LeanAsm.QuasiRiemann.Rat
 import LeanAsm.QuasiRiemann.ParametricQrhLadder
 import LeanAsm.QuasiRiemann.DyadicAbelBridge
+import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 import LeanAsm.QuasiRiemann.Valuation.RNS
 
 namespace QuasiRiemann
@@ -919,6 +920,300 @@ theorem dyadic_gate_rns_reflect_half_box_coupling_2048
   have h_step := inv_sqrt_tail_gate_dyadic_step gate
   have h_excl := qrh_rns_reflect_half_box_exclusion theta h_theta
   refine ⟨h_step, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
+-- =============================================================================
+-- 11. Parametric Dyadic Rungs (k ≥ 5) & Rungs 11..14 RNS Couplings (#185)
+-- =============================================================================
+
+/-- Coupled parametric dyadic Abel gate (`k ≥ 5`) and high-order RNS reflection box exclusion
+at scale `N = 1024`. Links parametric tail-gate preservation with `RnsPairBox 1024`. -/
+theorem dyadic_parametric_gate_rns_reflect_half_box_coupling_1024
+    (k : Nat) (hk : 5 ≤ k)
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    ((4 * (dyadicAbelGateParametric k hk).scaleN) *
+      ((dyadicAbelGateParametric k hk).tailBound * (dyadicAbelGateParametric k hk).tailBound) ≤
+      ((2 * (dyadicAbelGateParametric k hk).denomM) *
+        (2 * (dyadicAbelGateParametric k hk).denomM)) *
+        ((dyadicAbelGateParametric k hk).tailNum * (dyadicAbelGateParametric k hk).tailNum)) ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 1024 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo =
+      (highOrderRnsPairBox 1024 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 1024 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_step := inv_sqrt_tail_gate_dyadic_step (dyadicAbelGateParametric k hk)
+  have h_excl := qrh_rns_reflect_half_box_exclusion_1024 theta h_theta
+  exact ⟨h_step, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
+/-- Coupled parametric dyadic Abel gate (`k ≥ 5`) and high-order RNS reflection box exclusion
+at scale `N = 2048`. Links parametric tail-gate preservation with `RnsPairBox 2048`. -/
+theorem dyadic_parametric_gate_rns_reflect_half_box_coupling_2048
+    (k : Nat) (hk : 5 ≤ k)
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    ((4 * (dyadicAbelGateParametric k hk).scaleN) *
+      ((dyadicAbelGateParametric k hk).tailBound * (dyadicAbelGateParametric k hk).tailBound) ≤
+      ((2 * (dyadicAbelGateParametric k hk).denomM) *
+        (2 * (dyadicAbelGateParametric k hk).denomM)) *
+        ((dyadicAbelGateParametric k hk).tailNum * (dyadicAbelGateParametric k hk).tailNum)) ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 2048 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo =
+      (highOrderRnsPairBox 2048 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 2048 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_step := inv_sqrt_tail_gate_dyadic_step (dyadicAbelGateParametric k hk)
+  have h_excl := qrh_rns_reflect_half_box_exclusion theta h_theta
+  exact ⟨h_step, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
+/-- Coupled parametric dyadic Chebyshev spec (`k ≥ 5`) and high-order RNS reflection box exclusion
+at scale `N = 1024`. Couples short-interval prime positivity to `RnsPairBox 1024`. -/
+theorem short_interval_dyadic_rns_reflect_half_box_coupling_1024
+    (k : Nat) (hk : 5 ≤ k)
+    (hFactor : 2 * (dyadicChebyshevCoeff k * 10 ^ 3) + 2 < 10 ^ 18)
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    (shortIntervalDyadicSpec k hk).HasGuaranteedPrime ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 1024 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo =
+      (highOrderRnsPairBox 1024 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 1024 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_prime := shortIntervalDyadicSpec_has_prime_of_factor_lt k hk hFactor
+  have h_excl := qrh_rns_reflect_half_box_exclusion_1024 theta h_theta
+  exact ⟨h_prime, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
+/-- Coupled parametric dyadic Chebyshev spec (`k ≥ 5`) and high-order RNS reflection box exclusion
+at scale `N = 2048`. Couples short-interval prime positivity to `RnsPairBox 2048`. -/
+theorem short_interval_dyadic_rns_reflect_half_box_coupling_2048
+    (k : Nat) (hk : 5 ≤ k)
+    (hFactor : 2 * (dyadicChebyshevCoeff k * 10 ^ 3) + 2 < 10 ^ 18)
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    (shortIntervalDyadicSpec k hk).HasGuaranteedPrime ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 2048 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo =
+      (highOrderRnsPairBox 2048 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 2048 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_prime := shortIntervalDyadicSpec_has_prime_of_factor_lt k hk hFactor
+  have h_excl := qrh_rns_reflect_half_box_exclusion theta h_theta
+  exact ⟨h_prime, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
+/-- Coupled dyadic Abel gate rung 11 and high-order RNS reflection box exclusion at N = 1024. -/
+theorem dyadic_gate_rung11_rns_reflect_half_box_coupling_1024
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    ((4 * dyadicAbelGateRung11.scaleN) *
+      (dyadicAbelGateRung11.tailBound * dyadicAbelGateRung11.tailBound) ≤
+      ((2 * dyadicAbelGateRung11.denomM) * (2 * dyadicAbelGateRung11.denomM)) *
+        (dyadicAbelGateRung11.tailNum * dyadicAbelGateRung11.tailNum)) ∧
+    shortIntervalDyadicRung11Spec.HasGuaranteedPrime ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 1024 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo =
+      (highOrderRnsPairBox 1024 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 1024 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_step := inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung11
+  have h_prime := shortIntervalDyadicRung11Spec_has_prime
+  have h_excl := qrh_rns_reflect_half_box_exclusion_1024 theta h_theta
+  exact ⟨h_step, h_prime, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
+/-- Coupled dyadic Abel gate rung 11 and high-order RNS reflection box exclusion at N = 2048. -/
+theorem dyadic_gate_rung11_rns_reflect_half_box_coupling_2048
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    ((4 * dyadicAbelGateRung11.scaleN) *
+      (dyadicAbelGateRung11.tailBound * dyadicAbelGateRung11.tailBound) ≤
+      ((2 * dyadicAbelGateRung11.denomM) * (2 * dyadicAbelGateRung11.denomM)) *
+        (dyadicAbelGateRung11.tailNum * dyadicAbelGateRung11.tailNum)) ∧
+    shortIntervalDyadicRung11Spec.HasGuaranteedPrime ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 2048 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo =
+      (highOrderRnsPairBox 2048 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 2048 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_step := inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung11
+  have h_prime := shortIntervalDyadicRung11Spec_has_prime
+  have h_excl := qrh_rns_reflect_half_box_exclusion theta h_theta
+  exact ⟨h_step, h_prime, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
+/-- Coupled dyadic Abel gate rung 12 and high-order RNS reflection box exclusion at N = 1024. -/
+theorem dyadic_gate_rung12_rns_reflect_half_box_coupling_1024
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    ((4 * dyadicAbelGateRung12.scaleN) *
+      (dyadicAbelGateRung12.tailBound * dyadicAbelGateRung12.tailBound) ≤
+      ((2 * dyadicAbelGateRung12.denomM) * (2 * dyadicAbelGateRung12.denomM)) *
+        (dyadicAbelGateRung12.tailNum * dyadicAbelGateRung12.tailNum)) ∧
+    shortIntervalDyadicRung12Spec.HasGuaranteedPrime ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 1024 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo =
+      (highOrderRnsPairBox 1024 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 1024 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_step := inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung12
+  have h_prime := shortIntervalDyadicRung12Spec_has_prime
+  have h_excl := qrh_rns_reflect_half_box_exclusion_1024 theta h_theta
+  exact ⟨h_step, h_prime, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
+/-- Coupled dyadic Abel gate rung 12 and high-order RNS reflection box exclusion at N = 2048. -/
+theorem dyadic_gate_rung12_rns_reflect_half_box_coupling_2048
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    ((4 * dyadicAbelGateRung12.scaleN) *
+      (dyadicAbelGateRung12.tailBound * dyadicAbelGateRung12.tailBound) ≤
+      ((2 * dyadicAbelGateRung12.denomM) * (2 * dyadicAbelGateRung12.denomM)) *
+        (dyadicAbelGateRung12.tailNum * dyadicAbelGateRung12.tailNum)) ∧
+    shortIntervalDyadicRung12Spec.HasGuaranteedPrime ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 2048 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo =
+      (highOrderRnsPairBox 2048 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 2048 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_step := inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung12
+  have h_prime := shortIntervalDyadicRung12Spec_has_prime
+  have h_excl := qrh_rns_reflect_half_box_exclusion theta h_theta
+  exact ⟨h_step, h_prime, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
+/-- Coupled dyadic Abel gate rung 13 and high-order RNS reflection box exclusion at N = 1024. -/
+theorem dyadic_gate_rung13_rns_reflect_half_box_coupling_1024
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    ((4 * dyadicAbelGateRung13.scaleN) *
+      (dyadicAbelGateRung13.tailBound * dyadicAbelGateRung13.tailBound) ≤
+      ((2 * dyadicAbelGateRung13.denomM) * (2 * dyadicAbelGateRung13.denomM)) *
+        (dyadicAbelGateRung13.tailNum * dyadicAbelGateRung13.tailNum)) ∧
+    shortIntervalDyadicRung13Spec.HasGuaranteedPrime ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 1024 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo =
+      (highOrderRnsPairBox 1024 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 1024 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_step := inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung13
+  have h_prime := shortIntervalDyadicRung13Spec_has_prime
+  have h_excl := qrh_rns_reflect_half_box_exclusion_1024 theta h_theta
+  exact ⟨h_step, h_prime, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
+/-- Coupled dyadic Abel gate rung 13 and high-order RNS reflection box exclusion at N = 2048. -/
+theorem dyadic_gate_rung13_rns_reflect_half_box_coupling_2048
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    ((4 * dyadicAbelGateRung13.scaleN) *
+      (dyadicAbelGateRung13.tailBound * dyadicAbelGateRung13.tailBound) ≤
+      ((2 * dyadicAbelGateRung13.denomM) * (2 * dyadicAbelGateRung13.denomM)) *
+        (dyadicAbelGateRung13.tailNum * dyadicAbelGateRung13.tailNum)) ∧
+    shortIntervalDyadicRung13Spec.HasGuaranteedPrime ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 2048 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo =
+      (highOrderRnsPairBox 2048 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 2048 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_step := inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung13
+  have h_prime := shortIntervalDyadicRung13Spec_has_prime
+  have h_excl := qrh_rns_reflect_half_box_exclusion theta h_theta
+  exact ⟨h_step, h_prime, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
+/-- Coupled dyadic Abel gate rung 14 and high-order RNS reflection box exclusion at N = 1024. -/
+theorem dyadic_gate_rung14_rns_reflect_half_box_coupling_1024
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    ((4 * dyadicAbelGateRung14.scaleN) *
+      (dyadicAbelGateRung14.tailBound * dyadicAbelGateRung14.tailBound) ≤
+      ((2 * dyadicAbelGateRung14.denomM) * (2 * dyadicAbelGateRung14.denomM)) *
+        (dyadicAbelGateRung14.tailNum * dyadicAbelGateRung14.tailNum)) ∧
+    shortIntervalDyadicRung14Spec.HasGuaranteedPrime ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 1024 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo =
+      (highOrderRnsPairBox 1024 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 1024 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_step := inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung14
+  have h_prime := shortIntervalDyadicRung14Spec_has_prime
+  have h_excl := qrh_rns_reflect_half_box_exclusion_1024 theta h_theta
+  exact ⟨h_step, h_prime, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
+/-- Coupled dyadic Abel gate rung 14 and high-order RNS reflection box exclusion at N = 2048. -/
+theorem dyadic_gate_rung14_rns_reflect_half_box_coupling_2048
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    ((4 * dyadicAbelGateRung14.scaleN) *
+      (dyadicAbelGateRung14.tailBound * dyadicAbelGateRung14.tailBound) ≤
+      ((2 * dyadicAbelGateRung14.denomM) * (2 * dyadicAbelGateRung14.denomM)) *
+        (dyadicAbelGateRung14.tailNum * dyadicAbelGateRung14.tailNum)) ∧
+    shortIntervalDyadicRung14Spec.HasGuaranteedPrime ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 2048 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo =
+      (highOrderRnsPairBox 2048 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 2048 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_step := inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung14
+  have h_prime := shortIntervalDyadicRung14Spec_has_prime
+  have h_excl := qrh_rns_reflect_half_box_exclusion theta h_theta
+  exact ⟨h_step, h_prime, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
+/-- Master certificate bundle coupling dyadic rungs 11..14 with N = 1024 and N = 2048
+high-order RNS reflection boxes and critical exclusion. -/
+theorem dyadic_rungs_k11_to_k14_rns_coupling_certs
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    ((4 * dyadicAbelGateRung11.scaleN) *
+      (dyadicAbelGateRung11.tailBound * dyadicAbelGateRung11.tailBound) ≤
+      ((2 * dyadicAbelGateRung11.denomM) * (2 * dyadicAbelGateRung11.denomM)) *
+        (dyadicAbelGateRung11.tailNum * dyadicAbelGateRung11.tailNum)) ∧
+    ((4 * dyadicAbelGateRung12.scaleN) *
+      (dyadicAbelGateRung12.tailBound * dyadicAbelGateRung12.tailBound) ≤
+      ((2 * dyadicAbelGateRung12.denomM) * (2 * dyadicAbelGateRung12.denomM)) *
+        (dyadicAbelGateRung12.tailNum * dyadicAbelGateRung12.tailNum)) ∧
+    ((4 * dyadicAbelGateRung13.scaleN) *
+      (dyadicAbelGateRung13.tailBound * dyadicAbelGateRung13.tailBound) ≤
+      ((2 * dyadicAbelGateRung13.denomM) * (2 * dyadicAbelGateRung13.denomM)) *
+        (dyadicAbelGateRung13.tailNum * dyadicAbelGateRung13.tailNum)) ∧
+    ((4 * dyadicAbelGateRung14.scaleN) *
+      (dyadicAbelGateRung14.tailBound * dyadicAbelGateRung14.tailBound) ≤
+      ((2 * dyadicAbelGateRung14.denomM) * (2 * dyadicAbelGateRung14.denomM)) *
+        (dyadicAbelGateRung14.tailNum * dyadicAbelGateRung14.tailNum)) ∧
+    shortIntervalDyadicRung11Spec.HasGuaranteedPrime ∧
+    shortIntervalDyadicRung12Spec.HasGuaranteedPrime ∧
+    shortIntervalDyadicRung13Spec.HasGuaranteedPrime ∧
+    shortIntervalDyadicRung14Spec.HasGuaranteedPrime ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 1024 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 2048 theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo =
+      (highOrderRnsPairBox 1024 theta h_theta).stepContract ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo =
+      (highOrderRnsPairBox 2048 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo) ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 1024 theta h_theta).stepContract))
+      (QRat.ofInt 0)) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 2048 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h11 := inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung11
+  have h12 := inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung12
+  have h13 := inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung13
+  have h14 := inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung14
+  have hp11 := shortIntervalDyadicRung11Spec_has_prime
+  have hp12 := shortIntervalDyadicRung12Spec_has_prime
+  have hp13 := shortIntervalDyadicRung13Spec_has_prime
+  have hp14 := shortIntervalDyadicRung14Spec_has_prime
+  have hex1024 := qrh_rns_reflect_half_box_exclusion_1024 theta h_theta
+  have hex2048 := qrh_rns_reflect_half_box_exclusion theta h_theta
+  exact ⟨h11, h12, h13, h14, hp11, hp12, hp13, hp14,
+         hex1024.1, hex2048.1, rfl, rfl, hex1024.2.2.1, hex2048.2.2.1,
+         hex1024.2.2.2, hex2048.2.2.2⟩
 
 end QuasiRiemann
 

@@ -1232,4 +1232,24 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 
 #print axioms QuasiRiemann.dyadic_abel_rungs_k5_to_k14_certs
 
+-- =============================================================================
+-- Part 79: Parametric Dyadic Rungs (k ≥ 5) & Rungs 11..14 RNS Couplings (Issue #185)
+-- =============================================================================
+
+#print axioms QuasiRiemann.dyadic_parametric_gate_rns_reflect_half_box_coupling_1024
+#print axioms QuasiRiemann.dyadic_parametric_gate_rns_reflect_half_box_coupling_2048
+#print axioms QuasiRiemann.short_interval_dyadic_rns_reflect_half_box_coupling_1024
+#print axioms QuasiRiemann.short_interval_dyadic_rns_reflect_half_box_coupling_2048
+
+#print axioms QuasiRiemann.dyadic_gate_rung11_rns_reflect_half_box_coupling_1024
+#print axioms QuasiRiemann.dyadic_gate_rung11_rns_reflect_half_box_coupling_2048
+#print axioms QuasiRiemann.dyadic_gate_rung12_rns_reflect_half_box_coupling_1024
+#print axioms QuasiRiemann.dyadic_gate_rung12_rns_reflect_half_box_coupling_2048
+#print axioms QuasiRiemann.dyadic_gate_rung13_rns_reflect_half_box_coupling_1024
+#print axioms QuasiRiemann.dyadic_gate_rung13_rns_reflect_half_box_coupling_2048
+#print axioms QuasiRiemann.dyadic_gate_rung14_rns_reflect_half_box_coupling_1024
+#print axioms QuasiRiemann.dyadic_gate_rung14_rns_reflect_half_box_coupling_2048
+
+#print axioms QuasiRiemann.dyadic_rungs_k11_to_k14_rns_coupling_certs
+
 -- end of file: leanasm/tests/TestAxioms.lean
