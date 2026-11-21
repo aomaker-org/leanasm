@@ -547,6 +547,300 @@ theorem dyadic_abel_rungs_k5_to_k10_certs :
     inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung9,
     inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung10⟩
 
+-- =============================================================================
+-- Part 6b: Parametric Dyadic Rung Theorem & Rungs 11..14 (Issue #183)
+-- =============================================================================
+
+/-- Scale factor `K = 2^(k - 1)` at ladder rung `k`. -/
+def dyadicScaleK (k : Nat) : Nat := 2 ^ (k - 1)
+
+/-- Coordinate exponent `xScaleExp = 12 * K = 12 * 2^(k - 1)` at ladder rung `k`. -/
+def dyadicXScaleExp (k : Nat) : Nat := 12 * dyadicScaleK k
+
+/-- Base exponent `baseExp = 6 * K = 6 * 2^(k - 1)` at ladder rung `k`. -/
+def dyadicBaseExp (k : Nat) : Nat := 6 * dyadicScaleK k
+
+/-- Short-interval window exponent `hScaleExp = baseExp + 18` at ladder rung `k`. -/
+def dyadicHScaleExp (k : Nat) : Nat := dyadicBaseExp k + 18
+
+/-- Contraction gate denominator `m = 2^(k + 5)` at ladder rung `k`. -/
+def dyadicDenomM (k : Nat) : Nat := 2 ^ (k + 5)
+
+/-- Contraction gate scale `N = 2^(2k - 6)` at ladder rung `k`. -/
+def dyadicScaleN (k : Nat) : Nat := 2 ^ (2 * k - 6)
+
+/-- Chebyshev log-squared prefactor coefficient `2 * (29 * K)^2` at ladder rung `k`. -/
+def dyadicChebyshevCoeff (k : Nat) : Nat :=
+  2 * ((29 * dyadicScaleK k) * (29 * dyadicScaleK k))
+
+/-- Exact closed-form reduction for the ten-power ceiling exponent of `θ(k)` at rung `k ≥ 5`:
+`⌈(12 * K * θ.num + θ.den - 1) / θ.den⌉ = 6 * K + 3 = baseExp + 3`. -/
+theorem tenPowThetaCeilExp_dyadic (k : Nat) (hk : 5 ≤ k) :
+    tenPowThetaCeilExp (dyadicScaleK k) (qrhShortExponent k) = dyadicBaseExp k + 3 := by
+  have hk1 : 1 ≤ k := by omega
+  have hpow : 2 ^ (k + 1) = 4 * 2 ^ (k - 1) := by
+    have h1 : 2 ^ (k + 1) = 2 ^ ((k - 1) + 2) := by congr 1; omega
+    rw [h1, Nat.pow_add]
+    have h4 : 2 ^ 2 = 4 := rfl
+    rw [h4, Nat.mul_comm]
+  have hpowK : 2 ^ k = 2 * 2 ^ (k - 1) := by
+    have h1 : 2 ^ k = 2 ^ ((k - 1) + 1) := by congr 1; omega
+    rw [h1, Nat.pow_add]
+    have h2 : 2 ^ 1 = 2 := rfl
+    rw [h2, Nat.mul_comm]
+  dsimp only [tenPowThetaCeilExp, qrhShortExponent, QRat.mk', dyadicScaleK, dyadicBaseExp]
+  generalize hK : 2 ^ (k - 1) = K
+  have hKpos : 0 < K := by
+    rw [← hK]
+    exact Nat.pos_of_ne_zero (Nat.ne_of_gt (Nat.pow_pos (by decide : 0 < 2)))
+  have hDen : 2 ^ (k + 1) = 4 * K := by rw [hpow, hK]
+  have hNum : (((2 ^ k + 1 : Nat) : Int).natAbs) = 2 * K + 1 := by
+    rw [hpowK, hK]
+    rfl
+  rw [hDen, hNum]
+  have hNumerator : 12 * K * (2 * K + 1) + 4 * K - 1 = (4 * K - 1) + (6 * K + 3) * (4 * K) := by
+    have h1 : 12 * K * (2 * K + 1) = 12 * K * (2 * K) + 12 * K * 1 :=
+      Nat.mul_add (12 * K) (2 * K) 1
+    have h2 : (6 * K + 3) * (4 * K) = (6 * K) * (4 * K) + 3 * (4 * K) :=
+      Nat.add_mul (6 * K) 3 (4 * K)
+    have ha : 12 * K * (2 * K) = 24 * (K * K) := by
+      calc
+        12 * K * (2 * K) = 12 * (K * (2 * K)) := Nat.mul_assoc 12 K (2 * K)
+        _ = 12 * ((K * 2) * K) := by rw [Nat.mul_assoc K 2 K]
+        _ = 12 * ((2 * K) * K) := by rw [Nat.mul_comm K 2]
+        _ = 12 * (2 * (K * K)) := by rw [Nat.mul_assoc 2 K K]
+        _ = (12 * 2) * (K * K) := (Nat.mul_assoc 12 2 (K * K)).symm
+        _ = 24 * (K * K) := rfl
+    have hb : (6 * K) * (4 * K) = 24 * (K * K) := by
+      calc
+        6 * K * (4 * K) = 6 * (K * (4 * K)) := Nat.mul_assoc 6 K (4 * K)
+        _ = 6 * ((K * 4) * K) := by rw [Nat.mul_assoc K 4 K]
+        _ = 6 * ((4 * K) * K) := by rw [Nat.mul_comm K 4]
+        _ = 6 * (4 * (K * K)) := by rw [Nat.mul_assoc 4 K K]
+        _ = (6 * 4) * (K * K) := (Nat.mul_assoc 6 4 (K * K)).symm
+        _ = 24 * (K * K) := rfl
+    have hc : 3 * (4 * K) = 12 * K := by
+      calc
+        3 * (4 * K) = (3 * 4) * K := (Nat.mul_assoc 3 4 K).symm
+        _ = 12 * K := rfl
+    rw [h1, h2, ha, hb, hc, Nat.mul_one]
+    omega
+  rw [hNumerator]
+  rw [Nat.add_mul_div_right (4 * K - 1) (6 * K + 3) (by omega : 0 < 4 * K)]
+  have hRem : (4 * K - 1) / (4 * K) = 0 := by
+    apply Nat.div_eq_of_lt
+    omega
+  rw [hRem, Nat.zero_add]
+
+/-- General tail-gate inequality `N * 256^2 ≤ m^2 * 1^2` at dyadic ladder rung `k ≥ 5`:
+`2^(2k - 6) * 2^16 = 2^(2k + 10) ≤ 2^(2k + 10)`. -/
+theorem dyadic_gate_le (k : Nat) (hk : 5 ≤ k) :
+    dyadicScaleN k * (256 * 256) ≤ dyadicDenomM k * dyadicDenomM k * (1 * 1) := by
+  change 2 ^ (2 * k - 6) * 2 ^ 16 ≤ 2 ^ (k + 5) * 2 ^ (k + 5) * 1
+  rw [Nat.mul_one, ← Nat.pow_add, ← Nat.pow_add]
+  have hExp : (2 * k - 6) + 16 = (k + 5) + (k + 5) := by omega
+  rw [hExp]
+  exact Nat.le_refl _
+
+/-- Parametric dyadic tail gate specification at ladder rung `k ≥ 5`. -/
+def dyadicAbelGateParametric (k : Nat) (hk : 5 ≤ k) : InvSqrtTailGateSpec :=
+  { denomM := dyadicDenomM k
+    tailBound := 256
+    scaleN := dyadicScaleN k
+    tailNum := 1
+    denomM_pos := Nat.pos_of_ne_zero (Nat.ne_of_gt (Nat.pow_pos (by decide : 0 < 2)))
+    scaleN_pos := Nat.pos_of_ne_zero (Nat.ne_of_gt (Nat.pow_pos (by decide : 0 < 2)))
+    gate_le := dyadic_gate_le k hk }
+
+/-- Parametric short-interval Chebyshev specification at ladder rung `k ≥ 5`. -/
+def shortIntervalDyadicSpec (k : Nat) (hk : 5 ≤ k) : ShortIntervalChebyshevSpec :=
+  { thetaNum := 2 ^ k + 1
+    thetaDen := 2 ^ (k + 1)
+    xScaleExp := dyadicXScaleExp k
+    hScaleExp := dyadicHScaleExp k
+    errUpper := dyadicChebyshevCoeff k * 10 ^ (dyadicBaseExp k + 3)
+    primePowerCorr := 2 * 10 ^ dyadicBaseExp k
+    thetaDen_pos := Nat.pos_of_ne_zero (Nat.ne_of_gt (Nat.pow_pos (by decide : 0 < 2)))
+    theta_lt_one := by
+      have hpow : 2 ^ (k + 1) = 2 * 2 ^ k := by
+        rw [Nat.pow_succ, Nat.mul_comm]
+      rw [hpow]
+      have h2 : 2 * 2 ^ k = 2 ^ k + 2 ^ k := by rw [Nat.two_mul]
+      rw [h2]
+      have hLe : 2 ≤ 2 ^ k := by
+        have h1 : 2 ^ 1 ≤ 2 ^ k := Nat.pow_le_pow_right (by decide) (by omega)
+        exact h1
+      omega }
+
+/-- Master parametric prime-existence theorem for short intervals along the dyadic ladder:
+Any rung `k ≥ 5` whose cleared prefactor factor satisfies `2 * C * 10^3 + 2 < 10^18`
+guarantees at least one prime in `[10^xScaleExp, 10^xScaleExp + 10^hScaleExp]`. -/
+theorem shortIntervalDyadicSpec_has_prime_of_factor_lt (k : Nat) (hk : 5 ≤ k)
+    (hFactor : 2 * (dyadicChebyshevCoeff k * 10 ^ 3) + 2 < 10 ^ 18) :
+    (shortIntervalDyadicSpec k hk).HasGuaranteedPrime := by
+  dsimp [ShortIntervalChebyshevSpec.HasGuaranteedPrime, shortIntervalDyadicSpec, dyadicHScaleExp]
+  have hExp : (10 : Nat) ^ (dyadicBaseExp k + 3) = 10 ^ 3 * 10 ^ dyadicBaseExp k := by
+    rw [Nat.add_comm, Nat.pow_add]
+  have hHExp : (10 : Nat) ^ (dyadicBaseExp k + 18) = 10 ^ (18 + dyadicBaseExp k) := by
+    rw [Nat.add_comm]
+  rw [hExp, hHExp]
+  have hLeft :
+      2 * (dyadicChebyshevCoeff k * (10 ^ 3 * 10 ^ dyadicBaseExp k)) + 2 * 10 ^ dyadicBaseExp k =
+        (2 * (dyadicChebyshevCoeff k * 10 ^ 3) + 2) * 10 ^ dyadicBaseExp k := by
+    have h1 : 2 * (dyadicChebyshevCoeff k * (10 ^ 3 * 10 ^ dyadicBaseExp k)) =
+        (2 * (dyadicChebyshevCoeff k * 10 ^ 3)) * 10 ^ dyadicBaseExp k := by
+      calc
+        2 * (dyadicChebyshevCoeff k * (10 ^ 3 * 10 ^ dyadicBaseExp k))
+            = 2 * ((dyadicChebyshevCoeff k * 10 ^ 3) * 10 ^ dyadicBaseExp k) := by
+          rw [Nat.mul_assoc (dyadicChebyshevCoeff k) (10 ^ 3) (10 ^ dyadicBaseExp k)]
+        _ = (2 * (dyadicChebyshevCoeff k * 10 ^ 3)) * 10 ^ dyadicBaseExp k := by
+          rw [Nat.mul_assoc 2 (dyadicChebyshevCoeff k * 10 ^ 3) (10 ^ dyadicBaseExp k)]
+    rw [h1, ← Nat.add_mul]
+  rw [hLeft]
+  exact pow_ten_factor_lt_mvb hFactor
+
+/-- Concrete cleared-denominator tail gate at rung `k = 11`. -/
+def dyadicAbelGateRung11 : InvSqrtTailGateSpec := dyadicAbelGateParametric 11 (by decide)
+
+/-- Concrete cleared-denominator tail gate at rung `k = 12`. -/
+def dyadicAbelGateRung12 : InvSqrtTailGateSpec := dyadicAbelGateParametric 12 (by decide)
+
+/-- Concrete cleared-denominator tail gate at rung `k = 13`. -/
+def dyadicAbelGateRung13 : InvSqrtTailGateSpec := dyadicAbelGateParametric 13 (by decide)
+
+/-- Concrete cleared-denominator tail gate at rung `k = 14`. -/
+def dyadicAbelGateRung14 : InvSqrtTailGateSpec := dyadicAbelGateParametric 14 (by decide)
+
+/-- Concrete short-interval Chebyshev benchmark at rung `k = 11` (`θ = 2049/4096`). -/
+def shortIntervalDyadicRung11Spec : ShortIntervalChebyshevSpec :=
+  shortIntervalDyadicSpec 11 (by decide)
+
+/-- Concrete short-interval Chebyshev benchmark at rung `k = 12` (`θ = 4097/8192`). -/
+def shortIntervalDyadicRung12Spec : ShortIntervalChebyshevSpec :=
+  shortIntervalDyadicSpec 12 (by decide)
+
+/-- Concrete short-interval Chebyshev benchmark at rung `k = 13` (`θ = 8193/16384`). -/
+def shortIntervalDyadicRung13Spec : ShortIntervalChebyshevSpec :=
+  shortIntervalDyadicSpec 13 (by decide)
+
+/-- Concrete short-interval Chebyshev benchmark at rung `k = 14` (`θ = 16385/32768`). -/
+def shortIntervalDyadicRung14Spec : ShortIntervalChebyshevSpec :=
+  shortIntervalDyadicSpec 14 (by decide)
+
+/-- Exact positivity certificate for rung `k = 11` (`[10^12288, 10^12288 + 10^6162]`). -/
+theorem shortIntervalDyadicRung11Spec_has_prime :
+    shortIntervalDyadicRung11Spec.HasGuaranteedPrime :=
+  shortIntervalDyadicSpec_has_prime_of_factor_lt 11 (by decide) (by decide)
+
+/-- Exact positivity certificate for rung `k = 12` (`[10^24576, 10^24576 + 10^12306]`). -/
+theorem shortIntervalDyadicRung12Spec_has_prime :
+    shortIntervalDyadicRung12Spec.HasGuaranteedPrime :=
+  shortIntervalDyadicSpec_has_prime_of_factor_lt 12 (by decide) (by decide)
+
+/-- Exact positivity certificate for rung `k = 13` (`[10^49152, 10^49152 + 10^24594]`). -/
+theorem shortIntervalDyadicRung13Spec_has_prime :
+    shortIntervalDyadicRung13Spec.HasGuaranteedPrime :=
+  shortIntervalDyadicSpec_has_prime_of_factor_lt 13 (by decide) (by decide)
+
+/-- Exact positivity certificate for rung `k = 14` (`[10^98304, 10^98304 + 10^49170]`). -/
+theorem shortIntervalDyadicRung14Spec_has_prime :
+    shortIntervalDyadicRung14Spec.HasGuaranteedPrime :=
+  shortIntervalDyadicSpec_has_prime_of_factor_lt 14 (by decide) (by decide)
+
+/-- Extended master rung certificate bundle spanning rungs `k = 5` through `k = 14`. -/
+theorem dyadic_abel_rungs_k5_to_k14_certs :
+    QRat.eqv (qrhShortExponent 5) (QRat.mk' 33 64) ∧
+    QRat.eqv (qrhShortExponent 6) (QRat.mk' 65 128) ∧
+    QRat.eqv (qrhShortExponent 7) (QRat.mk' 129 256) ∧
+    QRat.eqv (qrhShortExponent 8) (QRat.mk' 257 512) ∧
+    QRat.eqv (qrhShortExponent 9) (QRat.mk' 513 1024) ∧
+    QRat.eqv (qrhShortExponent 10) (QRat.mk' 1025 2048) ∧
+    QRat.eqv (qrhShortExponent 11) (QRat.mk' 2049 4096) ∧
+    QRat.eqv (qrhShortExponent 12) (QRat.mk' 4097 8192) ∧
+    QRat.eqv (qrhShortExponent 13) (QRat.mk' 8193 16384) ∧
+    QRat.eqv (qrhShortExponent 14) (QRat.mk' 16385 32768) ∧
+    qrhShortExponent 14 < qrhShortExponent 13 ∧
+    qrhShortExponent 13 < qrhShortExponent 12 ∧
+    qrhShortExponent 12 < qrhShortExponent 11 ∧
+    qrhShortExponent 11 < qrhShortExponent 10 ∧
+    qrhShortExponent 10 < qrhShortExponent 9 ∧
+    qrhShortExponent 9 < qrhShortExponent 8 ∧
+    qrhShortExponent 8 < qrhShortExponent 7 ∧
+    qrhShortExponent 7 < qrhShortExponent 6 ∧
+    qrhShortExponent 6 < qrhShortExponent 5 ∧
+    qrhShortExponent 5 < qrhShortExponent 4 ∧
+    qrhShortExponent 4 < qrhShortExponent 0 ∧
+    shortIntervalQrh3364Spec.HasGuaranteedPrime ∧
+    shortIntervalQrh65128Spec.HasGuaranteedPrime ∧
+    shortIntervalQrh129256Spec.HasGuaranteedPrime ∧
+    shortIntervalQrh257512Spec.HasGuaranteedPrime ∧
+    shortIntervalQrh5131024Spec.HasGuaranteedPrime ∧
+    shortIntervalQrh10252048Spec.HasGuaranteedPrime ∧
+    shortIntervalDyadicRung11Spec.HasGuaranteedPrime ∧
+    shortIntervalDyadicRung12Spec.HasGuaranteedPrime ∧
+    shortIntervalDyadicRung13Spec.HasGuaranteedPrime ∧
+    shortIntervalDyadicRung14Spec.HasGuaranteedPrime ∧
+    (4 * dyadicAbelGateRung5.scaleN) *
+      (dyadicAbelGateRung5.tailBound * dyadicAbelGateRung5.tailBound) ≤
+      ((2 * dyadicAbelGateRung5.denomM) * (2 * dyadicAbelGateRung5.denomM)) *
+        (dyadicAbelGateRung5.tailNum * dyadicAbelGateRung5.tailNum) ∧
+    (4 * dyadicAbelGateRung6.scaleN) *
+      (dyadicAbelGateRung6.tailBound * dyadicAbelGateRung6.tailBound) ≤
+      ((2 * dyadicAbelGateRung6.denomM) * (2 * dyadicAbelGateRung6.denomM)) *
+        (dyadicAbelGateRung6.tailNum * dyadicAbelGateRung6.tailNum) ∧
+    (4 * dyadicAbelGateRung7.scaleN) *
+      (dyadicAbelGateRung7.tailBound * dyadicAbelGateRung7.tailBound) ≤
+      ((2 * dyadicAbelGateRung7.denomM) * (2 * dyadicAbelGateRung7.denomM)) *
+        (dyadicAbelGateRung7.tailNum * dyadicAbelGateRung7.tailNum) ∧
+    (4 * dyadicAbelGateRung8.scaleN) *
+      (dyadicAbelGateRung8.tailBound * dyadicAbelGateRung8.tailBound) ≤
+      ((2 * dyadicAbelGateRung8.denomM) * (2 * dyadicAbelGateRung8.denomM)) *
+        (dyadicAbelGateRung8.tailNum * dyadicAbelGateRung8.tailNum) ∧
+    (4 * dyadicAbelGateRung9.scaleN) *
+      (dyadicAbelGateRung9.tailBound * dyadicAbelGateRung9.tailBound) ≤
+      ((2 * dyadicAbelGateRung9.denomM) * (2 * dyadicAbelGateRung9.denomM)) *
+        (dyadicAbelGateRung9.tailNum * dyadicAbelGateRung9.tailNum) ∧
+    (4 * dyadicAbelGateRung10.scaleN) *
+      (dyadicAbelGateRung10.tailBound * dyadicAbelGateRung10.tailBound) ≤
+      ((2 * dyadicAbelGateRung10.denomM) * (2 * dyadicAbelGateRung10.denomM)) *
+        (dyadicAbelGateRung10.tailNum * dyadicAbelGateRung10.tailNum) ∧
+    (4 * dyadicAbelGateRung11.scaleN) *
+      (dyadicAbelGateRung11.tailBound * dyadicAbelGateRung11.tailBound) ≤
+      ((2 * dyadicAbelGateRung11.denomM) * (2 * dyadicAbelGateRung11.denomM)) *
+        (dyadicAbelGateRung11.tailNum * dyadicAbelGateRung11.tailNum) ∧
+    (4 * dyadicAbelGateRung12.scaleN) *
+      (dyadicAbelGateRung12.tailBound * dyadicAbelGateRung12.tailBound) ≤
+      ((2 * dyadicAbelGateRung12.denomM) * (2 * dyadicAbelGateRung12.denomM)) *
+        (dyadicAbelGateRung12.tailNum * dyadicAbelGateRung12.tailNum) ∧
+    (4 * dyadicAbelGateRung13.scaleN) *
+      (dyadicAbelGateRung13.tailBound * dyadicAbelGateRung13.tailBound) ≤
+      ((2 * dyadicAbelGateRung13.denomM) * (2 * dyadicAbelGateRung13.denomM)) *
+        (dyadicAbelGateRung13.tailNum * dyadicAbelGateRung13.tailNum) ∧
+    (4 * dyadicAbelGateRung14.scaleN) *
+      (dyadicAbelGateRung14.tailBound * dyadicAbelGateRung14.tailBound) ≤
+      ((2 * dyadicAbelGateRung14.denomM) * (2 * dyadicAbelGateRung14.denomM)) *
+        (dyadicAbelGateRung14.tailNum * dyadicAbelGateRung14.tailNum) := by
+  refine ⟨by decide, by decide, by decide, by decide, by decide, by decide,
+    by decide, by decide, by decide, by decide,
+    by decide, by decide, by decide, by decide, by decide, by decide, by decide,
+    by decide, by decide, by decide, by decide,
+    shortIntervalQrh3364Spec_has_prime, shortIntervalQrh65128Spec_has_prime,
+    shortIntervalQrh129256Spec_has_prime, shortIntervalQrh257512Spec_has_prime,
+    shortIntervalQrh5131024Spec_has_prime, shortIntervalQrh10252048Spec_has_prime,
+    shortIntervalDyadicRung11Spec_has_prime, shortIntervalDyadicRung12Spec_has_prime,
+    shortIntervalDyadicRung13Spec_has_prime, shortIntervalDyadicRung14Spec_has_prime,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung5,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung6,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung7,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung8,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung9,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung10,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung11,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung12,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung13,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung14⟩
+
+
 /-- Master rung `k = 5, 6, 7, 8` certificate bundle extending the verified chain
 `257/512 < 129/256 < 65/128 < 33/64 < 17/32 < 7/8` with concrete short-interval prime positivity at
 `[10^192, 10^192 + 10^108]`, `[10^384, 10^384 + 10^206]`, `[10^768, 10^768 + 10^402]`, and
