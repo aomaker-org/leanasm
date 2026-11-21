@@ -1,0 +1,19 @@
+# Path: leanasm/scripts/helpers/agy_helper_scripts.log
+# Consolidated log of trial helper script executions
+# Max Column: 100 Columns
+
+2026-11-21T00:49:54Z offline-witness/check_rung10.py:
+  Verify rung k=10 exponents, bounds, power bases, tail gate - PASS
+2026-11-21T00:56:10Z offline-witness/stress_rung10_t60.py:
+  Stress & factoring check for rung k=10 (1025/2048) at t~10^60 - PASS
+2026-11-21T02:55:24Z offline-witness/stress_rung11_t60.py:
+  Stress & factoring check for rung k=11 (2049/4096) at t~10^60 - PASS
+2026-11-21T02:57:29Z offline-witness/stress_rung12_t60.py:
+  Stress & factoring check for rung k=12 (4097/8192) at t~10^60 - PASS
+2026-11-21T02:59:20Z offline-witness/stress_rung13_t60.py:
+  Verify rung k=13 (8193/16384), bases, InvSqrtTailGate, P>=120 - PASS
+2026-11-21T03:37:12Z offline-witness/stress_rung14_t60.py:
+  Rung k=14 and t~10^60 stress & factoring witness check - PASS
+2026-11-21T03:37:35Z offline-witness/stress_high_k_t120.py:
+  High rungs k=15..20 & t~10^120 probe, c(k)<10^18 breaks at k=21, P>=180/240 - PASS
+# end of file: leanasm/scripts/helpers/agy_helper_scripts.log
