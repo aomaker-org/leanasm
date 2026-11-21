@@ -1141,4 +1141,17 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.rns_pair_box_N1024_cert
 #print axioms QuasiRiemann.rns_pair_box_N2048_cert
 
+-- =============================================================================
+-- Part 74: Constructive reflectHalf & BoxSupplyBound Lemmas (Issue #173)
+-- =============================================================================
+
+#print axioms QuasiRiemann.reflectHalf
+#print axioms QuasiRiemann.reflectHalf_involutive
+#print axioms QuasiRiemann.reflectHalf_reflectHalf
+#print axioms QuasiRiemann.reflectHalf_lt_reflectHalf
+#print axioms QuasiRiemann.reflectHalf_axis_dichotomy
+#print axioms QuasiRiemann.BoxSupplyBound.zero_free_box
+#print axioms QuasiRiemann.BoxSupplyBound.zero_free_box_pos
+#print axioms QuasiRiemann.makeBoxSupplyBound
+
 -- end of file: leanasm/tests/TestAxioms.lean

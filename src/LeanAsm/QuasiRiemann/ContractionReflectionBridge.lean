@@ -571,6 +571,134 @@ theorem rns_pair_box_N2048_cert (theta : QRat)
     ¬ QRat.eqv (highOrderRnsPairBox 2048 theta h_theta).stepContract (QRat.ofInt 0) :=
   (highOrderRnsPairBox 2048 theta h_theta).stepContract_ne_zero
 
+-- =============================================================================
+-- 9. Constructive reflectHalf Involution & BoxSupplyBound Nonvanishing (#173)
+-- =============================================================================
+
+/-- Constructive symmetry reflection operator `reflectHalf x = 1 - x` across the
+critical axis `1/2` over `QRat`.
+Dual to `reflectQRat`, inspired by `RhOfRight.lean` in `subrepos/alpo-rh`. -/
+def reflectHalf (x : QRat) : QRat :=
+  QRat.ofInt 1 - x
+
+/-- Involutivity of `reflectHalf`: `reflectHalf (reflectHalf x) = x` up to `QRat.eqv`. -/
+theorem reflectHalf_involutive (x : QRat) :
+    QRat.eqv (reflectHalf (reflectHalf x)) x :=
+  half_plane_reflection_qrat_involution x
+
+/-- Double application of `reflectHalf` restores the original `QRat` value. -/
+theorem reflectHalf_reflectHalf (x : QRat) :
+    QRat.eqv (reflectHalf (reflectHalf x)) x :=
+  reflectHalf_involutive x
+
+/-- Order reversal under `reflectHalf`: `x < y ↔ reflectHalf y < reflectHalf x`. -/
+theorem reflectHalf_lt_reflectHalf (x y : QRat) :
+    reflectHalf y < reflectHalf x ↔ x < y := by
+  constructor
+  · intro h
+    change (1 * (y.den : Int) - y.num * 1) * ((1 * x.den : Nat) : Int) <
+      (1 * (x.den : Int) - x.num * 1) * ((1 * y.den : Nat) : Int) at h
+    rw [Nat.one_mul, Nat.one_mul] at h
+    change x.num * (y.den : Int) < y.num * (x.den : Int)
+    rw [Int.sub_mul, Int.sub_mul] at h
+    rw [Int.one_mul, Int.mul_one, Int.one_mul, Int.mul_one] at h
+    rw [Int.mul_comm (y.den : Int) (x.den : Int)] at h
+    omega
+  · intro h
+    change (1 * (y.den : Int) - y.num * 1) * ((1 * x.den : Nat) : Int) <
+      (1 * (x.den : Int) - x.num * 1) * ((1 * y.den : Nat) : Int)
+    rw [Nat.one_mul, Nat.one_mul]
+    change x.num * (y.den : Int) < y.num * (x.den : Int) at h
+    rw [Int.sub_mul, Int.sub_mul]
+    rw [Int.one_mul, Int.mul_one, Int.one_mul, Int.mul_one]
+    rw [Int.mul_comm (y.den : Int) (x.den : Int)]
+    omega
+
+/-- Axis nonvanishing dichotomy:
+If a predicate `P` on `QRat` is symmetric under `reflectHalf` (`P (reflectHalf x) ↔ P x`)
+and vanishes nowhere to the right of the critical axis `1/2` (`1/2 < x → ¬ P x`),
+then `P` cannot hold at any point `x < 1/2`.
+Direct constructive analogue of `rh_of_right` from `RhOfRight.lean`. -/
+theorem reflectHalf_axis_dichotomy (P : QRat → Prop)
+    (h_symm : ∀ x : QRat, P (reflectHalf x) ↔ P x)
+    (h_right : ∀ x : QRat, halfQRat < x → ¬ P x) :
+    ∀ x : QRat, x < halfQRat → ¬ P x := by
+  intro x hx_lt hPx
+  have h_refl_lt : halfQRat < reflectHalf x := by
+    dsimp [halfQRat, reflectHalf, QRat.lt, QRat.sub, QRat.ofInt] at hx_lt ⊢
+    change x.num * 2 < 1 * (x.den : Int) at hx_lt
+    change 1 * ((1 * x.den : Nat) : Int) < (1 * (x.den : Int) - x.num * 1) * 2
+    rw [Nat.one_mul]
+    omega
+  have h_refl_P : P (reflectHalf x) := (h_symm x).mpr hPx
+  exact h_right (reflectHalf x) h_refl_lt h_refl_P
+
+/-- Constructive box supply bound certificate over `QRat`.
+Captures an interval box `[xLo, xHi]` with a strictly positive lower bound `xLo > 0`,
+guaranteeing uniform zero-free exclusion on the entire box supply.
+Inspired by `CharacterBoxes/SupplyChi.lean` and `CharacterBoxes/Supply.lean`. -/
+structure BoxSupplyBound where
+  xLo : QRat
+  xHi : QRat
+  h_order : xLo ≤ xHi
+  h_lo_pos : QRat.ofInt 0 < xLo
+
+/-- Zero-free box property for `BoxSupplyBound`:
+Any evaluation `x` within the supply box `[xLo, xHi]` satisfies `0 < x` and therefore
+cannot vanish (`x ≠ 0` up to `QRat.eqv`). -/
+theorem BoxSupplyBound.zero_free_box (B : BoxSupplyBound) (x : QRat)
+    (hx_ge : B.xLo ≤ x) :
+    ¬ QRat.eqv x (QRat.ofInt 0) := by
+  intro h
+  have h_pos := B.h_lo_pos
+  change (0 : Int) * (B.xLo.den : Int) < B.xLo.num * (1 : Int) at h_pos
+  rw [Int.zero_mul, Int.mul_one] at h_pos
+  change x.num * (1 : Int) = 0 * ((x.den : Nat) : Int) at h
+  rw [Int.mul_one, Int.zero_mul] at h
+  change B.xLo.num * (x.den : Int) ≤ x.num * (B.xLo.den : Int) at hx_ge
+  rw [h, Int.zero_mul] at hx_ge
+  have h_xden_nat := x.den_pos
+  have h_xden : 0 < (x.den : Int) := by omega
+  have h_prod : 0 < B.xLo.num * (x.den : Int) := Int.mul_pos h_pos h_xden
+  omega
+
+/-- Strict positivity of any point `x` bounded below by `B.xLo`. -/
+theorem BoxSupplyBound.zero_free_box_pos (B : BoxSupplyBound) (x : QRat)
+    (hx_ge : B.xLo ≤ x) :
+    QRat.ofInt 0 < x := by
+  have h_pos := B.h_lo_pos
+  change (0 : Int) * (B.xLo.den : Int) < B.xLo.num * (1 : Int) at h_pos
+  rw [Int.zero_mul, Int.mul_one] at h_pos
+  change (0 : Int) * (x.den : Int) < x.num * (1 : Int)
+  rw [Int.zero_mul, Int.mul_one]
+  change B.xLo.num * (x.den : Int) ≤ x.num * (B.xLo.den : Int) at hx_ge
+  have h_xden_nat := x.den_pos
+  have h_xden : 0 < (x.den : Int) := by omega
+  have h_prod : 0 < B.xLo.num * (x.den : Int) := Int.mul_pos h_pos h_xden
+  have h_ineq : 0 < x.num * (B.xLo.den : Int) := by omega
+  if hx_pos : 0 < x.num then
+    exact hx_pos
+  else
+    have h_bden_nat := B.xLo.den_pos
+    have h_nonpos : x.num * (B.xLo.den : Int) ≤ 0 :=
+      Int.mul_nonpos_of_nonpos_of_nonneg (by omega) (by omega)
+    omega
+
+/-- Canonical witness constructor for `BoxSupplyBound` given rational numerator and denominator. -/
+def makeBoxSupplyBound (numLo denLo numHi denHi : Nat)
+    (h_numLo_pos : 0 < numLo) (h_denLo_pos : 0 < denLo)
+    (h_denHi_pos : 0 < denHi)
+    (h_order : (numLo : Int) * (denHi : Int) ≤ (numHi : Int) * (denLo : Int)) :
+    BoxSupplyBound where
+  xLo := QRat.mk' (numLo : Int) denLo h_denLo_pos
+  xHi := QRat.mk' (numHi : Int) denHi h_denHi_pos
+  h_order := by
+    exact h_order
+  h_lo_pos := by
+    change (0 : Int) * (denLo : Int) < (numLo : Int) * (1 : Int)
+    rw [Int.zero_mul, Int.mul_one]
+    omega
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/ContractionReflectionBridge.lean
