@@ -1166,4 +1166,16 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.rnsPairBoxToBoxSupplyBound
 #print axioms QuasiRiemann.qrh_rns_reflect_half_box_exclusion
 
+-- =============================================================================
+-- Part 76: Dyadic Rung k = 8 & Tightened RNS Bridge (Issue #177)
+-- =============================================================================
+
+#print axioms QuasiRiemann.chebyshevSpec1536_257512
+#print axioms QuasiRiemann.shortIntervalQrh257512Spec
+#print axioms QuasiRiemann.chebyshevSpec1536_257512_env_le
+#print axioms QuasiRiemann.shortIntervalQrh257512Spec_has_prime
+#print axioms QuasiRiemann.dyadicAbelGateRung8
+#print axioms QuasiRiemann.dyadic_abel_rungs_k5_to_k8_certs
+#print axioms QuasiRiemann.dyadic_gate_rns_reflect_half_box_coupling
+
 -- end of file: leanasm/tests/TestAxioms.lean
