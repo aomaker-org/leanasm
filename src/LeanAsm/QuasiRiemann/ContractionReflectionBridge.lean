@@ -717,6 +717,50 @@ def rnsPairBoxToBoxSupplyBound {k : Nat} (pb : LeanAsm.QuasiRiemann.RNS.RnsPairB
     rw [Int.zero_mul, Int.mul_one]
     exact h_pos
 
+/-- High-order RNS contraction box exclusion at scale `N = 1024` under `reflectHalf`.
+Wires high-order paired-channel contraction at `N = 1024` (`RnsPairBox 3` via `highOrderRnsPairBox`)
+and `BoxSupplyBound` into `reflectHalf` exclusion: the contraction step evaluation cannot vanish. -/
+theorem qrh_rns_reflect_half_box_exclusion_1024 (theta : QRat)
+    (h_theta : qrhThresholdSevenEighths < theta) :
+    ¬ QRat.eqv (highOrderRnsPairBox 1024 theta h_theta).stepContract (QRat.ofInt 0) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo =
+      (highOrderRnsPairBox 1024 theta h_theta).stepContract ∧
+    QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo ∧
+    ¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 1024 theta h_theta).stepContract))
+      (QRat.ofInt 0) := by
+  have h_ne := rns_pair_box_N1024_cert theta h_theta
+  have h_xlo_eq : (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo =
+      (highOrderRnsPairBox 1024 theta h_theta).stepContract := rfl
+  have h_pos : QRat.ofInt 0 <
+      (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).xLo :=
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 1024 theta h_theta)).h_lo_pos
+  have h_refl := reflectHalf_reflectHalf (highOrderRnsPairBox 1024 theta h_theta).stepContract
+  have h_refl_ne :
+      ¬ QRat.eqv
+        (reflectHalf (reflectHalf (highOrderRnsPairBox 1024 theta h_theta).stepContract))
+        (QRat.ofInt 0) := by
+    intro h
+    have h_contra : (highOrderRnsPairBox 1024 theta h_theta).stepContract.eqv (QRat.ofInt 0) := by
+      let rf := reflectHalf (reflectHalf (highOrderRnsPairBox 1024 theta h_theta).stepContract)
+      have h1 : rf.num * 1 = 0 * ((rf.den : Nat) : Int) := h
+      rw [Int.mul_one, Int.zero_mul] at h1
+      have h2 : rf.num * ((highOrderRnsPairBox 1024 theta h_theta).stepContract.den : Int) =
+          (highOrderRnsPairBox 1024 theta h_theta).stepContract.num *
+            ((rf.den : Nat) : Int) := h_refl
+      rw [h1, Int.zero_mul] at h2
+      have h_rf_den_pos := rf.den_pos
+      have h_rf_den : 0 < ((rf.den : Nat) : Int) := by omega
+      have h_zero : (highOrderRnsPairBox 1024 theta h_theta).stepContract.num = 0 := by
+        rcases Int.mul_eq_zero.mp h2.symm with hz1 | hz2
+        · exact hz1
+        · omega
+      change (highOrderRnsPairBox 1024 theta h_theta).stepContract.num * 1 =
+        0 * (((highOrderRnsPairBox 1024 theta h_theta).stepContract.den : Nat) : Int)
+      rw [h_zero, Int.zero_mul, Int.zero_mul]
+    exact h_ne h_contra
+  exact ⟨h_ne, h_xlo_eq, h_pos, h_refl_ne⟩
+
 /-- High-order RNS contraction box exclusion under critical-axis reflection `reflectHalf`.
 Wires high-order paired-channel contraction at `N = 2048` (`RnsPairBox 3` via `highOrderRnsPairBox`)
 and `BoxSupplyBound` into `reflectHalf` exclusion: the contraction step evaluation cannot vanish. -/
@@ -805,6 +849,76 @@ theorem dyadic_gate_rns_reflect_half_box_coupling
         highOrderRnsPairBox 2048 theta h_theta := by rw [h_scale]
     rw [h_rw]
     exact h_refl
+
+/-- Coupled dyadic Abel gate rung 8 and high-order RNS reflection box exclusion.
+Establishes that the high-order RNS paired-channel contraction at scale `gate.scaleN`
+(which equals `1024` when `gate.scaleN = 1024`, as in `dyadicAbelGateRung8`) inherits
+non-vanishing critical reflection exclusion and positive box supply bounds together
+with the dyadic tail-step preservation of `gate`. -/
+theorem dyadic_gate_rns_reflect_half_box_coupling_1024
+    (gate : InvSqrtTailGateSpec) (h_gate_scale : gate.scaleN = 1024)
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    ((4 * gate.scaleN) * (gate.tailBound * gate.tailBound) ≤
+      ((2 * gate.denomM) * (2 * gate.denomM)) * (gate.tailNum * gate.tailNum)) ∧
+    (gate.scaleN = 1024) ∧
+    (¬ QRat.eqv (highOrderRnsPairBox gate.scaleN theta h_theta).stepContract
+      (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound
+      (highOrderRnsPairBox gate.scaleN theta h_theta)).xLo =
+      (highOrderRnsPairBox gate.scaleN theta h_theta).stepContract ∧
+    (QRat.ofInt 0 <
+      (rnsPairBoxToBoxSupplyBound
+        (highOrderRnsPairBox gate.scaleN theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf
+        (reflectHalf
+          (highOrderRnsPairBox gate.scaleN theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_step := inv_sqrt_tail_gate_dyadic_step gate
+  have h_excl := qrh_rns_reflect_half_box_exclusion_1024 theta h_theta
+  refine ⟨h_step, h_gate_scale, ?_, ?_, ?_, ?_⟩
+  · intro h
+    have h_rw : highOrderRnsPairBox gate.scaleN theta h_theta =
+        highOrderRnsPairBox 1024 theta h_theta := by rw [h_gate_scale]
+    rw [h_rw] at h
+    exact h_excl.1 h
+  · exact rfl
+  · have h_pos := h_excl.2.2.1
+    have h_rw : highOrderRnsPairBox gate.scaleN theta h_theta =
+        highOrderRnsPairBox 1024 theta h_theta := by rw [h_gate_scale]
+    rw [h_rw]
+    exact h_pos
+  · have h_refl := h_excl.2.2.2
+    have h_rw : highOrderRnsPairBox gate.scaleN theta h_theta =
+        highOrderRnsPairBox 1024 theta h_theta := by rw [h_gate_scale]
+    rw [h_rw]
+    exact h_refl
+
+/-- Coupled dyadic Abel gate and high-order RNS reflection box exclusion at scale `N = 2048`.
+Establishes that the high-order RNS paired-channel contraction at scale `2048` inherits
+non-vanishing critical reflection exclusion and positive box supply bounds together
+with the dyadic tail-step preservation of `gate`. -/
+theorem dyadic_gate_rns_reflect_half_box_coupling_2048
+    (gate : InvSqrtTailGateSpec)
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    ((4 * gate.scaleN) * (gate.tailBound * gate.tailBound) ≤
+      ((2 * gate.denomM) * (2 * gate.denomM)) * (gate.tailNum * gate.tailNum)) ∧
+    (¬ QRat.eqv (highOrderRnsPairBox 2048 theta h_theta).stepContract
+      (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound
+      (highOrderRnsPairBox 2048 theta h_theta)).xLo =
+      (highOrderRnsPairBox 2048 theta h_theta).stepContract ∧
+    (QRat.ofInt 0 <
+      (rnsPairBoxToBoxSupplyBound
+        (highOrderRnsPairBox 2048 theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf
+        (reflectHalf
+          (highOrderRnsPairBox 2048 theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_step := inv_sqrt_tail_gate_dyadic_step gate
+  have h_excl := qrh_rns_reflect_half_box_exclusion theta h_theta
+  refine ⟨h_step, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
 
 end QuasiRiemann
 
