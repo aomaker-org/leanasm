@@ -1178,4 +1178,22 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.dyadic_abel_rungs_k5_to_k8_certs
 #print axioms QuasiRiemann.dyadic_gate_rns_reflect_half_box_coupling
 
+-- =============================================================================
+-- Part 77: Dyadic Rungs k = 9 & k = 10 Certificates (Issue #179)
+-- =============================================================================
+
+#print axioms QuasiRiemann.chebyshevSpec3072_5131024
+#print axioms QuasiRiemann.shortIntervalQrh5131024Spec
+#print axioms QuasiRiemann.chebyshevSpec3072_5131024_env_le
+#print axioms QuasiRiemann.shortIntervalQrh5131024Spec_has_prime
+#print axioms QuasiRiemann.dyadicAbelGateRung9
+
+#print axioms QuasiRiemann.chebyshevSpec6144_10252048
+#print axioms QuasiRiemann.shortIntervalQrh10252048Spec
+#print axioms QuasiRiemann.chebyshevSpec6144_10252048_env_le
+#print axioms QuasiRiemann.shortIntervalQrh10252048Spec_has_prime
+#print axioms QuasiRiemann.dyadicAbelGateRung10
+
+#print axioms QuasiRiemann.dyadic_abel_rungs_k5_to_k10_certs
+
 -- end of file: leanasm/tests/TestAxioms.lean
