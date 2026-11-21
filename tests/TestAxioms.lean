@@ -1199,5 +1199,37 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.qrh_rns_reflect_half_box_exclusion_1024
 #print axioms QuasiRiemann.dyadic_gate_rns_reflect_half_box_coupling_1024
 #print axioms QuasiRiemann.dyadic_gate_rns_reflect_half_box_coupling_2048
+-- =============================================================================
+-- Part 78: Parametric Dyadic Rung Theorem & Rungs 11..14 (Issue #183)
+-- =============================================================================
+
+#print axioms QuasiRiemann.dyadicScaleK
+#print axioms QuasiRiemann.dyadicXScaleExp
+#print axioms QuasiRiemann.dyadicBaseExp
+#print axioms QuasiRiemann.dyadicHScaleExp
+#print axioms QuasiRiemann.dyadicDenomM
+#print axioms QuasiRiemann.dyadicScaleN
+#print axioms QuasiRiemann.dyadicChebyshevCoeff
+#print axioms QuasiRiemann.tenPowThetaCeilExp_dyadic
+#print axioms QuasiRiemann.dyadicAbelGateParametric
+#print axioms QuasiRiemann.shortIntervalDyadicSpec
+#print axioms QuasiRiemann.shortIntervalDyadicSpec_has_prime_of_factor_lt
+
+#print axioms QuasiRiemann.dyadicAbelGateRung11
+#print axioms QuasiRiemann.dyadicAbelGateRung12
+#print axioms QuasiRiemann.dyadicAbelGateRung13
+#print axioms QuasiRiemann.dyadicAbelGateRung14
+
+#print axioms QuasiRiemann.shortIntervalDyadicRung11Spec
+#print axioms QuasiRiemann.shortIntervalDyadicRung12Spec
+#print axioms QuasiRiemann.shortIntervalDyadicRung13Spec
+#print axioms QuasiRiemann.shortIntervalDyadicRung14Spec
+
+#print axioms QuasiRiemann.shortIntervalDyadicRung11Spec_has_prime
+#print axioms QuasiRiemann.shortIntervalDyadicRung12Spec_has_prime
+#print axioms QuasiRiemann.shortIntervalDyadicRung13Spec_has_prime
+#print axioms QuasiRiemann.shortIntervalDyadicRung14Spec_has_prime
+
+#print axioms QuasiRiemann.dyadic_abel_rungs_k5_to_k14_certs
 
 -- end of file: leanasm/tests/TestAxioms.lean
