@@ -1154,4 +1154,16 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.BoxSupplyBound.zero_free_box_pos
 #print axioms QuasiRiemann.makeBoxSupplyBound
 
+-- =============================================================================
+-- Part 75: Dyadic Rung k = 7 & RNS Reflection Bridge (Issue #175)
+-- =============================================================================
+
+#print axioms QuasiRiemann.shortIntervalQrh129256Spec
+#print axioms QuasiRiemann.dyadicAbelGateRung7
+#print axioms QuasiRiemann.chebyshevSpec768_129256_env_le
+#print axioms QuasiRiemann.shortIntervalQrh129256Spec_has_prime
+#print axioms QuasiRiemann.dyadic_abel_rungs_k5_k6_k7_certs
+#print axioms QuasiRiemann.rnsPairBoxToBoxSupplyBound
+#print axioms QuasiRiemann.qrh_rns_reflect_half_box_exclusion
+
 -- end of file: leanasm/tests/TestAxioms.lean

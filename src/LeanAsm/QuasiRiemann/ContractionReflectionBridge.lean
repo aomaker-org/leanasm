@@ -699,6 +699,66 @@ def makeBoxSupplyBound (numLo denLo numHi denHi : Nat)
     rw [Int.zero_mul, Int.mul_one]
     omega
 
+/-- Converts an `RnsPairBox` into a constructive `BoxSupplyBound` on its contraction step.
+Wires the discrete paired-channel RNS contraction lower bound into the continuous
+interval supply representation. -/
+def rnsPairBoxToBoxSupplyBound {k : Nat} (pb : LeanAsm.QuasiRiemann.RNS.RnsPairBox k) :
+    BoxSupplyBound where
+  xLo := pb.stepContract
+  xHi := pb.stepContract
+  h_order := by
+    change pb.stepContract.num * (pb.stepContract.den : Int) ≤
+      pb.stepContract.num * (pb.stepContract.den : Int)
+    exact Int.le_refl _
+  h_lo_pos := by
+    have h_pos := pb.stepContract_pos
+    change (0 : Int) * (pb.stepContract.den : Int) < pb.stepContract.num * (1 : Int)
+    rw [Int.zero_mul, Int.mul_one]
+    exact h_pos
+
+/-- High-order RNS contraction box exclusion under critical-axis reflection `reflectHalf`.
+Wires high-order paired-channel contraction at `N = 2048` (`RnsPairBox 3` via `highOrderRnsPairBox`)
+and `BoxSupplyBound` into `reflectHalf` exclusion: the contraction step evaluation cannot vanish. -/
+theorem qrh_rns_reflect_half_box_exclusion (theta : QRat)
+    (h_theta : qrhThresholdSevenEighths < theta) :
+    ¬ QRat.eqv (highOrderRnsPairBox 2048 theta h_theta).stepContract (QRat.ofInt 0) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo =
+      (highOrderRnsPairBox 2048 theta h_theta).stepContract ∧
+    QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo ∧
+    ¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox 2048 theta h_theta).stepContract))
+      (QRat.ofInt 0) := by
+  have h_ne := rns_pair_box_N2048_cert theta h_theta
+  have h_xlo_eq : (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo =
+      (highOrderRnsPairBox 2048 theta h_theta).stepContract := rfl
+  have h_pos : QRat.ofInt 0 <
+      (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).xLo :=
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox 2048 theta h_theta)).h_lo_pos
+  have h_refl := reflectHalf_reflectHalf (highOrderRnsPairBox 2048 theta h_theta).stepContract
+  have h_refl_ne :
+      ¬ QRat.eqv
+        (reflectHalf (reflectHalf (highOrderRnsPairBox 2048 theta h_theta).stepContract))
+        (QRat.ofInt 0) := by
+    intro h
+    have h_contra : (highOrderRnsPairBox 2048 theta h_theta).stepContract.eqv (QRat.ofInt 0) := by
+      let rf := reflectHalf (reflectHalf (highOrderRnsPairBox 2048 theta h_theta).stepContract)
+      have h1 : rf.num * 1 = 0 * ((rf.den : Nat) : Int) := h
+      rw [Int.mul_one, Int.zero_mul] at h1
+      have h2 : rf.num * ((highOrderRnsPairBox 2048 theta h_theta).stepContract.den : Int) =
+          (highOrderRnsPairBox 2048 theta h_theta).stepContract.num * ((rf.den : Nat) : Int) := h_refl
+      rw [h1, Int.zero_mul] at h2
+      have h_rf_den_pos := rf.den_pos
+      have h_rf_den : 0 < ((rf.den : Nat) : Int) := by omega
+      have h_zero : (highOrderRnsPairBox 2048 theta h_theta).stepContract.num = 0 := by
+        rcases Int.mul_eq_zero.mp h2.symm with hz1 | hz2
+        · exact hz1
+        · omega
+      change (highOrderRnsPairBox 2048 theta h_theta).stepContract.num * 1 =
+        0 * (((highOrderRnsPairBox 2048 theta h_theta).stepContract.den : Nat) : Int)
+      rw [h_zero, Int.zero_mul, Int.zero_mul]
+    exact h_ne h_contra
+  exact ⟨h_ne, h_xlo_eq, h_pos, h_refl_ne⟩
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/ContractionReflectionBridge.lean
