@@ -91,6 +91,7 @@ import LeanAsm.Genus2MultiPrimeWeil
 import LeanAsm.Genus2WeilGSp4Weave
 import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 import LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave
+import LeanAsm.QuasiRiemann.Qsd1IdempotentDyadicAbelWeave
 import LeanAsm.QuasiRiemann.RankinSelbergGSp4Sub78Bridge
 import LeanAsm.QuasiRiemann.JacobianRankinSelbergWeave
 import LeanAsm.MiniVMRnsHenselWeave

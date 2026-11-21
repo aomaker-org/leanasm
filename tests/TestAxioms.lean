@@ -8,6 +8,7 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 import LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave
+import LeanAsm.QuasiRiemann.Qsd1IdempotentDyadicAbelWeave
 
 #print axioms MiniVM.get_set_same
 #print axioms MiniVM.get_set_other
@@ -1003,6 +1004,14 @@ import LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave
 #print axioms LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave.preperiodic_qsd1_strip_weave
 #print axioms LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave.preperiodicQsd1Rung32000Spec
 #print axioms LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave.preperiodic_qsd1_strip_cert
+
+-- =============================================================================
+-- QSD[1] Split Idempotents & HighTruncDyadicAbelWeave (Issue #123)
+-- =============================================================================
+
+#print axioms QuasiRiemann.qsd1_idempotent_dyadic_abel_weave
+#print axioms QuasiRiemann.qsd1IdempotentDyadicAbelCertSpec
+#print axioms QuasiRiemann.qsd1_idempotent_dyadic_abel_cert
 
 -- =============================================================================
 -- Part 64: Rankin-Selberg & GSp(4) to Sub-7/8 Strip Certificate Bridge
