@@ -1130,6 +1130,25 @@ theorem short_interval_dyadic_rns_reflect_half_box_coupling_param
   have h_excl := qrh_rns_reflect_half_box_exclusion_param N theta h_theta
   exact ⟨h_prime, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
 
+/-- Coupled parametric dyadic Chebyshev spec (`k ≥ 5`) with parameterized `eGap`
+and parametric high-order RNS reflection box exclusion for arbitrary scale `N`.
+Couples short-interval prime positivity to `RnsPairBox N`. -/
+theorem short_interval_dyadic_egap_rns_reflect_half_box_coupling_param
+    (N : Nat) (k : Nat) (hk : 5 ≤ k) (eGap : Nat)
+    (hFactor : 2 * (dyadicChebyshevCoeff k * 10 ^ 3) + 2 < 10 ^ eGap)
+    (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta) :
+    (shortIntervalDyadicSpec k hk eGap).HasGuaranteedPrime ∧
+    (¬ QRat.eqv (highOrderRnsPairBox N theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox N theta h_theta)).xLo =
+      (highOrderRnsPairBox N theta h_theta).stepContract ∧
+    (QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox N theta h_theta)).xLo) ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox N theta h_theta).stepContract))
+      (QRat.ofInt 0)) := by
+  have h_prime := shortIntervalDyadicSpec_has_prime_of_factor_lt k hk hFactor
+  have h_excl := qrh_rns_reflect_half_box_exclusion_param N theta h_theta
+  exact ⟨h_prime, h_excl.1, rfl, h_excl.2.2.1, h_excl.2.2.2⟩
+
 /-- Coupled parametric dyadic Chebyshev spec (`k ≥ 5`) and high-order RNS reflection box exclusion
 at scale `N = 4096`. Couples short-interval prime positivity to `RnsPairBox 4096`. -/
 theorem short_interval_dyadic_rns_reflect_half_box_coupling_4096
