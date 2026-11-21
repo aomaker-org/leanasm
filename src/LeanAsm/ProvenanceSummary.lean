@@ -27,6 +27,7 @@ import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 import LeanAsm.QuasiRiemann.Valuation.RNS
 import LeanAsm.QuasiRiemann.QsdAlgebraBridge
 import LeanAsm.QuasiRiemann.GaussianQsdBridge
+import LeanAsm.QuasiRiemann.RnsGaussianNormBridge
 import LeanAsm.QuasiRiemann.Qsd1LogDerivStripBridge
 import LeanAsm.RnsArithmetic
 import LeanAsm.FiniteFieldRH
@@ -1834,7 +1835,47 @@ def ValuationDynamicsProvenance : Prop :=
      (p ^ (2 * k)) ∣ (tan_elem.val * tan_elem.val)) ∧
    ((LeanAsm.QuasiRiemann.RNS.mersenneA.reconstruct % 7 = 3) ∧
     (LeanAsm.QuasiRiemann.RNS.mersenneA.reconstruct % 31 = 25) ∧
-    (LeanAsm.QuasiRiemann.RNS.mersenneA.reconstruct % 127 = 51)))
+    (LeanAsm.QuasiRiemann.RNS.mersenneA.reconstruct % 127 = 51))) ∧
+  ((LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z1_test.norm = 5 ∧
+    LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z2_test.norm = 10 ∧
+    LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z12_test.norm = 50 ∧
+    QuasiRiemann.GaussianQsdInt.norm
+      (QuasiRiemann.GaussianQsdInt.mulGaussian
+        LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z1_test
+        LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z2_test) =
+      LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z1_test.norm *
+        LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z2_test.norm ∧
+    (LeanAsm.QuasiRiemann.RnsGaussianNormBridge.gaussianToRnsMersenne
+        LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z1_test).residues = #[5, 5, 5] ∧
+    (LeanAsm.QuasiRiemann.RnsGaussianNormBridge.gaussianToRnsMersenne
+        LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z1_test).reconstruct = 5 ∧
+    (LeanAsm.QuasiRiemann.RnsGaussianNormBridge.gaussianToRnsMersenne
+        LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z2_test).residues = #[3, 10, 10] ∧
+    (LeanAsm.QuasiRiemann.RnsGaussianNormBridge.gaussianToRnsMersenne
+        LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z2_test).reconstruct = 10 ∧
+    (LeanAsm.QuasiRiemann.RnsGaussianNormBridge.gaussianToRnsMersenne
+        LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z12_test).residues = #[1, 19, 50] ∧
+    (LeanAsm.QuasiRiemann.RnsGaussianNormBridge.gaussianToRnsMersenne
+        LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z12_test).reconstruct = 50 ∧
+    (LeanAsm.QuasiRiemann.RnsGaussianNormBridge.gaussianToRnsMersenne
+        LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z12_test).reconstruct % 7 = 1 ∧
+    (LeanAsm.QuasiRiemann.RnsGaussianNormBridge.gaussianToRnsMersenne
+        LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z12_test).reconstruct % 31 = 19 ∧
+    (LeanAsm.QuasiRiemann.RnsGaussianNormBridge.gaussianToRnsMersenne
+        LeanAsm.QuasiRiemann.RnsGaussianNormBridge.z12_test).reconstruct % 127 = 50) ∧
+   (∀ x y : QuasiRiemann.GaussianQsdInt,
+     0 ≤ x.norm ∧
+     0 ≤ y.norm ∧
+     QuasiRiemann.GaussianQsdInt.norm (QuasiRiemann.GaussianQsdInt.mulGaussian x y) =
+       QuasiRiemann.GaussianQsdInt.norm x * QuasiRiemann.GaussianQsdInt.norm y ∧
+     (let rnsX := LeanAsm.QuasiRiemann.RnsGaussianNormBridge.gaussianToRnsMersenne x
+      (rnsX.reconstruct % 7 = ((x.norm.toNat % 7 : Nat) : Int)) ∧
+      (rnsX.reconstruct % 31 = ((x.norm.toNat % 31 : Nat) : Int)) ∧
+      (rnsX.reconstruct % 127 = ((x.norm.toNat % 127 : Nat) : Int))) ∧
+     (let rnsY := LeanAsm.QuasiRiemann.RnsGaussianNormBridge.gaussianToRnsMersenne y
+      (rnsY.reconstruct % 7 = ((y.norm.toNat % 7 : Nat) : Int)) ∧
+      (rnsY.reconstruct % 31 = ((y.norm.toNat % 31 : Nat) : Int)) ∧
+      (rnsY.reconstruct % 127 = ((y.norm.toNat % 127 : Nat) : Int)))))
 
 /-- Zero-axiom certificate for Part 52 2-adic valuation and preperiodic dynamics bounds. -/
 theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
@@ -1865,7 +1906,9 @@ theorem valuation_dynamics_provenance_certified : ValuationDynamicsProvenance :=
      QuasiRiemann.Valuation.qsd4_prime_tower_nilpotent_remainder_bound p hp k hk,
    ⟨⟨rfl, rfl, rfl⟩, QuasiRiemann.Valuation.qsd4_hensel_tower_cert_p2⟩,
    LeanAsm.MiniVMRnsHenselWeave.minivm_ntt_rns_hensel_weave_bridge,
-   QuasiRiemann.gaussian_qsd_hensel_tower_bridge⟩
+   QuasiRiemann.gaussian_qsd_hensel_tower_bridge,
+   ⟨LeanAsm.QuasiRiemann.RnsGaussianNormBridge.rns_crt_gaussian_norm_cert,
+    LeanAsm.QuasiRiemann.RnsGaussianNormBridge.rns_crt_gaussian_norm_bound⟩⟩
 
 /-- Part 7 provenance specification bundling Hasse-Weil RH for `E / F_7`,
 genus-2 `C / F_5` negative discriminants, `L(C, 1) = 71/25`, Cantor-Mumford group axioms

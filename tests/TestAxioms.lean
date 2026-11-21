@@ -983,6 +983,8 @@ import LeanAsm.QuasiRiemann.Qsd1IdempotentDyadicAbelWeave
 #print axioms QuasiRiemann.gaussian_qsd_norm_multiplicative
 #print axioms QuasiRiemann.gaussian_qsd_truncation_defect
 #print axioms QuasiRiemann.gaussian_qsd_hensel_tower_bridge
+#print axioms LeanAsm.QuasiRiemann.RnsGaussianNormBridge.rns_crt_gaussian_norm_bound
+#print axioms LeanAsm.QuasiRiemann.RnsGaussianNormBridge.rns_crt_gaussian_norm_cert
 
 -- =============================================================================
 -- Part 63: Genus-2 Multi-Prime Frobenius Traces, QSD[4] Hensel & Preperiodic Weave
