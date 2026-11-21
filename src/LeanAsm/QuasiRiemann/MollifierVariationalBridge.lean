@@ -107,7 +107,8 @@ def shortIntervalQrh3364Spec : ShortIntervalChebyshevSpec :=
     thetaDen_pos := by decide
     theta_lt_one := by decide }
 
-/-- Exact verification of the `k = 5` Chebyshev error envelope against `shortIntervalQrh3364Spec`. -/
+/-- Exact verification of the `k = 5` Chebyshev error envelope against
+`shortIntervalQrh3364Spec`. -/
 theorem chebyshevSpec192_3364_env_le :
     qrhRemainderBoundAtTwoTenPow chebyshevSpec192_3364 ≤ shortIntervalQrh3364Spec.errUpper := by
   have hExp : tenPowThetaCeilExp 16 (QRat.mk' 33 64) = 99 := by decide
@@ -161,7 +162,8 @@ def shortIntervalQrh65128Spec : ShortIntervalChebyshevSpec :=
     thetaDen_pos := by decide
     theta_lt_one := by decide }
 
-/-- Exact verification of the `k = 6` Chebyshev error envelope against `shortIntervalQrh65128Spec`. -/
+/-- Exact verification of the `k = 6` Chebyshev error envelope against
+`shortIntervalQrh65128Spec`. -/
 theorem chebyshevSpec384_65128_env_le :
     qrhRemainderBoundAtTwoTenPow chebyshevSpec384_65128 ≤ shortIntervalQrh65128Spec.errUpper := by
   have hExp : tenPowThetaCeilExp 32 (QRat.mk' 65 128) = 195 := by decide
@@ -279,6 +281,117 @@ def dyadicAbelGateRung7 : InvSqrtTailGateSpec :=
     denomM_pos := by decide
     scaleN_pos := by decide
     gate_le := by decide }
+
+/-- Concrete Chebyshev remainder model for ladder rung `k = 8` at `x = 10^1536`
+with `θ = qrhShortExponent 8 = 257/512 = 1/2 + 1/512`. -/
+def chebyshevSpec1536_257512 : ChebyshevRemainderSpec :=
+  { scaleK := 128
+    scaleK_pos := by decide
+    prefactor := 1
+    prefactor_pos := by decide
+    theta := QRat.mk' 257 512
+    theta_pos := by decide
+    theta_lt_one := by decide }
+
+set_option exponentiation.threshold 2000 in
+/-- Concrete short-interval Chebyshev benchmark at rung `k = 8` (`θ = 257/512`)
+covering `[10^1536, 10^1536 + 10^786]`.
+Since `1536 * (257/512) = 771` and `chebyshevLogSqEnv 128 = 3712^2 = 13778944`,
+`qrhRemainderBoundAtTwoTenPow = 2 * 13778944 * 10^771 = 27557888 * 10^771`. -/
+def shortIntervalQrh257512Spec : ShortIntervalChebyshevSpec :=
+  { thetaNum := 257
+    thetaDen := 512
+    xScaleExp := 1536
+    hScaleExp := 786
+    errUpper := 27557888 * 10 ^ 771
+    primePowerCorr := 2 * 10 ^ 768
+    thetaDen_pos := by decide
+    theta_lt_one := by decide }
+
+set_option exponentiation.threshold 2000 in
+/-- Exact verification of the `k = 8` Chebyshev error envelope against
+`shortIntervalQrh257512Spec`. -/
+theorem chebyshevSpec1536_257512_env_le :
+    qrhRemainderBoundAtTwoTenPow chebyshevSpec1536_257512 ≤
+      shortIntervalQrh257512Spec.errUpper := by
+  have hExp : tenPowThetaCeilExp 128 (QRat.mk' 257 512) = 771 := by decide
+  change 2 * 1 * 10 ^ (tenPowThetaCeilExp 128 (QRat.mk' 257 512)) * ((29 * 128) * (29 * 128)) ≤
+    27557888 * 10 ^ 771
+  rw [hExp]
+  have hCoef : 2 * 1 * ((29 * 128) * (29 * 128)) = 27557888 := by decide
+  rw [Nat.mul_assoc (2 * 1), Nat.mul_comm (10 ^ 771), ← Nat.mul_assoc]
+  rw [hCoef]
+  exact Nat.le_refl _
+
+set_option exponentiation.threshold 2000 in
+/-- Exact positivity certificate for `[10^1536, 10^1536 + 10^786]` at `θ = 257/512` (`k = 8`):
+`2 * 27557888 * 10^771 + 2 * 10^768 < 10^786`. -/
+theorem shortIntervalQrh257512Spec_has_prime :
+    shortIntervalQrh257512Spec.HasGuaranteedPrime := by
+  change 2 * (27557888 * 10 ^ 771) + 2 * 10 ^ 768 < 10 ^ 786
+  have h771 : (10 : Nat) ^ 771 = 10 ^ 3 * 10 ^ 768 := by
+    rw [← Nat.pow_add]
+  have h786 : (10 : Nat) ^ 786 = 10 ^ (18 + 768) := rfl
+  rw [h771, h786]
+  have hLeft :
+      2 * (27557888 * (10 ^ 3 * 10 ^ 768)) + 2 * 10 ^ 768 = 55115776002 * 10 ^ 768 := by
+    omega
+  rw [hLeft]
+  exact pow_ten_factor_lt_mvb (by decide : 55115776002 < 10 ^ 18)
+
+/-- Concrete cleared-denominator `1/√N` tail gate at rung `k = 8` (`m = 8192`, `N = 1024`,
+`tailNum = 1`, `tailBound = 256`, witnessing `1024 * 256^2 ≤ 8192^2 * 1^2`). -/
+def dyadicAbelGateRung8 : InvSqrtTailGateSpec :=
+  { denomM := 8192
+    tailBound := 256
+    scaleN := 1024
+    tailNum := 1
+    denomM_pos := by decide
+    scaleN_pos := by decide
+    gate_le := by decide }
+
+/-- Master rung `k = 5, 6, 7, 8` certificate bundle extending the verified chain
+`257/512 < 129/256 < 65/128 < 33/64 < 17/32 < 7/8` with concrete short-interval prime positivity at
+`[10^192, 10^192 + 10^108]`, `[10^384, 10^384 + 10^206]`, `[10^768, 10^768 + 10^402]`, and
+`[10^1536, 10^1536 + 10^786]`. -/
+theorem dyadic_abel_rungs_k5_to_k8_certs :
+    QRat.eqv (qrhShortExponent 5) (QRat.mk' 33 64) ∧
+    QRat.eqv (qrhShortExponent 6) (QRat.mk' 65 128) ∧
+    QRat.eqv (qrhShortExponent 7) (QRat.mk' 129 256) ∧
+    QRat.eqv (qrhShortExponent 8) (QRat.mk' 257 512) ∧
+    qrhShortExponent 8 < qrhShortExponent 7 ∧
+    qrhShortExponent 7 < qrhShortExponent 6 ∧
+    qrhShortExponent 6 < qrhShortExponent 5 ∧
+    qrhShortExponent 5 < qrhShortExponent 4 ∧
+    qrhShortExponent 4 < qrhShortExponent 0 ∧
+    shortIntervalQrh3364Spec.HasGuaranteedPrime ∧
+    shortIntervalQrh65128Spec.HasGuaranteedPrime ∧
+    shortIntervalQrh129256Spec.HasGuaranteedPrime ∧
+    shortIntervalQrh257512Spec.HasGuaranteedPrime ∧
+    (4 * dyadicAbelGateRung5.scaleN) *
+      (dyadicAbelGateRung5.tailBound * dyadicAbelGateRung5.tailBound) ≤
+      ((2 * dyadicAbelGateRung5.denomM) * (2 * dyadicAbelGateRung5.denomM)) *
+        (dyadicAbelGateRung5.tailNum * dyadicAbelGateRung5.tailNum) ∧
+    (4 * dyadicAbelGateRung6.scaleN) *
+      (dyadicAbelGateRung6.tailBound * dyadicAbelGateRung6.tailBound) ≤
+      ((2 * dyadicAbelGateRung6.denomM) * (2 * dyadicAbelGateRung6.denomM)) *
+        (dyadicAbelGateRung6.tailNum * dyadicAbelGateRung6.tailNum) ∧
+    (4 * dyadicAbelGateRung7.scaleN) *
+      (dyadicAbelGateRung7.tailBound * dyadicAbelGateRung7.tailBound) ≤
+      ((2 * dyadicAbelGateRung7.denomM) * (2 * dyadicAbelGateRung7.denomM)) *
+        (dyadicAbelGateRung7.tailNum * dyadicAbelGateRung7.tailNum) ∧
+    (4 * dyadicAbelGateRung8.scaleN) *
+      (dyadicAbelGateRung8.tailBound * dyadicAbelGateRung8.tailBound) ≤
+      ((2 * dyadicAbelGateRung8.denomM) * (2 * dyadicAbelGateRung8.denomM)) *
+        (dyadicAbelGateRung8.tailNum * dyadicAbelGateRung8.tailNum) := by
+  refine ⟨by decide, by decide, by decide, by decide, by decide, by decide, by decide, by decide,
+    by decide,
+    shortIntervalQrh3364Spec_has_prime, shortIntervalQrh65128Spec_has_prime,
+    shortIntervalQrh129256Spec_has_prime, shortIntervalQrh257512Spec_has_prime,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung5,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung6,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung7,
+    inv_sqrt_tail_gate_dyadic_step dyadicAbelGateRung8⟩
 
 /-- Master rung `k = 5, 6, 7` certificate bundle extending the verified chain
 `129/256 < 65/128 < 33/64 < 17/32 < 7/8` with concrete short-interval prime positivity at
