@@ -7,6 +7,7 @@ import LeanAsm.QuasiRiemann.Valuation.Contraction
 import LeanAsm.QuasiRiemann.Valuation.Hensel
 import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
+import LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave
 
 #print axioms MiniVM.get_set_same
 #print axioms MiniVM.get_set_other
@@ -994,6 +995,14 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave.cert_weave_p23
 #print axioms LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave.genus2_hensel_preperiodic_weave_bridge
 #print axioms LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave.genus2_hensel_preperiodic_cert
+
+-- =============================================================================
+-- Preperiodic Dynamics & QSD[1] Sub-7/8 Strip Weave (Issue #128)
+-- =============================================================================
+
+#print axioms LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave.preperiodic_qsd1_strip_weave
+#print axioms LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave.preperiodicQsd1Rung32000Spec
+#print axioms LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave.preperiodic_qsd1_strip_cert
 
 -- =============================================================================
 -- Part 64: Rankin-Selberg & GSp(4) to Sub-7/8 Strip Certificate Bridge
