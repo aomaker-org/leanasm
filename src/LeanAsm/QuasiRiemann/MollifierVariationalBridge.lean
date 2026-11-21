@@ -560,8 +560,9 @@ def dyadicXScaleExp (k : Nat) : Nat := 12 * dyadicScaleK k
 /-- Base exponent `baseExp = 6 * K = 6 * 2^(k - 1)` at ladder rung `k`. -/
 def dyadicBaseExp (k : Nat) : Nat := 6 * dyadicScaleK k
 
-/-- Short-interval window exponent `hScaleExp = baseExp + 18` at ladder rung `k`. -/
-def dyadicHScaleExp (k : Nat) : Nat := dyadicBaseExp k + 18
+/-- Short-interval window exponent `hScaleExp = baseExp + eGap` at ladder rung `k`.
+Defaults to `eGap = 18` for backward compatibility. -/
+def dyadicHScaleExp (k : Nat) (eGap : Nat := 18) : Nat := dyadicBaseExp k + eGap
 
 /-- Contraction gate denominator `m = 2^(k + 5)` at ladder rung `k`. -/
 def dyadicDenomM (k : Nat) : Nat := 2 ^ (k + 5)
@@ -652,12 +653,14 @@ def dyadicAbelGateParametric (k : Nat) (hk : 5 ≤ k) : InvSqrtTailGateSpec :=
     scaleN_pos := Nat.pos_of_ne_zero (Nat.ne_of_gt (Nat.pow_pos (by decide : 0 < 2)))
     gate_le := dyadic_gate_le k hk }
 
-/-- Parametric short-interval Chebyshev specification at ladder rung `k ≥ 5`. -/
-def shortIntervalDyadicSpec (k : Nat) (hk : 5 ≤ k) : ShortIntervalChebyshevSpec :=
+/-- Parametric short-interval Chebyshev specification at ladder rung `k ≥ 5`
+with parameterized gap exponent `eGap` (defaults to 18). -/
+def shortIntervalDyadicSpec (k : Nat) (hk : 5 ≤ k) (eGap : Nat := 18) :
+    ShortIntervalChebyshevSpec :=
   { thetaNum := 2 ^ k + 1
     thetaDen := 2 ^ (k + 1)
     xScaleExp := dyadicXScaleExp k
-    hScaleExp := dyadicHScaleExp k
+    hScaleExp := dyadicHScaleExp k eGap
     errUpper := dyadicChebyshevCoeff k * 10 ^ (dyadicBaseExp k + 3)
     primePowerCorr := 2 * 10 ^ dyadicBaseExp k
     thetaDen_pos := Nat.pos_of_ne_zero (Nat.ne_of_gt (Nat.pow_pos (by decide : 0 < 2)))
@@ -672,16 +675,18 @@ def shortIntervalDyadicSpec (k : Nat) (hk : 5 ≤ k) : ShortIntervalChebyshevSpe
         exact h1
       omega }
 
-/-- Master parametric prime-existence theorem for short intervals along the dyadic ladder:
-Any rung `k ≥ 5` whose cleared prefactor factor satisfies `2 * C * 10^3 + 2 < 10^18`
+/-- Master parametric prime-existence theorem for short intervals along the dyadic ladder
+with parameterized gap exponent `eGap` (defaults to 18):
+Any rung `k ≥ 5` whose cleared prefactor factor satisfies `2 * C * 10^3 + 2 < 10^eGap`
 guarantees at least one prime in `[10^xScaleExp, 10^xScaleExp + 10^hScaleExp]`. -/
 theorem shortIntervalDyadicSpec_has_prime_of_factor_lt (k : Nat) (hk : 5 ≤ k)
-    (hFactor : 2 * (dyadicChebyshevCoeff k * 10 ^ 3) + 2 < 10 ^ 18) :
-    (shortIntervalDyadicSpec k hk).HasGuaranteedPrime := by
+    {eGap : Nat}
+    (hFactor : 2 * (dyadicChebyshevCoeff k * 10 ^ 3) + 2 < 10 ^ eGap) :
+    (shortIntervalDyadicSpec k hk eGap).HasGuaranteedPrime := by
   dsimp [ShortIntervalChebyshevSpec.HasGuaranteedPrime, shortIntervalDyadicSpec, dyadicHScaleExp]
   have hExp : (10 : Nat) ^ (dyadicBaseExp k + 3) = 10 ^ 3 * 10 ^ dyadicBaseExp k := by
     rw [Nat.add_comm, Nat.pow_add]
-  have hHExp : (10 : Nat) ^ (dyadicBaseExp k + 18) = 10 ^ (18 + dyadicBaseExp k) := by
+  have hHExp : (10 : Nat) ^ (dyadicBaseExp k + eGap) = 10 ^ (eGap + dyadicBaseExp k) := by
     rw [Nat.add_comm]
   rw [hExp, hHExp]
   have hLeft :
@@ -746,6 +751,17 @@ theorem shortIntervalDyadicRung13Spec_has_prime :
 theorem shortIntervalDyadicRung14Spec_has_prime :
     shortIntervalDyadicRung14Spec.HasGuaranteedPrime :=
   shortIntervalDyadicSpec_has_prime_of_factor_lt 14 (by decide) (by decide)
+
+/-- Concrete short-interval Chebyshev benchmark at rung `k = 29` (`eGap = 24`).
+Provides headroom up to `t ~ 10^120` along the dyadic ladder. -/
+def shortIntervalDyadicRung29Spec : ShortIntervalChebyshevSpec :=
+  shortIntervalDyadicSpec 29 (by decide) 24
+
+/-- Exact positivity certificate for rung `k = 29` with `eGap = 24`
+covering the dyadic window up to `t ~ 10^120` headroom. -/
+theorem shortIntervalDyadicRung29Spec_has_prime :
+    shortIntervalDyadicRung29Spec.HasGuaranteedPrime :=
+  shortIntervalDyadicSpec_has_prime_of_factor_lt 29 (by decide) (by decide)
 
 /-- Extended master rung certificate bundle spanning rungs `k = 5` through `k = 14`. -/
 theorem dyadic_abel_rungs_k5_to_k14_certs :

@@ -1266,4 +1266,12 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.short_interval_dyadic_rns_reflect_half_box_coupling_4096
 #print axioms QuasiRiemann.dyadic_gate_rung14_rns_reflect_half_box_coupling_4096
 
+-- =============================================================================
+-- Part 81: Parameterized Gap Exponent eGap & Rung k = 29 Check (Issue #189)
+-- =============================================================================
+
+#print axioms QuasiRiemann.shortIntervalDyadicRung29Spec
+#print axioms QuasiRiemann.shortIntervalDyadicRung29Spec_has_prime
+#print axioms QuasiRiemann.short_interval_dyadic_egap_rns_reflect_half_box_coupling_param
+
 -- end of file: leanasm/tests/TestAxioms.lean
