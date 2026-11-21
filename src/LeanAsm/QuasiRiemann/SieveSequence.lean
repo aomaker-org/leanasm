@@ -4,5 +4,6 @@
 
 import LeanAsm.QuasiRiemann.SieveSequence.Core
 import LeanAsm.QuasiRiemann.SieveSequence.BeurlingCerts
+import LeanAsm.QuasiRiemann.SieveSequence.LuckyGenerators500
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/SieveSequence.lean
