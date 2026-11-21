@@ -1140,6 +1140,8 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.highOrderRnsPairBox
 #print axioms QuasiRiemann.rns_pair_box_N1024_cert
 #print axioms QuasiRiemann.rns_pair_box_N2048_cert
+#print axioms QuasiRiemann.rns_pair_box_param_cert
+#print axioms QuasiRiemann.rns_pair_box_N4096_cert
 
 -- =============================================================================
 -- Part 74: Constructive reflectHalf & BoxSupplyBound Lemmas (Issue #173)
@@ -1251,5 +1253,17 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 #print axioms QuasiRiemann.dyadic_gate_rung14_rns_reflect_half_box_coupling_2048
 
 #print axioms QuasiRiemann.dyadic_rungs_k11_to_k14_rns_coupling_certs
+
+-- =============================================================================
+-- Part 80: Parametric & N = 4096 RnsPairBox Couplings (Issue #187)
+-- =============================================================================
+
+#print axioms QuasiRiemann.qrh_rns_reflect_half_box_exclusion_param
+#print axioms QuasiRiemann.qrh_rns_reflect_half_box_exclusion_4096
+#print axioms QuasiRiemann.dyadic_parametric_gate_rns_reflect_half_box_coupling_param
+#print axioms QuasiRiemann.dyadic_parametric_gate_rns_reflect_half_box_coupling_4096
+#print axioms QuasiRiemann.short_interval_dyadic_rns_reflect_half_box_coupling_param
+#print axioms QuasiRiemann.short_interval_dyadic_rns_reflect_half_box_coupling_4096
+#print axioms QuasiRiemann.dyadic_gate_rung14_rns_reflect_half_box_coupling_4096
 
 -- end of file: leanasm/tests/TestAxioms.lean
