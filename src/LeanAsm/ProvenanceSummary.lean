@@ -14,6 +14,7 @@ import LeanAsm.QuasiRiemann.AsymptoticZfrBridge
 import LeanAsm.QuasiRiemann.ZeroDensityBridge
 import LeanAsm.QuasiRiemann.ShortIntervalPrimes
 import LeanAsm.QuasiRiemann.ParametricQrhLadder
+import LeanAsm.QuasiRiemann.ContractionReflectionBridge
 import LeanAsm.QuasiRiemann.DyadicAbelBridge
 import LeanAsm.QuasiRiemann.HighTruncDyadicAbelWeave
 import LeanAsm.QuasiRiemann.MollifierVariationalBridge
@@ -1001,7 +1002,36 @@ def UltrametricValuationProp : Prop :=
      (QuasiRiemann.Valuation.buildCrtSeed QuasiRiemann.Valuation.mersenneTower e
        QuasiRiemann.Valuation.mersenneSqrt2RootSeed)
      (QuasiRiemann.Valuation.buildCrtSeed QuasiRiemann.Valuation.mersenneTower e
-       QuasiRiemann.Valuation.mersenneSqrt2DerivInvSeed))
+       QuasiRiemann.Valuation.mersenneSqrt2DerivInvSeed)) ∧
+  (∀ (N : Nat) (theta : QuasiRiemann.QRat)
+      (h_theta : QuasiRiemann.qrhThresholdSevenEighths < theta)
+      (p : Nat) (_hp : QuasiRiemann.Valuation.IsPrime p)
+      (step : Int) (f : QuasiRiemann.QRat → QuasiRiemann.QRat)
+      (_h_cont : QuasiRiemann.Valuation.IsPAdicStepContraction p step f)
+      (x₀ : QuasiRiemann.QRat) (n m : Nat),
+    0 < (QuasiRiemann.highOrderRnsPairBox N theta h_theta).stepContract.num ∧
+    (¬ QuasiRiemann.QRat.eqv (QuasiRiemann.highOrderRnsPairBox N theta h_theta).stepContract
+      (QuasiRiemann.QRat.ofInt 0)) ∧
+    (QuasiRiemann.rnsPairBoxToBoxSupplyBound (QuasiRiemann.highOrderRnsPairBox N theta h_theta)).xLo =
+      (QuasiRiemann.highOrderRnsPairBox N theta h_theta).stepContract ∧
+    QuasiRiemann.QRat.ofInt 0 <
+      (QuasiRiemann.rnsPairBoxToBoxSupplyBound (QuasiRiemann.highOrderRnsPairBox N theta h_theta)).xLo ∧
+    (¬ QuasiRiemann.QRat.eqv
+      (QuasiRiemann.reflectHalf (QuasiRiemann.reflectHalf
+        (QuasiRiemann.highOrderRnsPairBox N theta h_theta).stepContract))
+      (QuasiRiemann.QRat.ofInt 0)) ∧
+    QuasiRiemann.Valuation.valLe
+      (QuasiRiemann.Valuation.valAdd
+        (QuasiRiemann.Valuation.pAdicVal p (f x₀ - x₀))
+        (some (Int.ofNat n * step)))
+      (QuasiRiemann.Valuation.pAdicVal p
+        (Nat.repeat f (n + 1) x₀ - Nat.repeat f n x₀)) ∧
+    QuasiRiemann.Valuation.valLe
+      (QuasiRiemann.Valuation.valAdd
+        (QuasiRiemann.Valuation.pAdicVal p (f x₀ - x₀))
+        (some (Int.ofNat n * step)))
+      (QuasiRiemann.Valuation.pAdicVal p
+        (Nat.repeat f (n + m) x₀ - Nat.repeat f n x₀)))
 
 /-- Part 5 provenance specification bundling mollifier descent, 2D rectangles down to
 `σ = 0.501`, `t ~ 10^12` phase-reduced rectangles, DVP asymptotic strip, Dirichlet `L^2`
@@ -1419,7 +1449,10 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
     QuasiRiemann.Valuation.hensel_mersenne_tower_inv_5_mod_27559_pow,
     QuasiRiemann.Valuation.hensel_mersenne_tower_crt_built_inv_5,
     QuasiRiemann.Valuation.hensel_sqrt2_mod_pow_7,
-    QuasiRiemann.Valuation.hensel_mersenne_tower_sqrt2_built⟩,
+    QuasiRiemann.Valuation.hensel_mersenne_tower_sqrt2_built,
+    fun N theta h_theta p hp step f h_cont x₀ n m =>
+      QuasiRiemann.high_order_rns_pair_box_padic_weave
+        N theta h_theta p hp step f h_cont x₀ n m⟩,
    QuasiRiemann.lucky_beurling_qsd1_strip_cert,
    QuasiRiemann.lucky_sub78_strip_cert_50_bridge,
    QuasiRiemann.SieveSequence.sieve_sequence_qsd1_strip_cert⟩
