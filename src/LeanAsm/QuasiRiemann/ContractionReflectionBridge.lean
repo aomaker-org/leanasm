@@ -1715,6 +1715,179 @@ theorem contraction_reflection_bridge_certs
    critical_strip_dichotomy_2d s8 tAbs hs ht,
    qrh_implies_certified_2d s8 tAbs hHalf⟩
 
+-- =============================================================================
+-- 13. Constructive Multi-Step Stepanov Gain-vs.-Cost Lift Chain (#209)
+-- =============================================================================
+
+/-- Constructive Stepanov-style multi-step lift chain specification over `QRat` / `Nat`:
+Each lift stage achieves per-step contraction/amplification gain `gainPerStep`
+at the expense of per-step error `costPerStep`, with strict stage-wise dominance. -/
+structure StepanovLiftChainSpec where
+  stages : Nat
+  h_stages_pos : 0 < stages
+  initBudget : QRat
+  h_init_pos : 0 < initBudget.num
+  gainPerStep : QRat
+  costPerStep : QRat
+  h_gain_pos : 0 < gainPerStep.num
+  h_cost_pos : 0 < costPerStep.num
+  h_step_dom : costPerStep < gainPerStep
+
+/-- Accumulated per-step cost across `m` stages: `m • costPerStep`. -/
+def StepanovLiftChainSpec.accumulatedCost (chain : StepanovLiftChainSpec) (m : Nat) : QRat :=
+  QRat.mk' ((m : Int) * chain.costPerStep.num) chain.costPerStep.den chain.costPerStep.den_pos
+
+/-- Accumulated per-step gain across `m` stages: `m • gainPerStep`. -/
+def StepanovLiftChainSpec.accumulatedGain (chain : StepanovLiftChainSpec) (m : Nat) : QRat :=
+  QRat.mk' ((m : Int) * chain.gainPerStep.num) chain.gainPerStep.den chain.gainPerStep.den_pos
+
+/-- Net margin after `m` stages: `accumulatedGain m - accumulatedCost m`. -/
+def StepanovLiftChainSpec.netMargin (chain : StepanovLiftChainSpec) (m : Nat) : QRat :=
+  chain.accumulatedGain m - chain.accumulatedCost m
+
+/-- Effective contracted error envelope after `m` stages: `initBudget + accumulatedCost m`. -/
+def StepanovLiftChainSpec.effectiveCost (chain : StepanovLiftChainSpec) (m : Nat) : QRat :=
+  chain.initBudget + chain.accumulatedCost m
+
+/-- Step dominance lifts strictly across positive stage compositions:
+If `costPerStep < gainPerStep`, then `accumulatedCost m < accumulatedGain m` for any `0 < m`. -/
+theorem stepanov_lift_chain_accumulated_strict_dominance
+    (chain : StepanovLiftChainSpec) (m : Nat) (hm : 0 < m) :
+    chain.accumulatedCost m < chain.accumulatedGain m := by
+  have h_dom : chain.costPerStep.num * (chain.gainPerStep.den : Int) <
+      chain.gainPerStep.num * (chain.costPerStep.den : Int) := chain.h_step_dom
+  have hm_int : 0 < (m : Int) := by omega
+  have h_mul := Int.mul_lt_mul_of_pos_left h_dom hm_int
+  have h1 : (m : Int) * (chain.costPerStep.num * (chain.gainPerStep.den : Int)) =
+      (m : Int) * chain.costPerStep.num * (chain.gainPerStep.den : Int) := by
+    rw [Int.mul_assoc]
+  have h2 : (m : Int) * (chain.gainPerStep.num * (chain.costPerStep.den : Int)) =
+      (m : Int) * chain.gainPerStep.num * (chain.costPerStep.den : Int) := by
+    rw [Int.mul_assoc]
+  change (m : Int) * chain.costPerStep.num * (chain.gainPerStep.den : Int) <
+    (m : Int) * chain.gainPerStep.num * (chain.costPerStep.den : Int)
+  rw [← h1, ← h2]
+  exact h_mul
+
+/-- Non-vanishing and positivity of net gain margin across positive stage counts `0 < m`. -/
+theorem stepanov_lift_chain_net_margin_pos
+    (chain : StepanovLiftChainSpec) (m : Nat) (hm : 0 < m) :
+    0 < (chain.netMargin m).num ∧ ¬ QRat.eqv (chain.netMargin m) (QRat.ofInt 0) := by
+  have h_dom := stepanov_lift_chain_accumulated_strict_dominance chain m hm
+  have h_diff_pos : 0 < (chain.accumulatedGain m).num * ((chain.accumulatedCost m).den : Int) -
+      (chain.accumulatedCost m).num * ((chain.accumulatedGain m).den : Int) := by
+    change (chain.accumulatedCost m).num * ((chain.accumulatedGain m).den : Int) <
+      (chain.accumulatedGain m).num * ((chain.accumulatedCost m).den : Int) at h_dom
+    omega
+  have h_num_pos : 0 < (chain.netMargin m).num := h_diff_pos
+  have h_ne : ¬ QRat.eqv (chain.netMargin m) (QRat.ofInt 0) := by
+    intro h
+    change (chain.netMargin m).num * 1 = 0 * (((chain.netMargin m).den : Nat) : Int) at h
+    rw [Int.mul_one, Int.zero_mul] at h
+    omega
+  exact ⟨h_num_pos, h_ne⟩
+
+private theorem stepanov_comp_helper (u c_num c_den g_num g_den i m : Int)
+    (h_dom : m * c_num * g_den < m * g_num * c_den)
+    (h_sq_pos : 0 < i * i) :
+    (u * c_den + m * c_num * i) * (i * g_den) <
+    (u * g_den + m * g_num * i) * (i * c_den) := by
+  have h_scaled := Int.mul_lt_mul_of_pos_right h_dom h_sq_pos
+  have h_exp_l : (u * c_den + m * c_num * i) * (i * g_den) =
+      u * c_den * (i * g_den) + (m * c_num * g_den) * (i * i) := by
+    rw [Int.add_mul]
+    congr 1
+    simp only [Int.mul_comm, Int.mul_left_comm]
+  have h_exp_r : (u * g_den + m * g_num * i) * (i * c_den) =
+      u * g_den * (i * c_den) + (m * g_num * c_den) * (i * i) := by
+    rw [Int.add_mul]
+    congr 1
+    simp only [Int.mul_comm, Int.mul_left_comm]
+  have h_base_eq : u * c_den * (i * g_den) = u * g_den * (i * c_den) := by
+    simp only [Int.mul_comm, Int.mul_left_comm]
+  rw [h_exp_l, h_exp_r, h_base_eq]
+  omega
+
+/-- Preserved contraction ratio: the multi-step effective cost `initBudget + accumulatedCost m`
+is bounded by `initBudget + accumulatedGain m` with strictly positive margin whenever `0 < m`. -/
+theorem stepanov_lift_chain_composition_bound
+    (chain : StepanovLiftChainSpec) (m : Nat) (hm : 0 < m) :
+    chain.effectiveCost m < chain.initBudget + chain.accumulatedGain m ∧
+    0 < (chain.effectiveCost m).num ∧
+    ¬ QRat.eqv (chain.effectiveCost m) (QRat.ofInt 0) := by
+  have h_dom := stepanov_lift_chain_accumulated_strict_dominance chain m hm
+  have h_lt : chain.effectiveCost m < chain.initBudget + chain.accumulatedGain m := by
+    change (chain.initBudget.num * (chain.costPerStep.den : Int) +
+        (m : Int) * chain.costPerStep.num * (chain.initBudget.den : Int)) *
+        ((chain.initBudget.den * chain.gainPerStep.den : Nat) : Int) <
+      (chain.initBudget.num * (chain.gainPerStep.den : Int) +
+        (m : Int) * chain.gainPerStep.num * (chain.initBudget.den : Int)) *
+        ((chain.initBudget.den * chain.costPerStep.den : Nat) : Int)
+    rw [Int.natCast_mul, Int.natCast_mul]
+    have h_i_den : 0 < ((chain.initBudget.den : Nat) : Int) := by
+      have := chain.initBudget.den_pos; omega
+    have h_sq_pos : 0 < (chain.initBudget.den : Int) * (chain.initBudget.den : Int) :=
+      Int.mul_pos h_i_den h_i_den
+    change (m : Int) * chain.costPerStep.num * (chain.gainPerStep.den : Int) <
+      (m : Int) * chain.gainPerStep.num * (chain.costPerStep.den : Int) at h_dom
+    exact stepanov_comp_helper chain.initBudget.num chain.costPerStep.num
+      (chain.costPerStep.den : Int) chain.gainPerStep.num (chain.gainPerStep.den : Int)
+      (chain.initBudget.den : Int) (m : Int) h_dom h_sq_pos
+  have h_cost_pos : 0 < (chain.effectiveCost m).num := by
+    change 0 < chain.initBudget.num * (chain.costPerStep.den : Int) +
+      (m : Int) * chain.costPerStep.num * (chain.initBudget.den : Int)
+    have h_i_pos := chain.h_init_pos
+    have h_c_pos := chain.h_cost_pos
+    have h_m_pos : 0 < (m : Int) := by omega
+    have h_mc_pos : 0 < (m : Int) * chain.costPerStep.num :=
+      Int.mul_pos h_m_pos h_c_pos
+    have h_c_den_pos : 0 < ((chain.costPerStep.den : Nat) : Int) := by
+      have := chain.costPerStep.den_pos; omega
+    have h_i_den_pos : 0 < ((chain.initBudget.den : Nat) : Int) := by
+      have := chain.initBudget.den_pos; omega
+    have h_part1 : 0 < chain.initBudget.num * ((chain.costPerStep.den : Nat) : Int) :=
+      Int.mul_pos h_i_pos h_c_den_pos
+    have h_part2 : 0 < (m : Int) * chain.costPerStep.num * ((chain.initBudget.den : Nat) : Int) :=
+      Int.mul_pos h_mc_pos h_i_den_pos
+    omega
+  have h_cost_nz : ¬ QRat.eqv (chain.effectiveCost m) (QRat.ofInt 0) := by
+    intro h
+    change (chain.effectiveCost m).num * 1 = 0 * (((chain.effectiveCost m).den : Nat) : Int) at h
+    rw [Int.mul_one, Int.zero_mul] at h
+    omega
+  exact ⟨h_lt, h_cost_pos, h_cost_nz⟩
+
+/-- Canonical non-degenerate Stepanov lift chain witness at ladder depth 7/8:
+Initial budget `1/8`, per-step cost `1/16`, per-step amplification gain `1/4` over 8 stages. -/
+def stepanovLiftChainWitness : StepanovLiftChainSpec where
+  stages := 8
+  h_stages_pos := by decide
+  initBudget := QRat.mk' 1 8 (by decide)
+  h_init_pos := by decide
+  gainPerStep := QRat.mk' 1 4 (by decide)
+  costPerStep := QRat.mk' 1 16 (by decide)
+  h_gain_pos := by decide
+  h_cost_pos := by decide
+  h_step_dom := by decide
+
+/-- Master certificate bundle for the Stepanov lift chain witness:
+Verifies stage-wise strict cost-gain dominance, non-vanishing effective cost,
+and positive net margin across `m = 8` composition stages under `[propext, Quot.sound]`. -/
+theorem stepanov_lift_chain_witness_certs :
+    stepanovLiftChainWitness.accumulatedCost 8 <
+      stepanovLiftChainWitness.accumulatedGain 8 ∧
+    stepanovLiftChainWitness.effectiveCost 8 <
+      stepanovLiftChainWitness.initBudget + stepanovLiftChainWitness.accumulatedGain 8 ∧
+    0 < (stepanovLiftChainWitness.netMargin 8).num ∧
+    (¬ QRat.eqv (stepanovLiftChainWitness.netMargin 8) (QRat.ofInt 0)) ∧
+    0 < (stepanovLiftChainWitness.effectiveCost 8).num ∧
+    (¬ QRat.eqv (stepanovLiftChainWitness.effectiveCost 8) (QRat.ofInt 0)) := by
+  have hm : 0 < 8 := by decide
+  have h_dom := stepanov_lift_chain_accumulated_strict_dominance stepanovLiftChainWitness 8 hm
+  have h_comp := stepanov_lift_chain_composition_bound stepanovLiftChainWitness 8 hm
+  have h_net := stepanov_lift_chain_net_margin_pos stepanovLiftChainWitness 8 hm
+  exact ⟨h_dom, h_comp.1, h_net.1, h_net.2, h_comp.2.1, h_comp.2.2⟩
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/ContractionReflectionBridge.lean

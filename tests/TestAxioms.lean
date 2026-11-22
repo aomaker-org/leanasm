@@ -1358,4 +1358,14 @@ import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 #print axioms QuasiRiemann.nonDegenerateRnsPairBoxToBoxSupplyBound
 #print axioms QuasiRiemann.non_degenerate_high_order_rns_pair_box_padic_weave
 
+-- =============================================================================
+-- Part 85: Constructive Stepanov Gain-vs.-Cost Lift Chain (Issue #209)
+-- =============================================================================
+
+#print axioms QuasiRiemann.stepanov_lift_chain_accumulated_strict_dominance
+#print axioms QuasiRiemann.stepanov_lift_chain_net_margin_pos
+#print axioms QuasiRiemann.stepanov_lift_chain_composition_bound
+#print axioms QuasiRiemann.stepanovLiftChainWitness
+#print axioms QuasiRiemann.stepanov_lift_chain_witness_certs
+
 -- end of file: leanasm/tests/TestAxioms.lean
