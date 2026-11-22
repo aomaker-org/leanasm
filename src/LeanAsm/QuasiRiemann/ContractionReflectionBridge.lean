@@ -10,6 +10,7 @@ import LeanAsm.QuasiRiemann.DyadicAbelBridge
 import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 import LeanAsm.QuasiRiemann.Valuation.RNS
 import LeanAsm.QuasiRiemann.Valuation.Contraction
+import LeanAsm.QuasiRiemann.QR.QrhCore
 
 namespace QuasiRiemann
 
@@ -1697,17 +1698,22 @@ theorem contraction_reflection_bridge_certs
     (centerLower lipNumerator radius deltaShrink : Nat)
     (h_shrink : deltaShrink < radius)
     (h_contract : lipNumerator * radius < centerLower * (radius - deltaShrink))
-    (z : Int) (hz : z.natAbs ≤ lipNumerator * radius) :
+    (z : Int) (hz : z.natAbs ≤ lipNumerator * radius)
+    (s8 tAbs : Nat) (hs : 4 < s8) (ht : 0 < tAbs) (hHalf : InQrhHalfPlane s8 tAbs) :
     ¬ QRat.eqv (QRat.ofInt 1 - QRat.mk' c (p ^ k) (Nat.pow_pos hp)) (QRat.ofInt 0) ∧
     QRat.eqv (reflectQRat (reflectQRat s)) s ∧
     (halfQRat < s ↔ reflectQRat s < halfQRat) ∧
     x.reconstruct ≠ 0 ∧
-    ((centerLower * (radius - deltaShrink) : Nat) : Int) - z ≠ 0 :=
+    ((centerLower * (radius - deltaShrink) : Nat) : Int) - z ≠ 0 ∧
+    (IsCertifiedZeroFree2D s8 tAbs ∨ InRemainingUnknownBox s8 tAbs) ∧
+    IsCertifiedZeroFree2D s8 tAbs :=
   ⟨qrh_contraction_qrat_ne_zero p k hp c hc,
    half_plane_reflection_qrat_involution s,
    half_plane_reflection_qrat_lt s,
    RnsStripNonVanishing x h_mod r1 r2 r3 h_res hr1 hr2 hr3 hp_primes hd_primes hnz,
-   QsdZeroExclusion centerLower lipNumerator radius deltaShrink h_shrink h_contract z hz⟩
+   QsdZeroExclusion centerLower lipNumerator radius deltaShrink h_shrink h_contract z hz,
+   critical_strip_dichotomy_2d s8 tAbs hs ht,
+   qrh_implies_certified_2d s8 tAbs hHalf⟩
 
 end QuasiRiemann
 

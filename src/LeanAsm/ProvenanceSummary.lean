@@ -923,7 +923,11 @@ def MollifierVariationalProp : Prop :=
    QuasiRiemann.variationalQrhThreshold QuasiRiemann.variationalMollifier3414Spec
       GSp4FunctorialityBridge.thetaKimSarnakSym4 <
       QuasiRiemann.qrhFromAutomorphic
-        GSp4FunctorialityBridge.thetaKimSarnakSym4)
+        GSp4FunctorialityBridge.thetaKimSarnakSym4 ∧
+   (∀ (s8 tAbs : Nat), 4 < s8 → 0 < tAbs →
+     QuasiRiemann.IsCertifiedZeroFree2D s8 tAbs ∨ QuasiRiemann.InRemainingUnknownBox s8 tAbs) ∧
+   (∀ (s8 tAbs : Nat), QuasiRiemann.InQrhHalfPlane s8 tAbs →
+     QuasiRiemann.IsCertifiedZeroFree2D s8 tAbs))
 
 /-- Sub-specification for constructive p-adic ultrametric valuation & contraction on `QRat`. -/
 def UltrametricValuationProp : Prop :=
@@ -1009,16 +1013,27 @@ def UltrametricValuationProp : Prop :=
       (step : Int) (f : QuasiRiemann.QRat → QuasiRiemann.QRat)
       (_h_cont : QuasiRiemann.Valuation.IsPAdicStepContraction p step f)
       (x₀ : QuasiRiemann.QRat) (n m : Nat),
-    0 < (QuasiRiemann.highOrderRnsPairBox N theta h_theta).stepContract.num ∧
-    (¬ QuasiRiemann.QRat.eqv (QuasiRiemann.highOrderRnsPairBox N theta h_theta).stepContract
+    0 < (QuasiRiemann.nonDegenerateHighOrderRnsPairBox N theta h_theta).box1.toQRat.num ∧
+    0 < (QuasiRiemann.nonDegenerateHighOrderRnsPairBox N theta h_theta).box2.toQRat.num ∧
+    (¬ QuasiRiemann.QRat.eqv
+      (QuasiRiemann.nonDegenerateHighOrderRnsPairBox N theta h_theta).box1.toQRat
       (QuasiRiemann.QRat.ofInt 0)) ∧
-    (QuasiRiemann.rnsPairBoxToBoxSupplyBound (QuasiRiemann.highOrderRnsPairBox N theta h_theta)).xLo =
-      (QuasiRiemann.highOrderRnsPairBox N theta h_theta).stepContract ∧
+    (¬ QuasiRiemann.QRat.eqv
+      (QuasiRiemann.nonDegenerateHighOrderRnsPairBox N theta h_theta).box2.toQRat
+      (QuasiRiemann.QRat.ofInt 0)) ∧
+    0 < (QuasiRiemann.nonDegenerateHighOrderRnsPairBox N theta h_theta).stepContract.num ∧
+    (¬ QuasiRiemann.QRat.eqv
+      (QuasiRiemann.nonDegenerateHighOrderRnsPairBox N theta h_theta).stepContract
+      (QuasiRiemann.QRat.ofInt 0)) ∧
+    (QuasiRiemann.nonDegenerateRnsPairBoxToBoxSupplyBound
+      (QuasiRiemann.nonDegenerateHighOrderRnsPairBox N theta h_theta)).xLo =
+      (QuasiRiemann.nonDegenerateHighOrderRnsPairBox N theta h_theta).stepContract ∧
     QuasiRiemann.QRat.ofInt 0 <
-      (QuasiRiemann.rnsPairBoxToBoxSupplyBound (QuasiRiemann.highOrderRnsPairBox N theta h_theta)).xLo ∧
+      (QuasiRiemann.nonDegenerateRnsPairBoxToBoxSupplyBound
+        (QuasiRiemann.nonDegenerateHighOrderRnsPairBox N theta h_theta)).xLo ∧
     (¬ QuasiRiemann.QRat.eqv
       (QuasiRiemann.reflectHalf (QuasiRiemann.reflectHalf
-        (QuasiRiemann.highOrderRnsPairBox N theta h_theta).stepContract))
+        (QuasiRiemann.nonDegenerateHighOrderRnsPairBox N theta h_theta).stepContract))
       (QuasiRiemann.QRat.ofInt 0)) ∧
     QuasiRiemann.Valuation.valLe
       (QuasiRiemann.Valuation.valAdd
@@ -1031,7 +1046,31 @@ def UltrametricValuationProp : Prop :=
         (QuasiRiemann.Valuation.pAdicVal p (f x₀ - x₀))
         (some (Int.ofNat n * step)))
       (QuasiRiemann.Valuation.pAdicVal p
-        (Nat.repeat f (n + m) x₀ - Nat.repeat f n x₀)))
+        (Nat.repeat f (n + m) x₀ - Nat.repeat f n x₀))) ∧
+  (∀ (p k : Nat) (hp : 0 < p) (c : Int) (_hc : c.natAbs < p ^ k)
+      (s : QuasiRiemann.QRat)
+      (x : LeanAsm.QuasiRiemann.RNS.RnsInt 3)
+      (_h_mod : x.moduli = #[7, 31, 127])
+      (r1 r2 r3 : Nat) (_h_res : x.residues = #[r1, r2, r3])
+      (_hr1 : r1 < 7) (_hr2 : r2 < 31) (_hr3 : r3 < 127)
+      (_hp_primes : QuasiRiemann.Valuation.AllPrimes x.moduli.toList)
+      (_hd_primes : QuasiRiemann.Valuation.PairwiseDistinct x.moduli.toList)
+      (_hnz : r1 ≠ 0 ∨ r2 ≠ 0 ∨ r3 ≠ 0)
+      (centerLower lipNumerator radius deltaShrink : Nat)
+      (_h_shrink : deltaShrink < radius)
+      (_h_contract : lipNumerator * radius < centerLower * (radius - deltaShrink))
+      (z : Int) (_hz : z.natAbs ≤ lipNumerator * radius)
+      (s8 tAbs : Nat) (_hs : 4 < s8) (_ht : 0 < tAbs) (_hHalf : QuasiRiemann.InQrhHalfPlane s8 tAbs),
+    ¬ QuasiRiemann.QRat.eqv
+        (QuasiRiemann.QRat.ofInt 1 -
+          QuasiRiemann.QRat.mk' c (p ^ k) (Nat.pow_pos hp))
+        (QuasiRiemann.QRat.ofInt 0) ∧
+    QuasiRiemann.QRat.eqv (QuasiRiemann.reflectQRat (QuasiRiemann.reflectQRat s)) s ∧
+    (QuasiRiemann.halfQRat < s ↔ QuasiRiemann.reflectQRat s < QuasiRiemann.halfQRat) ∧
+    x.reconstruct ≠ 0 ∧
+    ((centerLower * (radius - deltaShrink) : Nat) : Int) - z ≠ 0 ∧
+    (QuasiRiemann.IsCertifiedZeroFree2D s8 tAbs ∨ QuasiRiemann.InRemainingUnknownBox s8 tAbs) ∧
+    QuasiRiemann.IsCertifiedZeroFree2D s8 tAbs)
 
 /-- Part 5 provenance specification bundling mollifier descent, 2D rectangles down to
 `σ = 0.501`, `t ~ 10^12` phase-reduced rectangles, DVP asymptotic strip, Dirichlet `L^2`
@@ -1433,7 +1472,9 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
     fun m => (QuasiRiemann.linear_minimizes_dirichlet_energy m).2,
     fun m hc1 hc2 => QuasiRiemann.variational_energy_lt_one_of_pos m hc1 hc2,
     ⟨QuasiRiemann.mollifier_variational_bridge_certs.2.2.2.2.1,
-     QuasiRiemann.mollifier_variational_bridge_certs.2.2.2.2.2.2⟩⟩,
+     QuasiRiemann.mollifier_variational_bridge_certs.2.2.2.2.2.2.1,
+     QuasiRiemann.mollifier_variational_bridge_certs.2.2.2.2.2.2.2.1,
+     QuasiRiemann.mollifier_variational_bridge_certs.2.2.2.2.2.2.2.2⟩⟩,
    ⟨fun p hp x y =>
       ⟨QuasiRiemann.Valuation.pAdicVal_neg p x,
        QuasiRiemann.Valuation.pAdicVal_mul p hp x y,
@@ -1451,8 +1492,15 @@ theorem quasiRiemann_provenance_certified : QuasiRiemannProvenance :=
     QuasiRiemann.Valuation.hensel_sqrt2_mod_pow_7,
     QuasiRiemann.Valuation.hensel_mersenne_tower_sqrt2_built,
     fun N theta h_theta p hp step f h_cont x₀ n m =>
-      QuasiRiemann.high_order_rns_pair_box_padic_weave
-        N theta h_theta p hp step f h_cont x₀ n m⟩,
+      QuasiRiemann.non_degenerate_high_order_rns_pair_box_padic_weave
+        N theta h_theta p hp step f h_cont x₀ n m,
+    fun p k hp c hc s x h_mod r1 r2 r3 h_res hr1 hr2 hr3 hp_primes hd_primes hnz
+        centerLower lipNumerator radius deltaShrink h_shrink h_contract z hz
+        s8 tAbs hs ht hHalf =>
+      QuasiRiemann.contraction_reflection_bridge_certs
+        p k hp c hc s x h_mod r1 r2 r3 h_res hr1 hr2 hr3 hp_primes hd_primes hnz
+        centerLower lipNumerator radius deltaShrink h_shrink h_contract z hz
+        s8 tAbs hs ht hHalf⟩,
    QuasiRiemann.lucky_beurling_qsd1_strip_cert,
    QuasiRiemann.lucky_sub78_strip_cert_50_bridge,
    QuasiRiemann.SieveSequence.sieve_sequence_qsd1_strip_cert⟩
