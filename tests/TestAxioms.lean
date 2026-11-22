@@ -1330,4 +1330,11 @@ import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 #print axioms QuasiRiemann.linear_minimizes_dirichlet_energy
 #print axioms QuasiRiemann.variational_mollifier_beats_linear
 
+-- =============================================================================
+-- Part 83: RNS Valuation & RnsPairBox Contraction Reflection Weave (Issue #129)
+-- =============================================================================
+
+#print axioms QuasiRiemann.rns_pair_box_padic_contraction_weave
+#print axioms QuasiRiemann.high_order_rns_pair_box_padic_weave
+
 -- end of file: leanasm/tests/TestAxioms.lean

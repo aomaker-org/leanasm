@@ -9,6 +9,7 @@ import LeanAsm.QuasiRiemann.ParametricQrhLadder
 import LeanAsm.QuasiRiemann.DyadicAbelBridge
 import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 import LeanAsm.QuasiRiemann.Valuation.RNS
+import LeanAsm.QuasiRiemann.Valuation.Contraction
 
 namespace QuasiRiemann
 
@@ -1405,6 +1406,95 @@ theorem dyadic_rungs_k11_to_k14_rns_coupling_certs
          hex1024.1, hex2048.1, hex4096.1, rfl, rfl, rfl,
          hex1024.2.2.1, hex2048.2.2.1, hex4096.2.2.1,
          hex1024.2.2.2, hex2048.2.2.2, hex4096.2.2.2⟩
+
+-- =============================================================================
+-- 12. RNS Valuation & RnsPairBox Contraction Reflection Weave (#129)
+-- =============================================================================
+
+/-- Couples discrete `RnsPairBox` contraction evaluations with p-adic step contraction growth:
+Under `IsPAdicStepContraction p step f`, after `n` iterations the p-adic displacement valuation
+grows by at least `n * step`, while `pb.stepContract` remains strictly positive, non-vanishing,
+and invariant under double reflection `reflectHalf (reflectHalf ·)`. -/
+theorem rns_pair_box_padic_contraction_weave
+    {k : Nat} (pb : LeanAsm.QuasiRiemann.RNS.RnsPairBox k)
+    (p : Nat) (hp : QuasiRiemann.Valuation.IsPrime p)
+    (step : Int) (f : QRat → QRat)
+    (h_cont : QuasiRiemann.Valuation.IsPAdicStepContraction p step f)
+    (x₀ : QRat) (n m : Nat) :
+    0 < pb.stepContract.num ∧
+    (¬ QRat.eqv pb.stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound pb).xLo = pb.stepContract ∧
+    QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound pb).xLo ∧
+    (¬ QRat.eqv (reflectHalf (reflectHalf pb.stepContract)) (QRat.ofInt 0)) ∧
+    QuasiRiemann.Valuation.valLe
+      (QuasiRiemann.Valuation.valAdd
+        (QuasiRiemann.Valuation.pAdicVal p (f x₀ - x₀))
+        (some (Int.ofNat n * step)))
+      (QuasiRiemann.Valuation.pAdicVal p
+        (Nat.repeat f (n + 1) x₀ - Nat.repeat f n x₀)) ∧
+    QuasiRiemann.Valuation.valLe
+      (QuasiRiemann.Valuation.valAdd
+        (QuasiRiemann.Valuation.pAdicVal p (f x₀ - x₀))
+        (some (Int.ofNat n * step)))
+      (QuasiRiemann.Valuation.pAdicVal p
+        (Nat.repeat f (n + m) x₀ - Nat.repeat f n x₀)) := by
+  have h_pos := pb.stepContract_pos
+  have h_ne := pb.stepContract_ne_zero
+  have h_xlo : (rnsPairBoxToBoxSupplyBound pb).xLo = pb.stepContract := rfl
+  have h_lo_pos := (rnsPairBoxToBoxSupplyBound pb).h_lo_pos
+  have h_refl := reflectHalf_reflectHalf pb.stepContract
+  have h_refl_ne : ¬ QRat.eqv (reflectHalf (reflectHalf pb.stepContract)) (QRat.ofInt 0) := by
+    intro h
+    have h_contra : pb.stepContract.eqv (QRat.ofInt 0) := by
+      let rf := reflectHalf (reflectHalf pb.stepContract)
+      have h1 : rf.num * 1 = 0 * ((rf.den : Nat) : Int) := h
+      rw [Int.mul_one, Int.zero_mul] at h1
+      have h2 : rf.num * (pb.stepContract.den : Int) =
+          pb.stepContract.num * ((rf.den : Nat) : Int) := h_refl
+      rw [h1, Int.zero_mul] at h2
+      have h_rf_den_pos := rf.den_pos
+      have h_rf_den : 0 < ((rf.den : Nat) : Int) := by omega
+      have h_zero : pb.stepContract.num = 0 := by
+        rcases Int.mul_eq_zero.mp h2.symm with hz1 | hz2
+        · exact hz1
+        · omega
+      change pb.stepContract.num * 1 = 0 * ((pb.stepContract.den : Nat) : Int)
+      rw [h_zero, Int.zero_mul, Int.zero_mul]
+    exact h_ne h_contra
+  have h_growth := QuasiRiemann.Valuation.iterate_val_growth p step f h_cont x₀ n
+  have h_range := QuasiRiemann.Valuation.iterate_val_range p hp step f h_cont x₀ n m
+  exact ⟨h_pos, h_ne, h_xlo, h_lo_pos, h_refl_ne, h_growth, h_range⟩
+
+/-- Parametric high-order RNS pair box contraction reflection certificate weaving
+`highOrderRnsPairBox N` with p-adic step contraction growth across scale `N` and exponent `θ > 7/8`. -/
+theorem high_order_rns_pair_box_padic_weave
+    (N : Nat) (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta)
+    (p : Nat) (hp : QuasiRiemann.Valuation.IsPrime p)
+    (step : Int) (f : QRat → QRat)
+    (h_cont : QuasiRiemann.Valuation.IsPAdicStepContraction p step f)
+    (x₀ : QRat) (n m : Nat) :
+    0 < (highOrderRnsPairBox N theta h_theta).stepContract.num ∧
+    (¬ QRat.eqv (highOrderRnsPairBox N theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox N theta h_theta)).xLo =
+      (highOrderRnsPairBox N theta h_theta).stepContract ∧
+    QRat.ofInt 0 < (rnsPairBoxToBoxSupplyBound (highOrderRnsPairBox N theta h_theta)).xLo ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf (highOrderRnsPairBox N theta h_theta).stepContract))
+      (QRat.ofInt 0)) ∧
+    QuasiRiemann.Valuation.valLe
+      (QuasiRiemann.Valuation.valAdd
+        (QuasiRiemann.Valuation.pAdicVal p (f x₀ - x₀))
+        (some (Int.ofNat n * step)))
+      (QuasiRiemann.Valuation.pAdicVal p
+        (Nat.repeat f (n + 1) x₀ - Nat.repeat f n x₀)) ∧
+    QuasiRiemann.Valuation.valLe
+      (QuasiRiemann.Valuation.valAdd
+        (QuasiRiemann.Valuation.pAdicVal p (f x₀ - x₀))
+        (some (Int.ofNat n * step)))
+      (QuasiRiemann.Valuation.pAdicVal p
+        (Nat.repeat f (n + m) x₀ - Nat.repeat f n x₀)) :=
+  rns_pair_box_padic_contraction_weave
+    (highOrderRnsPairBox N theta h_theta) p hp step f h_cont x₀ n m
 
 /-- Master certificate bundle for `ContractionReflectionBridge` combining
 cleared-denominator contraction nonvanishing, reflection duality, RNS modular nonvanishing,
