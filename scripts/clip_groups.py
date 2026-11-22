@@ -253,6 +253,7 @@ def print_list(state: dict, stale: bool) -> None:
     print("Quick Shortcuts:")
     print("  ./scripts/clip_groups.py next     (send next sequential batch)")
     print(f"  ./scripts/clip_groups.py 1        (send batch 1..{len(batches)})")
+    print("  ./scripts/clip_groups.py pr123    (send files changed in PR #123)")
     print("  ./scripts/clip_groups.py rebuild  (rescan tree & update manifest)")
     print("  ./scripts/clip_groups.py reset    (reset next counter to 1)")
     print("=" * 78)
@@ -303,6 +304,183 @@ def send_batch(
         sys.exit(1)
 
 
+def parse_pr_target(
+    target: str, remaining_args: list[str]
+) -> tuple[int, int] | None:
+    """Parse pr target specifications: pr<N>, pr#<N>, or 'pr' <N>.
+
+    Returns (pr_number, consumed_extra_args_count) or None if target is not a
+    PR specification.
+    """
+    token = target.strip()
+    if token.startswith("pr#") or token.startswith("pr"):
+        # Could be 'pr', 'pr123', 'pr#123', 'pr-12', etc.
+        rem = token[2:]
+        if rem.startswith("#"):
+            rem = rem[1:]
+        if rem == "":
+            if remaining_args:
+                val = remaining_args[0].strip()
+                if val.startswith("#"):
+                    val = val[1:]
+                try:
+                    num = int(val)
+                except ValueError:
+                    sys.stderr.write(
+                        f"[-] Error: Invalid PR number '{remaining_args[0]}'. "
+                        "PR number must be a positive integer.\n"
+                    )
+                    sys.exit(1)
+                if num <= 0:
+                    sys.stderr.write(
+                        f"[-] Error: Invalid PR number {num}. "
+                        "PR number must be > 0.\n"
+                    )
+                    sys.exit(1)
+                return num, 1
+            else:
+                sys.stderr.write(
+                    "[-] Error: Missing PR number after 'pr'.\n"
+                )
+                sys.exit(1)
+        else:
+            try:
+                num = int(rem)
+            except ValueError:
+                sys.stderr.write(
+                    f"[-] Error: Invalid PR specification '{target}'. "
+                    "PR number must be a positive integer.\n"
+                )
+                sys.exit(1)
+            if num <= 0:
+                sys.stderr.write(
+                    f"[-] Error: Invalid PR number {num}. "
+                    "PR number must be > 0.\n"
+                )
+                sys.exit(1)
+            return num, 0
+    return None
+
+
+def fetch_pr_files(pr_number: int) -> list[str]:
+    """Fetch changed file paths for a PR using gh CLI."""
+    cmd = ["gh", "pr", "view", str(pr_number), "--json", "files"]
+    try:
+        res = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    except FileNotFoundError:
+        sys.stderr.write(
+            "[-] Error: 'gh' CLI tool is required to fetch PR files but was "
+            "not found in PATH.\n"
+        )
+        sys.exit(1)
+
+    if res.returncode != 0:
+        err_msg = res.stderr.strip() if res.stderr else res.stdout.strip()
+        sys.stderr.write(
+            f"[-] Error: Failed to fetch PR #{pr_number} via gh CLI.\n"
+            f"{err_msg}\n"
+        )
+        sys.exit(1)
+
+    try:
+        data = json.loads(res.stdout)
+    except Exception as e:
+        sys.stderr.write(
+            f"[-] Error: Failed to parse gh output as JSON: {e}\n"
+        )
+        sys.exit(1)
+
+    raw_files = data.get("files", [])
+    paths = [
+        item["path"]
+        for item in raw_files
+        if isinstance(item, dict) and "path" in item
+    ]
+    if not paths:
+        sys.stderr.write(
+            f"[-] Error: No changed files returned for PR #{pr_number}.\n"
+        )
+        sys.exit(1)
+
+    existing_files: list[str] = []
+    missing_files: list[str] = []
+    for p in paths:
+        norm = os.path.normpath(p)
+        if os.path.exists(norm) and os.path.isfile(norm):
+            existing_files.append(norm)
+        else:
+            missing_files.append(norm)
+
+    if missing_files:
+        sys.stderr.write(
+            f"[!] Warning: {len(missing_files)} file(s) changed in PR "
+            f"#{pr_number} do not exist in the local workspace:\n"
+        )
+        for mf in missing_files:
+            sys.stderr.write(f"    - {mf}\n")
+
+    if not existing_files:
+        sys.stderr.write(
+            f"[-] Error: None of the {len(paths)} file(s) changed in PR "
+            f"#{pr_number} exist in the local workspace.\n"
+        )
+        sys.exit(1)
+
+    return existing_files
+
+
+def send_pr_files(pr_number: int, dry_run: bool = False) -> None:
+    """Collect PR changed files, chunk them under MAX_BYTES, and dispatch."""
+    files = fetch_pr_files(pr_number)
+
+    chunks: list[list[str]] = []
+    cur_chunk: list[str] = []
+    cur_size = 0
+    for f in files:
+        sz = os.path.getsize(f)
+        if cur_chunk and (cur_size + sz > MAX_BYTES):
+            chunks.append(cur_chunk)
+            cur_chunk = [f]
+            cur_size = sz
+        else:
+            cur_chunk.append(f)
+            cur_size += sz
+    if cur_chunk:
+        chunks.append(cur_chunk)
+
+    total_size = sum(os.path.getsize(f) for f in files)
+    print(
+        f"[+] PR #{pr_number}: {len(files)} local file(s), "
+        f"{total_size/1024:.1f} KB total across {len(chunks)} chunk(s)."
+    )
+
+    for i, chunk in enumerate(chunks, 1):
+        chunk_sz = sum(os.path.getsize(f) for f in chunk)
+        chunk_label = (
+            f"PR #{pr_number}"
+            if len(chunks) == 1
+            else f"PR #{pr_number} (chunk {i}/{len(chunks)})"
+        )
+        print(
+            f"[+] Chunk {i}/{len(chunks)}: '{chunk_label}' "
+            f"({len(chunk)} files, {chunk_sz/1024:.1f} KB)"
+        )
+        for f in chunk:
+            print(f"    - {f} ({os.path.getsize(f)/1024:.1f} KB)")
+
+        if dry_run:
+            print(f"[+] Dry run complete for {chunk_label}.")
+            continue
+
+        cmd = ["files2clip"] + chunk
+        try:
+            subprocess.run(cmd, check=True)
+            print(f"[+] Successfully copied {chunk_label} to clipboard!")
+        except Exception as e:
+            sys.stderr.write(f"[-] Error running files2clip: {e}\n")
+            sys.exit(1)
+
+
 def main() -> None:
     raw_args = [a for a in sys.argv[1:] if a != "--include-docs"]
     dry_run = "--dry-run" in raw_args
@@ -331,6 +509,12 @@ def main() -> None:
         last_idx = int(state.get("last_index", 0))
         target_idx = last_idx + 1 if last_idx < len(batches) else 1
         send_batch(state, stale, target_idx, dry_run=dry_run)
+        sys.exit(0)
+
+    pr_spec = parse_pr_target(target, args[1:])
+    if pr_spec is not None:
+        pr_number, _ = pr_spec
+        send_pr_files(pr_number, dry_run=dry_run)
         sys.exit(0)
 
     if target.isdigit():
