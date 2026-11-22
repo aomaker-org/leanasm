@@ -14,6 +14,7 @@ import LeanAsm.QuasiRiemann.Qsd24JetIdempotentWeave
 import LeanAsm.QuasiRiemann.StepanovQrhLadderWeave
 import LeanAsm.QuasiRiemann.ContractionReflectionBridge
 import LeanAsm.QuasiRiemann.MollifierVariationalBridge
+import LeanAsm.QuasiRiemann.SieveRnsCrtBoxWeave
 
 #print axioms MiniVM.get_set_same
 #print axioms MiniVM.get_set_other
@@ -1418,5 +1419,23 @@ import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 #print axioms QuasiRiemann.preperiodicVariationalRung32000Spec
 #print axioms QuasiRiemann.preperiodic_variational_contraction_bridge
 #print axioms QuasiRiemann.preperiodic_variational_bridge_cert
+
+-- =============================================================================
+-- Part 89: Beurling / Lucky / Ulam Sieve x RNS CRT Box Weave (Issue #217)
+-- =============================================================================
+
+#print axioms LeanAsm.QuasiRiemann.natToRnsMersenne
+#print axioms LeanAsm.QuasiRiemann.natToRnsMersenne_residues
+#print axioms LeanAsm.QuasiRiemann.natToRnsMersenne_moduli
+#print axioms LeanAsm.QuasiRiemann.natToRnsMersenne_reconstruct_mod_eq
+#print axioms LeanAsm.QuasiRiemann.natToRnsMersenne_reconstruct_50_eq
+#print axioms LeanAsm.QuasiRiemann.natToRnsMersenne_reconstruct_1024_eq
+#print axioms LeanAsm.QuasiRiemann.natToRnsMersenne_reconstruct_2048_eq
+#print axioms LeanAsm.QuasiRiemann.natToRnsMersenne_reconstruct_4096_eq
+#print axioms LeanAsm.QuasiRiemann.rns_contraction_sound_2048
+#print axioms LeanAsm.QuasiRiemann.rns_contraction_sound_4096
+#print axioms LeanAsm.QuasiRiemann.sieve_rns_crt_box_weave
+#print axioms LeanAsm.QuasiRiemann.sieve_rns_crt_box_cert_50
+#print axioms LeanAsm.QuasiRiemann.sieve_rns_crt_box_cert_50_eval
 
 -- end of file: leanasm/tests/TestAxioms.lean
