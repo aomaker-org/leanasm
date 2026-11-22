@@ -1339,4 +1339,22 @@ import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 #print axioms QuasiRiemann.rns_pair_box_padic_contraction_weave
 #print axioms QuasiRiemann.high_order_rns_pair_box_padic_weave
 
+-- =============================================================================
+-- Part 84: Non-Degenerate Box & Bridge Witnesses (Issue #204)
+-- =============================================================================
+
+#print axioms QuasiRiemann.NonDegenerateWindowBox.contains_pos
+#print axioms QuasiRiemann.NonDegenerateWindowBox.contains_ne_zero
+#print axioms QuasiRiemann.supplyNonDegenerateCharWitness
+#print axioms QuasiRiemann.NonDegenerateCharBound.boundLo_ne_zero
+#print axioms QuasiRiemann.nonDegenerateMollifier3414Spec
+#print axioms QuasiRiemann.NonDegenerateMollifierSpec.variational_energy_lt_one
+#print axioms LeanAsm.QuasiRiemann.RNS.NonDegenerateRnsPairBox.channels_ne_zero
+#print axioms QuasiRiemann.highOrderRnsUnitQRat
+#print axioms QuasiRiemann.highOrderRnsUnitQRat_num_pos
+#print axioms QuasiRiemann.nonDegenerateHighOrderRnsPairBox
+#print axioms QuasiRiemann.nonDegenerateHighOrderRnsPairBox_channels_ne_zero
+#print axioms QuasiRiemann.nonDegenerateRnsPairBoxToBoxSupplyBound
+#print axioms QuasiRiemann.non_degenerate_high_order_rns_pair_box_padic_weave
+
 -- end of file: leanasm/tests/TestAxioms.lean

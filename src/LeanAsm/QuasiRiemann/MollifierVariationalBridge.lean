@@ -1010,6 +1010,20 @@ def variationalMollifier3414Spec : TwoPieceMollifierSpec :=
     c2_nonneg := by decide
     norm_one := by decide }
 
+/-- Non-degenerate two-piece variational mollifier specification requiring strictly
+positive coefficients `c1 > 0` and `c2 > 0`.
+Guarantees constructive non-vanishing off-diagonal mixing and strictly sub-unit
+variational energy `E_var < 1`. -/
+structure NonDegenerateMollifierSpec extends TwoPieceMollifierSpec where
+  c1_pos : QRat.ofInt 0 < c1
+  c2_pos : QRat.ofInt 0 < c2
+
+/-- Canonical concrete non-degenerate variational mollifier witness `(3/4, 1/4)`. -/
+def nonDegenerateMollifier3414Spec : NonDegenerateMollifierSpec where
+  toTwoPieceMollifierSpec := variationalMollifier3414Spec
+  c1_pos := by decide
+  c2_pos := by decide
+
 /-- Effective automorphic off-diagonal parameter under variational energy contraction:
 `θ_eff = E_var(m.c1, m.c2) * θAuto`. -/
 def effectiveAutoThetaVariational (m : TwoPieceMollifierSpec) (θAuto : QRat) : QRat :=
@@ -1177,6 +1191,22 @@ theorem variational_energy_lt_one_of_pos (m : TwoPieceMollifierSpec)
     ac_rfl
   rw [Int.mul_one, Int.one_mul, hEnum, hEden]
   exact Int.mul_lt_mul_of_pos_left hCoreLt hbd
+
+/-- Strictly sub-unit variational energy for any `NonDegenerateMollifierSpec`:
+Constructively proves `E_var < 1` from the non-zero witness bounds. -/
+theorem NonDegenerateMollifierSpec.variational_energy_lt_one (m : NonDegenerateMollifierSpec) :
+    mollifierVariationalEnergy m.c1 m.c2 < QRat.ofInt 1 := by
+  have hc1 : (0 : Int) < m.c1.num := by
+    have hp := m.c1_pos
+    change (0 : Int) * (m.c1.den : Int) < m.c1.num * 1 at hp
+    rw [Int.zero_mul, Int.mul_one] at hp
+    exact hp
+  have hc2 : (0 : Int) < m.c2.num := by
+    have hp := m.c2_pos
+    change (0 : Int) * (m.c2.den : Int) < m.c2.num * 1 at hp
+    rw [Int.zero_mul, Int.mul_one] at hp
+    exact hp
+  exact variational_energy_lt_one_of_pos m.toTwoPieceMollifierSpec hc1 hc2
 
 /-- Variational mollifier beats linear theorem:
 At `(c1, c2) = (3/4, 1/4)`, the variational energy drops from `1` to `13/16 < 1`

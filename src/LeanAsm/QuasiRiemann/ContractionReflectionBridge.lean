@@ -453,6 +453,99 @@ theorem qrat_window_char_bound_nonvanishing (B : QRatWindowBox) (cond : Nat) (hc
   rw [Int.mul_one, Int.zero_mul] at h
   omega
 
+/-- Non-degenerate window box specification requiring constructive non-zero scale
+and carrier witness. Prevents vacuous or degenerate box instances where lower bounds
+are zero or degenerate. -/
+structure NonDegenerateWindowBox extends QRatWindowBox where
+  sLo_pos : QRat.ofInt 0 < sLo
+  tLo_pos : QRat.ofInt 0 < tLo
+
+/-- Point containment in a `NonDegenerateWindowBox` guarantees constructive non-vanishing:
+Any evaluation `(s, t)` contained in `B` is strictly positive in both coordinates. -/
+theorem NonDegenerateWindowBox.contains_pos (B : NonDegenerateWindowBox) {s t : QRat}
+    (h : B.toQRatWindowBox.contains s t) :
+    QRat.ofInt 0 < s ∧ QRat.ofInt 0 < t := by
+  have hs_pos := B.sLo_pos
+  have ht_pos := B.tLo_pos
+  change (0 : Int) * (B.sLo.den : Int) < B.sLo.num * 1 at hs_pos
+  rw [Int.zero_mul, Int.mul_one] at hs_pos
+  change (0 : Int) * (B.tLo.den : Int) < B.tLo.num * 1 at ht_pos
+  rw [Int.zero_mul, Int.mul_one] at ht_pos
+  have hs_le := h.1
+  have ht_le := h.2.2.1
+  change B.sLo.num * (s.den : Int) ≤ s.num * (B.sLo.den : Int) at hs_le
+  have h_sden_pos : 0 < (s.den : Int) := by have := s.den_pos; omega
+  have h_bden_pos : 0 < (B.sLo.den : Int) := by have := B.sLo.den_pos; omega
+  have h_prod_s : 0 < B.sLo.num * (s.den : Int) := Int.mul_pos hs_pos h_sden_pos
+  have hs_num_pos : 0 < s.num := by
+    if h_pos : 0 < s.num then
+      exact h_pos
+    else
+      have h_nonpos : s.num * (B.sLo.den : Int) ≤ 0 :=
+        Int.mul_nonpos_of_nonpos_of_nonneg (by omega) (by omega)
+      omega
+  change B.tLo.num * (t.den : Int) ≤ t.num * (B.tLo.den : Int) at ht_le
+  have h_tden_pos : 0 < (t.den : Int) := by have := t.den_pos; omega
+  have h_btden_pos : 0 < (B.tLo.den : Int) := by have := B.tLo.den_pos; omega
+  have h_prod_t : 0 < B.tLo.num * (t.den : Int) := Int.mul_pos ht_pos h_tden_pos
+  have ht_num_pos : 0 < t.num := by
+    if h_pos : 0 < t.num then
+      exact h_pos
+    else
+      have h_nonpos : t.num * (B.tLo.den : Int) ≤ 0 :=
+        Int.mul_nonpos_of_nonpos_of_nonneg (by omega) (by omega)
+      omega
+  constructor
+  · change (0 : Int) * (s.den : Int) < s.num * 1
+    rw [Int.zero_mul, Int.mul_one]
+    exact hs_num_pos
+  · change (0 : Int) * (t.den : Int) < t.num * 1
+    rw [Int.zero_mul, Int.mul_one]
+    exact ht_num_pos
+
+/-- Constructive non-zero witness: Any point `(s, t)` in a `NonDegenerateWindowBox` is non-zero. -/
+theorem NonDegenerateWindowBox.contains_ne_zero (B : NonDegenerateWindowBox) {s t : QRat}
+    (h : B.toQRatWindowBox.contains s t) :
+    ¬ QRat.eqv s (QRat.ofInt 0) ∧ ¬ QRat.eqv t (QRat.ofInt 0) := by
+  have hpos := B.contains_pos h
+  constructor
+  · intro heq
+    change s.num * 1 = 0 * ((s.den : Nat) : Int) at heq
+    rw [Int.mul_one, Int.zero_mul] at heq
+    have hs_pos := hpos.1
+    change (0 : Int) * (s.den : Int) < s.num * 1 at hs_pos
+    rw [Int.zero_mul, Int.mul_one] at hs_pos
+    omega
+  · intro heq
+    change t.num * 1 = 0 * ((t.den : Nat) : Int) at heq
+    rw [Int.mul_one, Int.zero_mul] at heq
+    have ht_pos := hpos.2
+    change (0 : Int) * (t.den : Int) < t.num * 1 at ht_pos
+    rw [Int.zero_mul, Int.mul_one] at ht_pos
+    omega
+
+/-- Non-degenerate character conductor bound certificate requiring constructive
+non-zero lower bound. -/
+structure NonDegenerateCharBound extends QRatCharBound where
+  boundLo_pos : QRat.ofInt 0 < boundLo
+
+/-- Supplies a `NonDegenerateCharBound` from a `NonDegenerateWindowBox`. -/
+def supplyNonDegenerateCharWitness (cond : Nat) (hcond : 0 < cond)
+    (B : NonDegenerateWindowBox) : NonDegenerateCharBound where
+  toQRatCharBound := supplyCharWitness cond hcond B.toQRatWindowBox
+  boundLo_pos := B.sLo_pos
+
+/-- Non-vanishing lower bound of `NonDegenerateCharBound`. -/
+theorem NonDegenerateCharBound.boundLo_ne_zero (W : NonDegenerateCharBound) :
+    ¬ QRat.eqv W.boundLo (QRat.ofInt 0) := by
+  intro h
+  have hp := W.boundLo_pos
+  change (0 : Int) * (W.boundLo.den : Int) < W.boundLo.num * 1 at hp
+  rw [Int.zero_mul, Int.mul_one] at hp
+  change W.boundLo.num * 1 = 0 * ((W.boundLo.den : Nat) : Int) at h
+  rw [Int.mul_one, Int.zero_mul] at h
+  omega
+
 -- =============================================================================
 -- 7. Euler-Defect Contraction Nonvanishing & Real-Interval Box Exclusion (#167)
 -- =============================================================================
@@ -589,6 +682,44 @@ theorem rns_pair_box_N4096_cert (theta : QRat)
     (h_theta : qrhThresholdSevenEighths < theta) :
     ¬ QRat.eqv (highOrderRnsPairBox 4096 theta h_theta).stepContract (QRat.ofInt 0) :=
   rns_pair_box_param_cert 4096 theta h_theta
+
+/-- Explicit constructive unit RNS channel witness over the Mersenne tower `[7, 31, 127]`. -/
+def highOrderRnsUnitQRat : LeanAsm.QuasiRiemann.RNS.RnsQRat 3 :=
+  ⟨⟨#[1, 1, 1], #[7, 31, 127], rfl, rfl⟩, ⟨#[1, 1, 1], #[7, 31, 127], rfl, rfl⟩⟩
+
+/-- Strict positivity of reconstructed numerator for `highOrderRnsUnitQRat`. -/
+theorem highOrderRnsUnitQRat_num_pos : 0 < highOrderRnsUnitQRat.toQRat.num := by
+  have h : highOrderRnsUnitQRat.toQRat.num = 1 := rfl
+  rw [h]
+  decide
+
+/-- Canonical non-degenerate high-order RNS pair box constructor with constructive
+non-zero witnesses. -/
+def nonDegenerateHighOrderRnsPairBox (N : Nat) (theta : QRat)
+    (h_theta : qrhThresholdSevenEighths < theta) :
+    LeanAsm.QuasiRiemann.RNS.NonDegenerateRnsPairBox 3 where
+  toRnsPairBox := {
+    box1 := highOrderRnsUnitQRat
+    box2 := highOrderRnsUnitQRat
+    crossBound := QRat.mul (QRat.sub theta qrhThresholdSevenEighths)
+      (QRat.mk' 1 (N + 1) (by omega))
+    h_cross_pos := by
+      dsimp [QRat.mul, QRat.sub, QRat.mk', qrhThresholdSevenEighths]
+      have h_lt : (7 : Int) * theta.den < theta.num * 8 := h_theta
+      have h_diff_pos : 0 < theta.num * 8 - 7 * (theta.den : Int) := by omega
+      omega
+    h_box1_nonneg := LeanAsm.QuasiRiemann.RNS.rnsQRat_toQRat_nonneg highOrderRnsUnitQRat
+    h_box2_nonneg := LeanAsm.QuasiRiemann.RNS.rnsQRat_toQRat_nonneg highOrderRnsUnitQRat
+  }
+  h_box1_pos := highOrderRnsUnitQRat_num_pos
+  h_box2_pos := highOrderRnsUnitQRat_num_pos
+
+/-- Non-degenerate channel non-vanishing for `nonDegenerateHighOrderRnsPairBox`. -/
+theorem nonDegenerateHighOrderRnsPairBox_channels_ne_zero (N : Nat) (theta : QRat)
+    (h_theta : qrhThresholdSevenEighths < theta) :
+    ¬ QRat.eqv (nonDegenerateHighOrderRnsPairBox N theta h_theta).box1.toQRat (QRat.ofInt 0) ∧
+    ¬ QRat.eqv (nonDegenerateHighOrderRnsPairBox N theta h_theta).box2.toQRat (QRat.ofInt 0) :=
+  (nonDegenerateHighOrderRnsPairBox N theta h_theta).channels_ne_zero
 
 -- =============================================================================
 -- 9. Constructive reflectHalf Involution & BoxSupplyBound Nonvanishing (#173)
@@ -734,6 +865,13 @@ def rnsPairBoxToBoxSupplyBound {k : Nat} (pb : LeanAsm.QuasiRiemann.RNS.RnsPairB
     change (0 : Int) * (pb.stepContract.den : Int) < pb.stepContract.num * (1 : Int)
     rw [Int.zero_mul, Int.mul_one]
     exact h_pos
+
+/-- Converts a `NonDegenerateRnsPairBox` into a constructive `BoxSupplyBound`
+with certified non-degenerate channel witnesses. -/
+def nonDegenerateRnsPairBoxToBoxSupplyBound {k : Nat}
+    (pb : LeanAsm.QuasiRiemann.RNS.NonDegenerateRnsPairBox k) :
+    BoxSupplyBound :=
+  rnsPairBoxToBoxSupplyBound pb.toRnsPairBox
 
 /-- High-order RNS contraction box exclusion at scale `N = 1024` under `reflectHalf`.
 Wires high-order paired-channel contraction at `N = 1024` (`RnsPairBox 3` via `highOrderRnsPairBox`)
@@ -1499,6 +1637,49 @@ theorem high_order_rns_pair_box_padic_weave
         (Nat.repeat f (n + m) x₀ - Nat.repeat f n x₀)) :=
   rns_pair_box_padic_contraction_weave
     (highOrderRnsPairBox N theta h_theta) p hp step f h_cont x₀ n m
+
+/-- Non-degenerate master weave coupling `nonDegenerateHighOrderRnsPairBox N` with
+p-adic step contraction growth and constructive channel non-vanishing. -/
+theorem non_degenerate_high_order_rns_pair_box_padic_weave
+    (N : Nat) (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta)
+    (p : Nat) (hp : QuasiRiemann.Valuation.IsPrime p)
+    (step : Int) (f : QRat → QRat)
+    (h_cont : QuasiRiemann.Valuation.IsPAdicStepContraction p step f)
+    (x₀ : QRat) (n m : Nat) :
+    0 < (nonDegenerateHighOrderRnsPairBox N theta h_theta).box1.toQRat.num ∧
+    0 < (nonDegenerateHighOrderRnsPairBox N theta h_theta).box2.toQRat.num ∧
+    (¬ QRat.eqv (nonDegenerateHighOrderRnsPairBox N theta h_theta).box1.toQRat (QRat.ofInt 0)) ∧
+    (¬ QRat.eqv (nonDegenerateHighOrderRnsPairBox N theta h_theta).box2.toQRat (QRat.ofInt 0)) ∧
+    0 < (nonDegenerateHighOrderRnsPairBox N theta h_theta).stepContract.num ∧
+    (¬ QRat.eqv (nonDegenerateHighOrderRnsPairBox N theta h_theta).stepContract (QRat.ofInt 0)) ∧
+    (nonDegenerateRnsPairBoxToBoxSupplyBound
+      (nonDegenerateHighOrderRnsPairBox N theta h_theta)).xLo =
+      (nonDegenerateHighOrderRnsPairBox N theta h_theta).stepContract ∧
+    QRat.ofInt 0 < (nonDegenerateRnsPairBoxToBoxSupplyBound
+      (nonDegenerateHighOrderRnsPairBox N theta h_theta)).xLo ∧
+    (¬ QRat.eqv
+      (reflectHalf (reflectHalf
+        (nonDegenerateHighOrderRnsPairBox N theta h_theta).stepContract))
+      (QRat.ofInt 0)) ∧
+    QuasiRiemann.Valuation.valLe
+      (QuasiRiemann.Valuation.valAdd
+        (QuasiRiemann.Valuation.pAdicVal p (f x₀ - x₀))
+        (some (Int.ofNat n * step)))
+      (QuasiRiemann.Valuation.pAdicVal p
+        (Nat.repeat f (n + 1) x₀ - Nat.repeat f n x₀)) ∧
+    QuasiRiemann.Valuation.valLe
+      (QuasiRiemann.Valuation.valAdd
+        (QuasiRiemann.Valuation.pAdicVal p (f x₀ - x₀))
+        (some (Int.ofNat n * step)))
+      (QuasiRiemann.Valuation.pAdicVal p
+        (Nat.repeat f (n + m) x₀ - Nat.repeat f n x₀)) := by
+  have hw := rns_pair_box_padic_contraction_weave
+    (nonDegenerateHighOrderRnsPairBox N theta h_theta).toRnsPairBox p hp step f h_cont x₀ n m
+  have hch := (nonDegenerateHighOrderRnsPairBox N theta h_theta).channels_ne_zero
+  have hp1 := (nonDegenerateHighOrderRnsPairBox N theta h_theta).h_box1_pos
+  have hp2 := (nonDegenerateHighOrderRnsPairBox N theta h_theta).h_box2_pos
+  exact ⟨hp1, hp2, hch.1, hch.2, hw.1, hw.2.1, hw.2.2.1, hw.2.2.2.1, hw.2.2.2.2.1,
+         hw.2.2.2.2.2.1, hw.2.2.2.2.2.2⟩
 
 /-- Master certificate bundle for `ContractionReflectionBridge` combining
 cleared-denominator contraction nonvanishing, reflection duality, RNS modular nonvanishing,

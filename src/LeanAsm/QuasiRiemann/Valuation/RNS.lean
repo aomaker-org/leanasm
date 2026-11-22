@@ -596,6 +596,27 @@ structure RnsPairBox (k : Nat) where
   h_box1_nonneg : 0 ≤ box1.toQRat.num
   h_box2_nonneg : 0 ≤ box2.toQRat.num
 
+/-- Non-degenerate paired-channel RNS contraction box requiring constructive strictly
+positive channel witnesses and strictly positive cross-bound margin. -/
+structure NonDegenerateRnsPairBox (k : Nat) extends RnsPairBox k where
+  h_box1_pos : 0 < box1.toQRat.num
+  h_box2_pos : 0 < box2.toQRat.num
+
+/-- Strict channel non-vanishing for `NonDegenerateRnsPairBox`. -/
+theorem NonDegenerateRnsPairBox.channels_ne_zero {k : Nat} (pb : NonDegenerateRnsPairBox k) :
+    ¬ QRat.eqv pb.box1.toQRat (QRat.ofInt 0) ∧ ¬ QRat.eqv pb.box2.toQRat (QRat.ofInt 0) := by
+  constructor
+  · intro h
+    change pb.box1.toQRat.num * 1 = 0 * ((pb.box1.toQRat.den : Nat) : Int) at h
+    rw [Int.mul_one, Int.zero_mul] at h
+    have hp := pb.h_box1_pos
+    omega
+  · intro h
+    change pb.box2.toQRat.num * 1 = 0 * ((pb.box2.toQRat.den : Nat) : Int) at h
+    rw [Int.mul_one, Int.zero_mul] at h
+    have hp := pb.h_box2_pos
+    omega
+
 /-- Bilinear contraction step on an `RnsPairBox`. -/
 def RnsPairBox.stepContract {k : Nat} (pb : RnsPairBox k) : QRat :=
   pairStepContract pb.box1.toQRat pb.box2.toQRat pb.crossBound
