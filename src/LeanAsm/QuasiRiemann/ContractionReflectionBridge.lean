@@ -1406,6 +1406,34 @@ theorem dyadic_rungs_k11_to_k14_rns_coupling_certs
          hex1024.2.2.1, hex2048.2.2.1, hex4096.2.2.1,
          hex1024.2.2.2, hex2048.2.2.2, hex4096.2.2.2⟩
 
+/-- Master certificate bundle for `ContractionReflectionBridge` combining
+cleared-denominator contraction nonvanishing, reflection duality, RNS modular nonvanishing,
+and QSD band-exclusion bounds under `[propext, Quot.sound]`. -/
+theorem contraction_reflection_bridge_certs
+    (p k : Nat) (hp : 0 < p) (c : Int) (hc : c.natAbs < p ^ k)
+    (s : QRat)
+    (x : LeanAsm.QuasiRiemann.RNS.RnsInt 3)
+    (h_mod : x.moduli = #[7, 31, 127])
+    (r1 r2 r3 : Nat) (h_res : x.residues = #[r1, r2, r3])
+    (hr1 : r1 < 7) (hr2 : r2 < 31) (hr3 : r3 < 127)
+    (hp_primes : QuasiRiemann.Valuation.AllPrimes x.moduli.toList)
+    (hd_primes : QuasiRiemann.Valuation.PairwiseDistinct x.moduli.toList)
+    (hnz : r1 ≠ 0 ∨ r2 ≠ 0 ∨ r3 ≠ 0)
+    (centerLower lipNumerator radius deltaShrink : Nat)
+    (h_shrink : deltaShrink < radius)
+    (h_contract : lipNumerator * radius < centerLower * (radius - deltaShrink))
+    (z : Int) (hz : z.natAbs ≤ lipNumerator * radius) :
+    ¬ QRat.eqv (QRat.ofInt 1 - QRat.mk' c (p ^ k) (Nat.pow_pos hp)) (QRat.ofInt 0) ∧
+    QRat.eqv (reflectQRat (reflectQRat s)) s ∧
+    (halfQRat < s ↔ reflectQRat s < halfQRat) ∧
+    x.reconstruct ≠ 0 ∧
+    ((centerLower * (radius - deltaShrink) : Nat) : Int) - z ≠ 0 :=
+  ⟨qrh_contraction_qrat_ne_zero p k hp c hc,
+   half_plane_reflection_qrat_involution s,
+   half_plane_reflection_qrat_lt s,
+   RnsStripNonVanishing x h_mod r1 r2 r3 h_res hr1 hr2 hr3 hp_primes hd_primes hnz,
+   QsdZeroExclusion centerLower lipNumerator radius deltaShrink h_shrink h_contract z hz⟩
+
 end QuasiRiemann
 
 -- end of file: leanasm/src/LeanAsm/QuasiRiemann/ContractionReflectionBridge.lean
