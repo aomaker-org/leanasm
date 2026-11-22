@@ -9,6 +9,7 @@ import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 import LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave
 import LeanAsm.QuasiRiemann.Qsd1IdempotentDyadicAbelWeave
+import LeanAsm.QuasiRiemann.Qsd24JetIdempotentWeave
 import LeanAsm.QuasiRiemann.ContractionReflectionBridge
 import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 
@@ -1367,5 +1368,15 @@ import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 #print axioms QuasiRiemann.stepanov_lift_chain_composition_bound
 #print axioms QuasiRiemann.stepanovLiftChainWitness
 #print axioms QuasiRiemann.stepanov_lift_chain_witness_certs
+
+-- =============================================================================
+-- Part 86: Higher-Order QSD[2-4] Jet & Split-Idempotent Weave (Issue #215)
+-- =============================================================================
+
+#print axioms QuasiRiemann.qsd4_jet_nilpotent_order4
+#print axioms QuasiRiemann.jet4_tangent_sum_preservation
+#print axioms QuasiRiemann.qsd24_jet_idempotent_weave
+#print axioms QuasiRiemann.qsd24JetIdempotentCertSpec
+#print axioms QuasiRiemann.qsd24_jet_idempotent_cert
 
 -- end of file: leanasm/tests/TestAxioms.lean
