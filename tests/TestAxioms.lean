@@ -834,6 +834,8 @@ import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 #print axioms LeanAsm.QuasiRiemann.RNS.RnsInt.one
 #print axioms LeanAsm.QuasiRiemann.RNS.RnsQRat.add
 #print axioms LeanAsm.QuasiRiemann.RNS.RnsQRat.mul
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsQRat.zero
+#print axioms LeanAsm.QuasiRiemann.RNS.RnsQRat.one
 #print axioms LeanAsm.QuasiRiemann.RNS.rnsContractionStep
 #print axioms LeanAsm.QuasiRiemann.RNS.rnsContractionLoop
 #print axioms LeanAsm.QuasiRiemann.RNS.rnsInt_reconstruct_mod_eq

@@ -547,20 +547,23 @@ theorem real_interval_box_contains_ne_zero (delta x : QRat)
 
 /-- High-order RNS pair box constructor for scale `N` and exponent `θ > 7/8`.
 Constructs a paired-channel RNS contraction box over the prime tower `[7, 31, 127]`.
-Inspired by paired character boxes in `CharacterBoxes.PairRows`. -/
+Uses non-zero unit RNS channel witnesses and explicit `θ`-aware cross-bound coupling
+`(θ - 7/8) / (N + 1)`. Inspired by paired character boxes in `CharacterBoxes.PairRows`. -/
 def highOrderRnsPairBox (N : Nat) (theta : QRat)
-    (_h_theta : qrhThresholdSevenEighths < theta) :
+    (h_theta : qrhThresholdSevenEighths < theta) :
     LeanAsm.QuasiRiemann.RNS.RnsPairBox 3 where
-  box1 := LeanAsm.QuasiRiemann.RNS.RnsQRat.zero 3 #[7, 31, 127] (by decide)
-  box2 := LeanAsm.QuasiRiemann.RNS.RnsQRat.zero 3 #[7, 31, 127] (by decide)
-  crossBound := QRat.mk' 1 (N + 1) (by omega)
+  box1 := LeanAsm.QuasiRiemann.RNS.RnsQRat.one 3 #[7, 31, 127] (by decide)
+  box2 := LeanAsm.QuasiRiemann.RNS.RnsQRat.one 3 #[7, 31, 127] (by decide)
+  crossBound := QRat.mul (QRat.sub theta qrhThresholdSevenEighths) (QRat.mk' 1 (N + 1) (by omega))
   h_cross_pos := by
-    dsimp [QRat.mk']
-    decide
+    dsimp [QRat.mul, QRat.sub, QRat.mk', qrhThresholdSevenEighths]
+    have h_lt : (7 : Int) * theta.den < theta.num * 8 := h_theta
+    have h_diff_pos : 0 < theta.num * 8 - 7 * (theta.den : Int) := by omega
+    omega
   h_box1_nonneg := LeanAsm.QuasiRiemann.RNS.rnsQRat_toQRat_nonneg
-    (LeanAsm.QuasiRiemann.RNS.RnsQRat.zero 3 #[7, 31, 127] (by decide))
+    (LeanAsm.QuasiRiemann.RNS.RnsQRat.one 3 #[7, 31, 127] (by decide))
   h_box2_nonneg := LeanAsm.QuasiRiemann.RNS.rnsQRat_toQRat_nonneg
-    (LeanAsm.QuasiRiemann.RNS.RnsQRat.zero 3 #[7, 31, 127] (by decide))
+    (LeanAsm.QuasiRiemann.RNS.RnsQRat.one 3 #[7, 31, 127] (by decide))
 
 /-- Concrete N = 1024 high-order paired-channel contraction certificate (`θ > 7/8`). -/
 theorem rns_pair_box_N1024_cert (theta : QRat)
@@ -1466,7 +1469,8 @@ theorem rns_pair_box_padic_contraction_weave
   exact ⟨h_pos, h_ne, h_xlo, h_lo_pos, h_refl_ne, h_growth, h_range⟩
 
 /-- Parametric high-order RNS pair box contraction reflection certificate weaving
-`highOrderRnsPairBox N` with p-adic step contraction growth across scale `N` and exponent `θ > 7/8`. -/
+`highOrderRnsPairBox N` with p-adic step contraction growth across scale `N`
+and exponent `θ > 7/8`. -/
 theorem high_order_rns_pair_box_padic_weave
     (N : Nat) (theta : QRat) (h_theta : qrhThresholdSevenEighths < theta)
     (p : Nat) (hp : QuasiRiemann.Valuation.IsPrime p)
