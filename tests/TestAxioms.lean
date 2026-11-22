@@ -1104,6 +1104,8 @@ import LeanAsm.QuasiRiemann.Qsd1IdempotentDyadicAbelWeave
 #print axioms LeanAsm.QuasiRiemann.SieveSequence.ulam_harmonic_50_pos
 #print axioms LeanAsm.QuasiRiemann.SieveSequence.ulam_riemann_pi_10
 #print axioms LeanAsm.QuasiRiemann.SieveSequence.ulam_mobius_bridge_10
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.sieve_sequence_qsd1_strip_weave
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.sieve_sequence_qsd1_strip_cert
 
 -- =============================================================================
 -- Part 68: Contraction Nonvanishing & Reflection Duality Lemmas (Issue #156)
