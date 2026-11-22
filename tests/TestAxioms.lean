@@ -1093,6 +1093,17 @@ import LeanAsm.QuasiRiemann.Qsd1IdempotentDyadicAbelWeave
 #print axioms LeanAsm.QuasiRiemann.SieveSequence.luckyBeurlingCert_500
 #print axioms LeanAsm.QuasiRiemann.SieveSequence.lucky_survival_product_500_pos
 #print axioms LeanAsm.QuasiRiemann.SieveSequence.lucky_harmonic_500_pos
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ulamPrefixUpTo_20_eq
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ulamGeneratorsUpTo_20_eq
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ulamGeneratorsUpTo_20_length
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ulamPrefixUpTo_50_eq
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ulamGeneratorsUpTo_50_eq
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ulamGeneratorsUpTo_50_length
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ulamBeurlingCert_50
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ulam_survival_product_50_pos
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ulam_harmonic_50_pos
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ulam_riemann_pi_10
+#print axioms LeanAsm.QuasiRiemann.SieveSequence.ulam_mobius_bridge_10
 
 -- =============================================================================
 -- Part 68: Contraction Nonvanishing & Reflection Duality Lemmas (Issue #156)

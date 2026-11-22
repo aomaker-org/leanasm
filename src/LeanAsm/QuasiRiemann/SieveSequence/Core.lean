@@ -74,6 +74,41 @@ def josephusPrefixUpTo (N : Nat) : List Nat :=
 def josephusGeneratorsUpTo (N : Nat) : List Nat :=
   (josephusPrefixUpTo N).filter (fun x => x > 1)
 
+/-- Count of distinct pairs `(x, y)` in `xs` with `x < y` such that `x + y = cand`. -/
+def countPairsForCand (cand : Nat) : List Nat -> Nat
+  | [] => 0
+  | x :: xs =>
+    if x * 2 >= cand then 0
+    else
+      let rec countWithX : List Nat -> Nat
+        | [] => 0
+        | y :: ys => (if x + y == cand then 1 else 0) + countWithX ys
+      countWithX xs + countPairsForCand cand xs
+
+/-- Ulam condition: `cand` is the sum of two distinct elements in `prev` in uniquely one way. -/
+def isUlamNext (prev : List Nat) (cand : Nat) : Bool :=
+  countPairsForCand cand prev == 1
+
+/-- Concrete finite prefix of Ulam numbers `<= N` (OEIS A002858).
+    Initialized with `[1, 2]`. -/
+def ulamPrefixUpTo (N : Nat) : List Nat :=
+  if N == 0 then []
+  else if N == 1 then [1]
+  else
+    let rec build (curr : List Nat) (cand : Nat) (fuel : Nat) : List Nat :=
+      match fuel with
+      | 0 => curr
+      | f + 1 =>
+        if cand > N then curr
+        else
+          let nextList := if isUlamNext curr cand then curr ++ [cand] else curr
+          build nextList (cand + 1) f
+    build [1, 2] 3 (N + 1)
+
+/-- Ulam Beurling generators up to `N` (excluding `1`). -/
+def ulamGeneratorsUpTo (N : Nat) : List Nat :=
+  (ulamPrefixUpTo N).filter (fun x => x > 1)
+
 /-- Monotonicity: dropEveryKth does not increase list length. -/
 theorem dropEveryKth_go_length (k : Nat) (idx : Nat) (xs : List Nat) :
     (dropEveryKth.go k idx xs).length ≤ xs.length := by
@@ -152,6 +187,33 @@ theorem ludicGeneratorsUpTo_200_length :
 set_option maxRecDepth 200000 in
 theorem josephusGeneratorsUpTo_200_length :
     (josephusGeneratorsUpTo 200).length = 14 := by
+  decide
+
+theorem ulamPrefixUpTo_20_eq :
+    ulamPrefixUpTo 20 = [1, 2, 3, 4, 6, 8, 11, 13, 16, 18] := by
+  rfl
+
+theorem ulamGeneratorsUpTo_20_eq :
+    ulamGeneratorsUpTo 20 = [2, 3, 4, 6, 8, 11, 13, 16, 18] := by
+  rfl
+
+theorem ulamGeneratorsUpTo_20_length :
+    (ulamGeneratorsUpTo 20).length = 9 := by
+  rfl
+
+set_option maxRecDepth 200000 in
+theorem ulamPrefixUpTo_50_eq :
+    ulamPrefixUpTo 50 = [1, 2, 3, 4, 6, 8, 11, 13, 16, 18, 26, 28, 36, 38, 47, 48] := by
+  decide
+
+set_option maxRecDepth 200000 in
+theorem ulamGeneratorsUpTo_50_eq :
+    ulamGeneratorsUpTo 50 = [2, 3, 4, 6, 8, 11, 13, 16, 18, 26, 28, 36, 38, 47, 48] := by
+  decide
+
+set_option maxRecDepth 200000 in
+theorem ulamGeneratorsUpTo_50_length :
+    (ulamGeneratorsUpTo 50).length = 15 := by
   decide
 
 end LeanAsm.QuasiRiemann.SieveSequence

@@ -61,8 +61,57 @@ def generate_josephus(limit: int) -> np.ndarray:
     return arr[arr > 1]
 
 
+def generate_hawkins(limit: int, seed: int = 42) -> np.ndarray:
+    """Generate Hawkins random sieve generators <= limit.
+
+    Stochastic sieve where survivor x eliminates subsequent y > x with probability 1/x.
+    """
+    if limit < 2:
+        return np.array([], dtype=np.int64)
+    rng = np.random.default_rng(seed)
+    seq = list(range(2, limit + 1))
+    idx = 0
+    while idx < len(seq):
+        x = seq[idx]
+        prob = 1.0 / float(x)
+        survivors = seq[: idx + 1]
+        for y in seq[idx + 1 :]:
+            if rng.random() >= prob:
+                survivors.append(y)
+        seq = survivors
+        idx += 1
+    return np.array(seq, dtype=np.int64)
+
+
+def generate_ulam(limit: int) -> np.ndarray:
+    """Generate Ulam numbers <= limit (A002858, dropping 1).
+
+    Smallest integer > U_{n-1} with unique representation as sum of two earlier elements.
+    """
+    if limit < 2:
+        return np.array([], dtype=np.int64)
+    ulam = [1, 2]
+    cand = 3
+    while cand <= limit:
+        count = 0
+        for i in range(len(ulam)):
+            if ulam[i] * 2 >= cand:
+                break
+            for j in range(i + 1, len(ulam)):
+                if ulam[i] + ulam[j] == cand:
+                    count += 1
+                    if count > 1:
+                        break
+            if count > 1:
+                break
+        if count == 1:
+            ulam.append(cand)
+        cand += 1
+    return np.array([x for x in ulam if x > 1], dtype=np.int64)
+
+
 # -----------------------------------------------------------------------------
-# 2. Exact Generalized Chebyshev Step Function psi_P(x)
+# 2. Exact Generalized Chebyshev Step Function psi_P(x) and Prime Powers
 # -----------------------------------------------------------------------------
 
 def build_von_mangoldt_jumps(seq: np.ndarray, x_max: int) -> tuple[np.ndarray, np.ndarray]:
@@ -88,7 +137,99 @@ def evaluate_chebyshev_step(x_grid: np.ndarray, jump_pos: np.ndarray, jump_weigh
 
 
 # -----------------------------------------------------------------------------
-# 3. Forward Synthesis: Reconstruct Stepwise Curve from Beurling Zeros
+# 3. Partial Euler Product Z_X(s) and Log-Derivative Dirichlet Polynomial F_X(s)
+# -----------------------------------------------------------------------------
+
+def partial_euler_product_Z(s: complex, seq: np.ndarray, cutoff: int) -> complex:
+    """Evaluate partial Euler product Z_X(s) = prod_{l <= X} (1 - l^{-s})^{-1}."""
+    gens = seq[seq <= cutoff]
+    if len(gens) == 0:
+        return 1.0 + 0.0j
+    terms = 1.0 / (1.0 - gens.astype(np.complex128) ** (-s))
+    return np.prod(terms)
+
+
+def log_derivative_dirichlet_F(s: complex, seq: np.ndarray, cutoff: int) -> complex:
+    """Evaluate log-derivative Dirichlet polynomial F_X(s) = -Z_X'(s)/Z_X(s) = sum_{l^m <= X} ln(l)/l^{ms}."""
+    gens = seq[seq <= cutoff]
+    val = 0.0 + 0.0j
+    for l in gens:
+        ln_l = np.log(float(l))
+        lm = float(l)
+        while lm <= cutoff:
+            val += ln_l / (lm**s)
+            lm *= float(l)
+    return val
+
+
+def log_derivative_euler_Z(s: complex, seq: np.ndarray, cutoff: int) -> complex:
+    """Evaluate exact logarithmic derivative Z_X'(s)/Z_X(s) = - sum_{l <= X} ln(l) / (l^s - 1)."""
+    gens = seq[seq <= cutoff].astype(np.complex128)
+    if len(gens) == 0:
+        return 0.0 + 0.0j
+    ln_l = np.log(gens.real)
+    return -np.sum(ln_l / (gens**s - 1.0))
+
+
+def contour_winding_integration(
+    seq: np.ndarray,
+    cutoff: int,
+    sigma_min: float,
+    sigma_max: float,
+    T1: float,
+    T2: float,
+    n_pts: int = 400,
+) -> complex:
+    """Compute (1 / 2pi i) oint_{dR} (Z_X'(s) / Z_X(s)) ds over rectangle [sigma_min, sigma_max] x [T1, T2]."""
+    def integrate_segment(s_start: complex, s_end: complex) -> complex:
+        ts = np.linspace(0.0, 1.0, n_pts)
+        pts = s_start + ts * (s_end - s_start)
+        vals = np.array([log_derivative_euler_Z(s, seq, cutoff) for s in pts])
+        dt = (s_end - s_start) / (n_pts - 1)
+        return (0.5 * (vals[0] + vals[-1]) + np.sum(vals[1:-1])) * dt
+
+    c1 = integrate_segment(sigma_min + 1j * T1, sigma_max + 1j * T1)
+    c2 = integrate_segment(sigma_max + 1j * T1, sigma_max + 1j * T2)
+    c3 = integrate_segment(sigma_max + 1j * T2, sigma_min + 1j * T2)
+    c4 = integrate_segment(sigma_min + 1j * T2, sigma_min + 1j * T1)
+    return (c1 + c2 + c3 + c4) / (2.0 * np.pi * 1j)
+
+
+def newton_polish_inv_F(
+    s_init: complex,
+    seq: np.ndarray,
+    cutoff: int,
+    max_iter: int = 50,
+    tol: float = 1e-10,
+) -> complex:
+    """Polish root of 1 / F_X(s) = 0 using Newton-Raphson iterations."""
+    gens = seq[seq <= cutoff]
+    s = s_init
+    for _ in range(max_iter):
+        F = 0.0 + 0.0j
+        F_prime = 0.0 + 0.0j
+        for l in gens:
+            ln_l = np.log(float(l))
+            lm = float(l)
+            while lm <= cutoff:
+                term = ln_l / (lm**s)
+                F += term
+                F_prime += -ln_l * np.log(lm) / (lm**s)
+                lm *= float(l)
+        if abs(F) == 0.0:
+            break
+        g = 1.0 / F
+        if abs(g) < tol:
+            break
+        step = F / F_prime
+        s = s + step
+        if abs(step) < tol:
+            break
+    return s
+
+
+# -----------------------------------------------------------------------------
+# 4. Forward Synthesis: Reconstruct Stepwise Curve from Beurling Zeros
 # -----------------------------------------------------------------------------
 
 def synthesize_chebyshev_from_zeros(
@@ -106,7 +247,7 @@ def synthesize_chebyshev_from_zeros(
 
 
 # -----------------------------------------------------------------------------
-# 4. Inverse Transform: Landau Spectral Scan + Iterative VarPro Refinement
+# 5. Inverse Transform: Landau Spectral Scan + Iterative VarPro Refinement
 # -----------------------------------------------------------------------------
 
 def landau_inverse_spectrum(
@@ -170,11 +311,32 @@ def main():
     lucky = generate_lucky(limit)
     ludic = generate_ludic(limit)
     josephus = generate_josephus(limit)
+    hawkins = generate_hawkins(limit, seed=42)
+    ulam = generate_ulam(limit)
 
     print(f"Primes <= {limit}: count = {len(p)}")
     print(f"Lucky <= {limit}: count = {len(lucky)}")
     print(f"Ludic <= {limit}: count = {len(ludic)}")
     print(f"Josephus <= {limit}: count = {len(josephus)}")
+    print(f"Hawkins (seed=42) <= {limit}: count = {len(hawkins)}, expected ~ {limit / np.log(limit):.1f}")
+    print(f"Ulam <= {limit}: count = {len(ulam)}, expected ~ {limit / 13.517:.1f}")
+
+    # Partial Euler Product and Log-Derivative Dirichlet Polynomial
+    cutoff = 50
+    s_test = 2.0 + 0.0j
+    z_val = partial_euler_product_Z(s_test, ulam, cutoff)
+    f_val = log_derivative_dirichlet_F(s_test, ulam, cutoff)
+    print(f"Ulam Z_{cutoff}(2.0) = {z_val:.6f}")
+    print(f"Ulam F_{cutoff}(2.0) = {f_val:.6f}")
+
+    # Argument Principle Contour Winding Integration
+    winding = contour_winding_integration(ulam, cutoff, 0.2, 0.8, 10.0, 20.0)
+    print(f"Contour winding in [0.2, 0.8] x [10, 20]: {winding.real:.4f} + {winding.imag:.4f}i")
+
+    # Newton Root Polishing on 1 / F_X(s) = 0
+    s_root = newton_polish_inv_F(0.5 + 14.0j, ulam, cutoff)
+    inv_f_val = 1.0 / log_derivative_dirichlet_F(s_root, ulam, cutoff)
+    print(f"Newton polished root: s = {s_root.real:.4f} + {s_root.imag:.4f}i, |1/F(s)| = {abs(inv_f_val):.2e}")
 
     jumps, weights = build_von_mangoldt_jumps(lucky, 100)
     print(f"Lucky von Mangoldt jumps <= 100: count = {len(jumps)}")
