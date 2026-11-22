@@ -5,6 +5,7 @@
 
 import fractions
 import numpy as np
+from scipy.linalg import hankel
 from scipy.optimize import least_squares
 from scipy.signal import find_peaks
 
@@ -262,6 +263,133 @@ def landau_inverse_spectrum(
     return -(np.exp(-1j * np.outer(omegas, u_jumps)) @ amps)
 
 
+def varpro_analytic_jacobian(params: np.ndarray, u_grid: np.ndarray) -> np.ndarray:
+    """Evaluate analytic Jacobian for residual = 2*Re(exp(rho_k*u)/rho_k) - target.
+
+    For rho = beta + i*gamma:
+        d/d beta [2*Re(exp(rho*u)/rho)] = 2*Re(exp(rho*u)*(rho*u - 1) / rho^2)
+        d/d gamma [2*Re(exp(rho*u)/rho)] = -2*Im(exp(rho*u)*(rho*u - 1) / rho^2)
+    """
+    half = len(params) // 2
+    betas = params[:half]
+    gammas = params[half:]
+    rhos = betas + 1j * gammas
+    n_pts = len(u_grid)
+    k_poles = half
+    jac = np.zeros((n_pts, 2 * k_poles), dtype=np.float64)
+    for k in range(k_poles):
+        rho = rhos[k]
+        f_prime = np.exp(rho * u_grid) * (rho * u_grid - 1.0) / (rho**2)
+        jac[:, k] = 2.0 * np.real(f_prime)
+        jac[:, half + k] = -2.0 * np.imag(f_prime)
+    return jac
+
+
+def hankel_matrix_pencil(
+    u_grid: np.ndarray,
+    residual_target: np.ndarray,
+    rank: int = 12,
+    pencil_param: int | None = None,
+) -> np.ndarray:
+    """Extract continuous Beurling pseudo-zero poles using Hankel Matrix Pencil super-resolution.
+
+    Forms Hankel matrix H_{a,b} = r(u_{a+b}) with pencil parameter L (N/3 <= L <= N/2),
+    performs truncated SVD rank reduction, computes shift-invariance generalized eigenvalues,
+    and extracts continuous poles rho_k = ln(z_k) / du.
+    """
+    n_pts = len(u_grid)
+    du = float(u_grid[1] - u_grid[0])
+    l_param = pencil_param if pencil_param is not None else int(n_pts * 0.4)
+    k_param = n_pts - l_param
+
+    h_mat = hankel(residual_target[:l_param], residual_target[l_param - 1 : l_param - 1 + k_param])
+    u_svd, s_svd, vt_svd = np.linalg.svd(h_mat, full_matrices=False)
+
+    eff_rank = min(rank, len(s_svd))
+    u_r = u_svd[:, :eff_rank]
+    u1 = u_r[:-1, :]
+    u2 = u_r[1:, :]
+    z_mat = np.linalg.pinv(u1) @ u2
+    eigvals = np.linalg.eigvals(z_mat)
+
+    poles = np.log(eigvals) / du
+    pos_poles = [p for p in poles if p.imag > 0.5]
+    pos_poles.sort(key=lambda p: p.imag)
+    return np.array(pos_poles, dtype=np.complex128)
+
+
+def residual_peeled_varpro(
+    u_grid: np.ndarray,
+    residual_target: np.ndarray,
+    initial_poles: np.ndarray,
+    s0: float = 1.0,
+    joint_polish: bool = True,
+) -> np.ndarray:
+    """Polish poles using closed-loop Variable Projection (VarPro) with iterative residual peeling.
+
+    Sequentially fits single modes to prevent sidelobe masking of weaker/high-frequency zeros,
+    then executes a joint nonlinear least-squares VarPro polish with analytic Jacobian.
+    """
+    if len(initial_poles) == 0:
+        return np.array([], dtype=np.complex128)
+
+    curr_res = residual_target.copy()
+    peeled_poles = []
+    bounds_single = ([0.05, 0.5], [s0 - 0.01, 100.0])
+
+    for p in initial_poles:
+        p0 = np.array([np.clip(p.real, 0.1, s0 - 0.01), p.imag])
+
+        def single_res(param: np.ndarray) -> np.ndarray:
+            rho = param[0] + 1j * param[1]
+            return 2.0 * np.real(np.exp(rho * u_grid) / rho) - curr_res
+
+        def single_jac(param: np.ndarray) -> np.ndarray:
+            rho = param[0] + 1j * param[1]
+            f_prime = np.exp(rho * u_grid) * (rho * u_grid - 1.0) / (rho**2)
+            j_mat = np.empty((len(u_grid), 2), dtype=np.float64)
+            j_mat[:, 0] = 2.0 * np.real(f_prime)
+            j_mat[:, 1] = -2.0 * np.imag(f_prime)
+            return j_mat
+
+        sol = least_squares(single_res, p0, jac=single_jac, bounds=bounds_single, method="trf")
+        p_opt = sol.x[0] + 1j * sol.x[1]
+        peeled_poles.append(p_opt)
+        mode = 2.0 * np.real(np.exp(p_opt * u_grid) / p_opt)
+        curr_res -= mode
+
+    peeled = np.array(peeled_poles, dtype=np.complex128)
+    if not joint_polish or len(peeled) == 0:
+        return peeled[np.argsort(peeled.imag)]
+
+    k_poles = len(peeled)
+    p0 = np.concatenate([peeled.real, peeled.imag])
+    bounds_low = np.concatenate([np.full(k_poles, 0.05), np.full(k_poles, 0.5)])
+    bounds_high = np.concatenate([np.full(k_poles, s0 - 0.01), np.full(k_poles, 100.0)])
+
+    def joint_res(param: np.ndarray) -> np.ndarray:
+        half = len(param) // 2
+        rhos = param[:half] + 1j * param[half:]
+        pred = np.sum(2.0 * np.real(np.exp(np.outer(u_grid, rhos)) / rhos[None, :]), axis=1)
+        return pred - residual_target
+
+    def joint_jac(param: np.ndarray) -> np.ndarray:
+        return varpro_analytic_jacobian(param, u_grid)
+
+    sol_joint = least_squares(
+        joint_res,
+        p0,
+        jac=joint_jac,
+        bounds=(bounds_low, bounds_high),
+        method="trf",
+        xtol=1e-10,
+        ftol=1e-10,
+    )
+    half = len(sol_joint.x) // 2
+    joint_poles = sol_joint.x[:half] + 1j * sol_joint.x[half:]
+    return joint_poles[np.argsort(joint_poles.imag)]
+
+
 def extract_and_refine_zeros(
     jump_pos: np.ndarray,
     jump_weights: np.ndarray,
@@ -269,8 +397,9 @@ def extract_and_refine_zeros(
     num_zeros: int = 12,
     s0: float = 1.0,
     sigma_init: float = 0.5,
+    method: str = "landau",
 ) -> tuple[np.ndarray, float]:
-    """Estimate initial zeros via Landau scan, fit baseline a0, and refine via VarPro."""
+    """Estimate initial zeros via Landau or Hankel pencil scan, fit baseline a0, and refine via VarPro."""
     u_grid = np.linspace(np.log(2.0), np.log(float(x_max)), 2000)
     x_grid = np.exp(u_grid)
     psi_true = evaluate_chebyshev_step(x_grid, jump_pos, jump_weights)
@@ -279,6 +408,14 @@ def extract_and_refine_zeros(
     basis = np.exp(s0 * u_grid)
     a0 = float(np.dot(psi_true, basis) / np.dot(basis, basis))
     residual_target = a0 * basis - psi_true
+
+    if method == "hankel":
+        pencil_rank = max(num_zeros * 2, 12)
+        init_poles = hankel_matrix_pencil(u_grid, residual_target, rank=pencil_rank)
+        if len(init_poles) > num_zeros:
+            init_poles = init_poles[:num_zeros]
+        refined_rhos = residual_peeled_varpro(u_grid, residual_target, init_poles, s0=s0, joint_polish=True)
+        return refined_rhos, a0
 
     # Seed frequencies via Landau spectrum peaks
     omegas = np.linspace(1.0, 60.0, 6000)
@@ -340,10 +477,15 @@ def main():
 
     jumps, weights = build_von_mangoldt_jumps(lucky, 100)
     print(f"Lucky von Mangoldt jumps <= 100: count = {len(jumps)}")
-    rhos, a0 = extract_and_refine_zeros(jumps, weights, 100, num_zeros=6, s0=1.0)
+    rhos, a0 = extract_and_refine_zeros(jumps, weights, 100, num_zeros=6, s0=1.0, method="landau")
     print(f"Fitted baseline a0 = {a0:.4f}")
-    print("Top refined Beurling pseudo-zeros:")
+    print("Top refined Beurling pseudo-zeros (Landau + VarPro):")
     for i, r in enumerate(rhos):
+        print(f"  rho_{i+1} = {r.real:.4f} + {r.imag:.4f}i")
+
+    rhos_hankel, _ = extract_and_refine_zeros(jumps, weights, 100, num_zeros=6, s0=1.0, method="hankel")
+    print("Top refined Beurling pseudo-zeros (Hankel Pencil + Residual-Peeled VarPro):")
+    for i, r in enumerate(rhos_hankel):
         print(f"  rho_{i+1} = {r.real:.4f} + {r.imag:.4f}i")
 
 
