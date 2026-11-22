@@ -618,6 +618,7 @@ import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 #print axioms QuasiRiemann.chebyshevSpec384_65128_env_le
 #print axioms QuasiRiemann.shortIntervalQrh65128Spec_has_prime
 #print axioms QuasiRiemann.dyadic_abel_rungs_k5_k6_certs
+#print axioms QuasiRiemann.dyadic_gate_le
 #print axioms QuasiRiemann.linear_minimizes_dirichlet_energy
 #print axioms QuasiRiemann.variational_energy_lt_one_of_pos
 #print axioms QuasiRiemann.variational_mollifier_beats_linear

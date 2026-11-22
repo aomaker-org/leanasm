@@ -8,6 +8,7 @@ import LeanAsm.QuasiRiemann.ParametricQrhLadder
 import LeanAsm.QuasiRiemann.DyadicAbelBridge
 import LeanAsm.QuasiRiemann.ShortIntervalPrimes
 import LeanAsm.GSp4FunctorialityBridge
+import LeanAsm.QuasiRiemann.QR.QrhCore
 
 namespace QuasiRiemann
 
@@ -1254,14 +1255,19 @@ theorem mollifier_variational_bridge_certs :
       variationalMollifier3414Spec.c2 < QRat.ofInt 1 ∧
     variationalQrhThreshold variationalMollifier3414Spec
       GSp4FunctorialityBridge.thetaKimSarnakSym4 <
-      qrhFromAutomorphic GSp4FunctorialityBridge.thetaKimSarnakSym4 :=
+      qrhFromAutomorphic GSp4FunctorialityBridge.thetaKimSarnakSym4 ∧
+    (∀ (s8 tAbs : Nat), 4 < s8 → 0 < tAbs →
+      IsCertifiedZeroFree2D s8 tAbs ∨ InRemainingUnknownBox s8 tAbs) ∧
+    (∀ (s8 tAbs : Nat), InQrhHalfPlane s8 tAbs → IsCertifiedZeroFree2D s8 tAbs) :=
   ⟨dyadic_abel_rungs_k5_k6_certs.1,
    dyadic_abel_rungs_k5_k6_certs.2.1,
    dyadic_abel_rungs_k5_k6_certs.2.2.2.2.2.1,
    dyadic_abel_rungs_k5_k6_certs.2.2.2.2.2.2.1,
    variational_mollifier_beats_linear.2.1,
    variational_mollifier_beats_linear.2.2.1,
-   variational_mollifier_beats_linear.2.2.2.2.2.2.2.1⟩
+   variational_mollifier_beats_linear.2.2.2.2.2.2.2.1,
+   fun s8 tAbs hs ht => critical_strip_dichotomy_2d s8 tAbs hs ht,
+   fun s8 tAbs hHalf => qrh_implies_certified_2d s8 tAbs hHalf⟩
 
 end QuasiRiemann
 
