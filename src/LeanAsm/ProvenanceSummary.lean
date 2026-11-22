@@ -52,6 +52,7 @@ import LeanAsm.Genus2MultiPrimeWeil
 import LeanAsm.Genus2WeilGSp4Weave
 import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 import LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave
+import LeanAsm.QuasiRiemann.PreperiodicVariationalBridge
 import LeanAsm.QuasiRiemann.Qsd1IdempotentDyadicAbelWeave
 import LeanAsm.QuasiRiemann.RankinSelbergGSp4Sub78Bridge
 import LeanAsm.QuasiRiemann.JacobianRankinSelbergWeave
@@ -2298,6 +2299,62 @@ def FiniteFieldWeilProvenance : Prop :=
      spec.stripBridgeSpec.weaveSpec.strip.rectSpec.HasCertifiedNonVanishing) ∧
     (QuasiRiemann.QRat.mk' 1 2 < spec.stripBridgeSpec.weaveSpec.strip.sigmaLo ∧
      spec.stripBridgeSpec.weaveSpec.strip.sigmaLo < QuasiRiemann.qrhThresholdSevenEighths))) ∧
+  (let spec := QuasiRiemann.preperiodicVariationalRung32000Spec
+   (((QuasiRiemann.Valuation.PreperiodicDynamics.w0_formula 5 2 (by decide) (by decide)).reduce =
+       QuasiRiemann.QRat.mk' 2 5) ∧
+    (let base := QuasiRiemann.QRat.mk' 2 5 (by decide)
+     QuasiRiemann.Valuation.PreperiodicDynamics.theorem51AsymptoticBound 2 2 base ≥ base) ∧
+    (QuasiRiemann.Valuation.PreperiodicDynamics.theorem13AverageBound 134).num > 0 ∧
+    (QuasiRiemann.Valuation.PreperiodicDynamics.proposition53AverageBound 2 2 134).num > 0 ∧
+    (QuasiRiemann.Valuation.PreperiodicDynamics.wreathProductMultiplicityBound 2 2
+       (QuasiRiemann.QRat.mk' 1 100 (by decide))).num > 0 ∧
+    (QuasiRiemann.Valuation.PreperiodicDynamics.lemma43DivisibilityBound 2 3 1
+       (QuasiRiemann.QRat.mk' 1 10 (by decide))).num > 0) ∧
+   (QuasiRiemann.QRat.ofInt 0 < spec.windowBox.sLo ∧
+    QuasiRiemann.QRat.ofInt 0 < spec.windowBox.tLo ∧
+    ¬ QuasiRiemann.QRat.eqv spec.windowBox.sLo (QuasiRiemann.QRat.ofInt 0) ∧
+    ¬ QuasiRiemann.QRat.eqv (QuasiRiemann.supplyNonDegenerateCharWitness 1 (by decide)
+        spec.windowBox).boundLo (QuasiRiemann.QRat.ofInt 0)) ∧
+   (QuasiRiemann.QRat.eqv (QuasiRiemann.reflectQRat (QuasiRiemann.reflectQRat spec.windowBox.sLo))
+        spec.windowBox.sLo ∧
+    (QuasiRiemann.halfQRat < spec.windowBox.sLo ↔
+      QuasiRiemann.reflectQRat spec.windowBox.sLo < QuasiRiemann.halfQRat) ∧
+    (∀ (p k : Nat) (hp : 0 < p) (c : Int) (_hc : c.natAbs < p ^ k),
+      ¬ QuasiRiemann.QRat.eqv (QuasiRiemann.QRat.ofInt 1 -
+          QuasiRiemann.QRat.mk' c (p ^ k) (Nat.pow_pos hp)) (QuasiRiemann.QRat.ofInt 0))) ∧
+   (0 < (QuasiRiemann.mollifierVariationalEnergy spec.mollifierSpec.c1
+        spec.mollifierSpec.c2).num ∧
+    ¬ QuasiRiemann.QRat.eqv (QuasiRiemann.mollifierVariationalEnergy spec.mollifierSpec.c1
+        spec.mollifierSpec.c2) (QuasiRiemann.QRat.ofInt 0) ∧
+    QuasiRiemann.mollifierVariationalEnergy spec.mollifierSpec.c1
+        spec.mollifierSpec.c2 < QuasiRiemann.QRat.ofInt 1) ∧
+   ((2 * spec.weaveSpec.stripBridgeSpec.jetSpec.qSpec.lipNumerator *
+       spec.weaveSpec.stripBridgeSpec.jetSpec.qSpec.radius ≤
+     spec.weaveSpec.stripBridgeSpec.jetSpec.qSpec.centerLower *
+       (spec.weaveSpec.stripBridgeSpec.jetSpec.qSpec.radius -
+         spec.weaveSpec.stripBridgeSpec.jetSpec.qSpec.deltaShrink) ∧
+     spec.weaveSpec.stripBridgeSpec.jetSpec.qSpec.lipNumerator *
+       spec.weaveSpec.stripBridgeSpec.jetSpec.qSpec.radius <
+     spec.weaveSpec.stripBridgeSpec.jetSpec.qSpec.centerLower *
+       (spec.weaveSpec.stripBridgeSpec.jetSpec.qSpec.radius -
+         spec.weaveSpec.stripBridgeSpec.jetSpec.qSpec.deltaShrink)) ∧
+    (QuasiRiemann.mollifierThetaDen spec.weaveSpec.stripBridgeSpec.vDen2 ≤
+       2 * QuasiRiemann.mollifierThetaNum spec.weaveSpec.stripBridgeSpec.vNum2
+         spec.weaveSpec.stripBridgeSpec.vDen2 ∧
+     QuasiRiemann.mollifierThetaNum spec.weaveSpec.stripBridgeSpec.vNum2
+         spec.weaveSpec.stripBridgeSpec.vDen2 *
+       QuasiRiemann.mollifierThetaDen spec.weaveSpec.stripBridgeSpec.vDen1 <
+     QuasiRiemann.mollifierThetaNum spec.weaveSpec.stripBridgeSpec.vNum1
+         spec.weaveSpec.stripBridgeSpec.vDen1 *
+       QuasiRiemann.mollifierThetaDen spec.weaveSpec.stripBridgeSpec.vDen2 ∧
+     8 * QuasiRiemann.mollifierThetaNum spec.weaveSpec.stripBridgeSpec.vNum1
+         spec.weaveSpec.stripBridgeSpec.vDen1 ≤
+       7 * QuasiRiemann.mollifierThetaDen spec.weaveSpec.stripBridgeSpec.vDen1) ∧
+    (0 < spec.weaveSpec.stripBridgeSpec.weaveSpec.margin ∧
+     spec.weaveSpec.stripBridgeSpec.weaveSpec.strip.rectSpec.HasCertifiedNonVanishing) ∧
+    (QuasiRiemann.QRat.mk' 1 2 < spec.weaveSpec.stripBridgeSpec.weaveSpec.strip.sigmaLo ∧
+     spec.weaveSpec.stripBridgeSpec.weaveSpec.strip.sigmaLo <
+       QuasiRiemann.qrhThresholdSevenEighths))) ∧
   (let spec := QuasiRiemann.qsd1IdempotentDyadicAbelCertSpec
    (QuasiRiemann.QRat.eqv (QuasiRiemann.e_plus spec.splitGen +
        QuasiRiemann.e_minus spec.splitGen) (QuasiRiemann.QRat.ofInt 1) ∧
@@ -2464,6 +2521,7 @@ theorem finiteFieldWeil_provenance_certified : FiniteFieldWeilProvenance :=
    Genus2WeilGSp4Weave.genus2_multiprime_weil_gsp4_weave_bridge,
    QuasiRiemann.Genus2HenselPreperiodicWeave.genus2_hensel_preperiodic_weave_bridge,
    QuasiRiemann.PreperiodicQsd1StripWeave.preperiodic_qsd1_strip_cert,
+   QuasiRiemann.preperiodic_variational_bridge_cert,
    QuasiRiemann.qsd1_idempotent_dyadic_abel_cert,
    langlandsRankinSelberg_provenance_certified,
    QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankin_selberg_gsp4_sub78_bridge
