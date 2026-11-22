@@ -67,6 +67,10 @@ def RnsInt.mul {k : Nat} (a b : RnsInt k) : RnsInt k :=
 def RnsQRat.zero (k : Nat) (moduli : Array Nat) (h : moduli.size = k) : RnsQRat k :=
   ⟨RnsInt.zero k moduli h, RnsInt.one k moduli h⟩
 
+/-- Unit element for RnsQRat (num = 1, den = 1). -/
+def RnsQRat.one (k : Nat) (moduli : Array Nat) (h : moduli.size = k) : RnsQRat k :=
+  ⟨RnsInt.one k moduli h, RnsInt.one k moduli h⟩
+
 /-- Addition for RnsQRat: (n1/d1) + (n2/d2) = (n1*d2 + n2*d1) / (d1*d2). -/
 def RnsQRat.add {k : Nat} (a b : RnsQRat k) : RnsQRat k :=
   let n1d2 := RnsInt.mul a.num b.den
