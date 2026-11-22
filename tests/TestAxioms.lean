@@ -8,6 +8,7 @@ import LeanAsm.QuasiRiemann.Valuation.Hensel
 import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 import LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave
+import LeanAsm.QuasiRiemann.PreperiodicVariationalBridge
 import LeanAsm.QuasiRiemann.Qsd1IdempotentDyadicAbelWeave
 import LeanAsm.QuasiRiemann.Qsd24JetIdempotentWeave
 import LeanAsm.QuasiRiemann.StepanovQrhLadderWeave
@@ -1395,5 +1396,27 @@ import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 #print axioms QuasiRiemann.stepanovLadderWeaveBundle29_certs
 #print axioms QuasiRiemann.stepanov_qrh_ladder_weave_certs
 #print axioms QuasiRiemann.stepanov_ladder_rung29_weave_cert
+
+-- =============================================================================
+-- Part 88: Preperiodic Dynamics x Variational & Contraction Bridge (Issue #218)
+-- =============================================================================
+
+#print axioms QuasiRiemann.preperiodicWindowBox
+#print axioms QuasiRiemann.preperiodicWindowBox_sLo_eq
+#print axioms QuasiRiemann.preperiodicCharWitness
+#print axioms QuasiRiemann.preperiodicCharWitness_boundLo_ne_zero
+#print axioms QuasiRiemann.preperiodicWindowBox_contains_half
+#print axioms QuasiRiemann.preperiodicWindowBox_pos
+#print axioms QuasiRiemann.preperiodicWindowBox_ne_zero
+#print axioms QuasiRiemann.nonDegenerateMollifier_energy_num_pos
+#print axioms QuasiRiemann.nonDegenerateMollifier_energy_ne_zero
+#print axioms QuasiRiemann.preperiodicVariationalEnergyWitness
+#print axioms QuasiRiemann.preperiodicVariationalEnergyWitness_eq
+#print axioms QuasiRiemann.preperiodicVariationalEnergyWitness_num_pos
+#print axioms QuasiRiemann.preperiodicVariationalEnergyWitness_ne_zero
+#print axioms QuasiRiemann.preperiodicVariationalEnergyWitness_lt_one
+#print axioms QuasiRiemann.preperiodicVariationalRung32000Spec
+#print axioms QuasiRiemann.preperiodic_variational_contraction_bridge
+#print axioms QuasiRiemann.preperiodic_variational_bridge_cert
 
 -- end of file: leanasm/tests/TestAxioms.lean
