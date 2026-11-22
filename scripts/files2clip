@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/home/fekerr/src/leanasm/.venv/bin/python
 # -*- coding: utf-8 -*-
 # ==============================================================================
 # Path: leanasm/scripts/files2clip
@@ -15,7 +15,22 @@ import os
 import subprocess
 import sys
 
-VERSION = "2026.07.28-v1"
+try:
+    import ftfy
+except ImportError:
+    ftfy = None
+
+try:
+    import charset_normalizer
+except ImportError:
+    charset_normalizer = None
+
+try:
+    import pyperclip
+except ImportError:
+    pyperclip = None
+
+VERSION = "2026.11.22-v2"
 MAX_TRUNCATE_SIZE = 1024 * 1024   # 1MB safety gate
 MAX_CLIPBOARD_BYTES = 250 * 1024  # 250 KB ceiling to prevent browser freezes
 
@@ -32,12 +47,32 @@ def get_tracked_files(include_untracked=False):
         return None
 
 
+def read_text_clean(file_path):
+    """Reads a file with strict UTF-8 decoding, charset fallback, and mojibake fix."""
+    with open(file_path, "rb") as f:
+        raw_bytes = f.read(MAX_TRUNCATE_SIZE)
+
+    try:
+        text = raw_bytes.decode("utf-8")
+    except UnicodeDecodeError:
+        if charset_normalizer is not None:
+            matches = charset_normalizer.from_bytes(raw_bytes)
+            best_match = matches.best()
+            text = str(best_match) if best_match else raw_bytes.decode("utf-8", errors="replace")
+        else:
+            text = raw_bytes.decode("utf-8", errors="replace")
+
+    if ftfy is not None:
+        text = ftfy.fix_text(text)
+
+    return text
+
+
 def generate_file_stream(file_path):
     """Wraps target text asset contents into symmetrical, tail blocks."""
     try:
         size = os.path.getsize(file_path)
-        with open(file_path, "r", errors="ignore") as f:
-            content = f.read(MAX_TRUNCATE_SIZE)
+        content = read_text_clean(file_path)
 
         clean_content = content.replace("\r\n", "\n")
         sha256 = hashlib.sha256(clean_content.encode("utf-8")).hexdigest()
@@ -217,21 +252,33 @@ def main():
     # --------------------------------------------------------------------------
     copied = False
 
-    # Try the absolute WSL-to-Windows clipboard pipe first
-    wsl_clip = "/mnt/c/Windows/System32/clip.exe"
-    if os.path.exists(wsl_clip):
+    # Try pyperclip first if available
+    if pyperclip is not None:
         try:
-            proc = subprocess.Popen(
-                [wsl_clip], stdin=subprocess.PIPE, text=True, errors="ignore"
-            )
-            proc.communicate(input=wrapped_stream)
-            if proc.returncode == 0:
-                copied = True
+            pyperclip.copy(wrapped_stream)
+            copied = True
         except Exception as e:
             print(
-                f"[-] Diagnostic: WSL absolute clip.exe path failed: {e}",
+                f"[-] Diagnostic: pyperclip dispatch failed: {e}",
                 file=sys.stderr,
             )
+
+    # Try the absolute WSL-to-Windows clipboard pipe
+    if not copied:
+        wsl_clip = "/mnt/c/Windows/System32/clip.exe"
+        if os.path.exists(wsl_clip):
+            try:
+                proc = subprocess.Popen(
+                    [wsl_clip], stdin=subprocess.PIPE, text=True, errors="ignore"
+                )
+                proc.communicate(input=wrapped_stream)
+                if proc.returncode == 0:
+                    copied = True
+            except Exception as e:
+                print(
+                    f"[-] Diagnostic: WSL absolute clip.exe path failed: {e}",
+                    file=sys.stderr,
+                )
 
     # Fall back to raw command check (Windows where clip.exe is in PATH)
     if not copied:

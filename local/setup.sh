@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Path: leanasm/local/setup.sh
-# Install local Antigravity Python SDK dependencies into repo .venv via uv.
+# Install local Antigravity Python SDK & workspace tooling into repo .venv via uv.
 
 set -euo pipefail
 
@@ -18,10 +18,10 @@ if [ ! -d "${VENV_DIR}" ]; then
     uv venv "${VENV_DIR}"
 fi
 
-echo "[*] Installing google-antigravity SDK into ${VENV_DIR}..."
+echo "[*] Installing dependencies from requirements.txt into ${VENV_DIR}..."
 uv pip install --python "${VENV_DIR}/bin/python" -r "${SCRIPT_DIR}/requirements.txt"
 
-echo "[+] Local SDK environment ready."
+echo "[+] Local virtual environment and tooling ready."
 echo "    Re-source 'source config_env' to auto-activate .venv."
 
 # end of file: leanasm/local/setup.sh
