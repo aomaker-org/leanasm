@@ -1,3 +1,5 @@
 # Path: leanasm/local/requirements.txt
 google-antigravity
+ftfy
+pyperclip
 # end of file: leanasm/local/requirements.txt
