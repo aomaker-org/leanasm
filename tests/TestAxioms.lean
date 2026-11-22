@@ -9,6 +9,8 @@ import LeanAsm.QuasiRiemann.Valuation.QsdHenselTower
 import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 import LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave
 import LeanAsm.QuasiRiemann.Qsd1IdempotentDyadicAbelWeave
+import LeanAsm.QuasiRiemann.ContractionReflectionBridge
+import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 
 #print axioms MiniVM.get_set_same
 #print axioms MiniVM.get_set_other
@@ -1314,5 +1316,16 @@ import LeanAsm.QuasiRiemann.Qsd1IdempotentDyadicAbelWeave
 #print axioms QuasiRiemann.shortIntervalDyadicRung29Spec
 #print axioms QuasiRiemann.shortIntervalDyadicRung29Spec_has_prime
 #print axioms QuasiRiemann.short_interval_dyadic_egap_rns_reflect_half_box_coupling_param
+
+-- =============================================================================
+-- Part 82: Contraction Reflection & Mollifier Variational Axioms (Issue #198)
+-- =============================================================================
+
+#print axioms QuasiRiemann.contraction_reflection_bridge_certs
+#print axioms QuasiRiemann.mollifier_variational_bridge_certs
+#print axioms QuasiRiemann.RnsStripNonVanishing
+#print axioms QuasiRiemann.QsdZeroExclusion
+#print axioms QuasiRiemann.linear_minimizes_dirichlet_energy
+#print axioms QuasiRiemann.variational_mollifier_beats_linear
 
 -- end of file: leanasm/tests/TestAxioms.lean
