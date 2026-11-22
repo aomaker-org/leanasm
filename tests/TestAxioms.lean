@@ -10,6 +10,7 @@ import LeanAsm.QuasiRiemann.Genus2HenselPreperiodicWeave
 import LeanAsm.QuasiRiemann.PreperiodicQsd1StripWeave
 import LeanAsm.QuasiRiemann.Qsd1IdempotentDyadicAbelWeave
 import LeanAsm.QuasiRiemann.Qsd24JetIdempotentWeave
+import LeanAsm.QuasiRiemann.StepanovQrhLadderWeave
 import LeanAsm.QuasiRiemann.ContractionReflectionBridge
 import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 
@@ -1378,5 +1379,21 @@ import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 #print axioms QuasiRiemann.qsd24_jet_idempotent_weave
 #print axioms QuasiRiemann.qsd24JetIdempotentCertSpec
 #print axioms QuasiRiemann.qsd24_jet_idempotent_cert
+
+-- =============================================================================
+-- Part 87: Stepanov Gain-vs.-Cost x Parametric QRH Ladder Weave (Issue #216)
+-- =============================================================================
+
+#print axioms QuasiRiemann.energyVariationalDefectWitness
+#print axioms QuasiRiemann.energyVariationalDefectWitness_eq
+#print axioms QuasiRiemann.energyVariationalDefectWitness_num_pos
+#print axioms QuasiRiemann.energyVariationalDefectWitness_ne_zero
+#print axioms QuasiRiemann.stepanovRungWeaveSpec5_6
+#print axioms QuasiRiemann.stepanovRungWeaveSpec14
+#print axioms QuasiRiemann.stepanovRungWeaveSpec29
+#print axioms QuasiRiemann.stepanovLadderWeaveBundle29
+#print axioms QuasiRiemann.stepanovLadderWeaveBundle29_certs
+#print axioms QuasiRiemann.stepanov_qrh_ladder_weave_certs
+#print axioms QuasiRiemann.stepanov_ladder_rung29_weave_cert
 
 -- end of file: leanasm/tests/TestAxioms.lean
