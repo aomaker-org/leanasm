@@ -3,6 +3,7 @@
 
 import LeanAsm
 import LeanAsm.ArtinEpsilonTwistBridge
+import LeanAsm.LanglandsTwistHeckeWeave
 import LeanAsm.QuasiRiemann.Valuation.Ultrametric
 import LeanAsm.QuasiRiemann.Valuation.Contraction
 import LeanAsm.QuasiRiemann.Valuation.Hensel
@@ -1493,5 +1494,16 @@ import LeanAsm.QuasiRiemann.SieveRnsCrtBoxWeave
 #print axioms ArtinEpsilonTwistBridge.local_conductor_factorization
 #print axioms ArtinEpsilonTwistBridge.rs_euler_twisted_disc_invariant
 #print axioms ArtinEpsilonTwistBridge.artin_epsilon_twist_bridge
+
+-- =============================================================================
+-- Part 93: Langlands Twist Hecke Weave (Issue #229)
+-- =============================================================================
+
+#print axioms LanglandsTwistHeckeWeave.chi4_twist_natAbs_eq
+#print axioms LanglandsTwistHeckeWeave.chi4_twist_sq_eq
+#print axioms LanglandsTwistHeckeWeave.rs_ramanujan_twist_abs_mul_bound
+#print axioms LanglandsTwistHeckeWeave.rs_ramanujan_twist_product_bound
+#print axioms LanglandsTwistHeckeWeave.satake_degree_twist_invariant
+#print axioms LanglandsTwistHeckeWeave.langlands_twist_hecke_weave
 
 -- end of file: leanasm/tests/TestAxioms.lean
