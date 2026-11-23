@@ -2,6 +2,7 @@
 -- Kernel verification test auditing that proofs only rely on standard axioms.
 
 import LeanAsm
+import LeanAsm.ArtinEpsilonTwistBridge
 import LeanAsm.QuasiRiemann.Valuation.Ultrametric
 import LeanAsm.QuasiRiemann.Valuation.Contraction
 import LeanAsm.QuasiRiemann.Valuation.Hensel
@@ -1477,5 +1478,20 @@ import LeanAsm.QuasiRiemann.SieveRnsCrtBoxWeave
 #print axioms RankinSelbergSchurBoundWeave.rs_ramanujan_product_bound
 #print axioms RankinSelbergSchurBoundWeave.rs_ramanujan_abs_mul_bound
 #print axioms RankinSelbergSchurBoundWeave.rankin_selberg_schur_bound_weave
+
+-- =============================================================================
+-- Part 92: Artin Epsilon Factor & Character Twist Bridge (Issue #225)
+-- =============================================================================
+
+#print axioms ArtinEpsilonTwistBridge.twistedConductor
+#print axioms ArtinEpsilonTwistBridge.twistedConductor_11_chi4
+#print axioms ArtinEpsilonTwistBridge.IsRootNumber
+#print axioms ArtinEpsilonTwistBridge.root_number_sq
+#print axioms ArtinEpsilonTwistBridge.twistRootNumber
+#print axioms ArtinEpsilonTwistBridge.twist_is_root_number
+#print axioms ArtinEpsilonTwistBridge.twist_root_number_involutive
+#print axioms ArtinEpsilonTwistBridge.local_conductor_factorization
+#print axioms ArtinEpsilonTwistBridge.rs_euler_twisted_disc_invariant
+#print axioms ArtinEpsilonTwistBridge.artin_epsilon_twist_bridge
 
 -- end of file: leanasm/tests/TestAxioms.lean
