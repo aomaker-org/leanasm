@@ -1438,4 +1438,33 @@ import LeanAsm.QuasiRiemann.SieveRnsCrtBoxWeave
 #print axioms LeanAsm.QuasiRiemann.sieve_rns_crt_box_cert_50
 #print axioms LeanAsm.QuasiRiemann.sieve_rns_crt_box_cert_50_eval
 
+-- =============================================================================
+-- Part 90: Satake Spherical Hecke Degree Bridge (Issue #223)
+-- =============================================================================
+
+#print axioms SatakeHeckeDegreeBridge.qBinom1
+#print axioms SatakeHeckeDegreeBridge.qBinom1Nat
+#print axioms SatakeHeckeDegreeBridge.qBinom1_mul_sub_one
+#print axioms SatakeHeckeDegreeBridge.degGL2T1
+#print axioms SatakeHeckeDegreeBridge.degGL2T1_eq_qBinom1
+#print axioms SatakeHeckeDegreeBridge.degGLnT1
+#print axioms SatakeHeckeDegreeBridge.degGL3T1_eval
+#print axioms SatakeHeckeDegreeBridge.degGL4T1_eval
+#print axioms SatakeHeckeDegreeBridge.qBinom4_2
+#print axioms SatakeHeckeDegreeBridge.qBinom4_2_expanded
+#print axioms SatakeHeckeDegreeBridge.qBinom4_2_identity
+#print axioms SatakeHeckeDegreeBridge.degGL4T2
+#print axioms SatakeHeckeDegreeBridge.degGL4T2_identity
+#print axioms SatakeHeckeDegreeBridge.gsp4HeckeDegT1
+#print axioms SatakeHeckeDegreeBridge.gsp4HeckeDegT2
+#print axioms SatakeHeckeDegreeBridge.gsp4HeckeDegT1_eval
+#print axioms SatakeHeckeDegreeBridge.gsp4HeckeDegT2_eval
+#print axioms SatakeHeckeDegreeBridge.gsp4_degT1_eq_gl4_degT1
+#print axioms SatakeHeckeDegreeBridge.gsp4_degT1_concrete
+#print axioms SatakeHeckeDegreeBridge.gsp4_degT2_concrete
+#print axioms SatakeHeckeDegreeBridge.satake_gl2_inv_sum
+#print axioms SatakeHeckeDegreeBridge.satake_gl3_inv_sum
+#print axioms SatakeHeckeDegreeBridge.satake_gl4_inv_sum
+#print axioms SatakeHeckeDegreeBridge.satake_hecke_degree_bridge
+
 -- end of file: leanasm/tests/TestAxioms.lean
