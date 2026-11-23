@@ -1467,4 +1467,15 @@ import LeanAsm.QuasiRiemann.SieveRnsCrtBoxWeave
 #print axioms SatakeHeckeDegreeBridge.satake_gl4_inv_sum
 #print axioms SatakeHeckeDegreeBridge.satake_hecke_degree_bridge
 
+-- =============================================================================
+-- Part 91: Rankin-Selberg Schur & Euler Factor Bound Weave (Issue #224)
+-- =============================================================================
+
+#print axioms RankinSelbergSchurBoundWeave.two_mul_le_sq_add_sq
+#print axioms RankinSelbergSchurBoundWeave.sq_eq_sq_natAbs
+#print axioms RankinSelbergSchurBoundWeave.two_mul_natAbs_le_sq_add_sq
+#print axioms RankinSelbergSchurBoundWeave.rs_ramanujan_product_bound
+#print axioms RankinSelbergSchurBoundWeave.rs_ramanujan_abs_mul_bound
+#print axioms RankinSelbergSchurBoundWeave.rankin_selberg_schur_bound_weave
+
 -- end of file: leanasm/tests/TestAxioms.lean
