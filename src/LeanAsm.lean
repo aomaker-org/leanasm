@@ -90,6 +90,7 @@ import LeanAsm.ConstructiveOpenaiBridge
 import LeanAsm.EllipticModularityBridge
 import LeanAsm.LanglandsRankinSelbergBridge
 import LeanAsm.SatakeHeckeDegreeBridge
+import LeanAsm.RankinSelbergSchurBoundWeave
 import LeanAsm.ProthNttTowerBridge
 import LeanAsm.Genus2MultiPrimeWeil
 import LeanAsm.Genus2WeilGSp4Weave
