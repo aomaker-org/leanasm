@@ -43,6 +43,11 @@ boundaries, and repository hygiene for all assistants operating within the
   Otherwise, run builds synchronously or end your turn and let the CLI harness
   auto-wake on task completion.
 - **Safe Shell Usage**: Always use standard Linux bash.
+- **Dry & Read-Only Subrepos**: Keep `subrepos/*` unhydrated ("dry") by default
+  on new/secondary checkouts (do NOT run `git submodule update --init`).
+  Whenever a subrepo is hydrated (such as `subrepos/alpo-rh`), treat it as
+  strictly read-only—never edit files, cut branches, or run `lake build` inside
+  `subrepos/*`.
 
 ### [Directive 02] LOGGING & DIAGNOSTIC OBSERVABILITY
 - **Zero Silent Suppression**: NEVER redirect diagnostic streams to `/dev/null`
@@ -78,7 +83,7 @@ boundaries, and repository hygiene for all assistants operating within the
   are strictly additive.
 
 ### [Directive 08] AUTOMATED TURN-SYNC HANDOVER
-- Run `make sync` at turn completion to verify git status, run tests, and check
-  cleanliness.
+- Run `make sync` at turn completion when Lean code or build targets change;
+  skip redundant runs on merge-only or docs-only turns unless requested.
 
 <!-- end of file: leanasm/AI.md -->
