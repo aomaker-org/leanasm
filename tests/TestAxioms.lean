@@ -1544,4 +1544,13 @@ import LeanAsm.QuasiRiemann.QsdJetHenselContraction
 #print axioms QuasiRiemann.qsd_jet_hensel_contraction_cert_N2048
 #print axioms QuasiRiemann.qsd_jet_hensel_contraction_cert_N4096
 
+-- =============================================================================
+-- Part 96: Langlands-Hecke & Top-Level Provenance Conjunction (Issue #232)
+-- =============================================================================
+
+#print axioms LeanAsm.LanglandsHeckeProvenance
+#print axioms LeanAsm.langlandsHecke_provenance_certified
+#print axioms LeanAsm.LeanAsmFullProvenance
+#print axioms LeanAsm.leanasm_full_provenance_certified
+
 -- end of file: leanasm/tests/TestAxioms.lean

@@ -60,6 +60,12 @@ import LeanAsm.QuasiRiemann.LuckyBeurlingStripWeave
 import LeanAsm.QuasiRiemann.LuckyQrh78Strip
 import LeanAsm.QuasiRiemann.SieveSequenceStripWeave
 import LeanAsm.MiniVMRnsHenselWeave
+import LeanAsm.SatakeHeckeDegreeBridge
+import LeanAsm.RankinSelbergSchurBoundWeave
+import LeanAsm.ArtinEpsilonTwistBridge
+import LeanAsm.LanglandsTwistHeckeWeave
+import LeanAsm.QuasiRiemann.Rns4096ContractionLift
+import LeanAsm.QuasiRiemann.QsdJetHenselContraction
 
 namespace LeanAsm
 
@@ -2620,6 +2626,176 @@ theorem chudnovskyPi_provenance_certified : ChudnovskyPiProvenance :=
    PiChudnovsky.pi_100_digits_certified⟩
 
 -- =============================================================================
+-- Part 12: Langlands-Hecke, QSD Jet Hensel Contraction & RNS-4096 Provenance
+-- =============================================================================
+
+/-- Part 12 provenance specification synthesizing headline theorems across Parts 88-92:
+`SatakeHeckeDegreeBridge`, `RankinSelbergSchurBoundWeave`, `ArtinEpsilonTwistBridge`,
+`LanglandsTwistHeckeWeave`, `QsdJetHenselContraction`, and `Rns4096ContractionLift`. -/
+def LanglandsHeckeProvenance : Prop :=
+  (let satakeSpec : SatakeHeckeDegreeBridge.SatakeHeckeDegreeSpec := ⟨2, by decide⟩
+   (SatakeHeckeDegreeBridge.degGLnT1 2 satakeSpec.q = satakeSpec.q + 1 ∧
+    SatakeHeckeDegreeBridge.degGLnT1 3 satakeSpec.q = satakeSpec.q ^ 2 + satakeSpec.q + 1 ∧
+    SatakeHeckeDegreeBridge.degGLnT1 4 satakeSpec.q = satakeSpec.q ^ 3 + satakeSpec.q ^ 2 + satakeSpec.q + 1 ∧
+    (satakeSpec.q - 1) * SatakeHeckeDegreeBridge.degGLnT1 4 satakeSpec.q = satakeSpec.q ^ 4 - 1) ∧
+   ((satakeSpec.q - 1) * (satakeSpec.q ^ 2 - 1) * SatakeHeckeDegreeBridge.qBinom4_2 satakeSpec.q =
+      (satakeSpec.q ^ 4 - 1) * (satakeSpec.q ^ 3 - 1) ∧
+    SatakeHeckeDegreeBridge.degGL4T2 satakeSpec.q =
+      satakeSpec.q ^ 2 * SatakeHeckeDegreeBridge.qBinom4_2 satakeSpec.q) ∧
+   (SatakeHeckeDegreeBridge.gsp4HeckeDegT1 satakeSpec.q =
+      SatakeHeckeDegreeBridge.degGLnT1 4 satakeSpec.q ∧
+    SatakeHeckeDegreeBridge.gsp4HeckeDegT2 satakeSpec.q =
+      satakeSpec.q * SatakeHeckeDegreeBridge.gsp4HeckeDegT1 satakeSpec.q ∧
+    0 < SatakeHeckeDegreeBridge.gsp4HeckeDegT1 satakeSpec.q ∧
+    0 < SatakeHeckeDegreeBridge.gsp4HeckeDegT2 satakeSpec.q)) ∧
+  (let rsSpec := QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankinSelbergGSp4Rung32000Spec
+   let weaveSpec : RankinSelbergSchurBoundWeave.RankinSelbergSchurBoundWeaveSpec := ⟨rsSpec⟩
+   (∀ a b : Int, 2 * (a * b) ≤ a ^ 2 + b ^ 2) ∧
+   (∀ a b : Int, 2 * (a.natAbs * b.natAbs : Int) ≤ a ^ 2 + b ^ 2) ∧
+   (∀ (p : Nat) (a b : Int),
+     a ^ 2 < 4 * (p : Int) → b ^ 2 < 4 * (p : Int) →
+     (a.natAbs * b.natAbs : Int) < 4 * (p : Int) ∧
+     2 * (a.natAbs * b.natAbs : Int) < 8 * (p : Int)) ∧
+   (((∀ p ∈ weaveSpec.rsSpec.goodPrimes, Genus2WeilGSp4Weave.Genus2WeilGSp4PrimeWeaveCert p) ∧
+     (∀ p ∈ weaveSpec.rsSpec.goodPrimes, ∀ n d : Int,
+       Genus2WeilGSp4Weave.spinLPolyHomog p d ((p : Int) * n) =
+         (p : Int) ^ 2 * Genus2WeilGSp4Weave.spinLPolyHomog p n d) ∧
+     (∀ p ∈ weaveSpec.rsSpec.goodPrimes, ∀ T : Int,
+       Genus2MultiPrimeWeil.standardEulerPoly p T =
+         (1 - T) * GSp4FunctorialityBridge.gsp4StdQuarticCofactor (p : Int)
+           (Genus2MultiPrimeWeil.frobeniusTrace p) (Genus2MultiPrimeWeil.degree2Trace p) T) ∧
+     (∀ p ∈ weaveSpec.rsSpec.goodPrimes, ∀ n d : Int,
+       Genus2WeilGSp4Weave.standardEulerHomogP p d n =
+         -Genus2WeilGSp4Weave.standardEulerHomogP p n d) ∧
+     (∀ p ∈ weaveSpec.rsSpec.goodPrimes, Genus2MultiPrimeWeil.standardEulerPoly p 1 = 0)) ∧
+    ((∀ p ∈ EllipticModularityBridge.goodPrimes97, ∀ u v : Int, 0 < v →
+       0 < LanglandsRankinSelbergBridge.rsClearedEuler p
+         (EllipticModularityBridge.heckeCoeff11 p) u v) ∧
+     (∀ p ∈ EllipticModularityBridge.goodPrimes97, ∀ u v : Int, 0 ≤ u → 0 < v - (p : Int) * u →
+       0 < LanglandsRankinSelbergBridge.sym2ClearedEuler p
+         (EllipticModularityBridge.heckeCoeff11 p) u v) ∧
+     (∀ al1 al2 lam T : Int,
+       GSp4FunctorialityBridge.gsp4SpinEulerPoly lam (al1 + al2) (al1 * al2 + 2 * lam) T =
+         (1 - al1 * T + lam * T ^ 2) * (1 - al2 * T + lam * T ^ 2))))) ∧
+  (let rsSpec := QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankinSelbergGSp4Rung32000Spec
+   let artinSpec : ArtinEpsilonTwistBridge.ArtinEpsilonTwistBridgeSpec := ⟨rsSpec⟩
+   (ArtinEpsilonTwistBridge.twistedConductor ArtinEpsilonTwistBridge.baseConductor11
+      ArtinEpsilonTwistBridge.chi4Conductor ArtinEpsilonTwistBridge.gl2Dimension = 176) ∧
+   (∀ w signChi : Int, ArtinEpsilonTwistBridge.IsRootNumber w → ArtinEpsilonTwistBridge.IsRootNumber signChi →
+     ArtinEpsilonTwistBridge.IsRootNumber (ArtinEpsilonTwistBridge.twistRootNumber w signChi) ∧
+     ArtinEpsilonTwistBridge.twistRootNumber (ArtinEpsilonTwistBridge.twistRootNumber w signChi) signChi = w) ∧
+   (∀ p : Nat, ∀ ap : Int, p % 2 = 1 →
+     (LanglandsRankinSelbergBridge.chi4 p * ap) ^ 2 - 4 * (p : Int) = ap ^ 2 - 4 * (p : Int)) ∧
+   ((∀ p ∈ EllipticModularityBridge.goodPrimes97, ∀ u v : Int, 0 < v →
+      0 < LanglandsRankinSelbergBridge.rsClearedEuler p (EllipticModularityBridge.heckeCoeff11 p) u v) ∧
+    (∀ p ∈ EllipticModularityBridge.goodPrimes97, ∀ u v : Int, 0 ≤ u → 0 < v - (p : Int) * u →
+      0 < LanglandsRankinSelbergBridge.sym2ClearedEuler p (EllipticModularityBridge.heckeCoeff11 p) u v))) ∧
+  (let satakeSpec : SatakeHeckeDegreeBridge.SatakeHeckeDegreeSpec := ⟨2, by decide⟩
+   let rsSpec := QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankinSelbergGSp4Rung32000Spec
+   let artinSpec : ArtinEpsilonTwistBridge.ArtinEpsilonTwistBridgeSpec := ⟨rsSpec⟩
+   let twistSpec : LanglandsTwistHeckeWeave.LanglandsTwistHeckeWeaveSpec := ⟨satakeSpec, artinSpec⟩
+   ((SatakeHeckeDegreeBridge.degGLnT1 2 twistSpec.satakeSpec.q = twistSpec.satakeSpec.q + 1 ∧
+     SatakeHeckeDegreeBridge.degGLnT1 3 twistSpec.satakeSpec.q =
+       twistSpec.satakeSpec.q ^ 2 + twistSpec.satakeSpec.q + 1 ∧
+     SatakeHeckeDegreeBridge.degGLnT1 4 twistSpec.satakeSpec.q =
+       twistSpec.satakeSpec.q ^ 3 + twistSpec.satakeSpec.q ^ 2 + twistSpec.satakeSpec.q + 1 ∧
+     (twistSpec.satakeSpec.q - 1) * SatakeHeckeDegreeBridge.degGLnT1 4 twistSpec.satakeSpec.q =
+       twistSpec.satakeSpec.q ^ 4 - 1) ∧
+    ((twistSpec.satakeSpec.q - 1) * (twistSpec.satakeSpec.q ^ 2 - 1) *
+       SatakeHeckeDegreeBridge.qBinom4_2 twistSpec.satakeSpec.q =
+       (twistSpec.satakeSpec.q ^ 4 - 1) * (twistSpec.satakeSpec.q ^ 3 - 1) ∧
+     SatakeHeckeDegreeBridge.degGL4T2 twistSpec.satakeSpec.q =
+       twistSpec.satakeSpec.q ^ 2 * SatakeHeckeDegreeBridge.qBinom4_2 twistSpec.satakeSpec.q) ∧
+    (SatakeHeckeDegreeBridge.gsp4HeckeDegT1 twistSpec.satakeSpec.q =
+       SatakeHeckeDegreeBridge.degGLnT1 4 twistSpec.satakeSpec.q ∧
+     SatakeHeckeDegreeBridge.gsp4HeckeDegT2 twistSpec.satakeSpec.q =
+       twistSpec.satakeSpec.q * SatakeHeckeDegreeBridge.gsp4HeckeDegT1 twistSpec.satakeSpec.q ∧
+     0 < SatakeHeckeDegreeBridge.gsp4HeckeDegT1 twistSpec.satakeSpec.q ∧
+     0 < SatakeHeckeDegreeBridge.gsp4HeckeDegT2 twistSpec.satakeSpec.q)) ∧
+   (ArtinEpsilonTwistBridge.twistedConductor ArtinEpsilonTwistBridge.baseConductor11
+      ArtinEpsilonTwistBridge.chi4Conductor ArtinEpsilonTwistBridge.gl2Dimension = 176 ∧
+    (∀ w signChi : Int, ArtinEpsilonTwistBridge.IsRootNumber w → ArtinEpsilonTwistBridge.IsRootNumber signChi →
+      ArtinEpsilonTwistBridge.IsRootNumber (ArtinEpsilonTwistBridge.twistRootNumber w signChi) ∧
+      ArtinEpsilonTwistBridge.twistRootNumber (ArtinEpsilonTwistBridge.twistRootNumber w signChi) signChi = w) ∧
+    (∀ p : Nat, ∀ ap : Int, p % 2 = 1 →
+      (LanglandsRankinSelbergBridge.chi4 p * ap) ^ 2 - 4 * (p : Int) = ap ^ 2 - 4 * (p : Int))) ∧
+   (∀ (p : Nat) (a b : Int), p % 2 = 1 →
+      a ^ 2 < 4 * (p : Int) → b ^ 2 < 4 * (p : Int) →
+      ((LanglandsRankinSelbergBridge.chi4 p * a).natAbs * b.natAbs : Int) < 4 * (p : Int) ∧
+      2 * ((LanglandsRankinSelbergBridge.chi4 p * a).natAbs * b.natAbs : Int) < 8 * (p : Int))) ∧
+  ((QuasiRiemann.preperiodicTrapSpec_N1024.kappa ≤ QuasiRiemann.QRat.mk' 1 2 (by decide)) ∧
+   (QuasiRiemann.qsdJetStep (by decide) QuasiRiemann.qsdJet2_k2).tan = 0 ∧
+   (QuasiRiemann.preperiodicTrapSpec_N1024.boxSpec.lipNumerator *
+      QuasiRiemann.preperiodicTrapSpec_N1024.boxSpec.radius <
+    QuasiRiemann.preperiodicTrapSpec_N1024.boxSpec.centerLower *
+      (QuasiRiemann.preperiodicTrapSpec_N1024.boxSpec.radius -
+       QuasiRiemann.preperiodicTrapSpec_N1024.boxSpec.deltaShrink))) ∧
+  ((QuasiRiemann.preperiodicTrapSpec_N2048.kappa ≤ QuasiRiemann.QRat.mk' 1 2 (by decide)) ∧
+   (QuasiRiemann.qsdJetStep (by decide) QuasiRiemann.qsdJet2_k3).tan = 0 ∧
+   (QuasiRiemann.preperiodicTrapSpec_N2048.boxSpec.lipNumerator *
+      QuasiRiemann.preperiodicTrapSpec_N2048.boxSpec.radius <
+    QuasiRiemann.preperiodicTrapSpec_N2048.boxSpec.centerLower *
+      (QuasiRiemann.preperiodicTrapSpec_N2048.boxSpec.radius -
+       QuasiRiemann.preperiodicTrapSpec_N2048.boxSpec.deltaShrink))) ∧
+  ((QuasiRiemann.preperiodicTrapSpec_N4096.kappa ≤ QuasiRiemann.QRat.mk' 1 2 (by decide)) ∧
+   (QuasiRiemann.qsdJetStep (by decide) QuasiRiemann.qsdJet2_k4).tan = 0 ∧
+   (QuasiRiemann.preperiodicTrapSpec_N4096.boxSpec.lipNumerator *
+      QuasiRiemann.preperiodicTrapSpec_N4096.boxSpec.radius <
+    QuasiRiemann.preperiodicTrapSpec_N4096.boxSpec.centerLower *
+      (QuasiRiemann.preperiodicTrapSpec_N4096.boxSpec.radius -
+       QuasiRiemann.preperiodicTrapSpec_N4096.boxSpec.deltaShrink))) ∧
+  (let cert := QuasiRiemann.Rns4096.rns4096_lift_cert_50
+   (QuasiRiemann.QRat.ofInt 0 < QuasiRiemann.LuckySieve.survivalProductRat
+      (QuasiRiemann.LuckySieve.luckyGeneratorsUpTo 50) ∧
+    QuasiRiemann.QRat.ofInt 0 < QuasiRiemann.LuckySieve.luckyHarmonicRat
+      (QuasiRiemann.LuckySieve.luckyGeneratorsUpTo 50) ∧
+    (QuasiRiemann.LuckySieve.luckyPrefixUpTo 50).length = cert.luckyCert.luckyCert.countUpToN ∧
+    cert.luckyCert.luckyCert.harmonicLower ≤
+      QuasiRiemann.LuckySieve.luckyHarmonicRat (QuasiRiemann.LuckySieve.luckyGeneratorsUpTo 50) ∧
+    QuasiRiemann.LuckySieve.luckyHarmonicRat (QuasiRiemann.LuckySieve.luckyGeneratorsUpTo 50) ≤
+      cert.luckyCert.luckyCert.harmonicUpper ∧
+    QuasiRiemann.LuckySieve.survivalProductRat (QuasiRiemann.LuckySieve.luckyGeneratorsUpTo 50) ≤
+      cert.luckyCert.luckyCert.survivalUpper) ∧
+   (QuasiRiemann.QRat.ofInt 0 < QuasiRiemann.SieveSequence.survivalProductRat
+      (QuasiRiemann.SieveSequence.ulamGeneratorsUpTo 50) ∧
+    QuasiRiemann.QRat.ofInt 0 < QuasiRiemann.SieveSequence.sequenceHarmonicRat
+      (QuasiRiemann.SieveSequence.ulamGeneratorsUpTo 50) ∧
+    (QuasiRiemann.SieveSequence.ulamGeneratorsUpTo 50).length = cert.ulamCert.countUpToN ∧
+    cert.ulamCert.harmonicLower ≤
+      QuasiRiemann.SieveSequence.sequenceHarmonicRat (QuasiRiemann.SieveSequence.ulamGeneratorsUpTo 50) ∧
+    QuasiRiemann.SieveSequence.sequenceHarmonicRat (QuasiRiemann.SieveSequence.ulamGeneratorsUpTo 50) ≤
+      cert.ulamCert.harmonicUpper ∧
+    QuasiRiemann.SieveSequence.survivalProductRat (QuasiRiemann.SieveSequence.ulamGeneratorsUpTo 50) ≤
+      cert.ulamCert.survivalUpper) ∧
+   (QuasiRiemann.Rns4096.garnerReconstruct4 (4096 % QuasiRiemann.Rns4096.m1)
+      (4096 % QuasiRiemann.Rns4096.m2) (4096 % QuasiRiemann.Rns4096.m3)
+      (4096 % QuasiRiemann.Rns4096.m4) = 4096) ∧
+   (¬ QuasiRiemann.QRat.eqv
+      (QuasiRiemann.Rns4096.rns4096PairBox 4096 cert.theta cert.h_theta).stepContract
+      (QuasiRiemann.QRat.ofInt 0)) ∧
+   (0 < (QuasiRiemann.Rns4096.rns4096PairBox 4096 cert.theta cert.h_theta).stepContract.num) ∧
+   (¬ QuasiRiemann.QRat.eqv
+      (QuasiRiemann.reflectHalf
+        (QuasiRiemann.reflectHalf
+          (QuasiRiemann.Rns4096.rns4096PairBox 4096 cert.theta cert.h_theta).stepContract))
+      (QuasiRiemann.QRat.ofInt 0)) ∧
+   (QuasiRiemann.halfQRat < cert.theta ∧ cert.theta < QuasiRiemann.QRat.ofInt 1))
+
+/-- Zero-axiom certificate for Langlands-Hecke, QSD jet Hensel contraction, and RNS-4096 provenance. -/
+theorem langlandsHecke_provenance_certified : LanglandsHeckeProvenance :=
+  ⟨SatakeHeckeDegreeBridge.satake_hecke_degree_bridge ⟨2, by decide⟩,
+   RankinSelbergSchurBoundWeave.rankin_selberg_schur_bound_weave
+     ⟨QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankinSelbergGSp4Rung32000Spec⟩,
+   ArtinEpsilonTwistBridge.artin_epsilon_twist_bridge
+     ⟨QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankinSelbergGSp4Rung32000Spec⟩,
+   LanglandsTwistHeckeWeave.langlands_twist_hecke_weave
+     ⟨⟨2, by decide⟩, ⟨QuasiRiemann.RankinSelbergGSp4Sub78Bridge.rankinSelbergGSp4Rung32000Spec⟩⟩,
+   QuasiRiemann.qsd_jet_hensel_contraction_cert_N1024,
+   QuasiRiemann.qsd_jet_hensel_contraction_cert_N2048,
+   QuasiRiemann.qsd_jet_hensel_contraction_cert_N4096,
+   QuasiRiemann.Rns4096.rns4096_lift_cert_50_eval⟩
+
+-- =============================================================================
 -- Master Zero-Axiom Provenance Theorem (All 11 CLI Parts)
 -- =============================================================================
 
@@ -2637,7 +2813,8 @@ def LeanAsmFullProvenance : Prop :=
   CrtNttProvenance ∧
   ChudnovskyPiProvenance ∧
   ProthNttTowerProvenance ∧
-  ValuationDynamicsProvenance
+  ValuationDynamicsProvenance ∧
+  LanglandsHeckeProvenance
 
 theorem leanasm_full_provenance_certified : LeanAsmFullProvenance :=
   ⟨miniVm_provenance_certified,
@@ -2649,7 +2826,8 @@ theorem leanasm_full_provenance_certified : LeanAsmFullProvenance :=
    crtNtt_provenance_certified,
    chudnovskyPi_provenance_certified,
    prothNttTower_provenance_certified,
-   valuation_dynamics_provenance_certified⟩
+   valuation_dynamics_provenance_certified,
+   langlandsHecke_provenance_certified⟩
 
 end LeanAsm
 
