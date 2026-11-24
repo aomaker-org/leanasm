@@ -83,7 +83,7 @@ boundaries, and repository hygiene for all assistants operating within the
   are strictly additive.
 
 ### [Directive 08] AUTOMATED TURN-SYNC HANDOVER
-- Run `make sync` at turn completion to verify git status, run tests, and check
-  cleanliness.
+- Run `make sync` at turn completion when Lean code or build targets change;
+  skip redundant runs on merge-only or docs-only turns unless requested.
 
 <!-- end of file: leanasm/AI.md -->
