@@ -18,6 +18,7 @@ import LeanAsm.QuasiRiemann.ContractionReflectionBridge
 import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 import LeanAsm.QuasiRiemann.SieveRnsCrtBoxWeave
 import LeanAsm.QuasiRiemann.Rns4096ContractionLift
+import LeanAsm.QuasiRiemann.ProthRns8192Expansion
 import LeanAsm.QuasiRiemann.QsdJetHenselContraction
 
 #print axioms MiniVM.get_set_same
@@ -1552,5 +1553,39 @@ import LeanAsm.QuasiRiemann.QsdJetHenselContraction
 #print axioms LeanAsm.langlandsHecke_provenance_certified
 #print axioms LeanAsm.LeanAsmFullProvenance
 #print axioms LeanAsm.leanasm_full_provenance_certified
+
+-- =============================================================================
+-- Part 97: 4-Channel Proth & Mersenne RNS Expansion for N=8192+ (Issue #239)
+-- =============================================================================
+
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.moduli8192_coprime
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.dynamic_range_8192_sound
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.garner_inverses_sound
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.garner_inverses_int_sound
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.ntt_twiddle_roots_sound
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.inv_two_channels_sound
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.natToRns8192_residues
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.natToRns8192_moduli
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.garner_reconstruct_8192_eq
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.garner_reconstruct_16384_eq
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.garner_reconstruct_soundness_certs
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.rns8192_pair_box_step_contract_ne_zero
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.rns8192_pair_box_step_contract_pos
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.rns8192_pair_box_reflect_half_exclusion
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.rns16384_pair_box_step_contract_ne_zero
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.rns16384_pair_box_step_contract_pos
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.rns16384_pair_box_reflect_half_exclusion
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.rns8192_contraction_preserves_pos_O1
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.rns16384_contraction_preserves_pos_O1
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.rns_contraction_preserves_pos_generic
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.nttButterflyStep_bounds
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.ntt8192_ch2_butterfly_invariant
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.ntt8192_ch3_butterfly_invariant
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.ntt8192_ch4_butterfly_invariant
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.ntt16384_ch2_butterfly_invariant
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.ntt16384_ch3_butterfly_invariant
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.ntt16384_ch4_butterfly_invariant
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.proth_rns8192_contraction_lift
+#print axioms LeanAsm.QuasiRiemann.ProthRns8192.proth_rns8192_lift_cert_50_eval
 
 -- end of file: leanasm/tests/TestAxioms.lean
