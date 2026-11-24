@@ -32,11 +32,16 @@ boundaries, and repository hygiene for all assistants operating within the
   `lake build <target>` tool commands, assistants MUST explicitly prefix them
   with `LEAN_OPTS="-M4096"` (or host-appropriate cap). Ongoing architecture
   work targets finer-grained modularization so units stay fast and lightweight.
-- **Background Task & Timer Hygiene**: NEVER call `Schedule` or polling loops
-  to watch long-running `make` or `lake` background tasks, and do not
-  repeatedly call `ManageTask` on the same task ID (check/update a task ID at
-  most once per step and proceed directly); run builds synchronously or end
-  your turn and let the CLI harness auto-wake on task completion.
+- **Background Task & Timer Hygiene**: One-shot 1-to-2-minute `Schedule`
+  wake-up check-ins (`maxIterations=1`) are permitted during or between heavy
+  `make` / `lake` steps to provide signs of life and check `free -h`, swap,
+  `uptime`, and build log progress, with proactive replanning or decomposition
+  on high load (never spawning overlapping builds). Sub-minute polling loops,
+  repeated `ManageTask` calls on the same task ID (check/update at most once
+  per step and proceed directly), `> /dev/null`, `|| true`, and running
+  `lake build` inside read-only `subrepos/alpo-rh` remain strictly banned.
+  Otherwise, run builds synchronously or end your turn and let the CLI harness
+  auto-wake on task completion.
 - **Safe Shell Usage**: Always use standard Linux bash.
 
 ### [Directive 02] LOGGING & DIAGNOSTIC OBSERVABILITY
@@ -63,10 +68,10 @@ boundaries, and repository hygiene for all assistants operating within the
 ### [Directive 07] GIT BRANCHING & WORKFLOW STANDARDS
 - **Branch-Per-Feature Mandate**: Work in dedicated feature branches
   (`feature/*`, `refactor/*`, `fix/*`, `chore/*`).
-- **Issue-Before-PR Default**: Always check for or create a tracking GitHub
-  issue before opening a pull request. Every PR must reference its tracking
-  issue (e.g. `fixes #N` or `(#N)`), with narrow exceptions only for urgent
-  hotfixes or explicit user override.
+- **Issue-Before-PR Mandate**: Tracking GitHub issues are strictly
+  mandatory before opening a pull request, with zero exceptions. Always check
+  for or create a tracking GitHub issue first, and ensure every PR references
+  its tracking issue (e.g. `fixes #N`, `closes #N`, or `(#N)`).
 - **History Immutability**: Git history must NEVER be overwritten, squashed,
   or destroyed (`git reset --hard` and `git clean -fd` are prohibited).
 - **Additive Artifact Operations**: Generated traces and execution logs
