@@ -18,6 +18,7 @@ import LeanAsm.QuasiRiemann.ContractionReflectionBridge
 import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 import LeanAsm.QuasiRiemann.SieveRnsCrtBoxWeave
 import LeanAsm.QuasiRiemann.Rns4096ContractionLift
+import LeanAsm.QuasiRiemann.QsdJetHenselContraction
 
 #print axioms MiniVM.get_set_same
 #print axioms MiniVM.get_set_other
@@ -1525,5 +1526,22 @@ import LeanAsm.QuasiRiemann.Rns4096ContractionLift
 #print axioms LeanAsm.QuasiRiemann.Rns4096.sieve_contraction_bounds_in_strip
 #print axioms LeanAsm.QuasiRiemann.Rns4096.rns4096_contraction_lift
 #print axioms LeanAsm.QuasiRiemann.Rns4096.rns4096_lift_cert_50_eval
+
+-- =============================================================================
+-- Part 95: Higher-Order QSD Jet Hensel Contraction & Preperiodic Trapping (Issue #230)
+-- =============================================================================
+
+#print axioms QuasiRiemann.kappaContractionRat
+#print axioms QuasiRiemann.kappa_le_half
+#print axioms QuasiRiemann.mod2k_pos
+#print axioms QuasiRiemann.qsd_jet_tan_sq_vanish_k2
+#print axioms QuasiRiemann.qsd_jet_tan_sq_vanish_k3
+#print axioms QuasiRiemann.qsd_jet_tan_sq_vanish_k4
+#print axioms QuasiRiemann.preperiodic_cycle_trapping_bound
+#print axioms QuasiRiemann.rationalBoxSpec_N4096
+#print axioms QuasiRiemann.qsd_jet_hensel_contraction_master
+#print axioms QuasiRiemann.qsd_jet_hensel_contraction_cert_N1024
+#print axioms QuasiRiemann.qsd_jet_hensel_contraction_cert_N2048
+#print axioms QuasiRiemann.qsd_jet_hensel_contraction_cert_N4096
 
 -- end of file: leanasm/tests/TestAxioms.lean
