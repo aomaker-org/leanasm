@@ -28,9 +28,10 @@ boundaries, and repository hygiene for all assistants operating within the
   `-M 4096` / `LEAN_OPTS="-M4096"` and checking rolling build telemetry
   regression against `.lake/build-history.json` or via
   `python3 scripts/inspect_build_history.py`). Full unbounded concurrent builds
-  (`lake build`) risk exhausting system memory. Ongoing architecture work
-  targets finer-grained modularization so individual units remain fast and
-  lightweight.
+  (`lake build`) risk exhausting system memory; when running direct or ad-hoc
+  `lake build <target>` tool commands, assistants MUST explicitly prefix them
+  with `LEAN_OPTS="-M4096"` (or host-appropriate cap). Ongoing architecture
+  work targets finer-grained modularization so units stay fast and lightweight.
 - **Background Task & Timer Hygiene**: NEVER call `Schedule` or polling loops
   to watch long-running `make` or `lake` background tasks, and do not
   repeatedly call `ManageTask` on the same task ID (check/update a task ID at

@@ -17,6 +17,7 @@ import LeanAsm.QuasiRiemann.StepanovQrhLadderWeave
 import LeanAsm.QuasiRiemann.ContractionReflectionBridge
 import LeanAsm.QuasiRiemann.MollifierVariationalBridge
 import LeanAsm.QuasiRiemann.SieveRnsCrtBoxWeave
+import LeanAsm.QuasiRiemann.Rns4096ContractionLift
 
 #print axioms MiniVM.get_set_same
 #print axioms MiniVM.get_set_other
@@ -1505,5 +1506,24 @@ import LeanAsm.QuasiRiemann.SieveRnsCrtBoxWeave
 #print axioms LanglandsTwistHeckeWeave.rs_ramanujan_twist_product_bound
 #print axioms LanglandsTwistHeckeWeave.satake_degree_twist_invariant
 #print axioms LanglandsTwistHeckeWeave.langlands_twist_hecke_weave
+
+-- =============================================================================
+-- Part 94: 4-Channel Mersenne/Proth RNS Ring & CRT Box Contraction Lift (Issue #231)
+-- =============================================================================
+
+#print axioms LeanAsm.QuasiRiemann.Rns4096.moduli4096_coprime
+#print axioms LeanAsm.QuasiRiemann.Rns4096.dynamic_range_4096_sound
+#print axioms LeanAsm.QuasiRiemann.Rns4096.garner_inverses_sound
+#print axioms LeanAsm.QuasiRiemann.Rns4096.natToRns4096_residues
+#print axioms LeanAsm.QuasiRiemann.Rns4096.natToRns4096_moduli
+#print axioms LeanAsm.QuasiRiemann.Rns4096.garner_reconstruct_4096_eq
+#print axioms LeanAsm.QuasiRiemann.Rns4096.garner_reconstruct_soundness_certs
+#print axioms LeanAsm.QuasiRiemann.Rns4096.rns4096_pair_box_step_contract_ne_zero
+#print axioms LeanAsm.QuasiRiemann.Rns4096.rns4096_pair_box_step_contract_pos
+#print axioms LeanAsm.QuasiRiemann.Rns4096.rns4096_pair_box_reflect_half_exclusion
+#print axioms LeanAsm.QuasiRiemann.Rns4096.rns4096_contraction_sound
+#print axioms LeanAsm.QuasiRiemann.Rns4096.sieve_contraction_bounds_in_strip
+#print axioms LeanAsm.QuasiRiemann.Rns4096.rns4096_contraction_lift
+#print axioms LeanAsm.QuasiRiemann.Rns4096.rns4096_lift_cert_50_eval
 
 -- end of file: leanasm/tests/TestAxioms.lean
