@@ -105,6 +105,7 @@ import LeanAsm.QuasiRiemann.StepanovQrhLadderWeave
 import LeanAsm.QuasiRiemann.RankinSelbergGSp4Sub78Bridge
 import LeanAsm.QuasiRiemann.JacobianRankinSelbergWeave
 import LeanAsm.QuasiRiemann.SieveRnsCrtBoxWeave
+import LeanAsm.QuasiRiemann.Rns4096ContractionLift
 import LeanAsm.MiniVMRnsHenselWeave
 import LeanAsm.ProvenanceSummary
 
