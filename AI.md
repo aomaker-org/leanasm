@@ -21,17 +21,26 @@ boundaries, and repository hygiene for all assistants operating within the
   free of Mathlib dependencies; all proven theorems MUST reduce solely to
   `[propext, Quot.sound]` (zero `Classical.choice`, zero `sorryAx`), verified
   via `make axioms` (`lake env lean tests/TestAxioms.lean`).
-- **Preferred Build Strategy**: To prevent RAM thrashing and OOM terminations
-  on heavy modules (e.g., `UltraDeep108N2048Part1/2`, `UltraDeep108N1024`,
-  `CrtNtt`), assistants MUST prefer sequential, heap-capped elaboration via
-  `make build-seq` or `python3 tools/incremental_build.py` (enforcing
-  `-M 4096` / `LEAN_OPTS="-M4096"` and checking rolling build telemetry
-  regression against `.lake/build-history.json` or via
+- **Zero-Trust State Verification**: Always verify local, git, and remote state
+  directly via execution logs rather than trusting unverified claims.
+- **Scope & Interview Schedule Boundary**: Defer heavy `leanasm` proof/build
+  churn and WSL2 RAM/host configuration changes until after the Dec 2, 2026
+  Microsoft Silicon Validation Engineer interview.
+- **Preferred Build Strategy & Resource Guardrails**: To prevent RAM thrashing
+  and OOM terminations on heavy modules (e.g., `UltraDeep108N2048Part1/2`,
+  `UltraDeep108N1024`, `CrtNtt`), assistants MUST prefer sequential, heap-capped
+  elaboration via `make build-seq` or `python3 tools/incremental_build.py`
+  (enforcing `-M 4096` or host-appropriate `-M 2048` caps and checking rolling
+  build telemetry regression against `.lake/build-history.json` or via
   `python3 scripts/inspect_build_history.py`). Full unbounded concurrent builds
   (`lake build`) risk exhausting system memory; when running direct or ad-hoc
   `lake build <target>` tool commands, assistants MUST explicitly prefix them
-  with `LEAN_OPTS="-M4096"` (or host-appropriate cap). Ongoing architecture
-  work targets finer-grained modularization so units stay fast and lightweight.
+  with `LEAN_OPTS="-M4096"` (or host-appropriate cap).
+- **Timed Build & Watchdog Check-ins**: When executing or monitoring builds
+  (including remote build timing tests), enforce a 5-minute resource check
+  interval inspecting memory (`free -h`, `vmstat`, `df -h`) and checking for
+  external `"stop work"` markers, halting immediately if thrashing or stalls
+  occur.
 - **Background Task & Timer Hygiene**: One-shot 1-to-2-minute `Schedule`
   wake-up check-ins (`maxIterations=1`) are permitted during or between heavy
   `make` / `lake` steps to provide signs of life and check `free -h`, swap,
