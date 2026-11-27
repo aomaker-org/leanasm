@@ -4,6 +4,7 @@
 import LeanAsm
 import LeanAsm.ArtinEpsilonTwistBridge
 import LeanAsm.LanglandsTwistHeckeWeave
+import LeanAsm.LanglandsSegmentBridge
 import LeanAsm.QuasiRiemann.Valuation.Ultrametric
 import LeanAsm.QuasiRiemann.Valuation.Contraction
 import LeanAsm.QuasiRiemann.Valuation.Hensel
@@ -1587,5 +1588,28 @@ import LeanAsm.QuasiRiemann.QsdJetHenselContraction
 #print axioms LeanAsm.QuasiRiemann.ProthRns8192.ntt16384_ch4_butterfly_invariant
 #print axioms LeanAsm.QuasiRiemann.ProthRns8192.proth_rns8192_contraction_lift
 #print axioms LeanAsm.QuasiRiemann.ProthRns8192.proth_rns8192_lift_cert_50_eval
+
+-- =============================================================================
+-- Part 98: Bernstein-Zelevinsky Segment & Weil-Deligne Transport (Issue #240)
+-- =============================================================================
+
+#print axioms LanglandsSegmentBridge.segDim_pos
+#print axioms LanglandsSegmentBridge.segDual_dim
+#print axioms LanglandsSegmentBridge.segDual_involutive
+#print axioms LanglandsSegmentBridge.segTwist_dim
+#print axioms LanglandsSegmentBridge.segSumDim_append
+#print axioms LanglandsSegmentBridge.segSumDual_dim
+#print axioms LanglandsSegmentBridge.segSumTwist_dim
+#print axioms LanglandsSegmentBridge.segmentToWD_dim
+#print axioms LanglandsSegmentBridge.segmentToWD_nilp
+#print axioms LanglandsSegmentBridge.WDRel_refl
+#print axioms LanglandsSegmentBridge.WDRel_symm
+#print axioms LanglandsSegmentBridge.WDRel_trans
+#print axioms LanglandsSegmentBridge.place_transport_preserves_wd
+#print axioms LanglandsSegmentBridge.twistWD_dim
+#print axioms LanglandsSegmentBridge.twistWD_nilp
+#print axioms LanglandsSegmentBridge.twistWD_conductor
+#print axioms LanglandsSegmentBridge.segmentToWD_twist_comm
+#print axioms LanglandsSegmentBridge.langlandsSegmentMasterCert
 
 -- end of file: leanasm/tests/TestAxioms.lean
