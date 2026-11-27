@@ -93,6 +93,7 @@ import LeanAsm.SatakeHeckeDegreeBridge
 import LeanAsm.RankinSelbergSchurBoundWeave
 import LeanAsm.ArtinEpsilonTwistBridge
 import LeanAsm.LanglandsTwistHeckeWeave
+import LeanAsm.LanglandsSegmentBridge
 import LeanAsm.ProthNttTowerBridge
 import LeanAsm.Genus2MultiPrimeWeil
 import LeanAsm.Genus2WeilGSp4Weave
