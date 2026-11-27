@@ -108,6 +108,7 @@ import LeanAsm.QuasiRiemann.RankinSelbergGSp4Sub78Bridge
 import LeanAsm.QuasiRiemann.JacobianRankinSelbergWeave
 import LeanAsm.QuasiRiemann.SieveRnsCrtBoxWeave
 import LeanAsm.QuasiRiemann.Rns4096ContractionLift
+import LeanAsm.QuasiRiemann.HigherRungRnsBridge
 import LeanAsm.QuasiRiemann.ProthRns8192Expansion
 import LeanAsm.QuasiRiemann.QsdJetHenselContraction
 import LeanAsm.MiniVMRnsHenselWeave
