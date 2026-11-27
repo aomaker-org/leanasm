@@ -5,6 +5,7 @@ import LeanAsm
 import LeanAsm.ArtinEpsilonTwistBridge
 import LeanAsm.LanglandsTwistHeckeWeave
 import LeanAsm.LanglandsSegmentBridge
+import LeanAsm.UnitarySymplecticCongruence
 import LeanAsm.QuasiRiemann.Valuation.Ultrametric
 import LeanAsm.QuasiRiemann.Valuation.Contraction
 import LeanAsm.QuasiRiemann.Valuation.Hensel
@@ -1611,5 +1612,21 @@ import LeanAsm.QuasiRiemann.QsdJetHenselContraction
 #print axioms LanglandsSegmentBridge.twistWD_conductor
 #print axioms LanglandsSegmentBridge.segmentToWD_twist_comm
 #print axioms LanglandsSegmentBridge.langlandsSegmentMasterCert
+
+-- =============================================================================
+-- Part 99: Unitary & Symplectic Involution & Congruence Subgroups (Issue #241)
+-- =============================================================================
+
+#print axioms UnitarySymplecticCongruence.sympJ2_is_skew_herm
+#print axioms UnitarySymplecticCongruence.sympJ4_is_skew_herm
+#print axioms UnitarySymplecticCongruence.matOne2_preserves_sympJ2
+#print axioms UnitarySymplecticCongruence.matOne4_preserves_sympJ4
+#print axioms UnitarySymplecticCongruence.matOne_mem_princCong
+#print axioms UnitarySymplecticCongruence.matOne2_mem_princCong
+#print axioms UnitarySymplecticCongruence.matOne4_mem_princCong
+#print axioms UnitarySymplecticCongruence.matOne4_mem_princCongSp2
+#print axioms UnitarySymplecticCongruence.gsp4_hecke_congruence_compat
+#print axioms UnitarySymplecticCongruence.hecke_deg_gl4_congruence_level
+#print axioms UnitarySymplecticCongruence.unitary_symplectic_congruence_master_cert
 
 -- end of file: leanasm/tests/TestAxioms.lean
