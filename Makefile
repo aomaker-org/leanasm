@@ -52,12 +52,24 @@ run:
 	$(LAKE) exe leanasm
 
 test: build
-	@echo "[+] Running Lean executable test..."
-	@$(LAKE) exe leanasm
-	@echo "[+] Lean executable ran successfully."
+	@echo "[+] [timing] Starting Lean executable test suite..."
+	@start_ts=$$(date +%s); \
+	$(LAKE) exe leanasm; \
+	rc=$$?; \
+	end_ts=$$(date +%s); \
+	elapsed=$$((end_ts - start_ts)); \
+	echo "[+] [timing] Lean executable test finished in $${elapsed}s (exit code $$rc)."; \
+	exit $$rc
 
 axioms:
-	$(LAKE) env $(LEAN) tests/TestAxioms.lean
+	@echo "[+] [timing] Starting axioms verification..."
+	@start_ts=$$(date +%s); \
+	$(LAKE) env $(LEAN) tests/TestAxioms.lean; \
+	rc=$$?; \
+	end_ts=$$(date +%s); \
+	elapsed=$$((end_ts - start_ts)); \
+	echo "[+] [timing] Axioms verification finished in $${elapsed}s (exit code $$rc)."; \
+	exit $$rc
 
 check:
 	$(LEAN) Main.lean
@@ -75,8 +87,15 @@ status:
 	@echo "Git Head:  $$(git rev-parse --short HEAD)"
 	@git status --short
 
-sync: status test
-	@echo "[+] Workspace synced and verified."
+sync: status
+	@echo "[+] [timing] Starting turn synchronization (make sync)..."
+	@sync_start=$$(date +%s); \
+	$(MAKE) test; \
+	rc=$$?; \
+	sync_end=$$(date +%s); \
+	sync_elapsed=$$((sync_end - sync_start)); \
+	echo "[+] [timing] Workspace sync completed in $${sync_elapsed}s (exit code $$rc)."; \
+	exit $$rc
 
 # ------------------------------------------------------------------------------
 # Yang-Mills Verification & Exploration Targets
