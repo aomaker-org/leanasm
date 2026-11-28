@@ -22,6 +22,7 @@ import LeanAsm.QuasiRiemann.SieveRnsCrtBoxWeave
 import LeanAsm.QuasiRiemann.Rns4096ContractionLift
 import LeanAsm.QuasiRiemann.ProthRns8192Expansion
 import LeanAsm.QuasiRiemann.QsdJetHenselContraction
+import LeanAsm.QuasiRiemann.HigherRungRnsBridge
 
 #print axioms MiniVM.get_set_same
 #print axioms MiniVM.get_set_other
@@ -1628,5 +1629,17 @@ import LeanAsm.QuasiRiemann.QsdJetHenselContraction
 #print axioms UnitarySymplecticCongruence.gsp4_hecke_congruence_compat
 #print axioms UnitarySymplecticCongruence.hecke_deg_gl4_congruence_level
 #print axioms UnitarySymplecticCongruence.unitary_symplectic_congruence_master_cert
+
+-- =============================================================================
+-- Part 100: Higher-Rung Dyadic-Abel & RNS-4096 Contraction Lift (Issue #242)
+-- =============================================================================
+
+#print axioms QuasiRiemann.qrat_lt_trans
+#print axioms QuasiRiemann.qrhShortExponent_rung_ge_7_lt_rung6
+#print axioms QuasiRiemann.qrhShortExponent_gt_half
+#print axioms QuasiRiemann.qrhShortExponent_lt_seven_eighths
+#print axioms QuasiRiemann.qrhDualFraction_gt_seven_eighths
+#print axioms QuasiRiemann.higher_rung_rns4096_contraction_sound
+#print axioms QuasiRiemann.higher_rung_dyadic_abel_rns4096_master_cert
 
 -- end of file: leanasm/tests/TestAxioms.lean
